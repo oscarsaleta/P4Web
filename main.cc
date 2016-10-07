@@ -1,18 +1,20 @@
 #include "MyApplication.h"
 
-#include <Wt/Server>
+#include <Wt/WServer>
 
-Wt::WApplication *createApplication(const Wt::WEnvironment &env)
+using namespace Wt;
+
+WApplication *createApplication(const WEnvironment &env)
 {
-    return new MyApplication();
+    return new MyApplication(env);
 }
 
 int main (int argc, char **argv)
 {
     try {
-        Wt::WServer server = new WServer(argc, argv, WTHTTP_CONFIGURATION);
-        server.addEntryPoint(Wt::Application,createApplication);
-        server.run();
+        WServer *server = new WServer(argc, argv, WTHTTP_CONFIGURATION);
+        server->addEntryPoint(Wt::Application,createApplication);
+        server->run();
     } catch (Wt::WServer::Exception &e) {
         std::cerr << e.what() << std::endl;
     } catch (std::exception &e) {

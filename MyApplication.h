@@ -3,16 +3,18 @@
 
 #include <Wt/WApplication>
 
-class MainUI;
+#include "MainUI.h"
 
-class MyApplication : Wt::WApplication
+
+
+class MyApplication : public Wt::WApplication
 {
 public:
-    MyApplication(const Wt::WEnvironment &e);
+    MyApplication(const Wt::WEnvironment &env);
     ~MyApplication();
     
 private:
-    MainUI mainUI_;
+    MainUI *mainUI_;
 };
 
 #endif // __MYAPPLICATION_H_INCLUDED__

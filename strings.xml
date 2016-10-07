@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<messages>
+  <message id="differential.system.title.box">
+    Differential system:
+  </message>
+
+  <message id="x.prime.label">
+    x':
+  </message>
+
+  <message id="y.prime.label">
+    y':
+  </message>
+
+</messages>

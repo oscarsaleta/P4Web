@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<messages>
+
+  <message id="homeleft.fuploadboxtitle">
+    Load configuration file:
+  </message>
+
+  <message id="homeleft.equationboxtitle">
+    Differential system:
+  </message>
+
+  <message id="homeleft.xprimelabel">
+    x':
+  </message>
+
+  <message id="homeleft.yprimelabel">
+    y':
+  </message>
+
+  <message id="homeright.outputboxtitle">
+    Application output
+  </message>
+
+</messages>
