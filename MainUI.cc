@@ -35,6 +35,9 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     root_->setStyleClass(WString::fromUTF8("container"));
     root_->setInline(false);
 
+
+    /* start of navbar*/
+
     // define navbar
     navbar_ = new WNavigationBar(root_);
     navbar_->setId("navbar_");
@@ -107,6 +110,7 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     nvRightPopupButton_->setMenu(nvRightPopup_);
     nvRightMenu_->addItem(nvRightPopupButton_);
 
+    /* end of navbar */
 
 
     leftContainer_ = new HomeLeft(root_);

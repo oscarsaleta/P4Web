@@ -15,6 +15,10 @@ body{
 	overflow-y      : auto ;
 }
 
+.btn.disabled {
+  cursor: normal;
+}
+
 
 /* settings for double panel pages */
 #mainContainer_ {
@@ -48,11 +52,6 @@ body{
   display: inline;
   width: 90%;
   font-size: 14px;
-  margin-bottom: 10px;
-}
-
-
-#fileUploadButton_ {
   margin-bottom: 10px;
 }
 

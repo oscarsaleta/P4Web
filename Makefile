@@ -5,9 +5,11 @@ target: all
 	
 all: main
 
+# Main executable
 main: main.o MyApplication.o MainUI.o HomeLeft.o HomeRight.o
 	g++ $(FLAGS) main.o MyApplication.o MainUI.o HomeLeft.o HomeRight.o -o main -lwthttp $(TAIL)
 
+# Objects compilation
 main.o: main.cc
 	g++ $(FLAGS) -c main.cc -lwhttp $(TAIL)
 
@@ -23,9 +25,14 @@ HomeLeft.o: HomeLeft.cc HomeLeft.h
 HomeRight.o: HomeRight.cc HomeRight.h
 	g++ $(FLAGS) -c HomeRight.cc $(TAIL)
 
+
+
+
+# Cleaning directives
 clean:
 	rm *o main
 
+# Running directives
 run: all
 	./main --docroot . --http-address 0.0.0.0 --http-port 8080
 	
