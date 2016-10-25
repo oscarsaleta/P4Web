@@ -1,5 +1,6 @@
-FLAGS= -std=gnu++11 -Wall -g
-TAIL= -lwt
+CFLAGS= -std=gnu++14 -Wall -g
+LFLAGS= -lwt
+HTTPFLAGS= -lwthttp
 
 target: all
 	
@@ -7,23 +8,23 @@ all: main
 
 # Main executable
 main: main.o MyApplication.o MainUI.o HomeLeft.o HomeRight.o
-	g++ $(FLAGS) main.o MyApplication.o MainUI.o HomeLeft.o HomeRight.o -o main -lwthttp $(TAIL)
+	g++ $(CFLAGS) main.o MyApplication.o MainUI.o HomeLeft.o HomeRight.o -o main $(HTTPFLAGS) $(LFLAGS)
 
 # Objects compilation
 main.o: main.cc
-	g++ $(FLAGS) -c main.cc -lwhttp $(TAIL)
+	g++ $(CFLAGS) -c main.cc -lwhttp $(LFLAGS)
 
 MyApplication.o: MyApplication.cc MyApplication.h
-	g++ $(FLAGS) -c MyApplication.cc $(TAIL)
+	g++ $(CFLAGS) -c MyApplication.cc $(LFLAGS)
 
 MainUI.o: MainUI.cc MainUI.h
-	g++ $(FLAGS) -c MainUI.cc $(TAIL)
+	g++ $(CFLAGS) -c MainUI.cc $(LFLAGS)
 
 HomeLeft.o: HomeLeft.cc HomeLeft.h
-	g++ $(FLAGS) -c HomeLeft.cc $(TAIL)
+	g++ $(CFLAGS) -c HomeLeft.cc $(LFLAGS)
 
 HomeRight.o: HomeRight.cc HomeRight.h
-	g++ $(FLAGS) -c HomeRight.cc $(TAIL)
+	g++ $(CFLAGS) -c HomeRight.cc $(LFLAGS)
 
 
 

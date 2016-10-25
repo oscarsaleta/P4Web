@@ -9,19 +9,17 @@
 #include <vector>
 
 #include <Wt/WBreak>
-//#include <Wt/WFileResource>
 #include <Wt/WFileUpload>
 #include <Wt/WGroupBox>
 #include <Wt/WPushButton>
 #include <Wt/WText>
 #include <Wt/WLength>
 #include <Wt/WLineEdit>
-
-//#include "custom.h"
+#include <Wt/WString>
 
 using namespace Wt;
 
-HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent)
+HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluated_(this)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
@@ -103,6 +101,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent)
     saveButton_->setMargin(10,Left);
     saveButton_->setEnabled(false);
     equationsBox_->addWidget(saveButton_);
+    saveButton_->hide();
 
     saveButton_->clicked().connect(this,&HomeLeft::saveFile);
 
@@ -134,7 +133,22 @@ void HomeLeft::fileUploaded()
 {
     fileUploadButton_->setEnabled(false);
     fileUploadName_ = fileUploadWidget_->spoolFileName();
-    fileUploadButton_->setText(WString::fromUTF8(fileUploadName_));
+    /* aqui toca llegir el fitxer i omplir els camps */
+
+    std::ifstream f;
+    std::string line;
+    f.open(fileUploadName_.c_str());
+    if (f.is_open()) {
+        for (int i=0; i<=12; i++) {
+            getline(f,line);
+            if (i==11)
+                xEquationInput_->setText(WString::fromUTF8(line));
+            else if (i==12)
+                yEquationInput_->setText(WString::fromUTF8(line));
+        }
+        evalButton_->setEnabled(true);
+    }
+    
 }
 
 void HomeLeft::fileTooLarge()
@@ -178,9 +192,6 @@ void HomeLeft::prepareMapleFile()
 
     if (mplFile.is_open())
         fillMapleScript(fileUploadName_,mplFile);
-    
-    evalButton_->setText(WString::fromUTF8(fileUploadName_));
-
 }
 // TODO: llegir del fitxer uploaded el camp i ficar-lo als LineEdits i al .mpl
 
@@ -198,11 +209,13 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
     WString str_removecmd = "rm";
     WString str_simplify = "false";
     WString str_simplifycmd = "proc(expr) try radsimp(simplify(expr),ratdenom) catch: simplify(expr) end try end";
-    WString str_critpoints = "1";
+    WString str_critpoints = "0";
     WString str_saveall = "false";
     WString str_vectable = fname+"_vec.tab";
     WString str_fintab = fname+"_fin.tab";
     WString str_finres = fname+"_fin.res";
+    WString str_inftab = fname+"_inf.tab";
+    WString str_infres = fname+"_inf.res";
     WString str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
     WString str_gcf = "0";
     WString str_numeric = "true";
@@ -235,19 +248,21 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
     f << "vec_table := \"" << str_vectable << "\":" << std::endl;
     f << "finite_table := \"" << str_fintab << "\":" << std::endl;
     f << "finite_res := \"" << str_finres << "\":" << std::endl;
+    f << "infinite_table := \"" << str_inftab << "\":" << std::endl;
+    f << "infinite_res := \"" << str_infres << "\":" << std::endl;
     f << "user_f := " << str_userf << ":" << std::endl;
-    f << "user_gcf := " << str_gcf << std::endl;
-    f << "user_numeric :=" << str_numeric << std::endl;
-    f << "epsilon := " << str_epsilon << std::endl;
-    f << "test_sep := " << str_testsep << std::endl;
-    f << "user_precision := " << str_precision << std::endl;
-    f << "user_precision0 := " << str_precision0 << std::endl;
-    f << "taylor_level := " << str_taylor << std::endl;
-    f << "numeric_level := " << str_numericlevel << std::endl;
-    f << "max_level := " << str_maxlevel << std::endl;
-    f << "weakness_level := " << str_weaklevel << std::endl;
-    f << "user_p := " << str_userp << std::endl;
-    f << "user_q := " << str_userq << std::endl;
+    f << "user_gcf := " << str_gcf << ":" << std::endl;
+    f << "user_numeric :=" << str_numeric << ":" << std::endl;
+    f << "epsilon := " << str_epsilon << ":" << std::endl;
+    f << "test_sep := " << str_testsep << ":" << std::endl;
+    f << "user_precision := " << str_precision << ":" << std::endl;
+    f << "user_precision0 := " << str_precision0 << ":" << std::endl;
+    f << "taylor_level := " << str_taylor << ":" << std::endl;
+    f << "numeric_level := " << str_numericlevel << ":" << std::endl;
+    f << "max_level := " << str_maxlevel << ":" << std::endl;
+    f << "weakness_level := " << str_weaklevel << ":" << std::endl;
+    f << "user_p := " << str_userp << ":" << std::endl;
+    f << "user_q := " << str_userq << ":" << std::endl;
     f << "try p4main() catch:"  << std::endl
         << "printf( \"! Error (\%a) \%a\\n\", lastexception[1], lastexception[2] );\n"
         << "finally: closeallfiles();\n"
@@ -260,4 +275,12 @@ void HomeLeft::evaluate()
 {
     prepareMapleFile();
 
+    std::string command = "maple "+fileUploadName_+".mpl > "+fileUploadName_+".res";
+    system(command.c_str());
+    
+    //evalButton_->setText(WString::fromUTF8(fileUploadName_));
+
+    evaluated_.emit(42,fileUploadName_);
+    fileUploadName_="";
 }
+

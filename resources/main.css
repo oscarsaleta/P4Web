@@ -59,4 +59,10 @@ body{
 #outputTextArea_ {
   height: 400px;
   margin-bottom: 10px;
+  font-family: "Lucida Console", Monaco, monospace;
+  font-size: 9pt;
+}
+
+#HomeRight {
+  margin-top: 0px;
 }

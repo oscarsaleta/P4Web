@@ -2,12 +2,15 @@
 #define __HOMELEFT_H_INCLUDE__
 
 #include <Wt/WContainerWidget>
+#include <Wt/WSignal>
 
 class HomeLeft : public Wt::WContainerWidget
 {
 public:
     HomeLeft(Wt::WContainerWidget *parent = 0);
     ~HomeLeft();
+
+    Wt::Signal<int, std::string>& evaluated() {return evaluated_;}
     
 private:
     Wt::WGroupBox *fileUploadBox_;
@@ -33,6 +36,7 @@ private:
     void fillMapleScript(std::string, std::ofstream&);
     void evaluate();
 
+    Wt::Signal<int, std::string> evaluated_;
 
 
 };

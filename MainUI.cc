@@ -25,7 +25,7 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     WBootstrapTheme *theme = new WBootstrapTheme();
     theme->setVersion(WBootstrapTheme::Version3);
     WApplication::instance()->setTheme(theme);
-    WApplication::instance()->setTitle("Happy little test v2");
+    WApplication::instance()->setTitle("P4 Web v0.1 alpha");
 
     addAllStyleSheets();
 
@@ -119,6 +119,8 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     middleSpace_->setStyleClass("middle-box");
 
     rightContainer_ = new HomeRight(root_);
+
+    leftContainer_->evaluated().connect(rightContainer_,&HomeRight::readResults);
 
     root_->addWidget(leftContainer_);
     root_->addWidget(middleSpace_);
