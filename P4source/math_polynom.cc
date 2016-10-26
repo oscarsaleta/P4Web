@@ -10,9 +10,6 @@
 #include <cmath>
 #include <cstdio>
 
-#include "file_tab.h"          // defines polynomials as linked lists of terms
-
-
 // -----------------------------------------------------------------------
 //                              EVAL_TERM1
 // -----------------------------------------------------------------------

@@ -1,5 +1,7 @@
+#ifndef FILE_VF_H
+#define FILE_VF_H
+
 //#include <qprocess.h>
-#pragma once
 
 #include <Wt/WObject>
 #include <Wt/WString>
@@ -117,3 +119,5 @@ public slots:
 };
 
 extern QInputVF * ThisVF;
+
+#endif FILE_VF_H

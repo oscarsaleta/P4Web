@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MATH_POLYNOM_H
+#define MATH_POLYNOM_H
 
 #include "file_tab.h" // for term1,term2,term3
 
@@ -16,3 +17,5 @@ const char * DumpPoly3( term3 *, const char *, const char *, const char * );
 
 char * printterm2( char *, term2 *, bool, const char *, const char * );
 char * printterm3( char *, term3 *, bool, const char *, const char *, const char * );
+
+#endif /* MATH_POLYNOM_H */

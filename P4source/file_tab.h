@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FILE_TAB_H
+#define FILE_TAB_H
 
 #include <Wt/WObject>
 #include <Wt/WString>
@@ -419,3 +420,5 @@ public:
 
 #define LINESTYLE_DASHES    1
 #define LINESTYLE_POINTS    0
+
+#endif /* FILE_TAB_H */

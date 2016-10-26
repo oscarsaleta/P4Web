@@ -16,18 +16,7 @@
     The relevant structures for saddles etc are set up here.
 */
 
-void delete_term1( P4POLYNOM1 );
-void delete_term2( P4POLYNOM2 );
-void delete_term3( P4POLYNOM3 );
-
 void SetP4WindowTitle( QWidget *, WString );
-
-double eval_term2( P4POLYNOM2, double * );
-
-const char * DumpPoly1( P4POLYNOM1 f, const char * x );
-const char * DumpPoly2( P4POLYNOM2 f, const char * x, const char * y );
-const char * DumpPoly3( P4POLYNOM3 f, const char * x, const char * y, const char * z );
-
 
 // -----------------------------------------------------------------------
 //                              WVFStudy CONSTRUCTOR
