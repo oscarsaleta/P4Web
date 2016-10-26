@@ -1,9 +1,10 @@
 //#include <qprocess.h>
 #pragma once
 
-#ifndef MAXNUMPARAMS
+#include <Wt/WObject>
+#include <Wt/WString>
+
 #include "custom.h"
-#endif
 
 class QTextEdit;
 class QGcfDlg;

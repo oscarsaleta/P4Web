@@ -39,9 +39,13 @@ void (*plot_p)( QWinSphere *, double *, int ) = nullptr;
 
 bool less_poincare( double * p1, double * p2 )
 {
-    if((p1[0]*p2[2])<(p2[0]*p1[2]))return(1);
-    if(((p1[0]*p2[2])==(p2[0]*p1[2])) && ((p1[1]*p2[2])<(p2[1]*p1[2])))return( true );
-    return( false );
+    if((p1[0]*p2[2])<(p2[0]*p1[2])) {
+        return true;
+    }
+    if(((p1[0]*p2[2])==(p2[0]*p1[2])) && ((p1[1]*p2[2])<(p2[1]*p1[2]))) {
+        return true;
+    }
+    return false;
 }
 
 double eval_lc_poincare( double * pp,double a, double b, double c )
@@ -51,12 +55,13 @@ double eval_lc_poincare( double * pp,double a, double b, double c )
 
 double eval_lc_lyapunov( double * pp,double a, double b, double c )
 {
-    if( pp[0] )
+    if( pp[0] ) {
         return    a * pow(pp[1],VFResults.double_q)*cos(pp[2])
                 + b * pow(pp[1],VFResults.double_p)*sin(pp[2])
                 + c * pow(pp[1],VFResults.double_p_plus_q);
-    else
+    } else {
         return ( a * pp[1] + b * pp[2] + c );
+    }
 }
  
 bool less_lyapunov(double * p1, double * p2 )
@@ -65,9 +70,13 @@ bool less_lyapunov(double * p1, double * p2 )
 
     plsphere_annulus(p1[0],p1[1],p1[2],u);
     plsphere_annulus(p2[0],p2[1],p2[2],v);
-    if(u[0]<v[0])return(1);
-    if((u[0]==v[0]) && (u[1]<v[1]))return(1);
-    return(0);
+    if(u[0]<v[0]){
+        return true;
+    }
+    if((u[0]==v[0]) && (u[1]<v[1])) {
+        return true;
+    }
+    return false;
 }  
 
 
@@ -142,9 +151,7 @@ void QVFStudy::SetupCoordinateTransformations( void )
             sphere_to_viewcoordpair = psphere_to_viewcoordpair_discontinuousy;
             break;
         }
-    }
-    else
-    {
+    } else {
         U1_to_sphere = U1_to_plsphere;
         U2_to_sphere = U2_to_plsphere;
         V1_to_sphere = V1_to_plsphere;
@@ -219,9 +226,11 @@ void set_current_step( double curstep )
 {
     VFResults.config_currentstep = curstep;
     
-    if( p4startdlg != nullptr )
-        if( p4startdlg->Plot_Window != nullptr )
-            if( p4startdlg->Plot_Window->IntParams_Window != nullptr )
+    if( p4startdlg != nullptr ) {
+        if( p4startdlg->Plot_Window != nullptr ) {
+            if( p4startdlg->Plot_Window->IntParams_Window != nullptr ) {
                 p4startdlg->Plot_Window->IntParams_Window->SetCurrentStep( curstep );
-
+            }
+        }
+    }
 }

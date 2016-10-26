@@ -1,4 +1,7 @@
+#pragma once
+
 #include <Wt/WObject>
+#include <Wt/WString>
 
 // -----------------------------------------------------------------------
 //                      General polynomial expressions
@@ -6,11 +9,11 @@
 
 // Linked list of univariate terms a*x^i
 
-struct term1
+term1
 {
     int exp;
     double coeff;
-    struct term1 * next_term1;
+    term1 * next_term1;
 };
 
 typedef struct term1 * P4POLYNOM1;
@@ -22,7 +25,7 @@ struct term2
     int exp_x;
     int exp_y;
     double coeff;
-    struct term2 * next_term2;
+    term2 * next_term2;
 };
 
 // Linked list of terms a*r^i*cos(theta)^j*sin(theta)^k
@@ -35,7 +38,7 @@ struct term3
     int exp_Co;
     int exp_Si;
     double coeff;
-    struct term3 * next_term3;
+    term3 * next_term3;
 };
 
 typedef struct term3 * P4POLYNOM3;
@@ -57,7 +60,7 @@ struct orbits_points
     int type;           // the direction if we integrate the orbit of separatrice 
                         // and sometimes the type
 
-    struct orbits_points * next_point;
+    orbits_points * next_point;
 };
 
 typedef struct orbits_points * P4ORBIT;
@@ -68,7 +71,7 @@ struct orbits
     int color;
     P4ORBIT f_orbits;               // orbit
     P4ORBIT current_f_orbits;       // orbit
-    struct orbits * next_orbit;
+    orbits * next_orbit;
 };
 
 // -----------------------------------------------------------------------
@@ -80,7 +83,7 @@ struct transformations
     double x0, y0;                      // translation point
     int c1,c2, d1,d2,d3,d4;             // F(x,y)=(c1*x^d1*y^d2,c2*x^d3*y^d4)
     int d;                              // X/x^d
-    struct transformations * next_trans;
+    transformations * next_trans;
 };
 
 struct blow_up_points
@@ -97,22 +100,22 @@ struct blow_up_points
                                         // than 1
     double point[2];                    // end point sep in blow up chart
 
-    struct orbits_points * first_sep_point;
-    struct orbits_points * last_sep_point;
-    struct blow_up_points * next_blow_up_point;
+    orbits_points * first_sep_point;
+    orbits_points * last_sep_point;
+    blow_up_points * next_blow_up_point;
 };
 
 struct sep
 {
-    struct orbits_points * first_sep_point;
-    struct orbits_points * last_sep_point;
+    orbits_points * first_sep_point;
+    orbits_points * last_sep_point;
     int type;                           // STYPE_STABLE, UNSTABLE, CENSTABLE or CENUNSTABLE
     int direction;
     int d;
     bool notadummy;                     // false if separatrice is a copy of a structure (obtained
                                         // through a symmetry)
-    struct term1 * separatrice;         // if d=0 -> (t,f(t)), d=1 ->(f(t),t)
-    struct sep * next_sep;
+    term1 * separatrice;                // if d=0 -> (t,f(t)), d=1 ->(f(t),t)
+    sep * next_sep;
 };
 
 // -----------------------------------------------------------------------
@@ -123,7 +126,7 @@ struct genericsingularity       // part of the structure that is the same for al
 {
     double x0;
     double y0;
-    struct genericsingularity * next;
+    genericsingularity * next;
     int chart;
 };
 
@@ -131,14 +134,14 @@ struct saddle
 {
     double x0;
     double y0;
-    struct saddle * next_saddle;
+    saddle * next_saddle;
     int chart;
 
     double epsilon;
     int notadummy;
 
-    struct sep * separatrices;
-    struct term2 * vector_field[2];     // vector field {xdot,ydot}
+    sep * separatrices;
+    term2 * vector_field[2];     // vector field {xdot,ydot}
     double a11,a12,a21,a22;             // transformation matrix
 };
 
@@ -146,14 +149,14 @@ struct semi_elementary
 {
     double x0;
     double y0;
-    struct semi_elementary * next_se;
+    semi_elementary * next_se;
     int chart;
 
     double epsilon;
     int notadummy;
     
-    struct sep * separatrices;          // center sep (t,f(t)), sep (g(t),t)
-    struct term2 * vector_field[2];     // vector field
+    sep * separatrices;          // center sep (t,f(t)), sep (g(t),t)
+    term2 * vector_field[2];     // vector field
     double a11,a12,a21,a22;             // transformation matrix
 
     int type;                           // type of semi-elementary point
@@ -163,20 +166,20 @@ struct degenerate
 {
     double x0;
     double y0;
-    struct degenerate * next_de;
+    degenerate * next_de;
     int chart;
     
     double epsilon;
     int notadummy;
 
-    struct blow_up_points * blow_up;
+    blow_up_points * blow_up;
 };
 
 struct node
 {
     double x0;
     double y0;
-    struct node * next_node;
+    node * next_node;
     int chart;
 
     int stable;
@@ -186,17 +189,17 @@ struct strong_focus
 {
     double x0;
     double y0;
-    struct strong_focus * next_sf;
+    strong_focus * next_sf;
     int chart;
 
     int stable;
 };
 
-struct weak_focus
+weak_focus
 {
     double x0;
     double y0;
-    struct weak_focus * next_wf;
+    weak_focus * next_wf;
     int chart;
 
     int type;
@@ -288,12 +291,12 @@ public:
 
     // singular points and their properties:
 
-    struct saddle *             first_saddle_point;
-    struct semi_elementary *    first_se_point;
-    struct node *               first_node_point;
-    struct strong_focus *       first_sf_point;
-    struct weak_focus *         first_wf_point;
-    struct degenerate *         first_de_point;
+    saddle *             first_saddle_point;
+    semi_elementary *    first_se_point;
+    node *               first_node_point;
+    strong_focus *       first_sf_point;
+    weak_focus *         first_wf_point;
+    degenerate *         first_de_point;
 
     // Greatest common factor if present:
 
@@ -304,12 +307,12 @@ public:
     P4POLYNOM2                  gcf_V2;
     P4POLYNOM3                  gcf_C;
 
-    struct orbits_points *      gcf_points;
+    orbits_points *      gcf_points;
 
     // limit cycles
 
-    struct orbits *             first_lim_cycle;
-    struct orbits *             first_orbit;
+    orbits *             first_lim_cycle;
+    orbits *             first_orbit;
 
     // ------ Configuration
 
@@ -327,15 +330,15 @@ public:
 
     // run-time when plotting
 
-    struct orbits *             current_orbit;
-    struct orbits *             current_lim_cycle;
+    orbits *             current_orbit;
+    orbits *             current_lim_cycle;
 
-    double                      selected_ucoord[2];
-    struct saddle *             selected_saddle_point;
-    struct semi_elementary *    selected_se_point;
-    struct degenerate *         selected_de_point;
-    struct sep *                selected_sep;
-    struct blow_up_points *     selected_de_sep;
+    double               selected_ucoord[2];
+    saddle *             selected_saddle_point;
+    semi_elementary *    selected_se_point;
+    degenerate *         selected_de_point;
+    sep *                selected_sep;
+    blow_up_points *     selected_de_sep;
 
     // coordinate transformation routines, set up when starting the plot
 
@@ -375,19 +378,19 @@ public:
 
     void DeleteVF( void );
 
-    void DeleteSaddle( struct saddle * );
-    void DeleteSemiElementary( struct semi_elementary * );
-    void DeleteNode( struct node * );
-    void DeleteStrongFocus( struct strong_focus * );
-    void DeleteWeakFocus( struct weak_focus * );
-    void DeleteDegenerate( struct degenerate * );
-    void DeleteSeparatrices( struct sep * );
-    void DeleteTransformations( struct transformations * );
-    void DeleteBlowup( struct blow_up_points * b );
+    void DeleteSaddle( saddle * );
+    void DeleteSemiElementary( semi_elementary * );
+    void DeleteNode( node * );
+    void DeleteStrongFocus( strong_focus * );
+    void DeleteWeakFocus( weak_focus * );
+    void DeleteDegenerate( degenerate * );
+    void DeleteSeparatrices( sep * );
+    void DeleteTransformations( transformations * );
+    void DeleteBlowup( blow_up_points * b );
 
-    void DeleteLimitCycle( struct orbits * );
+    void DeleteLimitCycle( orbits * );
     void DeleteOrbitPoint( P4ORBIT p );
-    void DeleteOrbit( struct orbits * );
+    void DeleteOrbit( orbits * );
 
     // reading of the Maple/Reduce results
 
@@ -407,7 +410,7 @@ public:
     bool ReadDegeneratePoint( FILE * fp );
     bool ReadNodePoint( FILE * fp );
     bool ReadBlowupPoints( FILE * fp, struct blow_up_points * b, int n );
-    bool ReadTransformations( FILE * fp, struct transformations * trans, int n );
+    bool ReadTransformations( FILE * fp, transformations * trans, int n );
 
     void SetupCoordinateTransformations( void );    // see math_p4.cpp
 

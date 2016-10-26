@@ -4,10 +4,13 @@
 //
 // -----------------------------------------------------------------------
 
+#include "math_polynom.h"
+
 #include <Wt/WObject>
 #include <cmath>
 #include <cstdio>
-#include "table.h"          // defines polynomials as linked lists of terms
+
+#include "file_tab.h"          // defines polynomials as linked lists of terms
 
 
 // -----------------------------------------------------------------------
@@ -116,7 +119,7 @@ void delete_term1( P4POLYNOM1 p )
     {
         q = p;
         p = p->next_term1;
-        delete q;//free( q );
+        delete q;
         q = nullptr;
     }
 }
@@ -133,7 +136,7 @@ void delete_term2( P4POLYNOM2 p )
     {
         q = p;
         p = p->next_term2;
-        delete q;//free( q );
+        delete q;
         q = nullptr;
     }
 }
@@ -150,7 +153,7 @@ void delete_term3( P4POLYNOM3 p )
     {
         q = p;
         p = p->next_term3;
-        delete q;//free( q );
+        delete q;
         q = nullptr;
     }
 }

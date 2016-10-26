@@ -1,3 +1,5 @@
+#pragma once
+
 #include "color.h"
 
 // Defaults regarding Vector Field and Filename
