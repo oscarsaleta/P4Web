@@ -1,41 +1,37 @@
-CFLAGS= -std=gnu++14 -Wall -g
-LFLAGS= -lwt
-HTTPFLAGS= -lwthttp
+CC=g++
+CFLAGS=-std=gnu++14 -Wall -g
+LFLAGS=-lwt
+HTTPFLAGS=-lwthttp
+SOURCES=$(wildcard src/*.cc)
+OBJECTS=$(patsubst src/%.cc,bin/%.o,$(SOURCES))
+EXECUTABLE=bin/main
 
-target: all
+.PHONY: all build clean run debug test
+
+target: build all
 	
-all: main
+all: $(EXECUTABLE)
 
 # Main executable
-main: main.o MyApplication.o MainUI.o HomeLeft.o HomeRight.o
-	g++ $(CFLAGS) main.o MyApplication.o MainUI.o HomeLeft.o HomeRight.o -o main $(HTTPFLAGS) $(LFLAGS)
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $@ $(HTTPFLAGS) $(LFLAGS)
 
 # Objects compilation
-main.o: main.cc
-	g++ $(CFLAGS) -c main.cc -lwhttp $(LFLAGS)
-
-MyApplication.o: MyApplication.cc MyApplication.h
-	g++ $(CFLAGS) -c MyApplication.cc $(LFLAGS)
-
-MainUI.o: MainUI.cc MainUI.h
-	g++ $(CFLAGS) -c MainUI.cc $(LFLAGS)
-
-HomeLeft.o: HomeLeft.cc HomeLeft.h
-	g++ $(CFLAGS) -c HomeLeft.cc $(LFLAGS)
-
-HomeRight.o: HomeRight.cc HomeRight.h
-	g++ $(CFLAGS) -c HomeRight.cc $(LFLAGS)
+$(OBJECTS): bin/%.o : src/%.cc
+	$(CC) $(CFLAGS) -c $< $(LFLAGS) -o $@
 
 
-
+# Build (mkdir bin)
+build:
+	@mkdir -p bin
 
 # Cleaning directives
 clean:
-	rm *o main
+	-rm $(OBJECTS) $(EXECUTABLE)
 
 # Running directives
 run: all
-	./main --docroot . --http-address 0.0.0.0 --http-port 8080
+	$(EXECUTABLE) --docroot . --http-address 0.0.0.0 --http-port 8080
 	
 debug: all
-	gdb --args ./main --docroot . --http-address 0.0.0.0 --http-port 8080
+	gdb --args $(EXECUTABLE) --docroot . --http-address 0.0.0.0 --http-port 8080
