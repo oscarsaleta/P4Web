@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include <Wt/WBreak>
 #include <Wt/WContainerWidget>
@@ -104,42 +105,49 @@ HomeRight::~HomeRight()
 
 void HomeRight::readResults(int k, std::string fileName)
 {
-    std::ifstream resultsFile;
-    std::string line;
+    if (k!=0) {
+        fullResults_ = "Unauthorised operation. IP will be logged.";
+    } else {
+        std::ifstream resultsFile;
+        std::string line;
 
-    fileName_ = fileName;
-    flag_ = 0;
+        fileName_ = fileName;
+        flag_ = 0;
 
-    // read full results
-    fullResults_ = "";
-    resultsFile.open((fileName_+".res").c_str());
-    if (resultsFile.is_open()) {
-        while(getline(resultsFile,line))
-            fullResults_ += line + "\n";
-        resultsFile.close();
-    } else
-        flag_ = 1;
+        // read full results
+        fullResults_ = "";
+        resultsFile.open((fileName_+".res").c_str());
+        if (resultsFile.is_open()) {
+            while(getline(resultsFile,line))
+                fullResults_ += line + "\n";
+            resultsFile.close();
+        } else {
+            flag_ = 1;
+        }
 
-    // read finite singular points results
-    finResults_ = "";
-    resultsFile.open((fileName_+"_fin.res").c_str());
-    if(resultsFile.is_open()) {
-        while (getline(resultsFile,line))
-            finResults_ += line + "\n";
-        resultsFile.close();
-    } else
-        flag_ = 1;
-    
-    // add title for infinite region (missing in inf.res)
-    infResults_ = "AT THE INFINITE REGION \n";
-    // read infinite singular points results
-    resultsFile.open((fileName_+"_inf.res").c_str());
-    if(resultsFile.is_open()) {
-        while(getline(resultsFile,line))
-            infResults_ += line + "\n";
-        resultsFile.close();
-    } else
-        flag_ = 1;
+        // read finite singular points results
+        finResults_ = "";
+        resultsFile.open((fileName_+"_fin.res").c_str());
+        if(resultsFile.is_open()) {
+            while (getline(resultsFile,line))
+                finResults_ += line + "\n";
+            resultsFile.close();
+        } else {
+            flag_ = 1;
+        }
+        
+        // add title for infinite region (missing in inf.res)
+        infResults_ = "AT THE INFINITE REGION \n";
+        // read infinite singular points results
+        resultsFile.open((fileName_+"_inf.res").c_str());
+        if(resultsFile.is_open()) {
+            while(getline(resultsFile,line))
+                infResults_ += line + "\n";
+            resultsFile.close();
+        } else {
+            flag_ = 1;
+        }
+    }
 
     fullResults();
 }

@@ -1,5 +1,7 @@
 #include "HomeLeft.h"
 
+//#include "P4src/file_tab.h"
+
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -140,7 +142,7 @@ void HomeLeft::fileUploaded()
     f.open(fileUploadName_.c_str());
     if (f.is_open()) {
         for (int i=0; i<=12; i++) {
-            getline(f,line);
+            std::getline(f,line); // TODO: need to check for errors here?
             if (i==11)
                 xEquationInput_->setText(WString::fromUTF8(line));
             else if (i==12)
@@ -193,7 +195,6 @@ void HomeLeft::prepareMapleFile()
     if (mplFile.is_open())
         fillMapleScript(fileUploadName_,mplFile);
 }
-// TODO: llegir del fitxer uploaded el camp i ficar-lo als LineEdits i al .mpl
 
 void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
 {
@@ -269,18 +270,14 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
         << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
 }
 
-// TODO: executar arxiu temporal!
-
 void HomeLeft::evaluate()
 {
     prepareMapleFile();
 
-    std::string command = "maple "+fileUploadName_+".mpl > "+fileUploadName_+".res";
-    system(command.c_str());
+    std::string command = "maple -z --secure-read=/tmp/*,/usr/local/p4/bin/*,/usr/local/p4/sum_tables/* --secure-write=/tmp/* "+fileUploadName_+".mpl > "+fileUploadName_+".res";
+    int status = system(command.c_str());
     
-    //evalButton_->setText(WString::fromUTF8(fileUploadName_));
-
-    evaluated_.emit(42,fileUploadName_);
+    evaluated_.emit(status,fileUploadName_);
     fileUploadName_="";
 }
 
