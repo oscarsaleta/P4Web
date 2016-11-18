@@ -1,5 +1,10 @@
 #include <Wt/WContainerWidget>
+
+#include <Wt/WPushButton>
 #include <Wt/WString>
+#include <Wt/WTabWidget>
+#include <Wt/WTextArea>
+#include <Wt/WToolBar>
 
 class HomeRight : public Wt::WContainerWidget
 {

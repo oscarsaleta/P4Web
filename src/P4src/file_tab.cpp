@@ -1,13 +1,14 @@
 #include "file_tab.h"
 
-#include "math_p4.h"
-#include "math_charts.h"
-#include "math_separatrice.h"
-#include "math_changedir.h"
-#include "math_orbits.h"
+//#include "math_p4.h"
+//#include "math_charts.h"
+//#include "math_separatrice.h"
+//#include "math_changedir.h"
+//#include "math_orbits.h"
 #include "math_polynom.h"
-#include "p4application.h"
+//#include "p4application.h"
 
+#include "custom.h"
 #include <string>
 
 
@@ -416,7 +417,7 @@ bool WVFStudy::readTables( std::string basename )
 
     deleteVF();     // initialize structures, delete previous vector field if any
 
-    fp = fopen( basename + "_vec.tab" , "rt" );
+    fp = fopen( (basename + "_vec.tab").c_str() , "rt" );
     if( fp == nullptr )
     {
         //dump(basename,"Cannot open file *_vec.tab");
@@ -531,7 +532,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( typeofstudy != TYPEOFSTUDY_INF )
     {
-        fp = fopen( basename + "_fin.tab" , "rt" );
+        fp = fopen( (basename + "_fin.tab").c_str() , "rt" );
         if( fp != nullptr )
         {
             if( !readPoints( fp ) )
@@ -553,7 +554,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( typeofstudy != TYPEOFSTUDY_ONE && typeofstudy != TYPEOFSTUDY_FIN )
     {
-        fp = fopen( basename + "_inf.tab" , "rt" );
+        fp = fopen( (basename + "_inf.tab").c_str() , "rt" );
         if( fp != nullptr )
         {
             if( p==1 && q==1 )
@@ -656,7 +657,7 @@ bool WVFStudy::readGCF( FILE * fp )
             if( fscanf( fp, "%d", &N ) != 1 )
                 return false;
 
-            gcf_C = new term3;// (P4POLYNOM3)malloc( sizeof(term3) );
+            gcf_C = new term3;
             gcf_C->next_term3 = nullptr;
             if( !readTerm3( fp, gcf_C, N ) )
                 return false;
@@ -708,7 +709,7 @@ bool WVFStudy::readVectorFieldCylinder( FILE * fp, P4POLYNOM3 * vf )
 {
     int N;
 
-    vf[0] = new term3;// (P4POLYNOM3)malloc( sizeof( term3 ) );
+    vf[0] = new term3;
     vf[0]->next_term3 = nullptr;
     vf[1] = new term3;
     vf[1]->next_term3 = nullptr;
@@ -873,7 +874,7 @@ bool WVFStudy::readTerm3( FILE * fp, P4POLYNOM3 p, int N )
 
     for( i = 2; i <= N; i++ )
     {
-        p->next_term3 = new term3;// (P4POLYNOM3)malloc( sizeof( term3 ) );
+        p->next_term3 = new term3;
         p = p->next_term3;
         p->next_term3 = nullptr;
         if( fscanf( fp, "%d %d %d %lf", &(p->exp_r), &(p->exp_Co), &(p->exp_Si), &(p->coeff) ) != 4 )
@@ -1110,7 +1111,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             if( fscanf( fp, "%d ", &N ) != 1 )
                 return false;
             sep1->notadummy = true;
-            sep1->separatrice = new term1;// (term1 *)malloc( sizeof(term1) );
+            sep1->separatrice = new term1;
             readTerm1( fp, sep1->separatrice, N );
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
@@ -1119,7 +1120,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             {
                 // read second (hyperbolic) separatrix
 
-                sep1->next_sep = new sep;// (sep *)malloc( sizeof(sep) );
+                sep1->next_sep = new sep;
                 sep1 = sep1->next_sep;
                 sep1->type = OT_UNSTABLE;
                 sep1->d = 1;
@@ -1149,7 +1150,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
 
 
     case 2: // saddle-node 
-        point->separatrices = new sep;// (sep *) malloc(sizeof(sep));
+        point->separatrices = new sep;
         sep1 = point->separatrices;
         if( s )
             sep1->type = STYPE_CENUNSTABLE;
@@ -2210,8 +2211,9 @@ void WVFStudy::dump( WString basename, WString info )
     setP4WindowTitle( m, "DUMP SCREEN" );
     m->show();
 }
+*/
 
-void WVFStudy::setupCoordinateTransformations( void )
+/*void WVFStudy::setupCoordinateTransformations( void )
 {
     if( !plweights )
     {

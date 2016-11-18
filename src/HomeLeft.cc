@@ -280,3 +280,8 @@ void HomeLeft::evaluate()
     fileUploadName_="";
 }
 
+
+Signal<int, std::string>& HomeLeft::evaluated()
+{
+    return evaluated_;
+}

@@ -1,5 +1,9 @@
 #include "MainUI.h"
 
+#include "HomeLeft.h"
+#include "HomeRight.h"
+#include "P4src/file_tab.h"
+
 #include <Wt/WApplication>
 #include <Wt/WBootstrapTheme>
 #include <Wt/WGroupBox>
@@ -14,8 +18,7 @@
 #include <Wt/WText>
 #include <Wt/WVBoxLayout>
 
-#include "HomeLeft.h"
-#include "HomeRight.h"
+
 
 using namespace Wt;
 

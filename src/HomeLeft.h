@@ -10,7 +10,7 @@ public:
     HomeLeft(Wt::WContainerWidget *parent = 0);
     ~HomeLeft();
 
-    Wt::Signal<int, std::string>& evaluated() {return evaluated_;}
+    Wt::Signal<int, std::string>& evaluated();
     
 private:
     Wt::WGroupBox *fileUploadBox_;

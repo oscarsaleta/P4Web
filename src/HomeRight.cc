@@ -1,17 +1,14 @@
 #include "HomeRight.h"
 
+#include "PlotRegion.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
 
 #include <Wt/WBreak>
-#include <Wt/WContainerWidget>
 #include <Wt/WGroupBox>
 #include <Wt/WMenuItem>
-#include <Wt/WPushButton>
-#include <Wt/WTabWidget>
-#include <Wt/WTextArea>
-#include <Wt/WToolBar>
 
 using namespace Wt;
 
@@ -84,6 +81,10 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     plotContainer_->setId("plotContainer_");
     //plotContainer_->setTitle(tr("homeright.plotcontainertitle"));
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
+
+
+    PlotRegion test(plotContainer_);
+    test.show();
 
 
     //tabWidget_->setStyleClass("tabwidget");
