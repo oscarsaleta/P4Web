@@ -1,7 +1,5 @@
 #include "file_tab.h"
 
-#include "file_vf.h"
-#include "main.h"
 #include "math_p4.h"
 #include "math_charts.h"
 #include "math_separatrice.h"
@@ -9,6 +7,11 @@
 #include "math_orbits.h"
 #include "math_polynom.h"
 #include "p4application.h"
+
+#include <string>
+
+
+using namespace Wt;
 
 WVFStudy VFResults;
 
@@ -180,9 +183,9 @@ void WVFStudy::deleteVF()
 //                          WVFStudy::DeleteSaddle
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteSaddle( struct saddle * p )
+void WVFStudy::deleteSaddle( saddle * p )
 {
-    struct saddle * q;
+    saddle * q;
 
     while( p != nullptr )
     {
@@ -202,9 +205,9 @@ void WVFStudy::deleteSaddle( struct saddle * p )
 //                      WVFStudy::DeleteSemiElementary
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteSemiElementary( struct semi_elementary * p )
+void WVFStudy::deleteSemiElementary( semi_elementary * p )
 {
-    struct semi_elementary * q;
+    semi_elementary * q;
 
     while( p != nullptr )
     {
@@ -224,9 +227,9 @@ void WVFStudy::deleteSemiElementary( struct semi_elementary * p )
 //                          WVFStudy::DeleteNode
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteNode( struct node * p )
+void WVFStudy::deleteNode( node * p )
 {
-    struct node * q;
+    node * q;
 
     while( p != nullptr )
     {
@@ -241,9 +244,9 @@ void WVFStudy::deleteNode( struct node * p )
 //                      WVFStudy::DeleteStrongFocus
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteStrongFocus( struct strong_focus * p )
+void WVFStudy::deleteStrongFocus( strong_focus * p )
 {
-    struct strong_focus * q;
+    strong_focus * q;
 
     while( p != nullptr )
     {
@@ -258,9 +261,9 @@ void WVFStudy::deleteStrongFocus( struct strong_focus * p )
 //                          WVFStudy::DeleteWeakFocus
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteWeakFocus( struct weak_focus * p )
+void WVFStudy::deleteWeakFocus( weak_focus * p )
 {
-    struct weak_focus * q;
+    weak_focus * q;
 
     while( p != nullptr )
     {
@@ -275,9 +278,9 @@ void WVFStudy::deleteWeakFocus( struct weak_focus * p )
 //                      WVFStudy::DeleteDegenerate
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteDegenerate( struct degenerate * p )
+void WVFStudy::deleteDegenerate( degenerate * p )
 {
-    struct degenerate * q;
+    degenerate * q;
 
     while( p != nullptr )
     {
@@ -295,9 +298,9 @@ void WVFStudy::deleteDegenerate( struct degenerate * p )
 //                      WVFStudy::DeleteSeparatrices
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteSeparatrices( struct sep * p )
+void WVFStudy::deleteSeparatrices( sep * p )
 {
-    struct sep * q;
+    sep * q;
 
     while( p != nullptr )
     {
@@ -316,9 +319,9 @@ void WVFStudy::deleteSeparatrices( struct sep * p )
 //                      WVFStudy::DeleteTransformations
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteTransformations( struct transformations * t )
+void WVFStudy::deleteTransformations( transformations * t )
 {
-    struct transformations * u;
+    transformations * u;
 
     while( t != nullptr )
     {
@@ -333,9 +336,9 @@ void WVFStudy::deleteTransformations( struct transformations * t )
 //                      WVFStudy::DeleteBlowup
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteBlowup( struct blow_up_points * b )
+void WVFStudy::deleteBlowup( blow_up_points * b )
 {
-    struct blow_up_points * c;
+    blow_up_points * c;
 
     while( b != nullptr )
     {
@@ -355,7 +358,7 @@ void WVFStudy::deleteBlowup( struct blow_up_points * b )
 //                      WVFStudy::DeleteLimitCycle
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteLimitCycle( struct orbits * p )
+void WVFStudy::deleteLimitCycle( orbits * p )
 {
     deleteOrbit(p); // limit cycle is implemented as orbit.
 }
@@ -382,9 +385,9 @@ void WVFStudy::deleteOrbitPoint( P4ORBIT p )
 //                      WVFStudy::DeleteOrbit
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteOrbit( struct orbits * p )
+void WVFStudy::deleteOrbit( orbits * p )
 {
-    struct orbits * q;
+    orbits * q;
 
     while( p !=nullptr )
     {
@@ -405,7 +408,7 @@ void WVFStudy::deleteOrbit( struct orbits * p )
 // read filename_inf.tab
 // read filename_fin.tab
 
-bool WVFStudy::readTables( WString basename )
+bool WVFStudy::readTables( std::string basename )
 {
     FILE * fp;
     int j;
@@ -413,17 +416,17 @@ bool WVFStudy::readTables( WString basename )
 
     deleteVF();     // initialize structures, delete previous vector field if any
 
-    fp = fopen( QFile::encodeName( basename + "_vec.tab" ), "rt" ); //NOTE: we already have the file name
+    fp = fopen( basename + "_vec.tab" , "rt" );
     if( fp == nullptr )
     {
-        dump(basename,"Cannot open file *_vec.tab");
+        //dump(basename,"Cannot open file *_vec.tab");
         deleteVF();
         return false;
     }
 
     if( fscanf( fp, "%d %d %d ", &typeofstudy, &p, &q ) != 3 )
     {
-        dump(basename,"Cannot read typeofstudy in *_vec.tab");
+        //dump(basename,"Cannot read typeofstudy in *_vec.tab");
         deleteVF();
         fclose(fp);
         return false;
@@ -433,7 +436,7 @@ bool WVFStudy::readTables( WString basename )
     {
         if( fscanf( fp, "%lf %lf %lf %lf", &xmin, &xmax, &ymin, &ymax ) != 4 )
         {
-            dump(basename,"Cannot read min-max coords in *_vec.tab");
+            //dump(basename,"Cannot read min-max coords in *_vec.tab");
             deleteVF();
             fclose(fp);
             return false;
@@ -455,7 +458,7 @@ bool WVFStudy::readTables( WString basename )
 
     if( !readGCF( fp ) )
     {
-        dump(basename,"Cannot read gcf *_vec.tab");
+        //dump(basename,"Cannot read gcf *_vec.tab");
         deleteVF();
         fclose(fp);
         return false;
@@ -463,7 +466,7 @@ bool WVFStudy::readTables( WString basename )
 
     if( !readVectorField( fp, f_vec_field ) )
     {
-        dump(basename,"Cannot read vector field in *_vec.tab");
+        //dump(basename,"Cannot read vector field in *_vec.tab");
         deleteVF();
         fclose(fp);
         return false;
@@ -471,7 +474,7 @@ bool WVFStudy::readTables( WString basename )
 
     if( !readVectorField( fp, vec_field_U1 ) )
     {
-        dump(basename,"Cannot read vector field in U1-chart in *_vec.tab");
+        //dump(basename,"Cannot read vector field in U1-chart in *_vec.tab");
         deleteVF();
         fclose(fp);
         return false;
@@ -479,7 +482,7 @@ bool WVFStudy::readTables( WString basename )
 
     if( !readVectorField( fp, vec_field_V1 ) )
     {
-        dump(basename,"Cannot read vector field in V1-chart in *_vec.tab");
+        //dump(basename,"Cannot read vector field in V1-chart in *_vec.tab");
         deleteVF();
         fclose(fp);
         return false;
@@ -487,7 +490,7 @@ bool WVFStudy::readTables( WString basename )
 
     if( !readVectorField( fp, vec_field_U2 ) )
     {
-        dump(basename,"Cannot read vector field in U2-chart in *_vec.tab");
+        //dump(basename,"Cannot read vector field in U2-chart in *_vec.tab");
         deleteVF();
         fclose(fp);
         return false;
@@ -495,7 +498,7 @@ bool WVFStudy::readTables( WString basename )
 
     if( !readVectorField( fp, vec_field_V2 ) )
     {
-        dump(basename,"Cannot read vector field in V2-chart in *_vec.tab");
+        //dump(basename,"Cannot read vector field in V2-chart in *_vec.tab");
         deleteVF();
         fclose(fp);
         return false;
@@ -505,7 +508,7 @@ bool WVFStudy::readTables( WString basename )
     {
         if( !readVectorFieldCylinder( fp, vec_field_C ) )
         {
-            dump(basename,"Cannot read vector field in Cylinder-chart in *_vec.tab");
+            //dump(basename,"Cannot read vector field in Cylinder-chart in *_vec.tab");
             deleteVF();
             fclose(fp);
             return false;
@@ -516,7 +519,7 @@ bool WVFStudy::readTables( WString basename )
     {
         if( fscanf( fp, "%d %d", &flag, &VFResults.dir_vec_field ) != 2 )
         {
-            dump(basename,"Cannot read sing-at-infinity flag and directions flag in *_vec.tab");
+            //dump(basename,"Cannot read sing-at-infinity flag and directions flag in *_vec.tab");
             deleteVF();
             fclose(fp);
             return false;
@@ -528,12 +531,12 @@ bool WVFStudy::readTables( WString basename )
 
     if( typeofstudy != TYPEOFSTUDY_INF )
     {
-        fp = fopen( QFile::encodeName( basename + "_fin.tab" ), "rt" );
+        fp = fopen( basename + "_fin.tab" , "rt" );
         if( fp != nullptr )
         {
             if( !readPoints( fp ) )
             {
-                dump(basename,WString("Problem reading singularity info from *_fin.tab:") + lasterror );
+                //dump(basename,WString("Problem reading singularity info from *_fin.tab:") + lasterror );
                 deleteVF();
                 fclose( fp );
                 return false;
@@ -542,7 +545,7 @@ bool WVFStudy::readTables( WString basename )
         }
         else
         {
-            dump(basename,"Cannot open *_fin.tab");
+            //dump(basename,"Cannot open *_fin.tab");
             deleteVF();
             return false;
         }
@@ -550,7 +553,7 @@ bool WVFStudy::readTables( WString basename )
 
     if( typeofstudy != TYPEOFSTUDY_ONE && typeofstudy != TYPEOFSTUDY_FIN )
     {
-        fp = fopen( QFile::encodeName( basename + "_inf.tab" ), "rt" );
+        fp = fopen( basename + "_inf.tab" , "rt" );
         if( fp != nullptr )
         {
             if( p==1 && q==1 )
@@ -559,7 +562,7 @@ bool WVFStudy::readTables( WString basename )
                 {
                     if( !readPoints( fp ) )
                     {
-                        dump(basename,WString("Cannot read singular points in *_inf.tab (")+WString::number(j)+"):" + lasterror );
+                        //dump(basename,WString("Cannot read singular points in *_inf.tab (")+std::to_string(j)+"):" + lasterror );
                         deleteVF();
                         fclose(fp);
                         return false;
@@ -572,7 +575,7 @@ bool WVFStudy::readTables( WString basename )
                 {
                     if( !readPoints( fp ) )
                     {
-                        dump(basename,WString("Cannot read singular points in *_inf.tab (")+WString::number(j)+"):" + lasterror );
+                        //dump(basename,WString("Cannot read singular points in *_inf.tab (")+std::to_string(j)+"):" + lasterror );
                         deleteVF();
                         fclose(fp);
                         return false;
@@ -583,13 +586,13 @@ bool WVFStudy::readTables( WString basename )
         }
         else
         {
-            dump(basename,"Cannot open *_inf.tab");
+            //dump(basename,"Cannot open *_inf.tab");
             deleteVF();
             return false;
         }
     }
 
-    dump(basename, "all's well.");
+    //dump(basename, "all's well.");
     return true;
 } 
 
@@ -609,7 +612,7 @@ bool WVFStudy::readGCF( FILE * fp )
         if( fscanf( fp, "%d", &N ) != 1 )
             return false;
 
-        gcf = new term2;//(P4POLYNOM2)malloc( sizeof(struct term2) );
+        gcf = new term2;
         gcf->next_term2 = nullptr;
 
         if( !readTerm2( fp, gcf, N ) )
@@ -618,7 +621,7 @@ bool WVFStudy::readGCF( FILE * fp )
         if( fscanf( fp, "%d", &N ) != 1 )
             return false;
 
-        gcf_U1= new term2;//(P4POLYNOM2)malloc( sizeof(struct term2) );
+        gcf_U1= new term2;
         gcf_U1->next_term2 = nullptr;
 
         if( !readTerm2( fp, gcf_U1, N ) )
@@ -627,7 +630,7 @@ bool WVFStudy::readGCF( FILE * fp )
         if( fscanf( fp, "%d", &N ) != 1 )
             return false;
 
-        gcf_U2= new term2;//(P4POLYNOM2)malloc( sizeof(struct term2) );
+        gcf_U2= new term2;
         gcf_U2->next_term2 = nullptr;
 
         if( !readTerm2( fp, gcf_U2, N ) )
@@ -636,14 +639,14 @@ bool WVFStudy::readGCF( FILE * fp )
         if( fscanf( fp, "%d", &N ) != 1 )
             return false;
 
-        gcf_V1= new term2;//(P4POLYNOM2)malloc( sizeof(struct term2) );
+        gcf_V1= new term2;
         gcf_V1->next_term2 = nullptr;
         if( !readTerm2( fp, gcf_V1, N ) )
             return false;
         
         if( fscanf( fp, "%d", &N ) != 1 )
             return false;
-        gcf_V2= new term2;//(P4POLYNOM2)malloc( sizeof(struct term2) );
+        gcf_V2= new term2;
         gcf_V2->next_term2 = nullptr;
         if( !readTerm2( fp, gcf_V2, N ) )
             return false;
@@ -653,7 +656,7 @@ bool WVFStudy::readGCF( FILE * fp )
             if( fscanf( fp, "%d", &N ) != 1 )
                 return false;
 
-            gcf_C = new term3;// (P4POLYNOM3)malloc( sizeof(struct term3) );
+            gcf_C = new term3;// (P4POLYNOM3)malloc( sizeof(term3) );
             gcf_C->next_term3 = nullptr;
             if( !readTerm3( fp, gcf_C, N ) )
                 return false;
@@ -680,9 +683,9 @@ bool WVFStudy::readVectorField( FILE * fp, P4POLYNOM2 * vf )
 {
     int M,N;
 
-    vf[0] = new term2;//(P4POLYNOM2)malloc( sizeof( struct term2 ) );
+    vf[0] = new term2;
     vf[0]->next_term2 = nullptr;
-    vf[1] = new term2;//(P4POLYNOM2)malloc( sizeof( struct term2 ) );
+    vf[1] = new term2;
     vf[1]->next_term2 = nullptr;
 
     if( fscanf( fp, "%d", &M ) != 1 )
@@ -705,9 +708,9 @@ bool WVFStudy::readVectorFieldCylinder( FILE * fp, P4POLYNOM3 * vf )
 {
     int N;
 
-    vf[0] = new term3;// (P4POLYNOM3)malloc( sizeof( struct term3 ) ); 
+    vf[0] = new term3;// (P4POLYNOM3)malloc( sizeof( term3 ) );
     vf[0]->next_term3 = nullptr;
-    vf[1] = new term3;//(P4POLYNOM3)malloc( sizeof( struct term3 ) ); 
+    vf[1] = new term3;
     vf[1]->next_term3 = nullptr;
 
     if( fscanf( fp, "%d", &N ) != 1 )
@@ -740,7 +743,7 @@ bool WVFStudy::readPoints( FILE * fp )
     {
         if( fscanf( fp, "%d ", &typ ) != 1 )
         {
-            lasterror = WString( "sing #") + WString::number(i) + " type not readable";
+            lasterror = WString( "sing #") + std::to_string(i) + " type not readable";
             return false;
         }
         switch( typ )
@@ -748,47 +751,47 @@ bool WVFStudy::readPoints( FILE * fp )
         case SADDLE:
             if( !readSaddlePoint( fp ) )
             {
-                lasterror = WString( "sing #") + WString::number(i) + " = saddle : " + lasterror;
+                lasterror = WString( "sing #") + std::to_string(i) + " = saddle : " + lasterror;
                 return false;
             }
             break;
         case SEMI_HYPERBOLIC:
             if( !readSemiElementaryPoint( fp ) )
             {
-                lasterror = WString( "sing #") + WString::number(i) + " = semi-el : " + lasterror;
+                lasterror = WString( "sing #") + std::to_string(i) + " = semi-el : " + lasterror;
                 return false;
             }
             break;
         case NODE:
             if( !readNodePoint( fp ) )
             {
-                lasterror = WString( "sing #") + WString::number(i) + " = node : " + lasterror;
+                lasterror = WString( "sing #") + std::to_string(i) + " = node : " + lasterror;
                 return false;
             }
             break;
         case STRONG_FOCUS:
             if( !readStrongFocusPoint( fp ) )
             {
-                lasterror = WString( "sing #") + WString::number(i) + " = strongfocus : " + lasterror;
+                lasterror = WString( "sing #") + std::to_string(i) + " = strongfocus : " + lasterror;
                 return false;
             }
             break;
         case WEAK_FOCUS:
             if( !readWeakFocusPoint( fp ) )
             {
-                lasterror = WString( "sing #") + WString::number(i) + " = weakfocus : " + lasterror;
+                lasterror = WString( "sing #") + std::to_string(i) + " = weakfocus : " + lasterror;
                 return false;
             }
             break;
         case NON_ELEMENTARY:
             if( !readDegeneratePoint( fp ) )
             {
-                lasterror = WString( "sing #") + WString::number(i) + " = degen : " + lasterror;
+                lasterror = WString( "sing #") + std::to_string(i) + " = degen : " + lasterror;
                 return false;
             }
             break;
         default:
-            lasterror = WString( "sing #") + WString::number(i) + " type not exist (" + WString::number(typ) + ")";
+            lasterror = WString( "sing #") + std::to_string(i) + " type not exist (" + std::to_string(typ) + ")";
             return false;
         }
     }
@@ -813,7 +816,7 @@ bool WVFStudy::readTerm1( FILE * fp, P4POLYNOM1 p, int N )
 
     for( i = 2; i <= N; i++ )
     {
-        p->next_term1 = new term1;//(P4POLYNOM1)malloc( sizeof( struct term1 ) );
+        p->next_term1 = new term1;
         p = p->next_term1;
         p->next_term1 = nullptr;
         if( fscanf( fp, "%d %lf", &(p->exp), &(p->coeff) ) != 2 )
@@ -842,7 +845,7 @@ bool WVFStudy::readTerm2( FILE * fp, P4POLYNOM2 p, int N )
 
     for( i = 2; i <= N; i++ )
     {
-        p->next_term2 = new term2;//(P4POLYNOM2)malloc( sizeof( struct term2 ) );
+        p->next_term2 = new term2;
         p = p->next_term2;
         p->next_term2 = nullptr;
         if( fscanf( fp, "%d %d %lf", &(p->exp_x), &(p->exp_y), &(p->coeff) ) != 3 )
@@ -870,7 +873,7 @@ bool WVFStudy::readTerm3( FILE * fp, P4POLYNOM3 p, int N )
 
     for( i = 2; i <= N; i++ )
     {
-        p->next_term3 = new term3;// (P4POLYNOM3)malloc( sizeof( struct term3 ) );
+        p->next_term3 = new term3;// (P4POLYNOM3)malloc( sizeof( term3 ) );
         p = p->next_term3;
         p->next_term3 = nullptr;
         if( fscanf( fp, "%d %d %d %lf", &(p->exp_r), &(p->exp_Co), &(p->exp_Si), &(p->coeff) ) != 4 )
@@ -890,13 +893,13 @@ bool WVFStudy::readTerm3( FILE * fp, P4POLYNOM3 p, int N )
 bool WVFStudy::readSaddlePoint( FILE * fp )
 {
     int N;
-    struct sep * sep1;
-    struct sep * sep2;
+    sep * sep1;
+    sep * sep2;
 
     // make room in structure
 
-    struct saddle * last;
-    struct saddle * point;
+    saddle * last;
+    saddle * point;
 
     last = nullptr;
     point = first_saddle_point;
@@ -906,7 +909,7 @@ bool WVFStudy::readSaddlePoint( FILE * fp )
         point = point->next_saddle;
     }
 
-    point = new saddle;//(struct saddle *)malloc( sizeof(struct saddle) );
+    point = new saddle;
     if( last == nullptr )
         first_saddle_point = point;
     else
@@ -930,7 +933,7 @@ bool WVFStudy::readSaddlePoint( FILE * fp )
     {
         return false;
     }
-    point->separatrices = new sep;//(struct sep *)malloc( sizeof(struct sep) );
+    point->separatrices = new sep;
     sep1 = point->separatrices;
     if( fscanf( fp, "%d ", &(sep1->type) ) != 1 )
     {
@@ -941,7 +944,7 @@ bool WVFStudy::readSaddlePoint( FILE * fp )
         return false;
     }
     sep1->notadummy = true;
-    sep1->separatrice = new term1;//(P4POLYNOM1)malloc( sizeof(struct term1) );
+    sep1->separatrice = new term1;
     readTerm1( fp, sep1->separatrice, N );
     sep1->direction = 1;
     sep1->d = 0;
@@ -954,7 +957,7 @@ bool WVFStudy::readSaddlePoint( FILE * fp )
         // point is finite hence we have 4 separatrices or we have a line of singularities
         // at infinity and hence we have also 4 separatrices after removing the line
 
-        sep2 = new sep;//(struct sep *)malloc( sizeof(struct sep) );
+        sep2 = new sep;
         sep1->next_sep = sep2;
         
         sep2->type = sep1->type;
@@ -965,7 +968,7 @@ bool WVFStudy::readSaddlePoint( FILE * fp )
         sep2->first_sep_point = nullptr;
         sep2->last_sep_point = nullptr;
 
-        sep1 = sep2->next_sep = new sep;//(struct sep *)malloc( sizeof(struct sep) );
+        sep1 = sep2->next_sep = new sep;
 
         if( fscanf( fp, "%d", &(sep1->type) ) != 1 )
         {
@@ -977,14 +980,14 @@ bool WVFStudy::readSaddlePoint( FILE * fp )
         }
 
         sep1->notadummy = true;
-        sep1->separatrice = new term1;//(P4POLYNOM1)malloc( sizeof(struct term1) );
+        sep1->separatrice = new term1;
         readTerm1( fp, sep1->separatrice, N );
         sep1->direction = 1;
         sep1->d = 1;
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
 
-        sep2 = new sep;//(struct sep *)malloc( sizeof(struct sep) );
+        sep2 = new sep;
         sep1->next_sep = sep2;
 
         sep2->type = sep1->type;
@@ -1008,7 +1011,7 @@ bool WVFStudy::readSaddlePoint( FILE * fp )
     if( singinf && point->chart != CHART_R2 )
     {
         last = point;
-        point = new saddle;//(struct saddle *)malloc( sizeof(struct saddle) );
+        point = new saddle;
         last->next_saddle = point;
         point->next_saddle = nullptr;
 
@@ -1037,11 +1040,11 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
 {
     // make room in structure
 
-    struct semi_elementary * last;
-    struct semi_elementary * point;
+    semi_elementary * last;
+    semi_elementary * point;
     int N;
     int s;
-    struct sep * sep1;
+    sep * sep1;
     double y[2];
     bool ok;
 
@@ -1053,7 +1056,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         point = point->next_se;
     }
 
-    point = new semi_elementary;//(struct semi_elementary *)malloc( sizeof(struct semi_elementary) );
+    point = new semi_elementary;
     if( last == nullptr )
         first_se_point = point;
     else
@@ -1085,7 +1088,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             // at infinity, we  have s=0, so the center sep is the line at infinity, not reported so only sep is
             // then the hyperbolic sep.
 
-            point->separatrices = new sep;//(struct sep *)malloc( sizeof(struct sep) );
+            point->separatrices = new sep;
             sep1 = point->separatrices;
             
             if( s )
@@ -1107,7 +1110,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             if( fscanf( fp, "%d ", &N ) != 1 )
                 return false;
             sep1->notadummy = true;
-            sep1->separatrice = new term1;// (struct term1 *)malloc( sizeof(struct term1) );
+            sep1->separatrice = new term1;// (term1 *)malloc( sizeof(term1) );
             readTerm1( fp, sep1->separatrice, N );
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
@@ -1116,7 +1119,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             {
                 // read second (hyperbolic) separatrix
 
-                sep1->next_sep = new sep;// (struct sep *)malloc( sizeof(struct sep) );
+                sep1->next_sep = new sep;// (sep *)malloc( sizeof(sep) );
                 sep1 = sep1->next_sep;
                 sep1->type = OT_UNSTABLE;
                 sep1->d = 1;
@@ -1124,14 +1127,14 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
                 if( fscanf( fp, "%d ", &N ) != 1 )
                     return false;
                 sep1->notadummy = true;
-                sep1->separatrice = new term1;//(struct term1 *)malloc( sizeof(struct term1) );
+                sep1->separatrice = new term1;
                 readTerm1( fp, sep1->separatrice, N );
                 sep1->first_sep_point = nullptr;
                 sep1->last_sep_point = nullptr;
 
                 // it is two-sided, so make a copy in other direction
 
-                sep1->next_sep = new sep;//(struct sep *)malloc( sizeof(struct sep) );
+                sep1->next_sep = new sep;
                 sep1->next_sep->type = OT_UNSTABLE;
                 sep1->next_sep->d = 1;
                 sep1->next_sep->direction = -1;
@@ -1146,7 +1149,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
 
 
     case 2: // saddle-node 
-        point->separatrices = new sep;// (struct sep *) malloc(sizeof(struct sep));
+        point->separatrices = new sep;// (sep *) malloc(sizeof(sep));
         sep1 = point->separatrices;
         if( s )
             sep1->type = STYPE_CENUNSTABLE;
@@ -1162,14 +1165,14 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         if( fscanf( fp, "%d ", &N ) != 1 )
             return false;
         sep1->notadummy = true;
-        sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+        sep1->separatrice = new term1;
         readTerm1( fp, sep1->separatrice, N );
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
         sep1->next_sep = nullptr;
         if( point->chart == CHART_R2 || singinf )
         {
-            sep1->next_sep = new sep;//(struct sep *) malloc( sizeof(struct sep) );
+            sep1->next_sep = new sep;
             sep1 = sep1->next_sep;
             sep1->type = STYPE_STABLE;
             sep1->d = 1;
@@ -1177,11 +1180,11 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             if( fscanf( fp, "%d ", &N ) !=1 )
                 return false;
             sep1->notadummy = true;
-            sep1->separatrice = new term1;//(struct term1 *)malloc( sizeof(struct term1) );
+            sep1->separatrice = new term1;
             readTerm1( fp, sep1->separatrice, N );
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
-            sep1->next_sep = new sep;//(struct sep *)malloc(sizeof(struct sep));
+            sep1->next_sep = new sep;
             sep1->next_sep->type = STYPE_STABLE;
             sep1->next_sep->d = 1;
             sep1->next_sep->direction = -1;
@@ -1194,7 +1197,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         break;
 
     case 3: // saddle-node 
-        point->separatrices = new sep;//(struct sep *) malloc(sizeof(struct sep));
+        point->separatrices = new sep;
         sep1 = point->separatrices;
         if( s )
             sep1->type = STYPE_CENSTABLE;
@@ -1209,25 +1212,25 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         if( fscanf( fp, "%d ", &N ) != 1 )
             return false;
         sep1->notadummy = true;
-        sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+        sep1->separatrice = new term1;
         readTerm1( fp, sep1->separatrice, N );
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
         sep1->next_sep = nullptr;
         if( point->chart == CHART_R2 || singinf )
         {
-            sep1->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            sep1->next_sep = new sep;
             sep1 = sep1->next_sep;
             sep1->type = STYPE_UNSTABLE; sep1->d = 1;
             sep1->direction = 1;
             if( fscanf( fp, "%d ", &N ) !=1 )
                 return false;
             sep1->notadummy = true;
-            sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+            sep1->separatrice = new term1;
             readTerm1( fp, sep1->separatrice, N );
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
-            sep1->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            sep1->next_sep = new sep;
             sep1->next_sep->type = STYPE_UNSTABLE;
             sep1->next_sep->d = 1;
             sep1->next_sep->direction = -1;
@@ -1246,7 +1249,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         }
         else
         {
-            point->separatrices = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            point->separatrices = new sep;
             sep1 = point->separatrices;
             if( s )
                 sep1->type = STYPE_CENUNSTABLE;
@@ -1263,14 +1266,14 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             if( fscanf( fp, "%d ", &N ) != 1 )
                 return false;
             sep1->notadummy = true;
-            sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+            sep1->separatrice = new term1;
             readTerm1( fp, sep1->separatrice, N );
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
             sep1->next_sep = nullptr;
             if( point->chart == CHART_R2 || singinf )
             {
-                sep1->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+                sep1->next_sep = new sep;
                 sep1 = sep1->next_sep;
                 sep1->type = STYPE_STABLE;
                 sep1->d = 1;
@@ -1278,11 +1281,11 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
                 if( fscanf( fp, "%d ", &N ) !=1 )
                     return false;
                 sep1->notadummy = true;
-                sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+                sep1->separatrice = new term1;
                 readTerm1( fp, sep1->separatrice, N );
                 sep1->first_sep_point = nullptr;
                 sep1->last_sep_point = nullptr;
-                sep1->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+                sep1->next_sep = new sep;
                 sep1->next_sep->type = STYPE_STABLE;
                 sep1->next_sep->d = 1;
                 sep1->next_sep->direction = -1;
@@ -1296,7 +1299,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         break;   
 
     case 6: // saddle 
-        point->separatrices = new sep;//(struct sep *) malloc(sizeof(struct sep));
+        point->separatrices = new sep;
         sep1 = point->separatrices;
         if( s )
             sep1->type = STYPE_CENUNSTABLE;
@@ -1310,14 +1313,14 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         if( fscanf( fp, "%d ", &N ) !=1 )
             return false;
         sep1->notadummy = true;
-        sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+        sep1->separatrice = new term1;
         readTerm1( fp, sep1->separatrice, N );
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
         sep1->next_sep = nullptr;
         if( point->chart== CHART_R2 || singinf )
         {
-            sep1->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            sep1->next_sep = new sep;
             sep1->next_sep->type = STYPE_CENUNSTABLE;
             sep1->next_sep->d = 0;
             sep1->next_sep->direction = -1;
@@ -1325,7 +1328,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             sep1->next_sep->separatrice = sep1->separatrice;
             sep1->next_sep->first_sep_point = nullptr;
             sep1->next_sep->last_sep_point = nullptr;
-            sep1->next_sep->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            sep1->next_sep->next_sep = new sep;
             sep1 = sep1->next_sep->next_sep;
             sep1->type = STYPE_STABLE;
             sep1->d = 1;
@@ -1333,11 +1336,11 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             if( fscanf( fp, "%d ", &N ) != 1 )
                 return false;
             sep1->notadummy = true;
-            sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+            sep1->separatrice = new term1;
             readTerm1( fp, sep1->separatrice, N);
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
-            sep1->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            sep1->next_sep = new sep;
             sep1->next_sep->type = STYPE_STABLE;
             sep1->next_sep->d = 1;
             sep1->next_sep->direction = -1;
@@ -1350,7 +1353,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         break;
 
     case 7: // saddle 
-        point->separatrices = new sep;//(struct sep *) malloc(sizeof(struct sep));
+        point->separatrices = new sep;
         sep1 = point->separatrices;
         if( s )
             sep1->type = STYPE_CENSTABLE;
@@ -1364,14 +1367,14 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         if( fscanf( fp, "%d ", &N ) != 1 )
             return false;
         sep1->notadummy = true;
-        sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+        sep1->separatrice = new term1;
         readTerm1( fp, sep1->separatrice, N);
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
         sep1->next_sep = nullptr;
         if( point->chart== CHART_R2 || singinf )
         {
-            sep1->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            sep1->next_sep = new sep;
             sep1->next_sep->type = STYPE_CENSTABLE;
             sep1->next_sep->d = 0;
             sep1->next_sep->direction = -1;
@@ -1379,7 +1382,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             sep1->next_sep->separatrice = sep1->separatrice;
             sep1->next_sep->first_sep_point = nullptr;
             sep1->next_sep->last_sep_point = nullptr;
-            sep1->next_sep->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            sep1->next_sep->next_sep = new sep;
             sep1 = sep1->next_sep->next_sep;
             sep1->type = STYPE_UNSTABLE;
             sep1->d = 1;
@@ -1387,11 +1390,11 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
             if( fscanf( fp, "%d ",&N ) != 1 )
                 return false;
             sep1->notadummy = true;
-            sep1->separatrice = new term1;//(struct term1 *) malloc(sizeof(struct term1));
+            sep1->separatrice = new term1;
             readTerm1( fp, sep1->separatrice, N );
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
-            sep1->next_sep = new sep;//(struct sep *) malloc(sizeof(struct sep));
+            sep1->next_sep = new sep;
             sep1->next_sep->type = STYPE_UNSTABLE;
             sep1->next_sep->d = 1;
             sep1->next_sep->direction = -1;
@@ -1454,7 +1457,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
 
     if( singinf && (point->chart != CHART_R2) )
     {
-        point->next_se = new semi_elementary;//(struct semi_elementary *) malloc(sizeof(struct semi_elementary));
+        point->next_se = new semi_elementary;
         point->next_se->x0 = point->x0;
         point->next_se->y0 = 0.0;
         if( VFResults.dir_vec_field == 1 )
@@ -1496,8 +1499,8 @@ bool WVFStudy::readStrongFocusPoint( FILE * fp )
 
     // make room in structure
 
-    struct strong_focus * last;
-    struct strong_focus * point;
+    strong_focus * last;
+    strong_focus * point;
 
     last = nullptr;
     point = first_sf_point;
@@ -1507,7 +1510,7 @@ bool WVFStudy::readStrongFocusPoint( FILE * fp )
         point = point->next_sf;
     }
 
-    point = new strong_focus;//(struct strong_focus *)malloc( sizeof(struct strong_focus) );
+    point = new strong_focus;
     if( last == nullptr )
         first_sf_point = point;
     else
@@ -1566,7 +1569,7 @@ bool WVFStudy::readStrongFocusPoint( FILE * fp )
     if( singinf && point->chart != CHART_R2 )
     {
         last = point;
-        point = new strong_focus;//(struct strong_focus *)malloc( sizeof(struct strong_focus) );
+        point = new strong_focus;
         last->next_sf = point;
         point->next_sf = nullptr;
 
@@ -1583,8 +1586,8 @@ bool WVFStudy::readWeakFocusPoint( FILE * fp )
 {
     // make room in structure
 
-    struct weak_focus * last;
-    struct weak_focus * point;
+    weak_focus * last;
+    weak_focus * point;
     double y[2];
 
     last = nullptr;
@@ -1595,7 +1598,7 @@ bool WVFStudy::readWeakFocusPoint( FILE * fp )
         point = point->next_wf;
     }
 
-    point = new weak_focus;//(struct weak_focus *)malloc( sizeof(struct weak_focus) );
+    point = new weak_focus;
     if( last == nullptr )
         first_wf_point = point;
     else
@@ -1650,7 +1653,7 @@ bool WVFStudy::readWeakFocusPoint( FILE * fp )
 
     if( singinf && (point->chart != CHART_R2) )
     {
-        point->next_wf = new weak_focus;//(struct weak_focus *) malloc(sizeof(struct weak_focus));
+        point->next_wf = new weak_focus;
         point->next_wf->x0 = point->x0;
         point->next_wf->y0 = 0.0;
 
@@ -1682,8 +1685,8 @@ bool WVFStudy::readDegeneratePoint( FILE * fp )
 
     // make room in structure
 
-    struct degenerate * last;
-    struct degenerate * point;
+    degenerate * last;
+    degenerate * point;
 
     last = nullptr;
     point = first_de_point;
@@ -1693,7 +1696,7 @@ bool WVFStudy::readDegeneratePoint( FILE * fp )
         point = point->next_de;
     }
 
-    point = new degenerate;//(struct degenerate *)malloc( sizeof(struct degenerate) );
+    point = new degenerate;
     if( last == nullptr )
         first_de_point = point;
     else
@@ -1708,7 +1711,7 @@ bool WVFStudy::readDegeneratePoint( FILE * fp )
     point->blow_up=nullptr;
     if( n )
     {
-        point->blow_up = new blow_up_points;//(struct blow_up_points *)malloc( sizeof(struct blow_up_points) );
+        point->blow_up = new blow_up_points;
         readBlowupPoints( fp, point->blow_up, n );
         point->blow_up->blow_up_vec_field = true;
     }
@@ -1723,7 +1726,7 @@ bool WVFStudy::readDegeneratePoint( FILE * fp )
     if( singinf && point->chart != CHART_R2 )
     {
         last = point;
-        point = new degenerate;//(struct degenerate *)malloc( sizeof(struct degenerate) );
+        point = new degenerate;
         last->next_de = point;
         point->next_de = nullptr;
 
@@ -1748,8 +1751,8 @@ bool WVFStudy::readNodePoint( FILE * fp )
 
     // make room in structure
 
-    struct node * last;
-    struct node * point;
+    node * last;
+    node * point;
 
     last = nullptr;
     point = first_node_point;
@@ -1759,7 +1762,7 @@ bool WVFStudy::readNodePoint( FILE * fp )
         point = point->next_node;
     }
 
-    point = new node;//(struct node *)malloc( sizeof(struct node) );
+    point = new node;
     if( last == nullptr )
         first_node_point = point;
     else
@@ -1818,7 +1821,7 @@ bool WVFStudy::readNodePoint( FILE * fp )
     if( singinf != 0 && point->chart != CHART_R2 )
     {
         last = point;
-        point = new node;//(struct node *)malloc( sizeof(struct node) );
+        point = new node;
         last->next_node = point;
         point->next_node = nullptr;
 
@@ -1835,7 +1838,7 @@ bool WVFStudy::readNodePoint( FILE * fp )
 //                      WVFStudy::ReadTransformations
 // -----------------------------------------------------------------------
 
-bool WVFStudy::readTransformations( FILE * fp, struct transformations * trans, int n )
+bool WVFStudy::readTransformations( FILE * fp, transformations * trans, int n )
 {
 
     int i;
@@ -1849,7 +1852,7 @@ bool WVFStudy::readTransformations( FILE * fp, struct transformations * trans, i
 
     for( i = 2; i <= n; i++ )
     {
-        trans->next_trans = new transformations;//(struct transformations *)malloc( sizeof(struct transformations) );
+        trans->next_trans = new transformations;
         trans = trans->next_trans;
     
         if( fscanf( fp, "%lf %lf %d %d %d %d %d %d %d",
@@ -1867,7 +1870,7 @@ bool WVFStudy::readTransformations( FILE * fp, struct transformations * trans, i
 //                      WVFStudy::ReadBlowupPoints
 // -----------------------------------------------------------------------
 
-bool WVFStudy::readBlowupPoints( FILE * fp, struct blow_up_points * b, int n )
+bool WVFStudy::readBlowupPoints( FILE * fp, blow_up_points * b, int n )
 {
     int i, N, typ;
 
@@ -1876,7 +1879,7 @@ bool WVFStudy::readBlowupPoints( FILE * fp, struct blow_up_points * b, int n )
         if( fscanf( fp, "%d ", &(b->n) ) != 1 )
             return false;
         
-        b->trans = new transformations;//(struct transformations *)malloc( sizeof(struct transformations) );
+        b->trans = new transformations;
 
         readTransformations( fp, b->trans, b->n );
         if( fscanf( fp, "%lf %lf ", &(b->x0), &(b->y0) ) != 2 )
@@ -1884,7 +1887,7 @@ bool WVFStudy::readBlowupPoints( FILE * fp, struct blow_up_points * b, int n )
         if( fscanf( fp, "%lf %lf %lf %lf ",&(b->a11), &(b->a12), &(b->a21),&(b->a22) ) != 4 )
             return false;
         readVectorField( fp, b->vector_field );
-        b->sep = new term1;//(struct term1 *)malloc( sizeof(struct term1) );
+        b->sep = new term1;
         if( fscanf( fp, "%d ", &N ) != 1)
             return false;
         readTerm1( fp, b->sep, N );
@@ -1917,17 +1920,14 @@ bool WVFStudy::readBlowupPoints( FILE * fp, struct blow_up_points * b, int n )
         
         if( i < n )
         {
-            b->next_blow_up_point = new blow_up_points;//(struct blow_up_points *)malloc( sizeof(struct blow_up_points) );
+            b->next_blow_up_point = new blow_up_points;
             b = b->next_blow_up_point;
         }
     }
     return true;
 }
 
-#define DUMP(x) m->append( s.sprintf x );
-#define DUMPSTR(x) m->append( x );
-
-void WVFStudy::dumpSeparatrices( QTextEdit * m, struct sep * separ, int margin )
+/*void WVFStudy::dumpSeparatrices( QTextEdit * m, sep * separ, int margin )
 {
     WString s;
     char smargin[80];
@@ -1967,18 +1967,18 @@ void WVFStudy::dumpSeparatrices( QTextEdit * m, struct sep * separ, int margin )
 
 }
 
-void WVFStudy::dumpSingularities( QTextEdit * m, struct genericsingularity * p, const char * type, bool longversion )
+void WVFStudy::dumpSingularities( QTextEdit * m, genericsingularity * p, const char * type, bool longversion )
 {
     const char * chart;
     WString s;
     QByteArray ss;
 
-    struct saddle * sa;
-    struct degenerate * de;
-    struct strong_focus * sf;
-    struct weak_focus * wf;
-    struct node * no;
-    struct semi_elementary * se;
+    saddle * sa;
+    degenerate * de;
+    strong_focus * sf;
+    weak_focus * wf;
+    node * no;
+    semi_elementary * se;
 
     while( p != nullptr )
     {
@@ -1999,7 +1999,7 @@ void WVFStudy::dumpSingularities( QTextEdit * m, struct genericsingularity * p, 
             {
             case 'S'*'A':
                 // saddle
-                sa = (struct saddle *)p;
+                sa = (saddle *)p;
                 DUMP(( "   Epsilon = %g  original=%d", (float)(sa->epsilon), sa->notadummy ))
                 DUMP(( "   Transformation Matrix = [ [%g,%g], [%g,%g] ]", (float)(sa->a11),
                                         (float)(sa->a12), (float)(sa->a21), (float)(sa->a22) ))
@@ -2012,13 +2012,13 @@ void WVFStudy::dumpSingularities( QTextEdit * m, struct genericsingularity * p, 
 
             case 'D'*'E':
                 // degenerate
-                de = (struct degenerate *)p;
+                de = (degenerate *)p;
                 DUMP(( "   Epsilon = %g  original=%d", (float)(de->epsilon), de->notadummy ))
                 break;
 
             case 'S'*'T':
                 // strong focus
-                sf = (struct strong_focus *)p;
+                sf = (strong_focus *)p;
                 if( sf->stable == -1 ) s = "(stable)";
                 else if( sf->stable == +1 ) s = "(unstable)";
                 else s = "( ??? )";
@@ -2028,12 +2028,12 @@ void WVFStudy::dumpSingularities( QTextEdit * m, struct genericsingularity * p, 
                 break;
             case 'W'*'E':
                 // weak focus
-                wf = (struct weak_focus *)p;
+                wf = (weak_focus *)p;
                 DUMP(( "    Type = %d", wf->type ))
                 break;
             case 'N'*'O':
                 // node
-                no = (struct node *)p;
+                no = (node *)p;
                 if( no->stable == -1 ) s = "(stable)";
                 else if( no->stable == +1 ) s = "(unstable)";
                 else s = "( ??? )";
@@ -2042,7 +2042,7 @@ void WVFStudy::dumpSingularities( QTextEdit * m, struct genericsingularity * p, 
                 break;
             case 'S'*'E':
                 // semi-elementary
-                se = (struct semi_elementary *)p;
+                se = (semi_elementary *)p;
                 DUMP(( "   Type    = %d", se->type ))
                 DUMP(( "   Epsilon = %g  original=%d", (float)(se->epsilon), se->notadummy ))
                 DUMP(( "   Transformation Matrix = [ [%g,%g], [%g,%g] ]", (float)(se->a11),
@@ -2114,22 +2114,22 @@ void WVFStudy::dump( WString basename, WString info )
     DUMP(( "Singular points - summary" ))
     DUMP(( "-------------------------" ))
     DUMP(( " " ))
-    dumpSingularities( m, (struct genericsingularity *)first_saddle_point,  "SADDLE         ", false );
-    dumpSingularities( m, (struct genericsingularity *)first_se_point,      "SEMI-ELEMENTARY", false );
-    dumpSingularities( m, (struct genericsingularity *)first_node_point,    "NODE           ", false );
-    dumpSingularities( m, (struct genericsingularity *)first_wf_point,      "WEAK FOCUS     ", false );
-    dumpSingularities( m, (struct genericsingularity *)first_sf_point,      "STRONG FOCUS   ", false );
-    dumpSingularities( m, (struct genericsingularity *)first_de_point,      "DEGENERATE     ", false );
+    dumpSingularities( m, (genericsingularity *)first_saddle_point,  "SADDLE         ", false );
+    dumpSingularities( m, (genericsingularity *)first_se_point,      "SEMI-ELEMENTARY", false );
+    dumpSingularities( m, (genericsingularity *)first_node_point,    "NODE           ", false );
+    dumpSingularities( m, (genericsingularity *)first_wf_point,      "WEAK FOCUS     ", false );
+    dumpSingularities( m, (genericsingularity *)first_sf_point,      "STRONG FOCUS   ", false );
+    dumpSingularities( m, (genericsingularity *)first_de_point,      "DEGENERATE     ", false );
     DUMP(( " " ))
     DUMP(( "Singular points - full description" ))
     DUMP(( "----------------------------------" ))
     DUMP(( " " ))
-    dumpSingularities( m, (struct genericsingularity *)first_saddle_point,  "SADDLE         ", true );
-    dumpSingularities( m, (struct genericsingularity *)first_se_point,      "SEMI-ELEMENTARY", true );
-    dumpSingularities( m, (struct genericsingularity *)first_node_point,    "NODE           ", true );
-    dumpSingularities( m, (struct genericsingularity *)first_wf_point,      "WEAK FOCUS     ", true );
-    dumpSingularities( m, (struct genericsingularity *)first_sf_point,      "STRONG FOCUS   ", true );
-    dumpSingularities( m, (struct genericsingularity *)first_de_point,      "DEGENERATE     ", true );
+    dumpSingularities( m, (genericsingularity *)first_saddle_point,  "SADDLE         ", true );
+    dumpSingularities( m, (genericsingularity *)first_se_point,      "SEMI-ELEMENTARY", true );
+    dumpSingularities( m, (genericsingularity *)first_node_point,    "NODE           ", true );
+    dumpSingularities( m, (genericsingularity *)first_wf_point,      "WEAK FOCUS     ", true );
+    dumpSingularities( m, (genericsingularity *)first_sf_point,      "STRONG FOCUS   ", true );
+    dumpSingularities( m, (genericsingularity *)first_de_point,      "DEGENERATE     ", true );
     DUMP(( " " ))
     DUMP(( "Default integration parameters" ))
     DUMP(( "------------------------------" ))
@@ -2351,4 +2351,4 @@ void WVFStudy::setupCoordinateTransformations( void )
             break;
         }
     }
-}
+}*/

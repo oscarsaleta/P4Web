@@ -236,7 +236,6 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
     f << "user_bindir := \"" << str_bindir << "\":" << std::endl;
     f << "user_tmpdir := \"" << str_tmpdir << "\":" << std::endl;
     f << "user_lypexe := \"" << str_lypexe << "\":" << std::endl;
-    //f << "user_lypexe_mpf := \"" << user_lypexe_mpf << "\":" << std::endl;
     f << "user_sepexe := \"" << str_sepexe << "\":" << std::endl;
     f << "user_exeprefix := \"" << str_exeprefix << "\":" << std::endl;
     f << "user_platform := \"" << str_platform << "\":" << std::endl;
