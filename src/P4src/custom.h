@@ -4,6 +4,7 @@
 
 #include "color.h"
 
+#define UNUSED(x) (void)(x)   //  to avoid warnings of unused variables in case we cannot avoid it
 
 // Defaults regarding Vector Field and Filename
 
