@@ -1,3 +1,5 @@
+#include "PlotRegion.h"
+
 #include <Wt/WContainerWidget>
 
 #include <Wt/WPushButton>
@@ -30,6 +32,8 @@ private:
     std::string fullResults_;
     std::string finResults_;
     std::string infResults_;
+
+    PlotRegion *plotRegion_;
 
     Wt::WContainerWidget *plotContainer_;
 

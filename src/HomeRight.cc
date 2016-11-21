@@ -1,7 +1,5 @@
 #include "HomeRight.h"
 
-#include "PlotRegion.h"
-
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -83,8 +81,11 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
 
-    PlotRegion test(plotContainer_);
-    test.show();
+    plotRegion_ = new PlotRegion(plotContainer_,550,900);
+    plotRegion_->setId("plotRegion_");
+    //plotRegion_->setSize(550,9000);
+    plotRegion_->setMargin(5,Top);
+    plotContainer_->addWidget(plotRegion_);
 
 
     //tabWidget_->setStyleClass("tabwidget");
