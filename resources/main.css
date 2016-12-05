@@ -16,7 +16,7 @@ body{
 }
 
 .btn.disabled {
-  cursor: normal;
+  cursor: auto;
 }
 
 
@@ -38,6 +38,10 @@ body{
   content: " ";
 }
 
+/* inline load button */
+#infileUploadWidget_ {
+  display: inline-block;
+}
 
 /* inline labels */
 #xLabel_, #yLabel_ {

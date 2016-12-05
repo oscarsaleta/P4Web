@@ -32,15 +32,15 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     fileUploadBox_->setId("fileUploadBox_");
     fileUploadBox_->setTitle(tr("homeleft.fuploadboxtitle"));
     addWidget(fileUploadBox_);
-
+    
     fileUploadButton_ = new WPushButton("Load",fileUploadBox_);
     fileUploadButton_->setId("fileUploadButton_");
     fileUploadButton_->setEnabled(false);
     fileUploadButton_->setInline(true);
-    fileUploadButton_->setMargin(5,Bottom);
+    fileUploadButton_->setMargin(5,Right);
     fileUploadBox_->addWidget(fileUploadButton_);
-    
-    fileUploadWidget_ = new WFileUpload(this);
+
+    fileUploadWidget_ = new WFileUpload(fileUploadBox_);
     fileUploadWidget_->setId("fileUploadWidget_");
     fileUploadWidget_->setFileTextSize(30);
     fileUploadWidget_->setFilters(".inp");

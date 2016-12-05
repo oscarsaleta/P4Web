@@ -84,10 +84,9 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     plotRegion_->setId("plotRegion_");
     plotRegion_->setMargin(5,Top);
     plotContainer_->addWidget(plotRegion_);
-    plotRegion_->plotCircle(2);
+    //plotRegion_->plotCircle(2);
 
 
-    //tabWidget_->setStyleClass("tabwidget");
     tabWidget_->setCurrentIndex(0);
 
 
