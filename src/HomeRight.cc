@@ -77,15 +77,14 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     // plot widget
     plotContainer_ =  new WContainerWidget();
     plotContainer_->setId("plotContainer_");
-    //plotContainer_->setTitle(tr("homeright.plotcontainertitle"));
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
 
-    plotRegion_ = new PlotRegion(plotContainer_,550,900);
+    plotRegion_ = new PlotRegion(plotContainer_,550,550);
     plotRegion_->setId("plotRegion_");
-    //plotRegion_->setSize(550,9000);
     plotRegion_->setMargin(5,Top);
     plotContainer_->addWidget(plotRegion_);
+    plotRegion_->plotCircle(2);
 
 
     //tabWidget_->setStyleClass("tabwidget");
