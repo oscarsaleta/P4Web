@@ -1,5 +1,7 @@
-#ifndef TABLE_H
-#define TABLE_H
+
+
+#ifndef FILE_TAB_H
+#define FILE_TAB_H
 
 
 #include <Wt/WObject>
@@ -440,4 +442,4 @@ extern WVFStudy VFResults;	// (VFResults.p,VFResults.q) are lyapunov weights
 #define LINESTYLE_POINTS	0
 
 
-#endif /*TABLE_H*/
+#endif /*FILE_TAB_H*/

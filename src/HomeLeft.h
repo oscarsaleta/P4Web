@@ -1,5 +1,5 @@
-#ifndef __HOMELEFT_H_INCLUDE__
-#define __HOMELEFT_H_INCLUDE__
+#ifndef HOMELEFT_H
+#define HOMELEFT_H
 
 #include <Wt/WContainerWidget>
 #include <Wt/WSignal>
@@ -41,4 +41,4 @@ private:
 
 };
 
-#endif // __HOMELEFT_H_INCLUDE__
+#endif // HOMELEFT_H
