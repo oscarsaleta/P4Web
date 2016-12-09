@@ -24,17 +24,21 @@ private:
     Wt::WText *yLabel_;
     Wt::WLineEdit *yEquationInput_;
     Wt::WPushButton *evalButton_;
-    Wt::WPushButton *saveButton_;
 
+    Wt::WAnchor *saveButton_;
+    std::string saveFileName_;
+    Wt::WFileResource *saveFileResource_;
 
     void fileUploaded();
     void fileTooLarge();
 
-    void saveFile();
     std::string openTempStream(std::string, std::string, std::ofstream&);
     void prepareMapleFile();
     void fillMapleScript(std::string, std::ofstream&);
     void evaluate();
+
+    void saveFile();
+    void prepareSaveFile();
 
     Wt::Signal<int, std::string> evaluated_;
 

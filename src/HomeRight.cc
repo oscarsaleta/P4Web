@@ -1,5 +1,7 @@
 #include "HomeRight.h"
 
+#include "P4src/file_tab.h"
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,12 +20,10 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
 
     tabWidget_ = new WTabWidget(this);
     tabWidget_->setId("tabWidget_");
-    //addWidget(tabWidget_);
 
     // output widget
     outputContainer_ = new WContainerWidget();
     outputContainer_->setId("outputContainer_");
-    //outputContainer_->setTitle(tr("homeright.outputcontainertitle"));
     tabWidget_->addTab(outputContainer_,WString::fromUTF8("Output"),WTabWidget::PreLoading);
 
     // buttons menu for choosing output
@@ -64,8 +64,7 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
         outputTextAreaContent_ = "";
     }));
 
-
-
+    // text area where results are shown
     outputTextAreaContent_ = "";
     outputTextArea_ = new WTextArea(outputTextAreaContent_);
     outputTextArea_->setId("outputTextArea_");
@@ -73,18 +72,30 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     outputContainer_->addWidget(outputTextArea_);
 
 
-
-    // plot widget
+    // plot tab
     plotContainer_ =  new WContainerWidget();
     plotContainer_->setId("plotContainer_");
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
-
+    // region w
     plotRegion_ = new PlotRegion(plotContainer_,550,550);
     plotRegion_->setId("plotRegion_");
     plotRegion_->setMargin(5,Top);
     plotContainer_->addWidget(plotRegion_);
-    //plotRegion_->plotCircle(2);
+
+    plotButtonToolBar_ = new WToolBar(plotContainer_);
+    plotButtonToolBar_->setId("plotButtonToolBar_");
+    plotButtonToolBar_->setMargin(5,Top);
+
+    plotButton_ = new WPushButton("Plot");
+    plotButton_->setId("plotButton_");
+    plotButton_->setStyleClass("btn-default btn");
+    plotButtonToolBar_->addButton(plotButton_);
+
+    // TODO: ficar metode onPlot o equivalent.
+    //plotButton_->clicked().connect(this,&HomeRight::onPlot);
+
+    //plotContainer_->addWidget(plotButtonToolBar_);
 
 
     tabWidget_->setCurrentIndex(0);
@@ -175,3 +186,10 @@ void HomeRight::showInfResults()
         outputTextArea_->setText(outputTextAreaContent_);
     }
 }
+
+
+/*void HomeRight::onPlot()
+{
+    VFResults.deleteVF();
+    if (VFResults.readTables)
+}*/

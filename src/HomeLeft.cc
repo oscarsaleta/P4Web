@@ -23,15 +23,19 @@
 
 //#include "P4src/file_tab.h"
 
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <unistd.h>
 #include <vector>
 
+#include <Wt/WAnchor>
 #include <Wt/WBreak>
+#include <Wt/WFileResource>
 #include <Wt/WFileUpload>
 #include <Wt/WGroupBox>
 #include <Wt/WPushButton>
@@ -116,29 +120,28 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
 
     evalButton_->clicked().connect(this,&HomeLeft::evaluate);
 
-    // save file button and line edit for filename
-    saveButton_ = new WPushButton("Save",equationsBox_);
+    // save file button
+    saveButton_ = new WAnchor(equationsBox_);
     saveButton_->setId("saveButton_");
     saveButton_->setStyleClass("btn btn-default");
+    saveButton_->setText("Save");
     saveButton_->setInline(true);
-    saveButton_->setMargin(10,Left);
-    saveButton_->setEnabled(false);
+    saveButton_->setMargin(5,Left);
+    saveButton_->setDisabled(true);
     equationsBox_->addWidget(saveButton_);
-    saveButton_->hide();
 
-    saveButton_->clicked().connect(this,&HomeLeft::saveFile);
 
     // enable buttons if line edits have content
     xEquationInput_->textInput().connect(std::bind([=] () {
         if (!yEquationInput_->text().empty()) {
             evalButton_->setEnabled(true);
-            saveButton_->setEnabled(true);
+            prepareSaveFile();
         }
     }));
     yEquationInput_->textInput().connect(std::bind([=] () {
         if (!xEquationInput_->text().empty()) {
             evalButton_->setEnabled(true);
-            saveButton_->setEnabled(true);
+            prepareSaveFile();
         }
     }));
 
@@ -170,17 +173,12 @@ void HomeLeft::fileUploaded()
                 yEquationInput_->setText(WString::fromUTF8(line));
         }
         evalButton_->setEnabled(true);
+        prepareSaveFile();
     }
     
 }
 
 void HomeLeft::fileTooLarge()
-{
-
-}
-
-
-void HomeLeft::saveFile()
 {
 
 }
@@ -195,7 +193,7 @@ std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std
     int fd = mkstemps(&dst_prefix[0],4);
     if (fd != -1) {
         prefix.assign(dst_prefix.begin(), dst_prefix.end()-1-4);
-        fullname = prefix+".mpl";
+        fullname = prefix+suffix;
         f.open(fullname.c_str(), std::ios_base::trunc | std::ios_base::out);
         close(fd);
     }
@@ -305,4 +303,34 @@ void HomeLeft::evaluate()
 Signal<int, std::string>& HomeLeft::evaluated()
 {
     return evaluated_;
+}
+
+void HomeLeft::prepareSaveFile()
+{
+    if (fileUploadName_.empty()) {
+        std::ofstream saveFile;
+        saveFileName_ = openTempStream("/tmp",".txt",saveFile);
+        saveFileName_ += ".txt";
+        for (int i=0; i<11; i++) {
+            saveFile << 0 << std::endl;
+        }
+        saveFile << xEquationInput_->text() << std::endl;
+        saveFile << yEquationInput_->text() << std::endl;
+        saveFile << 0 << std::endl;
+        saveFile << 0 << std::endl;
+        saveFile.close();
+    } else {
+        saveFileName_ = fileUploadName_;
+    }
+
+    saveFileResource_ = new WFileResource(saveFileName_);
+
+    char date[100];
+    std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+    std::strftime(date,sizeof(date),"%F_%R",std::localtime(&now));
+    
+    saveFileResource_->suggestFileName("P4vf_"+std::string(date)+".inp");
+    saveButton_->setLink(saveFileResource_);
+    saveButton_->setDisabled(false);
+
 }

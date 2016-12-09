@@ -51,6 +51,9 @@ private:
     Wt::WPushButton *finResButton_;
     Wt::WPushButton *infResButton_;
     Wt::WPushButton *clearButton_;
+    Wt::WToolBar *plotButtonToolBar_;
+    Wt::WPushButton *plotButton_;
+
 
     std::string fileName_;
     std::string fullResults_;
@@ -66,6 +69,7 @@ private:
     void fullResults();
     void showFinResults();
     void showInfResults();
+    void onPlot();
     
 };
 

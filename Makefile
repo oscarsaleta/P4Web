@@ -1,6 +1,6 @@
 CC=g++
 CFLAGS=-std=gnu++14 -Wall -g
-LFLAGS=-lwt
+LFLAGS=-lwt -lboost_system
 HTTPFLAGS=-lwthttp
 DEPFLAGS=-MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 
