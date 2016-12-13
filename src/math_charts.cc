@@ -5,7 +5,6 @@
 #include "math_p4.h"
 #include "math_polynom.h"
 #include "math_numerics.h"
-//#include "main.h"
 
 #include <cmath>
 

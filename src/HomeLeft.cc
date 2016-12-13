@@ -21,7 +21,7 @@
 
 #include "HomeLeft.h"
 
-//#include "P4src/file_tab.h"
+#include "file_tab.h"
 
 #include <chrono>
 #include <cstdio>
@@ -130,20 +130,34 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     saveButton_->setDisabled(true);
     equationsBox_->addWidget(saveButton_);
 
+    plotButton_ = new WPushButton("Plot",equationsBox_);
+    plotButton_->setId("plotButton_");
+    plotButton_->setStyleClass("btn btn-default");
+    plotButton_->setInline(true);
+    plotButton_->setMargin(5,Left);
+    plotButton_->setEnabled(false);
+    equationsBox_->addWidget(plotButton_);
+
+    plotButton_->clicked().connect(this,&HomeLeft::onPlot);
+
+
 
     // enable buttons if line edits have content
     xEquationInput_->textInput().connect(std::bind([=] () {
         if (!yEquationInput_->text().empty()) {
             evalButton_->setEnabled(true);
+            plotButton_->setEnabled(true);
             prepareSaveFile();
         }
     }));
     yEquationInput_->textInput().connect(std::bind([=] () {
         if (!xEquationInput_->text().empty()) {
             evalButton_->setEnabled(true);
+            plotButton_->setEnabled(true);
             prepareSaveFile();
         }
     }));
+
 
 
 
@@ -173,6 +187,7 @@ void HomeLeft::fileUploaded()
                 yEquationInput_->setText(WString::fromUTF8(line));
         }
         evalButton_->setEnabled(true);
+        plotButton_->setEnabled(true);
         prepareSaveFile();
     }
     
@@ -294,15 +309,22 @@ void HomeLeft::evaluate()
 
     std::string command = "maple -z --secure-read=/tmp/*,/usr/local/p4/bin/*,/usr/local/p4/sum_tables/* --secure-write=/tmp/* "+fileUploadName_+".mpl > "+fileUploadName_+".res";
     int status = system(command.c_str());
+    if (status == 0)
+        evaluated_.emit(status,fileUploadName_);
+    else
+        error_.emit("Operation not permitted, IP will be logged.");
     
-    evaluated_.emit(status,fileUploadName_);
-    fileUploadName_="";
 }
 
 
 Signal<int, std::string>& HomeLeft::evaluated()
 {
     return evaluated_;
+}
+
+Signal<std::string>& HomeLeft::error()
+{
+    return error_;
 }
 
 void HomeLeft::prepareSaveFile()
@@ -333,4 +355,11 @@ void HomeLeft::prepareSaveFile()
     saveButton_->setLink(saveFileResource_);
     saveButton_->setDisabled(false);
 
+}
+
+void HomeLeft::onPlot()
+{
+    if ( !VFResults.readTables(fileUploadName_) ) {
+        error_.emit("Cannot read results, evaluate a vector field first.\n");
+    }
 }

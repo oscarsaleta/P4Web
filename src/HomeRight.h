@@ -39,6 +39,7 @@ public:
     ~HomeRight();
 
     void readResults(int,std::string);
+    void printError(std::string);
 
 private:
     Wt::WTabWidget *tabWidget_;

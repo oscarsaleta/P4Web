@@ -117,7 +117,8 @@ HomeRight::~HomeRight()
 void HomeRight::readResults(int k, std::string fileName)
 {
     if (k!=0) {
-        fullResults_ = "Unauthorised operation. IP will be logged.";
+    //    fullResults_ = "Unauthorised operation. IP will be logged.";
+        // TODO: really log IP?
     } else {
         std::ifstream resultsFile;
         std::string line;
@@ -160,6 +161,12 @@ void HomeRight::readResults(int k, std::string fileName)
         }
     }
 
+    fullResults();
+}
+
+void HomeRight::printError(std::string error)
+{
+    fullResults_ = error;
     fullResults();
 }
 

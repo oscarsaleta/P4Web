@@ -462,14 +462,14 @@ bool WVFStudy::readTables( std::string basename )
     fp = fopen( (basename + "_vec.tab").c_str() , "rt" );
     if( fp == nullptr )
     {
-        //dump(basename,"Cannot open file *_vec.tab");
+        fprintf(stderr,"Cannot open file %s_vec.tab\n",basename.c_str());
         deleteVF();
         return false;
     }
 
     if( fscanf( fp, "%d %d %d ", &typeofstudy, &p, &q ) != 3 )
     {
-        //dump(basename,"Cannot read typeofstudy in *_vec.tab");
+        fprintf(stderr,"Cannot read typeofstudy in %s_vec.tab\n",basename.c_str());
         deleteVF();
         fclose(fp);
         return false;
@@ -479,7 +479,7 @@ bool WVFStudy::readTables( std::string basename )
     {
         if( fscanf( fp, "%lf %lf %lf %lf", &xmin, &xmax, &ymin, &ymax ) != 4 )
         {
-            //dump(basename,"Cannot read min-max coords in *_vec.tab");
+            fprintf(stderr,"Cannot read min-max coords in %s_vec.tab\n",basename.c_str());
             deleteVF();
             fclose(fp);
             return false;
@@ -501,7 +501,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readGCF( fp ) )
     {
-        //dump(basename,"Cannot read gcf *_vec.tab");
+        fprintf(stderr,"Cannot read gcf %s_vec.tab\n",basename.c_str());
         deleteVF();
         fclose(fp);
         return false;
@@ -509,7 +509,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, f_vec_field ) )
     {
-        //dump(basename,"Cannot read vector field in *_vec.tab");
+        fprintf(stderr,"Cannot read vector field in %s_vec.tab\n",basename.c_str());
         deleteVF();
         fclose(fp);
         return false;
@@ -517,7 +517,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, vec_field_U1 ) )
     {
-        //dump(basename,"Cannot read vector field in U1-chart in *_vec.tab");
+        fprintf(stderr,"Cannot read vector field in U1-chart in %s_vec.tab\n",basename.c_str());
         deleteVF();
         fclose(fp);
         return false;
@@ -525,7 +525,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, vec_field_V1 ) )
     {
-        //dump(basename,"Cannot read vector field in V1-chart in *_vec.tab");
+        fprintf(stderr,"Cannot read vector field in V1-chart in %s_vec.tab\n",basename.c_str());
         deleteVF();
         fclose(fp);
         return false;
@@ -533,7 +533,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, vec_field_U2 ) )
     {
-        //dump(basename,"Cannot read vector field in U2-chart in *_vec.tab");
+        fprintf(stderr,"Cannot read vector field in U2-chart in %s_vec.tab\n",basename.c_str());
         deleteVF();
         fclose(fp);
         return false;
@@ -541,7 +541,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, vec_field_V2 ) )
     {
-        //dump(basename,"Cannot read vector field in V2-chart in *_vec.tab");
+        fprintf(stderr,"Cannot read vector field in V2-chart in %s_vec.tab\n",basename.c_str());
         deleteVF();
         fclose(fp);
         return false;
@@ -551,7 +551,7 @@ bool WVFStudy::readTables( std::string basename )
     {
         if( !readVectorFieldCylinder( fp, vec_field_C ) )
         {
-            //dump(basename,"Cannot read vector field in Cylinder-chart in *_vec.tab");
+            fprintf(stderr,"Cannot read vector field in Cylinder-chart in %s_vec.tab\n",basename.c_str());
             deleteVF();
             fclose(fp);
             return false;
@@ -562,7 +562,7 @@ bool WVFStudy::readTables( std::string basename )
     {
         if( fscanf( fp, "%d %d", &flag, &VFResults.dir_vec_field ) != 2 )
         {
-            //dump(basename,"Cannot read sing-at-infinity flag and directions flag in *_vec.tab");
+            fprintf(stderr,"Cannot read sing-at-infinity flag and directions flag in %s_vec.tab\n",basename.c_str());
             deleteVF();
             fclose(fp);
             return false;
@@ -579,7 +579,7 @@ bool WVFStudy::readTables( std::string basename )
         {
             if( !readPoints( fp ) )
             {
-                //dump(basename,WString("Problem reading singularity info from *_fin.tab:") + lasterror );
+                fprintf(stderr,"Problem reading singularity info from %s_fin.tab: %s\n",basename.c_str(),lasterror.toUTF8().c_str() );
                 deleteVF();
                 fclose( fp );
                 return false;
@@ -588,7 +588,7 @@ bool WVFStudy::readTables( std::string basename )
         }
         else
         {
-            //dump(basename,"Cannot open *_fin.tab");
+            fprintf(stderr,"Cannot open %s_fin.tab\n",basename.c_str());
             deleteVF();
             return false;
         }
@@ -605,7 +605,7 @@ bool WVFStudy::readTables( std::string basename )
                 {
                     if( !readPoints( fp ) )
                     {
-                        //dump(basename,WString("Cannot read singular points in *_inf.tab (")+std::to_string(j)+"):" + lasterror );
+                        fprintf(stderr,"Cannot read singular points in %s_inf.tab (%s): %s\n",basename.c_str(),std::to_string(j).c_str(),lasterror.toUTF8().c_str() );
                         deleteVF();
                         fclose(fp);
                         return false;
@@ -618,7 +618,7 @@ bool WVFStudy::readTables( std::string basename )
                 {
                     if( !readPoints( fp ) )
                     {
-                        //dump(basename,WString("Cannot read singular points in *_inf.tab (")+std::to_string(j)+"):" + lasterror );
+                        fprintf(stderr,"Cannot read singular points in %s_inf.tab (%s): %s\n", basename.c_str(),std::to_string(j).c_str(),lasterror.toUTF8().c_str() );
                         deleteVF();
                         fclose(fp);
                         return false;
@@ -629,13 +629,13 @@ bool WVFStudy::readTables( std::string basename )
         }
         else
         {
-            //dump(basename,"Cannot open *_inf.tab");
+            fprintf(stderr,"Cannot open %s_inf.tab\n",basename.c_str());
             deleteVF();
             return false;
         }
     }
 
-    //dump(basename, "all's well.");
+    fprintf(stderr,"all's well.\n");
     return true;
 } 
 

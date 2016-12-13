@@ -11,6 +11,7 @@ public:
     ~HomeLeft();
 
     Wt::Signal<int, std::string>& evaluated();
+    Wt::Signal<std::string>& error();
     
 private:
     Wt::WGroupBox *fileUploadBox_;
@@ -24,6 +25,7 @@ private:
     Wt::WText *yLabel_;
     Wt::WLineEdit *yEquationInput_;
     Wt::WPushButton *evalButton_;
+    Wt::WPushButton *plotButton_;
 
     Wt::WAnchor *saveButton_;
     std::string saveFileName_;
@@ -40,7 +42,10 @@ private:
     void saveFile();
     void prepareSaveFile();
 
+    void onPlot();
+
     Wt::Signal<int, std::string> evaluated_;
+    Wt::Signal<std::string> error_;
 
 
 };
