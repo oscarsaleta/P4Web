@@ -195,8 +195,7 @@ void HomeRight::showInfResults()
 }
 
 
-/*void HomeRight::onPlot()
+void HomeRight::onPlot(std::string basename)
 {
-    VFResults.deleteVF();
-    if (VFResults.readTables)
-}*/
+    // TODO: plot aqui a partir de QWinSphere
+}

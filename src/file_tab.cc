@@ -42,11 +42,11 @@
 
 #include "file_tab.h"
 
-//#include "math_p4.h"
-//#include "math_charts.h"
-//#include "math_separatrice.h"
-//#include "math_changedir.h"
-//#include "math_orbits.h"
+#include "math_p4.h"
+#include "math_charts.h"
+#include "math_separatrice.h"
+#include "math_changedir.h"
+#include "math_orbits.h"
 #include "math_polynom.h"
 //#include "p4application.h"
 
@@ -450,7 +450,7 @@ void WVFStudy::deleteOrbit( orbits * p )
 // read filename_vec.tab
 // read filename_inf.tab
 // read filename_fin.tab
-
+// TODO: comment fprintf(stderr,...) calls
 bool WVFStudy::readTables( std::string basename )
 {
     FILE * fp;
@@ -2255,7 +2255,7 @@ void WVFStudy::dump( WString basename, WString info )
 }
 */
 
-/*void WVFStudy::setupCoordinateTransformations( void )
+void WVFStudy::setupCoordinateTransformations( void )
 {
     if( !plweights )
     {
@@ -2395,4 +2395,4 @@ void WVFStudy::dump( WString basename, WString info )
             break;
         }
     }
-}*/
+}

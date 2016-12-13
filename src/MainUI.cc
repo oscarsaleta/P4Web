@@ -144,8 +144,9 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
 
     rightContainer_ = new HomeRight(root_);
 
-    leftContainer_->evaluated().connect(rightContainer_,&HomeRight::readResults);
-    leftContainer_->error().connect(rightContainer_,&HomeRight::printError);
+    leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
+    leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
+    leftContainer_->onPlotSignal().connect(rightContainer_,&HomeRight::onPlot);
 
     root_->addWidget(leftContainer_);
     root_->addWidget(middleSpace_);

@@ -10,8 +10,9 @@ public:
     HomeLeft(Wt::WContainerWidget *parent = 0);
     ~HomeLeft();
 
-    Wt::Signal<int, std::string>& evaluated();
-    Wt::Signal<std::string>& error();
+    Wt::Signal<int, std::string>& evaluatedSignal();
+    Wt::Signal<std::string>& errorSignal();
+    Wt::Signal<std::string>& onPlotSignal();
     
 private:
     Wt::WGroupBox *fileUploadBox_;
@@ -44,8 +45,9 @@ private:
 
     void onPlot();
 
-    Wt::Signal<int, std::string> evaluated_;
-    Wt::Signal<std::string> error_;
+    Wt::Signal<int, std::string> evaluatedSignal_;
+    Wt::Signal<std::string> errorSignal_;
+    Wt::Signal<std::string> onPlotSignal_;
 
 
 };

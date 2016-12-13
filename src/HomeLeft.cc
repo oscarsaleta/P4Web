@@ -46,7 +46,7 @@
 
 using namespace Wt;
 
-HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluated_(this)
+HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluatedSignal_(this), errorSignal_(this), onPlotSignal_(this)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
@@ -310,22 +310,16 @@ void HomeLeft::evaluate()
     std::string command = "maple -z --secure-read=/tmp/*,/usr/local/p4/bin/*,/usr/local/p4/sum_tables/* --secure-write=/tmp/* "+fileUploadName_+".mpl > "+fileUploadName_+".res";
     int status = system(command.c_str());
     if (status == 0)
-        evaluated_.emit(status,fileUploadName_);
+        evaluatedSignal_.emit(status,fileUploadName_);
     else
-        error_.emit("Operation not permitted, IP will be logged.");
+        errorSignal_.emit("Operation not permitted, IP will be logged.");
     
 }
 
 
-Signal<int, std::string>& HomeLeft::evaluated()
-{
-    return evaluated_;
-}
 
-Signal<std::string>& HomeLeft::error()
-{
-    return error_;
-}
+
+
 
 void HomeLeft::prepareSaveFile()
 {
@@ -360,6 +354,31 @@ void HomeLeft::prepareSaveFile()
 void HomeLeft::onPlot()
 {
     if ( !VFResults.readTables(fileUploadName_) ) {
-        error_.emit("Cannot read results, evaluate a vector field first.\n");
+        errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
+    } else {
+        // TODO: coses
+        VFResults.setupCoordinateTransformations();
+
+        onPlotSignal_.emit(fileUploadName_);
     }
+}
+
+
+
+
+// signals
+
+Signal<int, std::string>& HomeLeft::evaluatedSignal()
+{
+    return evaluatedSignal_;
+}
+
+Signal<std::string>& HomeLeft::errorSignal()
+{
+    return errorSignal_;
+}
+
+Signal <std::string>& HomeLeft::onPlotSignal()
+{
+    return onPlotSignal_;
 }

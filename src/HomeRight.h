@@ -40,6 +40,7 @@ public:
 
     void readResults(int,std::string);
     void printError(std::string);
+    void onPlot(std::string);
 
 private:
     Wt::WTabWidget *tabWidget_;
@@ -70,7 +71,6 @@ private:
     void fullResults();
     void showFinResults();
     void showInfResults();
-    void onPlot();
     
 };
 
