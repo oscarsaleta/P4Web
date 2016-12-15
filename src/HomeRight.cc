@@ -83,19 +83,7 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     plotRegion_->setMargin(5,Top);
     plotContainer_->addWidget(plotRegion_);
 
-    plotButtonToolBar_ = new WToolBar(plotContainer_);
-    plotButtonToolBar_->setId("plotButtonToolBar_");
-    plotButtonToolBar_->setMargin(5,Top);
 
-    plotButton_ = new WPushButton("Plot");
-    plotButton_->setId("plotButton_");
-    plotButton_->setStyleClass("btn-default btn");
-    plotButtonToolBar_->addButton(plotButton_);
-
-    // TODO: ficar metode onPlot o equivalent.
-    //plotButton_->clicked().connect(this,&HomeRight::onPlot);
-
-    //plotContainer_->addWidget(plotButtonToolBar_);
 
 
     tabWidget_->setCurrentIndex(0);
@@ -198,4 +186,5 @@ void HomeRight::showInfResults()
 void HomeRight::onPlot(std::string basename)
 {
     // TODO: plot aqui a partir de QWinSphere
+    tabWidget_->setCurrentIndex(1);
 }

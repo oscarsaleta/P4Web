@@ -356,7 +356,6 @@ void HomeLeft::onPlot()
     if ( !VFResults.readTables(fileUploadName_) ) {
         errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
     } else {
-        // TODO: coses
         VFResults.setupCoordinateTransformations();
 
         onPlotSignal_.emit(fileUploadName_);

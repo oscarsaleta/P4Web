@@ -48,6 +48,15 @@
 
 #define UNUSED(x) (void)(x)   //  to avoid warnings of unused variables in case we cannot avoid it
 
+struct P4POLYLINES
+{
+    double x1;
+    double y1;
+    double x2;
+    double y2;
+    P4POLYLINES * next;
+};
+
 // Defaults regarding Vector Field and Filename
 
 #define DEFAULTFILENAME     "untitled"

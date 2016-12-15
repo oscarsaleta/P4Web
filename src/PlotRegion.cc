@@ -26,6 +26,7 @@
 #include <Wt/WBrush>
 #include <Wt/WPainter>
 #include <Wt/WPainterPath>
+#include <Wt/WPointF>
 
 
 using namespace Wt;
@@ -61,10 +62,10 @@ void PlotRegion::paintBackground(WPaintDevice *paintDevice)
     const WColor grs(111,111,111);
     WPainter painter(paintDevice);
     painter.fillRect(0,0,width_,height_,grs);
-    Wt::WPainterPath path(Wt::WPointF(10, 10));
+    WPainterPath path(WPointF(10, 10));
     path.addEllipse(2,2,width_-4,height_-4);
     path.closeSubPath();
-    WPen pen(Wt::white);
+    WPen pen(white);
     pen.setWidth(2);
     painter.setPen(pen);
     painter.setBrush(Wt::black);
