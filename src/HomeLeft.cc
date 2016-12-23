@@ -120,16 +120,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
 
     evalButton_->clicked().connect(this,&HomeLeft::evaluate);
 
-    // save file button
-    saveButton_ = new WAnchor(equationsBox_);
-    saveButton_->setId("saveButton_");
-    saveButton_->setStyleClass("btn btn-default");
-    saveButton_->setText("Save");
-    saveButton_->setInline(true);
-    saveButton_->setMargin(5,Left);
-    saveButton_->setDisabled(true);
-    equationsBox_->addWidget(saveButton_);
-
+    // plot button
     plotButton_ = new WPushButton("Plot",equationsBox_);
     plotButton_->setId("plotButton_");
     plotButton_->setStyleClass("btn btn-default");
@@ -140,6 +131,15 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
 
     plotButton_->clicked().connect(this,&HomeLeft::onPlot);
 
+    // save file button (actually, it's a WAnchor)
+    saveButton_ = new WAnchor(equationsBox_);
+    saveButton_->setId("saveButton_");
+    saveButton_->setStyleClass("btn btn-default");
+    saveButton_->setText("Save");
+    saveButton_->setInline(true);
+    saveButton_->setMargin(5,Left);
+    saveButton_->setDisabled(true);
+    equationsBox_->addWidget(saveButton_);
 
 
     // enable buttons if line edits have content
@@ -307,7 +307,8 @@ void HomeLeft::evaluate()
 {
     prepareMapleFile();
 
-    std::string command = "maple -z --secure-read=/tmp/*,/usr/local/p4/bin/*,/usr/local/p4/sum_tables/* --secure-write=/tmp/* "+fileUploadName_+".mpl > "+fileUploadName_+".res";
+    std::string command = "maple -z --secure-read=/tmp/*,/usr/local/p4/bin/*,/usr/local/p4/sum_tables/* --secure-write=/tmp/*,/usr/local/p4/sum_tables/* --secure-extcall=/usr/local/p4/bin/lyapunov,/usr/local/p4/bin/separatrice "+fileUploadName_+".mpl > "+fileUploadName_+".res";
+    //std::cerr << command << std::endl;
     int status = system(command.c_str());
     if (status == 0)
         evaluatedSignal_.emit(status,fileUploadName_);

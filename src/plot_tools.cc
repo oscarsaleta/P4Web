@@ -112,7 +112,7 @@ void spherePlotPoint( WWinSphere * sp, double * p, int color )
     }
 }
 
-void spherePrintLine( WWinSphere * sp, double * p1, double * p2, int color )
+/*void spherePrintLine( WWinSphere * sp, double * p1, double * p2, int color )
 {
     double ucoord1[2];
     double ucoord2[2];
@@ -128,16 +128,16 @@ void spherePrintLine( WWinSphere * sp, double * p1, double * p2, int color )
         sp->printLine( ucoord1[0], ucoord1[1], ucoord2[0], ucoord2[1], color );
         sp->printLine( ucoord3[0], ucoord3[1], ucoord4[0], ucoord4[1], color );
     }
-}
+}*/
 
-void spherePrintPoint( WWinSphere * sp, double * p, int color )
+/*void spherePrintPoint( WWinSphere * sp, double * p, int color )
 {
     double ucoord[2];
 
     MATHFUNC(sphere_to_viewcoord)(p[0],p[1],p[2],ucoord);
 
     sp->printPoint( ucoord[0], ucoord[1], color );
-}
+}*/
 
 
 // Intersects a line with a rectangle.  Changes the coordinates so that both endpoints

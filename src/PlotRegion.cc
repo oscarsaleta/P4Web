@@ -34,6 +34,7 @@ using namespace Wt;
 PlotRegion::PlotRegion(WContainerWidget *parent, int width, int height) : width_(width), height_(height)
 {
     resize(width_,height_);
+    //sphere = new WWinSphere(this, false, 0,0,0,0)
     update();
 }
 

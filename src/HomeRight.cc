@@ -82,6 +82,10 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     plotRegion_->setId("plotRegion_");
     plotRegion_->setMargin(5,Top);
     plotContainer_->addWidget(plotRegion_);
+    sphere_ = new WWinSphere(plotContainer_,550,550);
+    sphere_->setId("sphere_");
+    sphere_->setMargin(5,Top);
+    plotContainer_->addWidget(sphere_);
 
 
 
@@ -106,7 +110,6 @@ void HomeRight::readResults(int k, std::string fileName)
 {
     if (k!=0) {
     //    fullResults_ = "Unauthorised operation. IP will be logged.";
-        // TODO: really log IP?
     } else {
         std::ifstream resultsFile;
         std::string line;
@@ -185,6 +188,6 @@ void HomeRight::showInfResults()
 
 void HomeRight::onPlot(std::string basename)
 {
-    // TODO: plot aqui a partir de QWinSphere
+    sphere_->update();
     tabWidget_->setCurrentIndex(1);
 }

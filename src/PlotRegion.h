@@ -22,8 +22,9 @@
 #ifndef PLOTREGION_H
 #define PLOTREGION_H
 
-#include <Wt/WPaintedWidget>
+//#include "win_sphere.h"
 
+#include <Wt/WPaintedWidget>
 #include <Wt/WPaintDevice>
 
 class PlotRegion : public Wt::WPaintedWidget
@@ -39,6 +40,8 @@ protected:
 private:
     int width_;
     int height_;
+
+    //WWinSphere *sphere;
 
     void paintBackground(Wt::WPaintDevice *);
     void paintSingularPoints(Wt::WPaintDevice *);
