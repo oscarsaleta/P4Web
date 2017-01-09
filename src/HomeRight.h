@@ -26,6 +26,7 @@
 
 #include <Wt/WContainerWidget>
 
+#include <Wt/WImage>
 #include <Wt/WPushButton>
 #include <Wt/WString>
 #include <Wt/WTabWidget>
@@ -63,6 +64,8 @@ private:
     WWinSphere *sphere_;
 
     Wt::WContainerWidget *plotContainer_;
+    Wt::WContainerWidget *legendContainer_;
+    Wt::WImage *legend_;
 
     int flag_;
 

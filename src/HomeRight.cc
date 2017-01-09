@@ -80,12 +80,25 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     plotContainer_->setId("plotContainer_");
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
-    // region w
+    // sphere
     sphere_ = new WWinSphere(plotContainer_,550,550);
     sphere_->setId("sphere_");
     sphere_->setMargin(5,Top);
     plotContainer_->addWidget(sphere_);
+    //TODO: add plot separatrices, orbits, etc buttons?
 
+    
+    // legend tab
+    legendContainer_ = new WContainerWidget();
+    legendContainer_->setId("legendContainer_");
+    tabWidget_->addTab(legendContainer_,WString::fromUTF8("Legend"),WTabWidget::PreLoading);
+
+    // legend image
+    legend_ = new WImage(WLink("resources/p4legend.png"), legendContainer_);
+    legend_->setAlternateText("Plot legend");
+    legend_->setId("legend_");
+    legend_->setMargin(5,Top);
+    legendContainer_->addWidget(legend_);
 
 
 
