@@ -49,7 +49,7 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     WBootstrapTheme *theme = new WBootstrapTheme();
     theme->setVersion(WBootstrapTheme::Version3);
     WApplication::instance()->setTheme(theme);
-    WApplication::instance()->setTitle("P4 Web v0.1 alpha");
+    WApplication::instance()->setTitle("P4 Web v0.2 pre-alpha");
 
     addAllStyleSheets();
 

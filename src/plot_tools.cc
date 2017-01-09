@@ -46,8 +46,8 @@
 
 #include <cmath>
 
-void (*plot_l)( WWinSphere *, double *, double *, int ) = nullptr;
-void (*plot_p)( WWinSphere *, double *, int ) = nullptr;
+void (*plot_l)( WWinSphere *, double *, double *, int ) = spherePlotLine;
+void (*plot_p)( WWinSphere *, double *, int ) = spherePlotPoint;
 
 /*
 void plotEllipse( QPainter * p, int cx, int cy, int a, int b, int color, bool dotted,

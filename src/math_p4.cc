@@ -87,13 +87,13 @@ bool less_lyapunov(double * p1, double * p2 )
     return 0;
 }  
 
-/*void set_current_step( double curstep )
+void set_current_step( double curstep )
 {
     VFResults.config_currentstep = curstep;
     
-    if( p4startdlg != nullptr )
+    /*if( p4startdlg != nullptr )
         if( p4startdlg->Plot_Window != nullptr )
             if( p4startdlg->Plot_Window->IntParams_Window != nullptr )
-                p4startdlg->Plot_Window->IntParams_Window->SetCurrentStep( curstep );
+                p4startdlg->Plot_Window->IntParams_Window->SetCurrentStep( curstep );*/
 
-}*/
+}

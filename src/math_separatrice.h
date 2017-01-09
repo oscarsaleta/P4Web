@@ -25,37 +25,37 @@
 
 
 #include "file_tab.h"
-//#include "win_sphere.h"
+#include "win_sphere.h"
 
 
-/*extern void (*change_epsilon)( QWinSphere *, double );
-extern void (*start_plot_sep)( QWinSphere * );
-extern void (*cont_plot_sep)( QWinSphere * );
-extern void (*plot_next_sep)( QWinSphere * );
-extern void (*select_next_sep)( QWinSphere * );
+extern void (*change_epsilon)( WWinSphere *, double );
+extern void (*start_plot_sep)( WWinSphere * );
+extern void (*cont_plot_sep)( WWinSphere * );
+extern void (*plot_next_sep)( WWinSphere * );
+extern void (*select_next_sep)( WWinSphere * );
 
-void start_plot_saddle_sep( QWinSphere * );
-void cont_plot_saddle_sep( QWinSphere * );
-void plot_next_saddle_sep( QWinSphere * );
-void select_next_saddle_sep( QWinSphere * );
-void change_epsilon_saddle( QWinSphere *, double );
+void start_plot_saddle_sep( WWinSphere * );
+void cont_plot_saddle_sep( WWinSphere * );
+void plot_next_saddle_sep( WWinSphere * );
+void select_next_saddle_sep( WWinSphere * );
+void change_epsilon_saddle( WWinSphere *, double );
 
-void start_plot_se_sep( QWinSphere * );
-void cont_plot_se_sep( QWinSphere * );
-void plot_next_se_sep( QWinSphere * );
-void select_next_se_sep( QWinSphere * );
-void change_epsilon_se( QWinSphere *, double );
+void start_plot_se_sep( WWinSphere * );
+void cont_plot_se_sep( WWinSphere * );
+void plot_next_se_sep( WWinSphere * );
+void select_next_se_sep( WWinSphere * );
+void change_epsilon_se( WWinSphere *, double );
 
-void start_plot_de_sep( QWinSphere * );
-void cont_plot_de_sep( QWinSphere * );
-void plot_next_de_sep( QWinSphere * );
-void select_next_de_sep( QWinSphere * );
-void change_epsilon_de( QWinSphere *, double );
+void start_plot_de_sep( WWinSphere * );
+void cont_plot_de_sep( WWinSphere * );
+void plot_next_de_sep( WWinSphere * );
+void select_next_de_sep( WWinSphere * );
+void change_epsilon_de( WWinSphere *, double );
 
-void plot_all_sep( QWinSphere * spherewnd );
-void draw_sep( QWinSphere * spherewnd, orbits_points *sep );
-void draw_selected_sep( QWinSphere * spherewnd, orbits_points *sep,int color);
-*/
+void plot_all_sep( WWinSphere * spherewnd );
+void draw_sep( WWinSphere * spherewnd, orbits_points *sep );
+void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep,int color);
+
 int findSepColor2(term2 *f,int type,double y[2]);
 int findSepColor3(term3 *f,int type,double y[2]);
 
@@ -68,11 +68,11 @@ void integrate_lyapunov_sep( double p0, double p1, double p2, double * pcoord,
 
 int change_type(int type);
 
-/*orbits_points * plot_separatrice(QWinSphere * spherewnd, double x0, double y0,double a11, double a12,
+orbits_points * plot_separatrice(WWinSphere * spherewnd, double x0, double y0,double a11, double a12,
                                         double a21, double a22, double epsilon, sep * sep1,
                                         orbits_points ** orbit, short int chart);
 
-void make_transformations(transformations * trans, double x0, double y0, double * point);*/
+void make_transformations(transformations * trans, double x0, double y0, double * point);
 
 
 #endif // MATH_SEPARATRICE_H

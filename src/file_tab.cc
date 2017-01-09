@@ -635,7 +635,7 @@ bool WVFStudy::readTables( std::string basename )
         }
     }
 
-    fprintf(stderr,"all's well.\n");
+    //fprintf(stderr,"all's well.\n");
     return true;
 } 
 

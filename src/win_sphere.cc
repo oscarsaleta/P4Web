@@ -580,11 +580,15 @@ void WWinSphere::paintEvent( WPaintDevice * p )
         else
             plotLineAtInfinity(); //not used
     }
-    //plotSeparatrices();
     //plotGcf();
     //drawOrbits(this);
     //drawLimitCycles(this);
     plotPoints();
+    plot_all_sep(this);
+    plot_all_sep(this);
+    plot_all_sep(this);
+    //plotSeparatrices();
+
     //staticPainter = nullptr;
 
     /*if( PainterCache == nullptr || isPainterCacheDirty )
@@ -1000,7 +1004,7 @@ void WWinSphere::plotPoints( void )
         plotPoint( dp );
 }
 
-/*void WWinSphere::plotPointSeparatrices( struct semi_elementary * p )
+void WWinSphere::plotPointSeparatrices( struct semi_elementary * p )
 {
     struct sep * separatrice;
 
@@ -1038,7 +1042,7 @@ void WWinSphere::plotSeparatrices( void )
         plotPointSeparatrices( sep );
     for( dp = VFResults.first_de_point; dp != nullptr; dp = dp->next_de )
         plotPointSeparatrices( dp );
-}*/
+}
 
 /*void WWinSphere::plotGcf(void )
 {
