@@ -583,10 +583,10 @@ void WWinSphere::paintEvent( WPaintDevice * p )
     //plotGcf();
     //drawOrbits(this);
     //drawLimitCycles(this);
+    for (int cnt=0;cnt<10;cnt++)
+        plot_all_sep(this);
     plotPoints();
-    plot_all_sep(this);
-    plot_all_sep(this);
-    plot_all_sep(this);
+    
     //plotSeparatrices();
 
     //staticPainter = nullptr;
