@@ -70,7 +70,8 @@ public:
     WWinSphere( Wt::WContainerWidget *parent=0,/* QStatusBar, bool, double, double, double, double*/
                 int width=255, int height=255 );
     ~WWinSphere();
-    void paintEvent( Wt::WPaintDevice * );
+    
+    void paintSphere();
 
     int coWinX( double x );     // coordinate changes: from world to windows coordinates
     int coWinY( double y );
@@ -81,6 +82,9 @@ public:
 
     double horPixelsPerMM;
     double verPixelsPerMM;
+
+    int width_;
+    int height_;
 
     double x0, y0;              // world-coordinates of upper-left corner
     double x1, y1;              // world-coordinates of upper-right corner
@@ -95,6 +99,10 @@ public:
     int paintedYMax;
 
     Wt::WString chartstring;
+
+protected:
+    void paintEvent( Wt::WPaintDevice * );
+
 
 private:
     Wt::WPainter * staticPainter;

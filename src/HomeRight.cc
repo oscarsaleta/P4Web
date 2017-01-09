@@ -78,10 +78,11 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
     // region w
-    plotRegion_ = new PlotRegion(plotContainer_,550,550);
+    /*plotRegion_ = new PlotRegion(plotContainer_,550,550);
     plotRegion_->setId("plotRegion_");
     plotRegion_->setMargin(5,Top);
-    plotContainer_->addWidget(plotRegion_);
+    plotContainer_->addWidget(plotRegion_);*/
+
     sphere_ = new WWinSphere(plotContainer_,550,550);
     sphere_->setId("sphere_");
     sphere_->setMargin(5,Top);
@@ -108,6 +109,7 @@ HomeRight::~HomeRight()
 
 void HomeRight::readResults(int k, std::string fileName)
 {
+    tabWidget_->setCurrentIndex(0);
     if (k!=0) {
     //    fullResults_ = "Unauthorised operation. IP will be logged.";
     } else {

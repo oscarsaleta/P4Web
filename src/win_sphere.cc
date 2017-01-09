@@ -54,6 +54,7 @@
 
 
 #include <cmath>
+#include <Wt/WPainterPath>
 
 using namespace Wt;
 
@@ -75,6 +76,7 @@ WWinSphere * * WWinSphere::SphereList = nullptr;
 // parameters _x1,... are irrelevant if isZoom is false
 
 WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height )
+    : width_(width), height_(height)
 {
     ReverseYaxis = false;
     //PainterCache = nullptr;
@@ -94,10 +96,13 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height )
 
     parentWnd = parent;
     //setMinimumSize(MINWIDTHPLOTWINDOW,MINHEIGHTPLOTWINDOW);         // THIS IS THE MINIMUM SIZE
-    setWidth(parent->width());
+    /*setWidth(parent->width());
     setHeight(parent->height());
     w = this->width().toPixels();
-    h = this->height().toPixels();
+    h = this->height().toPixels();*/
+    resize(width_,height_);
+    w = width_;
+    h = height_;
     idealh = w;
     SelectingPointStep =0;
 
@@ -549,37 +554,38 @@ WWinSphere::~WWinSphere()
     refresh();
 }*/
 
-
-
 void WWinSphere::paintEvent( WPaintDevice * p )
 {
     //UNUSED(p);
-
+    SetupPlot();
     WPainter paint(p);
-    paint.fillRect(0.,0.,width().toPixels(),height().toPixels(), WColor(QXFIGCOLOR(CBACKGROUND)));
-    if (VFResults.singinf)
-        paint.setPen(QXFIGCOLOR(CSING));
+    //WPainterPath path;
+    paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
+    /*if (VFResults.singinf)
+        paint.setPen(WPen(QXFIGCOLOR(CSING)));
     else
-        paint.setPen(QXFIGCOLOR(CLINEATINFINITY));
+        paint.setPen(WPen(QXFIGCOLOR(CLINEATINFINITY)));*/
     staticPainter = &paint;
     if( VFResults.typeofview != TYPEOFVIEW_PLANE )
     {
         if( VFResults.typeofview == TYPEOFVIEW_SPHERE )
         {
-            if( VFResults.plweights )
-                plotPoincareLyapunovSphere();
-            else
-                plotPoincareSphere();
+            if( VFResults.plweights ) {
+                plotPoincareLyapunovSphere(); //not used
+            }
+            else {
+                plotPoincareSphere(); // only one used for now
+            }
         }
         else
-            plotLineAtInfinity();
+            plotLineAtInfinity(); //not used
     }
     //plotSeparatrices();
     //plotGcf();
     //drawOrbits(this);
     //drawLimitCycles(this);
     plotPoints();
-    staticPainter = nullptr;
+    //staticPainter = nullptr;
 
     /*if( PainterCache == nullptr || isPainterCacheDirty )
     {
@@ -1232,17 +1238,19 @@ P4POLYLINES * WWinSphere::produceEllipse( double cx, double cy, double a, double
 void WWinSphere::plotPoincareSphere( void )
 {
     int color;
-    P4POLYLINES * p;
-
-    p = CircleAtInfinity;
+    WPainterPath path;
+    P4POLYLINES * circlePoint = CircleAtInfinity;
     color = VFResults.singinf ? CSING : CLINEATINFINITY;
-
-    staticPainter->setPen( QXFIGCOLOR(color) );
-    while( p != nullptr )
+    staticPainter->setPen(QXFIGCOLOR(color));
+    while( circlePoint != nullptr )
     {
-        staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2), coWinY(p->y2) );
-        p = p->next;
+        path.moveTo(coWinX(circlePoint->x1),coWinY(circlePoint->y1));
+        path.lineTo(coWinX(circlePoint->x2),coWinY(circlePoint->y2));
+        circlePoint = circlePoint->next;
     }
+    path.closeSubPath();
+    staticPainter->drawPath(path.crisp());
+
 }
 
 void WWinSphere::plotPoincareLyapunovSphere( void )
