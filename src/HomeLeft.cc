@@ -328,9 +328,17 @@ void HomeLeft::prepareSaveFile()
         std::ofstream saveFile;
         saveFileName_ = openTempStream("/tmp",".txt",saveFile);
         saveFileName_ += ".txt";
-        for (int i=0; i<11; i++) {
-            saveFile << 0 << std::endl;
-        }
+        saveFile << 0 << std::endl;
+        saveFile << 1 << std::endl;
+        saveFile << 8 << std::endl;
+        saveFile << 0.01 << std::endl;
+        saveFile << 0 << std::endl;
+        saveFile << 6 << std::endl;
+        saveFile << 10 << std::endl;
+        saveFile << 20 << std::endl;
+        saveFile << 4 << std::endl;
+        saveFile << 1 << std::endl;
+        saveFile << 1 << std::endl;
         saveFile << xEquationInput_->text() << std::endl;
         saveFile << yEquationInput_->text() << std::endl;
         saveFile << 0 << std::endl;
