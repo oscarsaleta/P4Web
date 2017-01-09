@@ -23,7 +23,7 @@
 
 #include "HomeLeft.h"
 #include "HomeRight.h"
-#include "P4src/file_tab.h"
+#include "file_tab.h"
 
 #include <Wt/WApplication>
 #include <Wt/WBootstrapTheme>
