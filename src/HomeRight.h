@@ -22,7 +22,6 @@
 #ifndef HOMERIGHT_H
 #define HOMERIGHT_H
 
-#include "PlotRegion.h"
 #include "win_sphere.h"
 
 #include <Wt/WContainerWidget>
@@ -61,7 +60,6 @@ private:
     std::string finResults_;
     std::string infResults_;
 
-    PlotRegion *plotRegion_;
     WWinSphere *sphere_;
 
     Wt::WContainerWidget *plotContainer_;

@@ -313,7 +313,7 @@ void HomeLeft::evaluate()
     if (status == 0)
         evaluatedSignal_.emit(status,fileUploadName_);
     else
-        errorSignal_.emit("Operation not permitted, IP will be logged.");
+        errorSignal_.emit("Maple error.");
     
 }
 

@@ -63,7 +63,7 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     /* start of navbar*/
 
     // define navbar
-    navbar_ = new WNavigationBar(root_);
+    /*navbar_ = new WNavigationBar(root_);
     navbar_->setId("navbar_");
     navbar_->setStyleClass(WString::fromUTF8("navbar navbar-inverse"));
     navbar_->setInline(false);
@@ -132,10 +132,14 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
 
     nvRightPopupButton_ = new WMenuItem("Help");
     nvRightPopupButton_->setMenu(nvRightPopup_);
-    nvRightMenu_->addItem(nvRightPopupButton_);
+    nvRightMenu_->addItem(nvRightPopupButton_);*/
 
     /* end of navbar */
 
+    title_ = new WText("<h2>P4: Planar Polynomial Phase Portraits</h2>");
+    title_->setId("title_");
+    title_->setStyleClass("jumbotron center");
+    root_->addWidget(title_);
 
     leftContainer_ = new HomeLeft(root_);
 

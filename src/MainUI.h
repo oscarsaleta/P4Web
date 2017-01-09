@@ -54,6 +54,9 @@ private:
     HomeLeft *leftContainer_;
     HomeRight *rightContainer_;
 
+    Wt::WText *title_;
+    Wt::WText *subtitle_;
+
 
 
     void addAllStyleSheets();
