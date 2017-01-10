@@ -559,7 +559,6 @@ void WWinSphere::paintEvent( WPaintDevice * p )
     //UNUSED(p);
     SetupPlot();
     WPainter paint(p);
-    //WPainterPath path;
     paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
     /*if (VFResults.singinf)
         paint.setPen(WPen(QXFIGCOLOR(CSING)));
@@ -583,67 +582,13 @@ void WWinSphere::paintEvent( WPaintDevice * p )
     //plotGcf();
     //drawOrbits(this);
     //drawLimitCycles(this);
+    //plotSeparatrices();
     for (int cnt=0;cnt<10;cnt++)
         plot_all_sep(this);
     plotPoints();
     
-    //plotSeparatrices();
-
-    //staticPainter = nullptr;
-
-    /*if( PainterCache == nullptr || isPainterCacheDirty )
-    {
-        if( PainterCache == nullptr )
-            PainterCache = new QPixmap( size() );
-        isPainterCacheDirty = false;
-
-        WPainter paint( PainterCache );
-        paint.fillRect(0,0,width(),height(), WColor( QXFIGCOLOR(CBACKGROUND) ) );
-
-        if( VFResults.singinf )
-            paint.setPen( QXFIGCOLOR(CSING) );
-        else
-            paint.setPen( QXFIGCOLOR(CLINEATINFINITY) );
-
-        staticPainter = &paint;
-
-        // Mental note: do not use prepareDrawing/FinishDrawing here,
-        // since it is not good to do drawing for all spheres every time we
-        // get a paint event from windows
-
-        if( VFResults.typeofview != TYPEOFVIEW_PLANE )
-        {
-            if( VFResults.typeofview == TYPEOFVIEW_SPHERE )
-            {
-                if( VFResults.plweights )
-                    plotPoincareLyapunovSphere();
-                else
-                    plotPoincareSphere();
-            }
-            else
-                plotLineAtInfinity();
-        }
-        //plotSeparatrices();
-        //plotGcf();
-        //drawOrbits(this);
-        //drawLimitCycles(this);
-        plotPoints();
-        staticPainter = nullptr;
-    }
-    
-    WPainter widgetpaint( p );
-    widgetpaint.drawPixmap( 0, 0, *PainterCache );*/
-    
-    /*if( SelectingPointStep != 0 )
-    {
-        widgetpaint.setPen( QXFIGCOLOR(WHITE) );
-        widgetpaint.setBrush( Qt::NoBrush );
-        widgetpaint.drawEllipse( SelectingX-SelectingPointRadius,
-                                 SelectingY-SelectingPointRadius,
-                                 SelectingPointRadius+SelectingPointRadius,
-                                 SelectingPointRadius+SelectingPointRadius );
-    }*/
 }
+
 
 /*void WWinSphere::MarkSelection( int x1, int y1, int x2, int y2, int selectiontype )
 {

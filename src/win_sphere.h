@@ -71,7 +71,7 @@ public:
                 int width=255, int height=255 );
     ~WWinSphere();
     
-    void paintSphere();
+    //void paintSphere();
 
     int coWinX( double x );     // coordinate changes: from world to windows coordinates
     int coWinY( double y );
