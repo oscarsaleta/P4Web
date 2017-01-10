@@ -318,16 +318,15 @@ void HomeLeft::evaluate()
 }
 
 
-
-
-
-
 void HomeLeft::prepareSaveFile()
 {
     if (fileUploadName_.empty()) {
         std::ofstream saveFile;
-        saveFileName_ = openTempStream("/tmp",".txt",saveFile);
-        saveFileName_ += ".txt";
+        if (saveFileName_.empty()) {
+            saveFileName_ = openTempStream("/tmp",".txt",saveFile);
+            saveFileName_ += ".txt";
+        } else
+            saveFile.open(saveFileName_.c_str());
         saveFile << 0 << std::endl;
         saveFile << 1 << std::endl;
         saveFile << 8 << std::endl;
