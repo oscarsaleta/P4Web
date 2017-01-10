@@ -21,15 +21,39 @@
 
 #include "MyApplication.h"
 
+#include <Wt/Auth/AuthModel>
+#include <Wt/Auth/AuthWidget>
+#include <Wt/Auth/PasswordService>
+
 using namespace Wt;
 
-MyApplication::MyApplication(const WEnvironment &env) : WApplication(env), mainUI_(new MainUI)
+MyApplication::MyApplication(const WEnvironment &env) : WApplication(env), session_(appRoot()+"auth.db")
 {
+    session_.login().changed().connect(this, &MyApplication::authEvent);
+
+    Auth::AuthWidget *authWidget = new Auth::AuthWidget(Session::auth(), session_.users(), session_.login());
+    authWidget->model()->addPasswordAuth(&Session::passwordAuth());
+    authWidget->model()->addOAuth(Session::oAuth());
+    authWidget->setRegistrationEnabled(true);
+
+    authWidget->processEnvironment();
+    root()->addWidget(authWidget);
+
     messageResourceBundle().use(appRoot()+"resources/strings");
+    mainUI_ = new MainUI();
     mainUI_->setupUI(root());
 }
 
 MyApplication::~MyApplication()
 {
     delete mainUI_;
+}
+
+void MyApplication::authEvent()
+{
+    if (session_.login().loggedIn()) {
+        const Auth::User& u = session_.login().user();
+        Wt::log("notice") << "User" << u.id() << " (" << u.identity(Auth::Identity::LoginName) << ") logged in.";
+    } else
+        Wt::log("notice") << "User logged out";
 }

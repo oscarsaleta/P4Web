@@ -25,6 +25,7 @@
 #include <Wt/WApplication>
 
 #include "MainUI.h"
+#include "Session.h"
 
 
 
@@ -34,8 +35,11 @@ public:
     MyApplication(const Wt::WEnvironment &env);
     ~MyApplication();
     
+    void authEvent();
+
 private:
     MainUI *mainUI_;
+    Session session_;
 };
 
 #endif // MYAPPLICATION_H
