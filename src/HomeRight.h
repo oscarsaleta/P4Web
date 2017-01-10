@@ -53,8 +53,7 @@ private:
     Wt::WPushButton *fullResButton_;
     Wt::WPushButton *finResButton_;
     Wt::WPushButton *infResButton_;
-    Wt::WPushButton *clearButton_;
-
+    Wt::WPushButton *clearOutputButton_;
 
     std::string fileName_;
     std::string fullResults_;
@@ -64,6 +63,11 @@ private:
     WWinSphere *sphere_;
 
     Wt::WContainerWidget *plotContainer_;
+    /*Wt::WToolBar *plotButtonsToolbar_;
+    Wt::WPushButton *clearPlotButton_;
+    Wt::WPushButton *plotPointsButton_;
+    Wt::WPushButton *plotSeparatricesButton_;*/
+
     Wt::WContainerWidget *legendContainer_;
     Wt::WImage *legend_;
 
@@ -72,6 +76,11 @@ private:
     void fullResults();
     void showFinResults();
     void showInfResults();
+    void clearResults();
+
+    /*void plotSingularPoints();
+    void plotSeparatrices();
+    void clearPlot();*/
     
 };
 

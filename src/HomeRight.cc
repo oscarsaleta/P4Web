@@ -21,7 +21,8 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     tabWidget_ = new WTabWidget(this);
     tabWidget_->setId("tabWidget_");
 
-    // output widget
+
+    // output tab ----
     outputContainer_ = new WContainerWidget();
     outputContainer_->setId("outputContainer_");
     tabWidget_->addTab(outputContainer_,WString::fromUTF8("Output"),WTabWidget::PreLoading);
@@ -31,6 +32,7 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     outputTextArea_ = new WTextArea(outputTextAreaContent_);
     outputTextArea_->setId("outputTextArea_");
     outputTextArea_->setReadOnly(true);
+    outputTextArea_->resize(550,550);
     outputTextArea_->setMargin(5,Top);
     outputContainer_->addWidget(outputTextArea_);
 
@@ -57,38 +59,59 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
 
     outputButtonsToolbar_->addSeparator();
 
-    clearButton_ = new WPushButton("Clear");
-    clearButton_->setId("clearButton_");
-    clearButton_->setStyleClass("btn-warning btn");
-    //outputContainer_->addWidget(clearButton_);
-    outputButtonsToolbar_->addButton(clearButton_);
+    clearOutputButton_ = new WPushButton("Clear");
+    clearOutputButton_->setId("clearOutputButton_");
+    clearOutputButton_->setStyleClass("btn-warning btn");
+    outputButtonsToolbar_->addButton(clearOutputButton_);
 
     fullResButton_->clicked().connect(this,&HomeRight::fullResults);
     finResButton_->clicked().connect(this,&HomeRight::showFinResults);
     infResButton_->clicked().connect(this,&HomeRight::showInfResults);
-
-    clearButton_->clicked().connect(std::bind([=] () {
-        outputTextArea_->setText("");
-        outputTextAreaContent_ = "";
-    }));
+    clearOutputButton_->clicked().connect(this,&HomeRight::clearResults);
 
     
 
-
-    // plot tab
+    // plot tab ----
     plotContainer_ =  new WContainerWidget();
     plotContainer_->setId("plotContainer_");
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
-    // sphere
+    // sphere (plot region)
     sphere_ = new WWinSphere(plotContainer_,550,550);
     sphere_->setId("sphere_");
     sphere_->setMargin(5,Top);
     plotContainer_->addWidget(sphere_);
+
     //TODO: add plot separatrices, orbits, etc buttons?
+    /*plotButtonsToolbar_ = new WToolBar(plotContainer_);
+    plotButtonsToolbar_->setId("plotButtonsToolbar_");
+    plotButtonsToolbar_->setMargin(5,Top);
+    plotButtonsToolbar_->setMargin(5,Bottom);
+
+    plotPointsButton_ = new WPushButton("Singular points");
+    plotPointsButton_->setId("plotPointsButton_");
+    plotPointsButton_->setStyleClass("btn-default btn");
+    plotButtonsToolbar_->addButton(plotPointsButton_);
+
+    plotSeparatricesButton_ = new WPushButton("Separatrices");
+    plotSeparatricesButton_->setId("plotSeparatricesButton_");
+    plotSeparatricesButton_->setStyleClass("btn-default btn");
+    plotButtonsToolbar_->addButton(plotSeparatricesButton_);
+
+    plotButtonsToolbar_->addSeparator();
+
+    clearPlotButton_ = new WPushButton("Clear");
+    clearPlotButton_->setId("clearPlotButton_");
+    clearPlotButton_->setStyleClass("btn-warning btn");
+    plotButtonsToolbar_->addButton(clearPlotButton_);
+
+    plotPointsButton_->clicked().connect(this,&HomeRight::plotSingularPoints);
+    plotSeparatricesButton_->clicked().connect(this,&HomeRight::plotSeparatrices);
+    clearPlotButton_->clicked().connect(this,&HomeRight::clearPlot);*/
+
 
     
-    // legend tab
+    // legend tab ----
     legendContainer_ = new WContainerWidget();
     legendContainer_->setId("legendContainer_");
     tabWidget_->addTab(legendContainer_,WString::fromUTF8("Legend"),WTabWidget::PreLoading);
@@ -109,12 +132,26 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
 
 HomeRight::~HomeRight()
 {
+    // sphere
+    delete sphere_;
+    // output tab
+    delete fullResButton_;
+    delete finResButton_;
+    delete infResButton_;
+    delete clearOutputButton_;
+    delete outputButtonsToolbar_;
     delete outputTextArea_;
-    delete clearButton_;
     delete outputContainer_;
-
+    // plot tab
+    /*delete clearPlotButton_;
+    delete plotPointsButton_;
+    delete plotSeparatricesButton_;
+    delete plotButtonsToolbar_;*/
     delete plotContainer_;
-
+    // legend tab
+    delete legend_;
+    delete legendContainer_;
+    // tab widget
     delete tabWidget_;
 }
 
@@ -198,9 +235,29 @@ void HomeRight::showInfResults()
     }
 }
 
+void HomeRight::clearResults()
+{
+    outputTextArea_->setText("");
+    outputTextAreaContent_ = "";
+}
 
 void HomeRight::onPlot(std::string basename)
 {
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
 }
+
+/*void HomeRight::clearPlot()
+{
+    sphere_->clearPlot();
+}
+
+void HomeRight::plotSingularPoints()
+{
+    return;
+}
+
+void HomeRight::plotSeparatrices()
+{
+    return;
+}*/
