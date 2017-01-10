@@ -136,9 +136,9 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
 
     /* end of navbar */
 
-    title_ = new WText("<h2>P4: Planar Polynomial Phase Portraits</h2>");
+    title_ = new WText(WString::tr("mainui.pagetitle"));
     title_->setId("title_");
-    title_->setStyleClass("jumbotron center");
+    title_->setStyleClass("page-header center");
     root_->addWidget(title_);
 
     leftContainer_ = new HomeLeft(root_);

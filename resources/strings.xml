@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <messages>
 
+  <message id="mainui.pagetitle">
+    <h1>P4: Planar Polynomial Phase Portraits</h1>
+  </message>
+
   <message id="homeleft.fuploadboxtitle">
     Load configuration file:
   </message>
