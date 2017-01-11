@@ -21,9 +21,10 @@
 
 #include "MainUI.h"
 
+#include "file_tab.h"
 #include "HomeLeft.h"
 #include "HomeRight.h"
-#include "file_tab.h"
+#include "MyLogger.h"
 
 #include <Wt/WApplication>
 #include <Wt/WBootstrapTheme>
@@ -43,6 +44,7 @@
 
 using namespace Wt;
 
+
 void MainUI::setupUI(WContainerWidget *pageRoot)
 {
     // set Bootstrap 3 theme
@@ -50,7 +52,7 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     theme->setVersion(WBootstrapTheme::Version3);
     WApplication::instance()->setTheme(theme);
     WApplication::instance()->setTitle("P4 Web v0.2 pre-alpha");
-
+    // add our own CSS file for some tweaks
     addAllStyleSheets();
 
     // get root page
@@ -132,29 +134,44 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
 
     nvRightPopupButton_ = new WMenuItem("Help");
     nvRightPopupButton_->setMenu(nvRightPopup_);
-    nvRightMenu_->addItem(nvRightPopupButton_);*/
+    nvRightMenu_->addItem(nvRightPopupButton_);
+    
+    globalLogger__.debug("MainUI :: navbar set up");
+    */
 
     /* end of navbar */
 
+    // title
     title_ = new WText(WString::tr("mainui.pagetitle"));
     title_->setId("title_");
     title_->setStyleClass("page-header center");
     root_->addWidget(title_);
+    globalLogger__.debug("MainUI :: title set up");
 
+    // left widget (file upload, input, buttons)
     leftContainer_ = new HomeLeft(root_);
+    globalLogger__.debug("MainUI :: HomeLeft created");
 
+    // middle space (aligns other widgets to left and right)
     WContainerWidget *middleSpace_ = new WContainerWidget(root_);
     middleSpace_->setStyleClass("middle-box");
 
+    // right widget (output text area, plots, legend)
     rightContainer_ = new HomeRight(root_);
+    globalLogger__.debug("MainUI :: HomeRight created");
 
+    // connect signals sent from left to actions performed by right
     leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
     leftContainer_->onPlotSignal().connect(rightContainer_,&HomeRight::onPlot);
+    globalLogger__.debug("MainUI :: signals connected");
 
+    // add the widgets
     root_->addWidget(leftContainer_);
     root_->addWidget(middleSpace_);
     root_->addWidget(rightContainer_);
+
+    globalLogger__.debug("MainUI :: MainUI set up");
 }
 
 void MainUI::addAllStyleSheets()

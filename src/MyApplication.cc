@@ -19,17 +19,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #include "MyApplication.h"
+#include "MyLogger.h"
 
 using namespace Wt;
+
 
 MyApplication::MyApplication(const WEnvironment &env) : WApplication(env), mainUI_(new MainUI)
 {
     messageResourceBundle().use(appRoot()+"resources/strings");
+
     mainUI_->setupUI(root());
+
+    globalLogger__.debug("MyApplication :: created correctly");
 }
+
 
 MyApplication::~MyApplication()
 {
     delete mainUI_;
+    globalLogger__.debug("MyApplication :: deleted correctly");
 }

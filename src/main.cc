@@ -19,17 +19,45 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*!
+ * @mainpage P4 web version, a C++/Wt web application
+ * @author Oscar Saleta Reig
+ */
+
+/*!
+ * @file main.c 
+ * @brief Main P4 web program.
+ * @author Oscar Saleta Reig
+ */
+
 #include "MyApplication.h"
 
 #include <Wt/WServer>
 
 using namespace Wt;
 
+/**
+ * @param &env WEnvironment variable (passed automatically)
+ * @return MyApplication object (the web app itself)
+ * @brief This function creates the main application (the web app)
+ *
+ * This function is called automatically by the server when the entry
+ * point is added and we call run() on it.
+ */
 WApplication *createApplication(const WEnvironment &env)
 {
     return new MyApplication(env);
 }
 
+/**
+ * @param @c argc count of how many arguments there are in @p **argv
+ * @param @c **argv arguments to the program
+ * @return @c 0 always
+ * @brief Main function. Creates the server and makes it run
+ *
+ * This function will create a loop and will keep running until
+ * the server is turned off or some error occurs.
+ */
 int main (int argc, char **argv)
 {
     try {

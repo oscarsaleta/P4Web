@@ -22,6 +22,7 @@
 #include "HomeLeft.h"
 
 #include "file_tab.h"
+#include "MyLogger.h"
 
 #include <chrono>
 #include <cstdio>
@@ -34,6 +35,7 @@
 #include <vector>
 
 #include <Wt/WAnchor>
+#include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WFileResource>
 #include <Wt/WFileUpload>
@@ -52,8 +54,32 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box"));
 
+    setupUI();
+    setupConnectors();
 
+    globalLogger__.debug("HomeLeft :: created correctly");
+}
 
+HomeLeft::~HomeLeft()
+{
+    delete fileUploadWidget_;
+    delete fileUploadBox_;
+
+    delete xLabel_;
+    delete yLabel_;
+    delete xEquationInput_;
+    delete yEquationInput_;
+    delete evalButton_;
+    delete plotButton_;
+    delete saveButton_;
+    delete equationsBox_;
+
+    globalLogger__.debug("HomeLeft :: deleted correctly");
+
+}
+
+void HomeLeft::setupUI()
+{
     // File upload box
     fileUploadBox_ = new WGroupBox(this);
     fileUploadBox_->setId("fileUploadBox_");
@@ -67,11 +93,6 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     fileUploadWidget_->setInline(true);
     fileUploadBox_->addWidget(fileUploadWidget_);
 
-    // add connectors
-    fileUploadWidget_->changed().connect(fileUploadWidget_,&WFileUpload::upload);
-    fileUploadWidget_->uploaded().connect(this,&HomeLeft::fileUploaded);
-    fileUploadWidget_->fileTooLarge().connect(this,&HomeLeft::fileTooLarge);
-    
     addWidget(new WBreak());
 
     // Equation boxes
@@ -107,10 +128,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     evalButton_->setId("evalButton_");
     evalButton_->setStyleClass("btn btn-primary");
     evalButton_->setInline(true);
-    evalButton_->setEnabled(false);
     equationsBox_->addWidget(evalButton_);
-
-    evalButton_->clicked().connect(this,&HomeLeft::evaluate);
 
     // plot button
     plotButton_ = new WPushButton("Plot",equationsBox_);
@@ -118,10 +136,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     plotButton_->setStyleClass("btn btn-default");
     plotButton_->setInline(true);
     plotButton_->setMargin(5,Left);
-    plotButton_->setEnabled(false);
     equationsBox_->addWidget(plotButton_);
-
-    plotButton_->clicked().connect(this,&HomeLeft::onPlot);
 
     // save file button (actually, it's a WAnchor)
     saveButton_ = new WAnchor(equationsBox_);
@@ -133,6 +148,20 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     saveButton_->setDisabled(true);
     equationsBox_->addWidget(saveButton_);
 
+    globalLogger__.debug("HomeLeft :: UI set up");
+
+}
+
+void HomeLeft::setupConnectors()
+{
+    // file upload
+    fileUploadWidget_->changed().connect(fileUploadWidget_,&WFileUpload::upload);
+    fileUploadWidget_->uploaded().connect(this,&HomeLeft::fileUploaded);
+    fileUploadWidget_->fileTooLarge().connect(this,&HomeLeft::fileTooLarge);
+
+    // buttons
+    evalButton_->clicked().connect(this,&HomeLeft::evaluate);
+    plotButton_->clicked().connect(this,&HomeLeft::onPlot);
 
     // enable buttons if line edits have content
     xEquationInput_->textInput().connect(std::bind([=] () {
@@ -150,13 +179,9 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
         }
     }));
 
+    globalLogger__.debug("HomeLeft :: connectors set up");
 }
 
-HomeLeft::~HomeLeft()
-{
-    delete fileUploadBox_;
-    delete equationsBox_;
-}
 
 void HomeLeft::fileUploaded()
 {
@@ -164,12 +189,13 @@ void HomeLeft::fileUploaded()
     std::string extension = fileUploadWidget_->clientFileName().toUTF8().substr(fileUploadWidget_->clientFileName().toUTF8().find_last_of(".")+1);
     if (extension != "inp") {
         errorSignal_.emit("Filetype not accepted.");
+        globalLogger__.warning("HomeLeft :: client tried to upload a not supported file type");
         return;
     }
 
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
-    /* aqui toca llegir el fitxer i omplir els camps */
+    // read file and fill xEquationInput and yEquationInput
     std::ifstream f;
     std::string line;
     f.open(fileUploadName_.c_str());
@@ -183,16 +209,17 @@ void HomeLeft::fileUploaded()
         i++;    
         }
         if (f.eof() && i<12) {
-            errorSignal_.emit("EOF reached prematurely.");
+            errorSignal_.emit("End-Of-File reached prematurely.");
+            globalLogger__.error("HomeLeft :: EOF while reading input file uploaded with name "+fileUploadName_);
             fileUploadName_ = "";
         } else if (f.bad()) {
-            errorSignal_.emit("I/O error.");
+            errorSignal_.emit("Input/Output error.");
+            globalLogger__.error("HomeLeft :: I/O error while reading input file uploaded with name "+fileUploadName_);
             fileUploadName_ = "";
         } else {
-            evalButton_->setEnabled(true);
-            plotButton_->setEnabled(true);
             prepareSaveFile();
             errorSignal_.emit("File uploaded. Press the Evaluate button to start computing.");
+            globalLogger__.info("HomeLeft :: Input file uploaded with name "+fileUploadName_);
         }
         f.close();
         
@@ -203,6 +230,7 @@ void HomeLeft::fileUploaded()
 void HomeLeft::fileTooLarge()
 {
     errorSignal_.emit("File too large.");
+    globalLogger__.warning("HomeLeft :: Client tried to upload file too large.");
 }
 
 std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std::ofstream &f)
@@ -219,6 +247,9 @@ std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std
         f.open(fullname.c_str(), std::ios_base::trunc | std::ios_base::out);
         close(fd);
     }
+
+    globalLogger__.debug("HomeLeft :: created temp file "+fullname);
+
     return prefix;
 }
 
@@ -308,19 +339,29 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
         << "printf( \"! Error (\%a) \%a\\n\", lastexception[1], lastexception[2] );\n"
         << "finally: closeallfiles();\n"
         << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
+
+    globalLogger__.info("HomeLeft :: filled Maple script "+fname);
 }
 
 void HomeLeft::evaluate()
 {
+    if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
+        errorSignal_.emit("Cannot evaluate yet, insert a vector field in the input forms.");
+        return;
+    }
+
     prepareMapleFile();
 
     std::string command = "maple -z --secure-read=/tmp/*,/usr/local/p4/bin/*,/usr/local/p4/sum_tables/* --secure-write=/tmp/*,/usr/local/p4/sum_tables/* --secure-extcall=/usr/local/p4/bin/lyapunov,/usr/local/p4/bin/separatrice "+fileUploadName_+".mpl > "+fileUploadName_+".res";
-    //std::cerr << command << std::endl;
+    globalLogger__.debug("HomeLeft :: Maple system command: "+command);
     int status = system(command.c_str());
-    if (status == 0)
-        evaluatedSignal_.emit(status,fileUploadName_);
-    else
+    if (status == 0) {
+        evaluatedSignal_.emit(fileUploadName_);
+        globalLogger__.info("HomeLeft :: Maple script successfully executed");
+    } else {
         errorSignal_.emit("Maple error.");
+        globalLogger__.error("HomeLeft :: error during Maple script execution");
+    }
     
 }
 
@@ -373,6 +414,7 @@ void HomeLeft::onPlot()
     } else {
         VFResults.setupCoordinateTransformations();
 
+        globalLogger__.debug("HomeLeft :: sending onPlot signal");
         onPlotSignal_.emit(fileUploadName_);
     }
 }
@@ -382,7 +424,7 @@ void HomeLeft::onPlot()
 
 // signals
 
-Signal<int, std::string>& HomeLeft::evaluatedSignal()
+Signal<std::string>& HomeLeft::evaluatedSignal()
 {
     return evaluatedSignal_;
 }
