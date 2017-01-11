@@ -13,60 +13,78 @@
 //						General polynomial expressions
 // -----------------------------------------------------------------------
 
-// Linked list of univariate terms a*x^i
-
+/**
+ * Linked list of univariate terms a*x^i
+ */
 struct term1
 {
-	int exp;
-	double coeff;
-	struct term1 * next_term1;
+	int exp; /**< exponent (i) */
+	double coeff; /**< coefficient (a) */
+	struct term1 * next_term1; /**< next term1 (linked list) */
 };
 
+/**
+ * Typedef for a pointer to a struct term1
+ */
 typedef struct term1 * P4POLYNOM1;
 
-// Linked list of terms a*x^i*y^j
-
+/**
+ * Linked list of terms a*x^i*y^j
+ */
 struct term2
 {
-	int exp_x;
-	int exp_y;
-	double coeff;
-	struct term2 * next_term2;
+	int exp_x; /**< x exponent (i) */
+	int exp_y; /**< y exponent (j) */
+	double coeff; /** coefficient (a) */
+	struct term2 * next_term2; /**< next term2 (linked list) */
 };
 
-// Linked list of terms a*r^i*cos(theta)^j*sin(theta)^k
-
+/**
+ * Typedef for a pointer to a struct term2
+ */
 typedef struct term2 * P4POLYNOM2;
 
+/**
+ * Linked list of terms a*r^i*cos(theta1)^j*sin(theta2)^k
+ */
 struct term3
 {
-	int exp_r;
-	int exp_Co;
-	int exp_Si;
-	double coeff;
-	struct term3 * next_term3;
+	int exp_r; /**< r exponent (i) */
+	int exp_Co; /**< cos exponent (theta1) */
+	int exp_Si; /**< sin exponent (theta2) */
+	double coeff; /**< coefficient (a) */
+	struct term3 * next_term3; /**< next term3 (linked list) */
 };
 
+/**
+ * Typedef for a pointer to a struct term3
+ */
 typedef struct term3 * P4POLYNOM3;
 
 // -----------------------------------------------------------------------
 //								Orbits
 // -----------------------------------------------------------------------
 
+/**
+ * Linked list of orbit points
+ *
+ * This struct holds information about coordinates and also about style
+ * for plotting purposes.
+ */
 struct orbits_points
 {
-	int color;			// color of seperatrice
+	int color;			/**< color of seperatrice */
 
-	double pcoord[3];	// point on the poincare sphere -> p=(X,Y,Z)
-						// or 
-						// on the poincare-lyapunov sphere 
-						// -> p=(0,x,y) or p=(1,r,theta)
+	double pcoord[3];	/**< point on the poincare sphere -> p=(X,Y,Z)
+						 or 
+						 on the poincare-lyapunov sphere 
+						 -> p=(0,x,y) or p=(1,r,theta) */
 	int dashes;
-	int dir;			// if we have a line of sing at infinity and have to change
-	int type;			// the direction if we integrate the orbit of separatrice 
-						// and sometimes the type
+	int dir;			/**< if we have a line of sing at infinity and have to change */
+	int type;			/**< the direction if we integrate the orbit of separatrice 
+						 and sometimes the type */
 
-	struct orbits_points * next_point;
+	struct orbits_points * next_point; /**< pointer to next orbits_points (linked list) */
 };
 
 typedef struct orbits_points * P4ORBIT;
