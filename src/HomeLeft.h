@@ -2,6 +2,7 @@
 #define HOMELEFT_H
 
 #include <Wt/WContainerWidget>
+#include <Wt/WLogger>
 #include <Wt/WSignal>
 
 class HomeLeft : public Wt::WContainerWidget
@@ -17,7 +18,6 @@ public:
 private:
     Wt::WGroupBox *fileUploadBox_;
     Wt::WFileUpload *fileUploadWidget_;
-    Wt::WPushButton *fileUploadButton_;
     std::string fileUploadName_;
 
     Wt::WGroupBox *equationsBox_;
@@ -31,6 +31,7 @@ private:
     Wt::WAnchor *saveButton_;
     std::string saveFileName_;
     Wt::WFileResource *saveFileResource_;
+
 
     void fileUploaded();
     void fileTooLarge();
@@ -48,6 +49,8 @@ private:
     Wt::Signal<int, std::string> evaluatedSignal_;
     Wt::Signal<std::string> errorSignal_;
     Wt::Signal<std::string> onPlotSignal_;
+
+    Wt::WLogger const logger_;
 
 
 };

@@ -52,18 +52,13 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box"));
 
+
+
     // File upload box
     fileUploadBox_ = new WGroupBox(this);
     fileUploadBox_->setId("fileUploadBox_");
     fileUploadBox_->setTitle(tr("homeleft.fuploadboxtitle"));
     addWidget(fileUploadBox_);
-    
-    /*fileUploadButton_ = new WPushButton("Load",fileUploadBox_);
-    fileUploadButton_->setId("fileUploadButton_");
-    fileUploadButton_->setEnabled(false);
-    fileUploadButton_->setInline(true);
-    fileUploadButton_->setMargin(5,Right);
-    fileUploadBox_->addWidget(fileUploadButton_);*/
 
     fileUploadWidget_ = new WFileUpload(fileUploadBox_);
     fileUploadWidget_->setId("fileUploadWidget_");
@@ -73,11 +68,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     fileUploadBox_->addWidget(fileUploadWidget_);
 
     // add connectors
-    /*fileUploadWidget_->changed().connect(std::bind([=] () {
-        fileUploadButton_->setEnabled(true);
-    }));*/
     fileUploadWidget_->changed().connect(fileUploadWidget_,&WFileUpload::upload);
-    //fileUploadButton_->clicked().connect(fileUploadWidget_,&WFileUpload::upload);
     fileUploadWidget_->uploaded().connect(this,&HomeLeft::fileUploaded);
     fileUploadWidget_->fileTooLarge().connect(this,&HomeLeft::fileTooLarge);
     
@@ -159,9 +150,6 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
         }
     }));
 
-
-
-
 }
 
 HomeLeft::~HomeLeft()
@@ -172,25 +160,42 @@ HomeLeft::~HomeLeft()
 
 void HomeLeft::fileUploaded()
 {
-    //fileUploadButton_->setEnabled(false);
-    fileUploadName_ = fileUploadWidget_->spoolFileName();
-    /* aqui toca llegir el fitxer i omplir els camps */
+    // input validation
+    std::string extension = fileUploadWidget_->clientFileName().toUTF8().substr(fileUploadWidget_->clientFileName().toUTF8().find_last_of(".")+1);
+    if (extension != "inp") {
+        errorSignal_.emit("Filetype not accepted.");
+        return;
+    }
 
+    fileUploadName_ = fileUploadWidget_->spoolFileName();
+
+    /* aqui toca llegir el fitxer i omplir els camps */
     std::ifstream f;
     std::string line;
     f.open(fileUploadName_.c_str());
     if (f.is_open()) {
-        for (int i=0; i<=12; i++) {
-            std::getline(f,line); // TODO: need to check for errors here?
+        int i=0;
+        while (std::getline(f,line)) {
             if (i==11)
                 xEquationInput_->setText(WString::fromUTF8(line));
             else if (i==12)
                 yEquationInput_->setText(WString::fromUTF8(line));
+        i++;    
         }
-        evalButton_->setEnabled(true);
-        plotButton_->setEnabled(true);
-        prepareSaveFile();
-        errorSignal_.emit("File uploaded. Press the Evaluate button to start computing.");
+        if (f.eof() && i<12) {
+            errorSignal_.emit("EOF reached prematurely.");
+            fileUploadName_ = "";
+        } else if (f.bad()) {
+            errorSignal_.emit("I/O error.");
+            fileUploadName_ = "";
+        } else {
+            evalButton_->setEnabled(true);
+            plotButton_->setEnabled(true);
+            prepareSaveFile();
+            errorSignal_.emit("File uploaded. Press the Evaluate button to start computing.");
+        }
+        f.close();
+        
     }
     
 }
