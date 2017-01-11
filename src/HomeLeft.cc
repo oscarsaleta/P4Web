@@ -58,12 +58,12 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     fileUploadBox_->setTitle(tr("homeleft.fuploadboxtitle"));
     addWidget(fileUploadBox_);
     
-    fileUploadButton_ = new WPushButton("Load",fileUploadBox_);
+    /*fileUploadButton_ = new WPushButton("Load",fileUploadBox_);
     fileUploadButton_->setId("fileUploadButton_");
     fileUploadButton_->setEnabled(false);
     fileUploadButton_->setInline(true);
     fileUploadButton_->setMargin(5,Right);
-    fileUploadBox_->addWidget(fileUploadButton_);
+    fileUploadBox_->addWidget(fileUploadButton_);*/
 
     fileUploadWidget_ = new WFileUpload(fileUploadBox_);
     fileUploadWidget_->setId("fileUploadWidget_");
@@ -73,12 +73,13 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     fileUploadBox_->addWidget(fileUploadWidget_);
 
     // add connectors
-    fileUploadWidget_->changed().connect(std::bind([=] () {
+    /*fileUploadWidget_->changed().connect(std::bind([=] () {
         fileUploadButton_->setEnabled(true);
-    }));
-    fileUploadButton_->clicked().connect(fileUploadWidget_,&WFileUpload::upload);
+    }));*/
+    fileUploadWidget_->changed().connect(fileUploadWidget_,&WFileUpload::upload);
+    //fileUploadButton_->clicked().connect(fileUploadWidget_,&WFileUpload::upload);
     fileUploadWidget_->uploaded().connect(this,&HomeLeft::fileUploaded);
-    fileUploadWidget_->uploaded().connect(this,&HomeLeft::fileTooLarge);
+    fileUploadWidget_->fileTooLarge().connect(this,&HomeLeft::fileTooLarge);
     
     addWidget(new WBreak());
 
@@ -171,7 +172,7 @@ HomeLeft::~HomeLeft()
 
 void HomeLeft::fileUploaded()
 {
-    fileUploadButton_->setEnabled(false);
+    //fileUploadButton_->setEnabled(false);
     fileUploadName_ = fileUploadWidget_->spoolFileName();
     /* aqui toca llegir el fitxer i omplir els camps */
 
@@ -189,13 +190,14 @@ void HomeLeft::fileUploaded()
         evalButton_->setEnabled(true);
         plotButton_->setEnabled(true);
         prepareSaveFile();
+        errorSignal_.emit("File uploaded. Press the Evaluate button to start computing.");
     }
     
 }
 
 void HomeLeft::fileTooLarge()
 {
-
+    errorSignal_.emit("File too large.");
 }
 
 std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std::ofstream &f)
