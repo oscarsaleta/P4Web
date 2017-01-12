@@ -22,6 +22,11 @@
 #ifndef MAINUI_H_
 #define MAINUI_H_
 
+/*!
+ * @file MainUI.h
+ * @author Oscar Saleta
+ */
+
 #include <Wt/WContainerWidget>
 
 class HomeLeft;

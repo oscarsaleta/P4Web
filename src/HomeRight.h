@@ -22,6 +22,11 @@
 #ifndef HOMERIGHT_H
 #define HOMERIGHT_H
 
+/*!
+ * @file HomeRight.h
+ * @author Oscar Saleta
+ */
+
 #include "win_sphere.h"
 
 #include <Wt/WContainerWidget>

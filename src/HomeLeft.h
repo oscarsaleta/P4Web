@@ -1,6 +1,11 @@
 #ifndef HOMELEFT_H
 #define HOMELEFT_H
 
+/*!
+ * @file HomeLeft.h
+ * @author Oscar Saleta
+ */
+
 #include <Wt/WContainerWidget>
 #include <Wt/WSignal>
 

@@ -22,6 +22,10 @@
 #ifndef MYAPPLICATION_H
 #define MYAPPLICATION_H
 
+/*!
+ * @file MyApplication.h
+ * @author Oscar Saleta
+ */
 
 #include <Wt/WApplication>
 
