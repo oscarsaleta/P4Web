@@ -905,9 +905,39 @@ public:
     // -----------------------------------------------------------------------
     //                  IMPLEMENTATION OF THE POINCARE CHARTS
     // -----------------------------------------------------------------------
+    /**
+     * R2 to Poincaré sphere
+     * @param x      x coordinate
+     * @param y      y coordinate
+     * @param pcoord length 3 vector where sphere coordinates will be stored
+     */
     void R2_to_psphere( double x, double y, double * pcoord );
+    /**
+     * Poincaré sphere to R2
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where R2 coordinates will be stored
+     */
     void psphere_to_R2( double X, double Y, double Z, double * rcoord );
+    /**
+     * Projection of Poincaré sphere coordinates to circle
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param ucoord length 2 vector where R2 coordinates will be stored
+     *
+     * Results depend on the config_projection value
+     */
     void psphere_ucircle( double X, double Y, double Z, double * ucoord);
+    /**
+     * Circle projection to Poincaré sphere
+     * @param u      coordinate 1 of Poincaré sphere
+     * @param v      coordinate 2 of Poincaré sphere
+     * @param pcoord length 3 vector where sphere coordinates will be stored
+     *
+     * Results depend on the config_projection value
+     */
     void ucircle_psphere( double u, double v, double * pcoord );
     void finite_ucircle( double x, double y, double * ucoord);
     void psphere_to_U1( double X, double Y, double Z, double * rcoord);
