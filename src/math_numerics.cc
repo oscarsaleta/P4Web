@@ -9,7 +9,7 @@
 //
 // -----------------------------------------------------------------------
 
-#include "math_numerics.h"
+#include "file_tab.h"
 
 #include "math_p4.h"
 
@@ -26,11 +26,11 @@ static double PRECISION2 = 1e-8;
 //
 // dx is a pointer to an array of two elements
 
-static void bisection( double (* f)(double), double * x, double e )
+void WVFStudy::bisection( double (WVFStudy::*f)(double), double * x, double e )
 {
 	double fx0, fmid, xmid;
 
-	if( (*f)( x[0] ) > 0 )
+	if( (this->*f)( x[0] ) > 0 )
 	{
 		xmid = x[0];
 		x[0] = x[1];
@@ -41,8 +41,8 @@ static void bisection( double (* f)(double), double * x, double e )
 	{
 		xmid = (x[0] + x[1])/2;
 	
-		fx0 = (*f)( x[0] );
-		fmid = (*f)( xmid );
+		fx0 = (this->*f)( x[0] );
+		fmid = (this->*f)( xmid );
 
 		if( fx0 * fmid < 0)
 			x[1] = xmid;
@@ -60,7 +60,7 @@ static void bisection( double (* f)(double), double * x, double e )
 //
 // x is an array of two elements
 
-static double regula_falsi( double (*f)(double), double * x, double e )
+double WVFStudy::regula_falsi( double (WVFStudy::*f)(double), double * x, double e )
 {
 	double x2;
 	double y;
@@ -69,12 +69,12 @@ static double regula_falsi( double (*f)(double), double * x, double e )
 	
 	for(;;)
 	{ 
-		y = x[1] - (*f)(x[1]) * ((x[1] - x[0])/((*f)(x[1]) - (*f)(x[0])));
+		y = x[1] - (this->*f)(x[1]) * ((x[1] - x[0])/((this->*f)(x[1]) - (this->*f)(x[0])));
 	
-		if( fabs( y - x2 ) < e && f(y) < PRECISION2 )
+		if( fabs( y - x2 ) < e && (this->*f)(y) < PRECISION2 )
 			break;
 
-		if( (*f)(x[1]) * (*f)(y) <= 0 )
+		if( (this->*f)(x[1]) * (this->*f)(y) <= 0 )
 			x[0] = y;
 		else
 			x[1] = y;
@@ -89,18 +89,18 @@ static double regula_falsi( double (*f)(double), double * x, double e )
 //								NEWTON
 // -----------------------------------------------------------------------
 
-double newton( double (*f)(double), double (*df)(double), double x, double e )
+double WVFStudy::newton( double (WVFStudy::*f)(double), double (WVFStudy::*df)(double), double x, double e )
 {
 	double dx;
 
-	if( fabs( (*f)(x) ) < PRECISION1 && fabs( (*f)(x) / (*df)(x) ) < e )
+	if( fabs( (this->*f)(x) ) < PRECISION1 && fabs( (this->*f)(x) / (this->*df)(x) ) < e )
 		return x;
 
 	for(;;)
 	{
-		dx = (*f)(x) / (*df)(x);
+		dx = (this->*f)(x) / (this->*df)(x);
 		x -= dx;
-		if( fabs( (*f)(x) ) < PRECISION1 || fabs(dx) < e )
+		if( fabs( (this->*f)(x) ) < PRECISION1 || fabs(dx) < e )
 			break;
 	}
 
@@ -113,7 +113,7 @@ double newton( double (*f)(double), double (*df)(double), double x, double e )
 //
 // value is a pointer to an array of two elements
 
-double find_root( double (*f)(double), double (*df)(double), double * value )
+double WVFStudy::find_root( double (WVFStudy::*f)(double), double (WVFStudy::*df)(double), double * value )
 {
 	double y;
 
@@ -128,8 +128,8 @@ double find_root( double (*f)(double), double (*df)(double), double * value )
 //								RK78
 // -----------------------------------------------------------------------
 
-void rk78( void (*deriv)( double *, double * ), double y[2], double * hh,
-			double hmi, double hma, double e1)
+void WVFStudy::rk78( void (WVFStudy::*deriv)( double *, double * ), double y[2],
+	double * hh, double hmi, double hma, double e1)
 {
 	double beta[79],c[11],d,dd,e3,h,r[13][2],b[2],f[2];
 	int k;
@@ -237,55 +237,55 @@ void rk78( void (*deriv)( double *, double * ), double y[2], double * hh,
 	{
 		for(k=0;k<2;++k)
 			b[k]=y[k];
-		deriv(b,r[0]); 
+		(this->*deriv)(b,r[0]); 
 
 		for(k=0;k<2;++k)
 			b[k]=y[k]+beta[1]*r[0][k]*h;
-		deriv(b,r[1]);
+		(this->*deriv)(b,r[1]);
 
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[2]*r[0][k]+beta[3]*r[1][k])*h;
-		deriv(b,r[2]);
+		(this->*deriv)(b,r[2]);
 
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[4]*r[0][k]+beta[6]*r[2][k])*h;
-		deriv(b,r[3]);
+		(this->*deriv)(b,r[3]);
 
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[7]*r[0][k]+beta[9]*(r[2][k]-r[3][k]))*h;
-		deriv(b,r[4]);
+		(this->*deriv)(b,r[4]);
 
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[11]*r[0][k]+beta[14]*r[3][k]+beta[15]*r[4][k])*h;
-		deriv(b,r[5]);
+		(this->*deriv)(b,r[5]);
 
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[16]*r[0][k]+beta[19]*r[3][k]+beta[20]*r[4][k]+beta[21]*r[5][k])*h;
-		deriv(b,r[6]);
+		(this->*deriv)(b,r[6]);
 		
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[22]*r[0][k]+beta[26]*r[4][k]+beta[27]*r[5][k]+beta[28]*r[6][k])*h;
-		deriv(b,r[7]);
+		(this->*deriv)(b,r[7]);
 
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[29]*r[0][k]+beta[32]*r[3][k]+beta[33]*r[4][k]+beta[34]*r[5][k]+beta[35]*r[6][k]+beta[36]*r[7][k])*h;
-		deriv(b,r[8]);
+		(this->*deriv)(b,r[8]);
 		
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[37]*r[0][k]+beta[40]*r[3][k]+beta[41]*r[4][k]+beta[42]*r[5][k]+beta[43]*r[6][k]+beta[44]*r[7][k]+beta[45]*r[8][k])*h;
-		deriv(b,r[9]);
+		(this->*deriv)(b,r[9]);
 
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[46]*r[0][k]+beta[49]*r[3][k]+beta[50]*r[4][k]+beta[51]*r[5][k]+beta[52]*r[6][k]+beta[53]*r[7][k]+beta[54]*r[8][k]+beta[55]*r[9][k])*h;
-		deriv(b,r[10]);
+		(this->*deriv)(b,r[10]);
 		
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[56]*r[0][k]+beta[61]*(r[5][k]-r[9][k])+beta[62]*r[6][k]+beta[63]*(r[7][k]-r[8][k]))*h;
-		deriv(b,r[11]);
+		(this->*deriv)(b,r[11]);
 		
 		for(k=0;k<2;++k)
 			b[k]=y[k]+(beta[67]*r[0][k]+beta[70]*r[3][k]+beta[71]*r[4][k]+beta[72]*r[5][k]+beta[73]*r[6][k]+beta[74]*r[7][k]+beta[75]*r[8][k]+beta[76]*r[9][k]+r[11][k])*h;
-		deriv(b,r[12]);
+		(this->*deriv)(b,r[12]);
  
 		d=0;
 		dd=0;

@@ -43,7 +43,7 @@
 #include "file_tab.h"
 
 #include "math_p4.h"
-#include "math_charts.h"
+//#include "math_charts.h"
 #include "math_separatrice.h"
 #include "math_changedir.h"
 #include "math_orbits.h"
@@ -56,7 +56,7 @@
 
 using namespace Wt;
 
-WVFStudy VFResults;
+//WVFStudy VFResults;
 
 /*
     This file contains the code to read the information from reduce/maple.
@@ -113,7 +113,7 @@ WVFStudy::WVFStudy()
     q = 1;
     typeofstudy = TYPEOFSTUDY_ALL;
     singinf = false;
-    VFResults.dir_vec_field = 1;
+    dir_vec_field = 1;
 
     // initialize parameters
 
@@ -217,7 +217,7 @@ void WVFStudy::deleteVF()
     q = 1;
     typeofstudy = TYPEOFSTUDY_ALL;
     singinf = false;
-    VFResults.dir_vec_field = 1;
+    dir_vec_field = 1;
 
     lasterror = "";
 }
@@ -560,7 +560,7 @@ bool WVFStudy::readTables( std::string basename )
     }
     else
     {
-        if( fscanf( fp, "%d %d", &flag, &VFResults.dir_vec_field ) != 2 )
+        if( fscanf( fp, "%d %d", &flag, &dir_vec_field ) != 2 )
         {
             fprintf(stderr,"Cannot read sing-at-infinity flag and directions flag in %s_vec.tab\n",basename.c_str());
             deleteVF();
@@ -1503,7 +1503,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         point->next_se = new semi_elementary;
         point->next_se->x0 = point->x0;
         point->next_se->y0 = 0.0;
-        if( VFResults.dir_vec_field == 1 )
+        if( dir_vec_field == 1 )
             point->next_se->type = point->type;
         else
             switch( point->type )
@@ -1619,7 +1619,7 @@ bool WVFStudy::readStrongFocusPoint( FILE * fp )
         point->x0 = last->x0;
         point->y0 = 0.0;
         point->chart = (( point->chart == CHART_U1 ) ? CHART_V1 : CHART_V2 );
-        point->stable = last->stable * ((VFResults.dir_vec_field == -1) ? -1 : 1);
+        point->stable = last->stable * ((dir_vec_field == -1) ? -1 : 1);
     }  
 
     return true;
@@ -1700,7 +1700,7 @@ bool WVFStudy::readWeakFocusPoint( FILE * fp )
         point->next_wf->x0 = point->x0;
         point->next_wf->y0 = 0.0;
 
-        if( VFResults.dir_vec_field == 1 )
+        if( dir_vec_field == 1 )
             point->next_wf->type = point->type;
         else
             switch( point->type )
@@ -1871,7 +1871,7 @@ bool WVFStudy::readNodePoint( FILE * fp )
         point->x0 = last->x0;
         point->y0 = 0.0;
         point->chart = (last->chart == CHART_U1) ? CHART_V1 : CHART_V2;
-        point->stable = last->stable * ( VFResults.dir_vec_field == -1 ) ? -1 : 1;
+        point->stable = last->stable * ( dir_vec_field == -1 ) ? -1 : 1;
     }
 
     return true;
@@ -2122,7 +2122,7 @@ void WVFStudy::dump( WString basename, WString info )
             (float)double_q_minus_1, (float)double_q_minus_p ))
     DUMP(( "  Range x: [%g,%g] Range y: [%g,%g]", (float)xmin, (float)xmax, (float)ymin, (float)ymax ))
     DUMP(( "  Line at infinity singular? %d", singinf ))
-    DUMP(( "  Direction of vector field: %d", VFResults.dir_vec_field ))
+    DUMP(( "  Direction of vector field: %d", dir_vec_field ))
     DUMP(( " " ))
     DUMP(( "Vector Fields" ))
     DUMP(( "-------------" ))
@@ -2259,140 +2259,1379 @@ void WVFStudy::setupCoordinateTransformations( void )
 {
     if( !plweights )
     {
-        U1_to_sphere = U1_to_psphere;
-        U2_to_sphere = U2_to_psphere;
-        V1_to_sphere = VV1_to_psphere;
-        V2_to_sphere = VV2_to_psphere;
-        sphere_to_R2 = psphere_to_R2;
-        R2_to_sphere = R2_to_psphere;
-        sphere_to_U1 = psphere_to_U1;
-        sphere_to_U2 = psphere_to_U2;
-        sphere_to_V1 = psphere_to_VV1;
-        sphere_to_V2 = psphere_to_VV2;
+        U1_to_sphere = &WVFStudy::U1_to_psphere;
+        U2_to_sphere = &WVFStudy::U2_to_psphere;
+        V1_to_sphere = &WVFStudy::VV1_to_psphere;
+        V2_to_sphere = &WVFStudy::VV2_to_psphere;
+        sphere_to_R2 = &WVFStudy::psphere_to_R2;
+        R2_to_sphere = &WVFStudy::R2_to_psphere;
+        sphere_to_U1 = &WVFStudy::psphere_to_U1;
+        sphere_to_U2 = &WVFStudy::psphere_to_U2;
+        sphere_to_V1 = &WVFStudy::psphere_to_VV1;
+        sphere_to_V2 = &WVFStudy::psphere_to_VV2;
 
-        integrate_sphere_sep = integrate_poincare_sep;
-        integrate_sphere_orbit = integrate_poincare_orbit;
-        eval_lc = eval_lc_poincare;
-        less2 = less_poincare;
-        change_dir = change_dir_poincare;
+        integrate_sphere_sep = &WVFStudy::integrate_poincare_sep;
+        integrate_sphere_orbit = &WVFStudy::integrate_poincare_orbit;
+        eval_lc = &WVFStudy::eval_lc_poincare;
+        less2 = &WVFStudy::less_poincare;
+        change_dir = &WVFStudy::change_dir_poincare;
 
         switch( typeofview )
         {
         case TYPEOFVIEW_SPHERE:
-            viewcoord_to_sphere = ucircle_psphere;
-            sphere_to_viewcoord = psphere_ucircle;
-            finite_to_viewcoord = finite_ucircle;
-            is_valid_viewcoord  = isvalid_psphereviewcoord;
-            sphere_to_viewcoordpair = default_sphere_to_viewcoordpair;
+            viewcoord_to_sphere = &WVFStudy::ucircle_psphere;
+            sphere_to_viewcoord = &WVFStudy::psphere_ucircle;
+            finite_to_viewcoord = &WVFStudy::finite_ucircle;
+            is_valid_viewcoord  = &WVFStudy::isvalid_psphereviewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::default_sphere_to_viewcoordpair;
             break;
 
         case TYPEOFVIEW_PLANE:
-            viewcoord_to_sphere = R2_to_psphere;
-            sphere_to_viewcoord = psphere_to_R2;
-            finite_to_viewcoord = identitytrf_R2;
-            is_valid_viewcoord  = isvalid_R2viewcoord;
-            sphere_to_viewcoordpair = default_sphere_to_viewcoordpair;
+            viewcoord_to_sphere = &WVFStudy::R2_to_psphere;
+            sphere_to_viewcoord = &WVFStudy::psphere_to_R2;
+            finite_to_viewcoord = &WVFStudy::identitytrf_R2;
+            is_valid_viewcoord  = &WVFStudy::isvalid_R2viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::default_sphere_to_viewcoordpair;
             break;
 
         case TYPEOFVIEW_U1:
-            viewcoord_to_sphere = xyrevU1_to_psphere;
-            sphere_to_viewcoord = psphere_to_xyrevU1;
-            finite_to_viewcoord = default_finite_to_viewcoord;
-            is_valid_viewcoord  = isvalid_U1viewcoord;
-            sphere_to_viewcoordpair = psphere_to_viewcoordpair_discontinuousx;
+            viewcoord_to_sphere = &WVFStudy::xyrevU1_to_psphere;
+            sphere_to_viewcoord = &WVFStudy::psphere_to_xyrevU1;
+            finite_to_viewcoord = &WVFStudy::default_finite_to_viewcoord;
+            is_valid_viewcoord  = &WVFStudy::isvalid_U1viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::psphere_to_viewcoordpair_discontinuousx;
             break;
 
         case TYPEOFVIEW_U2:
-            viewcoord_to_sphere = U2_to_psphere;
-            sphere_to_viewcoord = psphere_to_U2;
-            finite_to_viewcoord = default_finite_to_viewcoord;
-            is_valid_viewcoord  = isvalid_U2viewcoord;
-            sphere_to_viewcoordpair = psphere_to_viewcoordpair_discontinuousy;
+            viewcoord_to_sphere = &WVFStudy::U2_to_psphere;
+            sphere_to_viewcoord = &WVFStudy::psphere_to_U2;
+            finite_to_viewcoord = &WVFStudy::default_finite_to_viewcoord;
+            is_valid_viewcoord  = &WVFStudy::isvalid_U2viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::psphere_to_viewcoordpair_discontinuousy;
             break;
 
         case TYPEOFVIEW_V1:
-            viewcoord_to_sphere = xyrevV1_to_psphere;
-            sphere_to_viewcoord = psphere_to_xyrevV1;
-            finite_to_viewcoord = default_finite_to_viewcoord;
-            is_valid_viewcoord  = isvalid_V1viewcoord;
-            sphere_to_viewcoordpair = psphere_to_viewcoordpair_discontinuousx;
+            viewcoord_to_sphere = &WVFStudy::xyrevV1_to_psphere;
+            sphere_to_viewcoord = &WVFStudy::psphere_to_xyrevV1;
+            finite_to_viewcoord = &WVFStudy::default_finite_to_viewcoord;
+            is_valid_viewcoord  = &WVFStudy::isvalid_V1viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::psphere_to_viewcoordpair_discontinuousx;
             break;
 
         case TYPEOFVIEW_V2:
-            viewcoord_to_sphere = V2_to_psphere;
-            sphere_to_viewcoord = psphere_to_V2;
-            finite_to_viewcoord = default_finite_to_viewcoord;
-            is_valid_viewcoord  = isvalid_V2viewcoord;
-            sphere_to_viewcoordpair = psphere_to_viewcoordpair_discontinuousy;
+            viewcoord_to_sphere = &WVFStudy::V2_to_psphere;
+            sphere_to_viewcoord = &WVFStudy::psphere_to_V2;
+            finite_to_viewcoord = &WVFStudy::default_finite_to_viewcoord;
+            is_valid_viewcoord  = &WVFStudy::isvalid_V2viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::psphere_to_viewcoordpair_discontinuousy;
             break;
         }
     }
     else
     {
-        U1_to_sphere = U1_to_plsphere;
-        U2_to_sphere = U2_to_plsphere;
-        V1_to_sphere = V1_to_plsphere;
-        V2_to_sphere = V2_to_plsphere;
-        sphere_to_R2 = plsphere_to_R2;
-        R2_to_sphere = R2_to_plsphere;
-        sphere_to_U1 = plsphere_to_U1;
-        sphere_to_U2 = plsphere_to_U2;
-        sphere_to_V1 = plsphere_to_V1;
-        sphere_to_V2 = plsphere_to_V2;
+        U1_to_sphere = &WVFStudy::U1_to_plsphere;
+        U2_to_sphere = &WVFStudy::U2_to_plsphere;
+        V1_to_sphere = &WVFStudy::V1_to_plsphere;
+        V2_to_sphere = &WVFStudy::V2_to_plsphere;
+        sphere_to_R2 = &WVFStudy::plsphere_to_R2;
+        R2_to_sphere = &WVFStudy::R2_to_plsphere;
+        sphere_to_U1 = &WVFStudy::plsphere_to_U1;
+        sphere_to_U2 = &WVFStudy::plsphere_to_U2;
+        sphere_to_V1 = &WVFStudy::plsphere_to_V1;
+        sphere_to_V2 = &WVFStudy::plsphere_to_V2;
 
-        integrate_sphere_sep = integrate_lyapunov_sep;
-        integrate_sphere_orbit = integrate_lyapunov_orbit;
-        eval_lc = eval_lc_lyapunov;
-        less2 = less_lyapunov;
-        change_dir = change_dir_lyapunov;
+        integrate_sphere_sep = &WVFStudy::integrate_lyapunov_sep;
+        integrate_sphere_orbit = &WVFStudy::integrate_lyapunov_orbit;
+        eval_lc = &WVFStudy::eval_lc_lyapunov;
+        less2 = &WVFStudy::less_lyapunov;
+        change_dir = &WVFStudy::change_dir_lyapunov;
 
         switch( typeofview )
         {
         case TYPEOFVIEW_SPHERE:
-            viewcoord_to_sphere = annulus_plsphere;
-            sphere_to_viewcoord = plsphere_annulus;
-            finite_to_viewcoord = finite_annulus;
-            is_valid_viewcoord  = isvalid_plsphereviewcoord;
-            sphere_to_viewcoordpair = default_sphere_to_viewcoordpair;
+            viewcoord_to_sphere = &WVFStudy::annulus_plsphere;
+            sphere_to_viewcoord = &WVFStudy::plsphere_annulus;
+            finite_to_viewcoord = &WVFStudy::finite_annulus;
+            is_valid_viewcoord  = &WVFStudy::isvalid_plsphereviewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::default_sphere_to_viewcoordpair;
             break;
         case TYPEOFVIEW_PLANE:
-            viewcoord_to_sphere = R2_to_plsphere;
-            sphere_to_viewcoord = plsphere_to_R2;
-            finite_to_viewcoord = identitytrf_R2;
-            is_valid_viewcoord  = isvalid_R2viewcoord;
-            sphere_to_viewcoordpair = default_sphere_to_viewcoordpair;
+            viewcoord_to_sphere = &WVFStudy::R2_to_plsphere;
+            sphere_to_viewcoord = &WVFStudy::plsphere_to_R2;
+            finite_to_viewcoord = &WVFStudy::identitytrf_R2;
+            is_valid_viewcoord  = &WVFStudy::isvalid_R2viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::default_sphere_to_viewcoordpair;
             break;
         case TYPEOFVIEW_U1:
-            viewcoord_to_sphere = xyrevU1_to_plsphere;
-            sphere_to_viewcoord = plsphere_to_xyrevU1;
-            finite_to_viewcoord = default_finite_to_viewcoord;
-            is_valid_viewcoord  = isvalid_U1viewcoord;
-            sphere_to_viewcoordpair = plsphere_to_viewcoordpair_discontinuousx;
+            viewcoord_to_sphere = &WVFStudy::xyrevU1_to_plsphere;
+            sphere_to_viewcoord = &WVFStudy::plsphere_to_xyrevU1;
+            finite_to_viewcoord = &WVFStudy::default_finite_to_viewcoord;
+            is_valid_viewcoord  = &WVFStudy::isvalid_U1viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::plsphere_to_viewcoordpair_discontinuousx;
             break;
 
         case TYPEOFVIEW_U2:
-            viewcoord_to_sphere = U2_to_plsphere;
-            sphere_to_viewcoord = plsphere_to_U2;
-            finite_to_viewcoord = default_finite_to_viewcoord;
-            is_valid_viewcoord  = isvalid_U2viewcoord;
-            sphere_to_viewcoordpair = plsphere_to_viewcoordpair_discontinuousy;
+            viewcoord_to_sphere = &WVFStudy::U2_to_plsphere;
+            sphere_to_viewcoord = &WVFStudy::plsphere_to_U2;
+            finite_to_viewcoord = &WVFStudy::default_finite_to_viewcoord;
+            is_valid_viewcoord  = &WVFStudy::isvalid_U2viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::plsphere_to_viewcoordpair_discontinuousy;
             break;
 
         case TYPEOFVIEW_V1:
-            viewcoord_to_sphere = xyrevV1_to_plsphere;
-            sphere_to_viewcoord = plsphere_to_xyrevV1;
-            finite_to_viewcoord = default_finite_to_viewcoord;
-            is_valid_viewcoord  = isvalid_V1viewcoord;
-            sphere_to_viewcoordpair = plsphere_to_viewcoordpair_discontinuousx;
+            viewcoord_to_sphere = &WVFStudy::xyrevV1_to_plsphere;
+            sphere_to_viewcoord = &WVFStudy::plsphere_to_xyrevV1;
+            finite_to_viewcoord = &WVFStudy::default_finite_to_viewcoord;
+            is_valid_viewcoord  = &WVFStudy::isvalid_V1viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::plsphere_to_viewcoordpair_discontinuousx;
             break;
 
         case TYPEOFVIEW_V2:
-            viewcoord_to_sphere = V2_to_plsphere;
-            sphere_to_viewcoord = plsphere_to_V2;
-            finite_to_viewcoord = default_finite_to_viewcoord;
-            is_valid_viewcoord  = isvalid_V2viewcoord;
-            sphere_to_viewcoordpair = plsphere_to_viewcoordpair_discontinuousy;
+            viewcoord_to_sphere = &WVFStudy::V2_to_plsphere;
+            sphere_to_viewcoord = &WVFStudy::plsphere_to_V2;
+            finite_to_viewcoord = &WVFStudy::default_finite_to_viewcoord;
+            is_valid_viewcoord  = &WVFStudy::isvalid_V2viewcoord;
+            sphere_to_viewcoordpair = &WVFStudy::plsphere_to_viewcoordpair_discontinuousy;
             break;
         }
     }
 }
+
+#include "file_tab.h"
+
+#include "custom.h"
+#include "math_p4.h"
+#include "math_polynom.h"
+
+#include <cmath>
+
+
+// -----------------------------------------------------------------------
+//                      FUNCTION PROTOTYPES
+// -----------------------------------------------------------------------
+/*
+
+    There are, logically, 4 categories of FINITE coordinate systems:
+
+    (I)     Real coordinates
+    (II)    View coordinates
+    (III)   Poincare coordinates
+    (IV)    Poincare-Lyapunov coordinates
+
+    Category (I) are coordinates used by Maple/reduce, and also the points
+    given in dialog boxes by the user, are always (I)-coordinates.
+    Category (II) are coordinates that are obtained by interacting with
+    the plot-window or zoom-window.  When the user clicks, the click-coordinates
+    are in Category (II). When a local study is wanted, these coordinates are
+    exactly the same as (I).  Otherwhise, Category-(II) coordinates are coordinates
+    inside a rectangular box x=-1.1 .. 1.1, y=-1.1 .. 1.1, wherein the circle
+    at infinity is a circle with radius 1.
+
+*/
+
+// -----------------------------------------------------------------------
+//                  IMPLEMENTATION OF THE POINCARE CHARTS
+// -----------------------------------------------------------------------
+
+// declared in math_p4.cc
+void copy_x_into_y( double * x, double * y )
+{
+    y[0] = x[0];
+    y[1] = x[1];
+    y[2] = x[2];
+}
+
+void WVFStudy::R2_to_psphere( double x, double y, double * pcoord )
+{
+    double s;
+
+    s = sqrt(1.0+x*x+y*y);
+
+    pcoord[0] = x/s;
+    pcoord[1] = y/s;
+    pcoord[2] = 1.0/s;
+}
+
+void WVFStudy::psphere_to_R2( double X, double Y, double Z, double * rcoord )
+{
+    rcoord[0] = X/Z;
+    rcoord[1] = Y/Z;
+}
+
+void WVFStudy::psphere_ucircle( double X, double Y, double Z, double * ucoord)
+{
+    double k;
+
+    if (config_projection==0) {
+        ucoord[0]=X;
+        ucoord[1]=Y;
+    } else {
+        k=-Z/(Z-config_projection);
+        ucoord[0]=(1.0+k)*X;
+        ucoord[1]=(1.0+k)*Y;
+    }
+}
+
+void WVFStudy::ucircle_psphere( double u, double v, double * pcoord )
+{
+    double k, projection;
+
+    projection = config_projection;
+
+    if ( projection == 0 ) {
+        pcoord[0]=u;
+        pcoord[1]=v;
+        pcoord[2]=sqrt(1.0-u*u-v*v);
+    } else {
+        k=(sqrt(-projection*projection*(u*u+v*v)+
+            projection*projection+u*u+v*v)-u*u-v*v)/
+            (projection*projection+u*u+v*v);
+
+        pcoord[0]=(1.0+k)*u;
+        pcoord[1]=(1.0+k)*v;
+        pcoord[2]=-k*projection;
+    }
+}
+
+void WVFStudy::finite_ucircle( double x, double y, double * ucoord)
+{
+    double pcoord[3];
+
+    R2_to_psphere(x,y,pcoord);
+    psphere_ucircle(pcoord[0],pcoord[1],pcoord[2],ucoord);
+}
+
+void WVFStudy::psphere_to_U1( double X, double Y, double Z, double * rcoord)
+{
+    rcoord[0]=Y/X;
+    rcoord[1]=Z/X;
+}
+
+void WVFStudy::psphere_to_U2( double X, double Y, double Z, double * rcoord)
+{
+    rcoord[0]=X/Y;
+    rcoord[1]=Z/Y;
+}
+
+void WVFStudy::psphere_to_V1( double X, double Y, double Z, double * rcoord)
+{
+    rcoord[0]=-Y/X;
+    rcoord[1]=-Z/X;
+}
+
+void WVFStudy::psphere_to_V2( double X, double Y, double Z, double * rcoord)
+{
+    rcoord[0]=-X/Y;
+    rcoord[1]=-Z/Y;
+}
+
+void WVFStudy::U1_to_psphere( double z1, double z2, double * pcoord)
+{
+    pcoord[0]=1/(sqrt(1+z1*z1+z2*z2));
+    pcoord[1]=z1*pcoord[0];
+    pcoord[2]=z2*pcoord[0];
+}
+
+void WVFStudy::V1_to_psphere( double z1, double z2, double * pcoord)
+{
+    pcoord[0]=-1/(sqrt(1+z1*z1+z2*z2));
+    pcoord[1]=-z1*pcoord[0];
+    pcoord[2]=-z2*pcoord[0];
+}
+
+void WVFStudy::U2_to_psphere( double z1, double z2, double * pcoord)
+{
+    pcoord[1]=1/(sqrt(1+z1*z1+z2*z2));
+    pcoord[0]=z1*pcoord[1];
+    pcoord[2]=z2*pcoord[1];
+}
+
+void WVFStudy::V2_to_psphere( double z1, double z2, double * pcoord)
+{
+    pcoord[1]=-1/(sqrt(1+z1*z1+z2*z2));
+    pcoord[0]=-z1*pcoord[1];
+    pcoord[2]=-z2*pcoord[1];
+}
+
+
+void WVFStudy::VV1_to_psphere( double z1, double z2, double * pcoord)
+{
+    /* (z1,z2) is a point on the U1 chart */
+
+    U1_to_psphere(z1,z2,pcoord);
+    pcoord[0]=-pcoord[0];
+    pcoord[1]=-pcoord[1];
+    pcoord[2]=-pcoord[2];
+}
+
+void WVFStudy::psphere_to_VV1( double X, double Y, double Z, double * rcoord )
+{
+    psphere_to_U1(-X,-Y,-Z,rcoord);
+}
+
+void WVFStudy::VV2_to_psphere( double z1, double z2, double * pcoord)
+{
+
+    /* (z1,z2) is a point on the U2 chart */
+
+    U2_to_psphere(z1,z2,pcoord); 
+    pcoord[0]=-pcoord[0];
+    pcoord[1]=-pcoord[1];
+    pcoord[2]=-pcoord[2]; 
+}
+
+void WVFStudy::psphere_to_VV2( double X, double Y, double Z, double * rcoord )
+{
+    psphere_to_U2(-X,-Y,-Z,rcoord);
+}
+
+void WVFStudy::UU1_to_psphere( double z1, double z2, double * pcoord)
+{
+    /* (z1,z2) is a point on the V1 chart */
+    V1_to_psphere(z1,z2,pcoord);
+    pcoord[0]=-pcoord[0];
+    pcoord[1]=-pcoord[1];
+    pcoord[2]=-pcoord[2];
+}
+
+void WVFStudy::psphere_to_UU1( double X, double Y, double Z, double * rcoord )
+{
+    psphere_to_V1(-X,-Y,-Z,rcoord );
+}
+
+void WVFStudy::UU2_to_psphere( double z1, double z2, double * pcoord)
+{
+    /* (z1,z2) is a point on the V2 chart */
+    V2_to_psphere(z1,z2,pcoord);
+    pcoord[0]=-pcoord[0];
+    pcoord[1]=-pcoord[1];
+    pcoord[2]=-pcoord[2];
+}
+
+void WVFStudy::psphere_to_UU2( double X, double Y, double Z, double * rcoord )
+{
+    psphere_to_V2(-X,-Y,-Z,rcoord);
+}
+
+bool WVFStudy::isvalid_psphereviewcoord( double u, double v, double * pcoord )
+{
+    if ( u*u + v*v > 1.0 )
+        return false;
+
+    (this->*viewcoord_to_sphere)(u,v,pcoord);
+    return true;
+}
+
+bool WVFStudy::isvalid_U1viewcoord( double u, double v, double * pcoord )
+{
+    // the u coordinate must be positive, except when p is odd.
+
+    if ( plweights ) {
+        if ( (p % 2) == 0 && u < 0 )
+            return false;
+    }
+
+    (this->*viewcoord_to_sphere)(u,v,pcoord);
+    return true;
+}
+
+bool WVFStudy::isvalid_U2viewcoord( double u, double v, double * pcoord )
+{
+    if ( plweights ) {
+        if ( (q % 2) == 0 && v < 0 )
+            return false;
+    }
+
+    (this->*viewcoord_to_sphere)(u,v,pcoord);
+    return true;
+}
+
+bool WVFStudy::isvalid_V1viewcoord( double u, double v, double * pcoord )
+{
+    if ( plweights ) {
+        if ( (p % 2) == 0 && u < 0 )
+            return false;
+    }
+
+    (this->*viewcoord_to_sphere)(u,v,pcoord);
+    return true;
+}
+
+bool WVFStudy::isvalid_V2viewcoord( double u, double v, double * pcoord )
+{
+    if ( plweights ) {
+        if ( (q % 2) == 0 && v < 0 )
+            return false;
+    }
+
+    (this->*viewcoord_to_sphere)(u,v,pcoord);
+    return true;
+}
+
+bool WVFStudy::isvalid_R2viewcoord( double u, double v, double * pcoord )
+{
+    (this->*viewcoord_to_sphere)(u,v,pcoord);
+    return true;
+}
+
+void WVFStudy::psphere_to_xyrevU1( double X, double Y, double Z, double * rcoord)
+{
+    double _rcoord[2];
+    psphere_to_U1( X,Y,Z, _rcoord );
+    rcoord[0]=_rcoord[1];
+    rcoord[1]=_rcoord[0];
+}
+
+void WVFStudy::psphere_to_xyrevV1( double X, double Y, double Z, double * rcoord)
+{
+    double _rcoord[2];
+    psphere_to_V1( X,Y,Z, _rcoord );
+    rcoord[0]=_rcoord[1];
+    rcoord[1]=_rcoord[0];
+}
+
+void WVFStudy::xyrevU1_to_psphere( double z1, double z2, double * pcoord)
+{
+    U1_to_psphere( z2, z1, pcoord );
+}
+
+void WVFStudy::xyrevV1_to_psphere( double z1, double z2, double * pcoord)
+{
+    V1_to_psphere( z2, z1, pcoord );
+}
+
+// -----------------------------------------------------------------------
+//              IMPLEMENTATION OF THE POINCARE-LYPANOV CHARTS
+// -----------------------------------------------------------------------
+
+/* function for transformation U1,V1 chart to the cylinder 
+   on chart x=(+-)1/s^p, y=u/s^q 
+   on cylinder x=cos(theta)/r^p, y=sin(theta)/r^q
+   (u,s) -> (r,theta)
+   find positive root of  y^p+u^2*y^q-1 
+   r=sqrt(y)*s and theta=atan(u*sqrt(y)^(q-p)) if s<>0 !!
+   if s=0 and u<>0 then solve (+-1)^q*u^p*cos(theta)^q-sin(theta)^p 
+                        and r=0
+   if u=0 then r=s and theta=0 or Pi
+*/
+
+bool WVFStudy::isvalid_plsphereviewcoord( double u, double v, double * pcoord )
+{
+    if ( u*u + v*v > 1.0 )
+        return false;
+    (this->*viewcoord_to_sphere)(u,v,pcoord);
+    return true;
+}
+
+//void cylinder_to_U1( double r, double theta, double * c);
+//void cylinder_to_U2( double r, double theta, double * c );
+//void cylinder_to_V1( double r, double theta, double * c);
+//void cylinder_to_V2( double r, double theta, double * c);
+//void U1_to_cylinder( double u, double s, double * c);
+//void U2_to_cylinder( double u, double s, double * c);
+void V1_to_cylinder( double u, double s, double * c);
+void V2_to_cylinder( double u, double s, double * c);
+
+static double U = 0.0;
+
+double WVFStudy::func_U1( double x )
+{
+    return  pow(x, double_p ) + U*U*pow(x, double_q) - 1.0;
+}
+
+double WVFStudy::dfunc_U1( double x)
+{
+    return double_p * pow( x, double_p_minus_1 )
+            + U * U * double_q * pow(x, double_q_minus_1 );
+}
+
+double WVFStudy::func_U1_s0( double theta)
+{
+    /* find theta if s=0 and u<>0 */
+    return U*pow(cos(theta), double_q ) - pow(sin(theta), double_p );
+}
+
+double WVFStudy::dfunc_U1_s0( double theta)
+{
+    return(-double_q*U*pow(cos(theta),double_q_minus_1)*sin(theta)-
+         double_p*cos(theta)*pow(sin(theta),double_p_minus_1));
+}
+
+void WVFStudy::U1_to_cylinder( double u, double s, double * c)
+{
+    /* input (u,s) output c=(r,theta)
+        x=1/s^p, y=u/s^q
+    */
+    double x[2],y;
+    if (u==0) {
+        c[0]=s;
+        c[1]=0;
+    } else if (s==0) {
+        c[0]=0;
+        U=pow(u,double_p);
+        if (u>0) {
+            x[0]=0;
+            x[1]=PI/2.0;
+        } else {
+            x[0]=-PI/2.0;
+            x[1]=0;
+        }
+        c[1]=find_root(&WVFStudy::func_U1_s0,&WVFStudy::dfunc_U1_s0,x);
+    } else {
+        x[0]=0;
+        x[1]=1;
+        U=u;
+        y=find_root(&WVFStudy::func_U1,&WVFStudy::dfunc_U1,x);
+        c[0]=sqrt(y)*s;
+        c[1]=atan(u*pow(sqrt(y), double_q_minus_p ));
+    }
+}
+
+
+/*
+void WVFStudy::cylinder_to_U1( double r, double theta, double * c)
+{
+    c[1]=r/pow(cos(theta),__one_over_p);
+    c[0]=sin(theta)*pow(c[1]/r,double_q);
+}
+*/
+
+void WVFStudy::V1_to_cylinder( double u, double s, double * c)
+{
+    /* input (u,s) output c=(r,theta)
+        x=-1/s^p, y=u/s^q
+    */
+    double x[2],y;
+    if (u==0) {
+        c[0]=s;
+        c[1]=PI;
+    } else if (s==0) {
+        c[0]=0;
+        U=pow(u,double_p)*__minus_one_to_q;
+        if (u>0) {
+            x[0]=PI/2;
+            x[1]=PI;
+        } else {
+            x[0]=-PI;
+            x[1]=-PI/2;
+        }
+        c[1]=find_root(&WVFStudy::func_U1_s0,&WVFStudy::dfunc_U1_s0,x);
+    } else {
+        x[0]=0;
+        x[1]=1;
+        U=u;
+        y=find_root(&WVFStudy::func_U1,&WVFStudy::dfunc_U1,x);
+        c[0]=sqrt(y)*s;
+        c[1]=atan(-u*pow(sqrt(y), double_q_minus_p ));
+        if (c[1]>0)
+            c[1]-=PI;
+        else
+            c[1]+=PI;
+    }
+}
+
+/*
+void WVFStudy::cylinder_to_V1( double r, double theta, double * c)
+{ 
+    c[1]=r/pow(-cos(theta),__one_over_p);
+    c[0]=sin(theta)*pow(c[1]/r,double_q);
+}
+*/
+
+/* function for transformation U2,V2 chart to the cylinder 
+   on chart x=u/s^p, y=(+-)1/s^q 
+   on cylinder x=cos(theta)/r^p, y=sin(theta)/r^q
+   (u,s) -> (r,theta)
+   find positive root of  u^2*y^p+y^q-1 
+   r=sqrt(y)*s and theta=atan(sqrt(y)^(q-p)/u) if s<>0
+   if s=0 then solve u^q*sin(theta)^p-cos(theta)^q
+*/
+
+double WVFStudy::func_U2(double x)
+{
+    return(U*U*pow(x,double_p)+pow(x,double_q)-1.0);
+}
+
+double WVFStudy::dfunc_U2(double x)
+{
+    return(double_p*U*U*pow(x,double_p_minus_1)+double_q*pow(x,double_q_minus_1));
+}
+
+double WVFStudy::func_U2_s0(double theta)
+{
+    return(U*pow(sin(theta),double_p)-pow(cos(theta),double_q));
+}
+
+double WVFStudy::dfunc_U2_s0(double theta)
+{
+    return(double_p*U*cos(theta)*pow(sin(theta),double_p_minus_1)
+        +double_q*sin(theta)*pow(cos(theta),double_q_minus_1));////
+}
+
+void WVFStudy::U2_to_cylinder( double u, double s, double * c)
+/* input (u,s) output c=(r,theta) 
+    x=u/s^p, y=1/s^q
+*/
+{
+    double x[2],y;
+    if (u==0) {
+        c[0]=s;
+        c[1]=PI/2;
+    } else if (s==0) {
+        c[0]=0;
+        U=pow(u,double_q);
+        if (u>0) {
+            x[0]=0;
+            x[1]=PI/2.0;
+        } else {
+            x[0]=PI/2.0;
+            x[1]=PI;
+        }
+        c[1]=find_root(&WVFStudy::func_U2_s0,&WVFStudy::dfunc_U2_s0,x);
+    } else {
+        x[0]=0;
+        x[1]=1;
+        U=u;
+        y=find_root(&WVFStudy::func_U2,&WVFStudy::dfunc_U2,x);
+        c[0]=sqrt(y)*s;
+        c[1]=atan(pow(sqrt(y),double_q_minus_p)/u);
+        if (c[1]<0)
+            c[1]+=PI;
+    }
+}
+
+/*
+void WVFStudy::cylinder_to_U2( double r, double theta, double * c )
+{
+    c[1] = r/pow(sin(theta),__one_over_q);
+    c[0] = cos(theta)*pow(c[1]/r,double_p);
+}
+*/
+
+void WVFStudy::V2_to_cylinder( double u, double s, double * c)
+/* input (u,s) output c=(r,theta) 
+    x=u/s^p, y=-1/s^q
+*/
+{
+    double x[2], y;
+
+    if ( u == 0 ) {
+        c[0] = s;
+        c[1] = -PI/2;
+    } else {
+        if ( s == 0 ) {
+            c[0] = 0;
+            U = pow(u,double_q)*__minus_one_to_p;
+            if ( u > 0 ) {
+                x[0] = -PI/2;
+                x[1] = 0;
+            } else {
+                x[0] = -PI;
+                x[1] = -PI/2;
+            }
+            c[1] = find_root(&WVFStudy::func_U2_s0,&WVFStudy::dfunc_U2_s0,x);
+        } else {
+            x[0] = 0;
+            x[1] = 1;
+            U = u;
+            y = find_root(&WVFStudy::func_U2,&WVFStudy::dfunc_U2,x);
+            c[0] = sqrt(y)*s;
+            c[1] = atan(-pow(sqrt(y),double_q_minus_p)/u);
+            if ( c[1] > 0 )
+                c[1] -= PI;
+        }
+    }
+}
+
+/*
+void WVFStudy::cylinder_to_V2( double r, double theta, double * c)
+{
+    c[1] = r / pow( -sin(theta), __one_over_q );
+    c[0] = cos(theta) * pow( c[1]/r, double_p );
+}
+*/
+
+// -----------------------------------------------------------------------
+//                          ANNULUS_PLSPHERE
+// -----------------------------------------------------------------------
+//
+// Change of coordinates from plot-coordinates to Poincare-Lyapunov coordinates
+//
+// In the plot window, coordinates are mapped into a rectangular box x: -1..1, y: -1..1.
+// Inside this box, the circle at infinity is a circle with radius 1.0.
+//
+// The change of coordinates to PL-coordinates is given by this routine:
+ 
+void WVFStudy::annulus_plsphere( double x, double y, double * p)
+{
+    if ( x*x + y*y < RADIUS2 ) {
+        p[0] = 0;               // mark it as a finite point
+        p[1] = x / RADIUS;
+        p[2] = y / RADIUS;
+    } else {
+        p[0] = 1;               // mark it as a point near infinity
+        p[1] = (1.0 - x*x - y*y) / (1.0 - RADIUS2);
+        p[2] = atan2(y,x);
+    }
+}
+
+// -----------------------------------------------------------------------
+//                          PLSPHERE_ANNULUS
+// -----------------------------------------------------------------------
+//
+// Inverse of annulus_plsphere.
+//
+// projection cylinder on annulus 
+//  first we project the cylinder the cone x^2+y^2=1-(1-RADIUS2)*r
+
+void WVFStudy::plsphere_annulus( double x, double y, double z, double * u )
+{
+    double zz;
+
+    if ( x == 0 ) {
+        u[0] = y * RADIUS;
+        u[1] = z * RADIUS;
+    } else {
+        zz = sqrt( 1.0 - (1.0-RADIUS2)*y );
+        u[0] = zz*cos(z);
+        u[1] = zz*sin(z);
+    }
+}
+
+// -----------------------------------------------------------------------
+//                          R2_TO_PLSPHERE
+// -----------------------------------------------------------------------
+//
+// Change of real coordinates to Poincare-Lyapunov sphere.
+//
+// PL-sphere coordinates correspond to R^2-coordinates inside a ball
+// with radius 1 around the origin.
+//
+// Therefore, the first plsphere coordinate is either 0.0 or 1.0, indicating
+// which chart the point belongs to:
+//
+//
+//      (x,y)  --> (0,x,y)              if (x,y) in ball with radius 1
+//      (x,y)  --> (1,u,v)              outside ball
+//
+//
+//  We calculate (u,v) through the inverse of the prescription (x,y) = (cos(v)/u^p, sin(v)/u^q):
+//
+//      (cos(v),sin(v)) = ( x*u^p, y*u^q )
+//
+//  Hence, u is a root of "x^2 u^(2p) + y^2 u^(2q) - 1 = 0".
+//  We calculate a root using numeric analysis.
+//
+//  Once we have calculated u, we determine v using atan2.
+
+static double A = 0.0;
+static double B = 0.0;
+
+double WVFStudy::func(double z)
+{
+    return pow(z,double_p)*A + pow(z,double_q)*B - 1.0;
+}
+
+double WVFStudy::dfunc(double z)
+{
+    return double_p*pow(z,double_p_minus_1)*A + double_q*pow(z,double_q_minus_1)*B;
+}
+
+
+void WVFStudy::R2_to_plsphere( double x, double y, double * pcoord)
+{
+    double z[2];
+
+    if ((x*x+y*y)<=1.0) {
+        pcoord[0]=0.0;
+        pcoord[1]=x;
+        pcoord[2]=y;
+    } else {
+        pcoord[0]=1.0;
+        A=x*x; B=y*y;
+        z[0]=0.0;
+        z[1]=1.0;
+    
+        pcoord[1]=find_root(&WVFStudy::func,&WVFStudy::dfunc,z);
+        pcoord[1]=sqrt(pcoord[1]);
+        pcoord[2]=atan2(pow(pcoord[1],double_q)*y,
+                        pow(pcoord[1],double_p)*x);
+    }
+}
+
+// -----------------------------------------------------------------------
+//                          plsphere_to_R2
+// -----------------------------------------------------------------------
+//
+// Change of coordinates from Poincare-Lyapunov sphere to real coordinates
+//
+// PL-sphere coordinates correspond to R^2-coordinates inside a ball
+// with radius 1 around the origin.
+//
+// Therefore, the first plsphere coordinate is either 0.0 or 1.0, indicating
+// which chart the point belongs to:
+//
+//
+//      (0,u,v)  --> (x,y) = (u,v)
+//      (1,u,v)  --> (x,y) = (cos(v)/u^p, sin(v)/u^q)
+//
+
+void WVFStudy::plsphere_to_R2( double ch, double u, double v, double * c)
+{
+    if (ch) {
+        c[0]=cos(v)/pow(u,double_p);
+        c[1]=sin(v)/pow(u,double_q);
+    } else {
+        c[0]=u;
+        c[1]=v;
+    }
+}
+
+// -----------------------------------------------------------------------
+//                          FINITE_ANNULUS
+// -----------------------------------------------------------------------
+//
+// Change "Real" coordinates to "Plot" coordinates.
+//
+// It is simply by combining Symbolic-->PL, PL-->Plot
+
+void WVFStudy::finite_annulus( double x, double y, double * u )
+{
+    double pcoord[3];
+
+    R2_to_plsphere(x,y,pcoord);
+    plsphere_annulus(pcoord[0],pcoord[1],pcoord[2],u);
+}
+
+void WVFStudy::cylinder_to_plsphere( double r, double theta, double * pcoord)
+{
+    if ( r < 1.0 ) {
+        pcoord[0] = 1;
+        pcoord[1] = r;
+        pcoord[2] = theta;
+    } else {
+        pcoord[0] = 0;
+        pcoord[1] = cos(theta)/pow(r,double_p);
+        pcoord[2] = sin(theta)/pow(r,double_q);
+    }
+}
+
+void WVFStudy::U1_to_plsphere( double x0, double y0, double * pcoord)
+{
+    double c[2];
+    U1_to_cylinder(x0,y0,c);
+    cylinder_to_plsphere(c[0],c[1],pcoord);
+}
+
+void WVFStudy::xyrevU1_to_plsphere( double z1, double z2, double * pcoord)
+{
+    U1_to_plsphere( z2,z1,pcoord );
+}
+
+void WVFStudy::V1_to_plsphere( double x0, double y0, double * pcoord)
+{
+    double c[2];
+    V1_to_cylinder(x0,y0,c);
+    cylinder_to_plsphere(c[0],c[1],pcoord);
+}
+
+void WVFStudy::xyrevV1_to_plsphere( double z1, double z2, double * pcoord)
+{
+    V1_to_plsphere( z2, z1, pcoord );
+}
+
+void WVFStudy::U2_to_plsphere( double x0, double y0, double * pcoord)
+{
+    double c[2];
+    U2_to_cylinder(x0,y0,c);
+    cylinder_to_plsphere(c[0],c[1],pcoord);
+}
+
+void WVFStudy::V2_to_plsphere( double x0, double y0, double * pcoord)
+{
+    double c[2];
+    V2_to_cylinder(x0,y0,c);
+    cylinder_to_plsphere(c[0],c[1],pcoord);
+}
+
+void WVFStudy::identitytrf_R2(double x,double y, double * ucoord )
+{
+    ucoord[0]=x;
+    ucoord[1]=y;
+}
+
+double WVFStudy::floatinfinity( void )
+{
+    return pow(0,-1);
+}
+
+void WVFStudy::plsphere_to_U1( double ch, double x, double y, double * rcoord )
+{
+    double a;
+
+    if ( ch==1 ) {
+        a = cos(y);
+
+        if ( a < 0 ) {
+            if ( (p % 2) == 0 ) {
+                // p is even: so we have a problem
+                rcoord[0] = floatinfinity();
+                rcoord[1] = floatinfinity();
+                return;
+            } else
+                a = - pow( -a, - __one_over_p );// - (-cos(y))^(-1/p)
+        } else
+            a = pow( a,  - __one_over_p );      // cos(y)^(-1/p)
+
+        rcoord[0] = sin(y)*pow(a,double_q);          // sin(y) * cos(y)^(-q/p)
+        rcoord[1] = x*a;                        // x * cos(y)^(-1/p)
+    } else {
+        if ( x < 0 ) {
+            if ( (p % 2) == 0 ) {
+                rcoord[0] = floatinfinity();
+                rcoord[1] = floatinfinity();
+                return;
+            } else
+                a = - pow( -x, - __one_over_p );
+        } else
+            a = pow( x, - __one_over_p );           // x^(-1/p)
+        
+        rcoord[0] = y*pow(a,double_q);
+        rcoord[1] = a;
+    }
+}
+
+void WVFStudy::plsphere_to_xyrevU1( double ch, double x, double y, double * rcoord)
+{
+    double _rcoord[2];
+    plsphere_to_U1(ch,x,y,_rcoord);
+    rcoord[0] = _rcoord[1];
+    rcoord[1] = _rcoord[0];
+}
+
+void WVFStudy::plsphere_to_U2( double ch, double x, double y, double * rcoord )
+{
+    double a;
+
+    if ( ch==1 ) {
+        a = sin(y);
+
+        if ( a < 0 ) {
+            if ( (q % 2) == 0 ) {
+                // p is even: so we have a problem
+                rcoord[0] = floatinfinity();
+                rcoord[1] = floatinfinity();
+                return;
+            } else
+                a = - pow( -a, - __one_over_q );// - (-sin(y))^(-1/q)
+        } else
+            a = pow( a,  - __one_over_q );      // sin(y)^(-1/q)
+
+        rcoord[0] = cos(y)*pow(a,double_p);          // cos(y) * sin(y)^(-p/q)
+        rcoord[1] = x*a;                        // x * sin(y)^(-1/q)
+    } else {
+        if ( y < 0 ) {
+            if ( (q % 2) == 0 ) {
+                rcoord[0] = floatinfinity();
+                rcoord[1] = floatinfinity();
+                return;
+            } else
+                a = - pow( -y, - __one_over_q );
+        } else
+            a = pow( y, - __one_over_q );           // x^(-1/p)
+        
+        rcoord[0] = x*pow(a,double_p);
+        rcoord[1] = a;
+    }
+}
+void WVFStudy::plsphere_to_V1( double ch, double x, double y, double * rcoord )
+{
+    double a;
+
+    if ( ch==1 ) {
+        a = -cos(y);
+
+        if ( a < 0 ) {
+            if ( (p % 2) == 0 ) {
+                // p is even: so we have a problem
+                rcoord[0] = floatinfinity();
+                rcoord[1] = floatinfinity();
+                return;
+            } else
+                a = - pow( -a, - __one_over_p );// - (-cos(y))^(-1/p)
+        } else
+            a = pow( a,  - __one_over_p );      // cos(y)^(-1/p)
+
+        rcoord[0] = sin(y)*pow(a,double_q);          // sin(y) * cos(y)^(-q/p)
+        rcoord[1] = x*a;                        // x * cos(y)^(-1/p)
+    } else {
+        if ( x > 0 ) {
+            if ( (p % 2) == 0 ) {
+                rcoord[0] = floatinfinity();
+                rcoord[1] = floatinfinity();
+                return;
+            } else
+                a = - pow( x, - __one_over_p );
+        } else
+            a = pow( -x, - __one_over_p );          // x^(-1/p)
+        
+        rcoord[0] = y*pow(a,double_q);
+        rcoord[1] = a;
+    }
+}
+void WVFStudy::plsphere_to_xyrevV1( double ch, double x, double y, double * rcoord)
+{
+    double _rcoord[2];
+    plsphere_to_V1(ch,x,y,_rcoord);
+    rcoord[0] = _rcoord[1];
+    rcoord[1] = _rcoord[0];
+}
+void WVFStudy::plsphere_to_V2( double ch, double x, double y, double * rcoord )
+{
+    double a;
+
+    if ( ch==1 ) {
+        a = -sin(y);
+
+        if ( a < 0 ) {
+            if ( (q % 2) == 0 ) {
+                // p is even: so we have a problem
+                rcoord[0] = floatinfinity();
+                rcoord[1] = floatinfinity();
+                return;
+            } else
+                a = - pow( -a, - __one_over_q );// - (-sin(y))^(-1/q)
+        } else
+            a = pow( a,  - __one_over_q );      // sin(y)^(-1/q)
+
+        rcoord[0] = cos(y)*pow(a,double_p);          // cos(y) * sin(y)^(-p/q)
+        rcoord[1] = x*a;                        // x * sin(y)^(-1/q)
+    } else {
+        if ( y > 0 ) {
+            if ( (q % 2) == 0 ) {
+                rcoord[0] = floatinfinity();
+                rcoord[1] = floatinfinity();
+                return;
+            } else
+                a = - pow( y, - __one_over_q );
+        } else
+            a = pow( -y, - __one_over_q );          // x^(-1/p)
+        
+        rcoord[0] = x*pow(a,double_p);
+        rcoord[1] = a;
+    }
+}
+
+// -----------------------------------------------------------------------
+//                      EVALUATION OF VECTOR FIELDS
+// -----------------------------------------------------------------------
+
+void WVFStudy::eval_r_vec_field( double * y, double * f )
+{
+    double s=1.0;
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && gcf != nullptr )
+        s = eval_term2( gcf, y );
+
+    f[0] = s * eval_term2( f_vec_field[0], y );
+    f[1] = s * eval_term2( f_vec_field[1], y );
+}
+
+void WVFStudy::eval_U1_vec_field( double * y, double * f )
+{
+    double s=1.0;
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && gcf_U1 != nullptr )
+        s = eval_term2( gcf_U1, y );
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && singinf )
+        s *= y[1];
+
+    f[0] = s * eval_term2( vec_field_U1[0], y );
+    f[1] = s * eval_term2( vec_field_U1[1], y );
+}
+
+void WVFStudy::eval_U2_vec_field( double * y, double * f )
+{
+    double s=1.0;
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && gcf_U2 != nullptr )
+        s = eval_term2( gcf_U2, y );
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && singinf )
+        s *= y[1];
+
+    f[0] = s * eval_term2( vec_field_U2[0], y );
+    f[1] = s * eval_term2( vec_field_U2[1], y );
+}
+
+void WVFStudy::eval_V1_vec_field( double * y, double * f )
+{
+    double s=1.0;
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && gcf_V1 != nullptr )
+        s = eval_term2( gcf_V1, y );
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && singinf )
+        s *= y[1];
+
+    f[0] = s * eval_term2( vec_field_V1[0], y );
+    f[1] = s * eval_term2( vec_field_V1[1], y );
+}
+
+void WVFStudy::eval_V2_vec_field( double * y, double * f )
+{
+    double s=1.0;
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && gcf_V2 != nullptr )
+        s = eval_term2( gcf_V2, y );
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && singinf )
+        s *= y[1];
+
+    f[0] = s * eval_term2( vec_field_V2[0], y );
+    f[1] = s * eval_term2( vec_field_V2[1], y );
+}
+
+void WVFStudy::eval_vec_field_cyl( double * y, double * f )
+{
+    double s=1.0;
+
+    if ( config_kindvf == INTCONFIG_ORIGINAL && gcf_C != nullptr )
+        s = eval_term3( gcf_C, y );
+    
+    f[0] = s * eval_term3( vec_field_C[0], y );
+    f[1] = s * eval_term3( vec_field_C[1], y );
+}
+
+
+
+
+
+
+
+
+void WVFStudy::default_finite_to_viewcoord( double x, double y, double * ucoord)
+{
+    double pcoord[3];
+
+    (this->*R2_to_sphere)(x,y,pcoord);
+    (this->*sphere_to_viewcoord)(pcoord[0],pcoord[1],pcoord[2],ucoord);
+}
+
+bool WVFStudy::default_sphere_to_viewcoordpair( double * p, double * q, double * u1, double * u2, double * u3, double * u4 )
+{
+    /*
+        when plotting a line, one checks plot coordinates for both endpoints.
+        Normally, this is just it.
+
+        However, when the plot canvas has a discontinuity (for example when plotting
+        two charts at infinity at the same time), this routine should be bypassed,
+        so that intermediate points ensure that the line plotting is done correctly.
+    */
+    (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+    (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u2 );
+    UNUSED(u3);         // u3&u4 are not used in this case
+    UNUSED(u4);
+    return true;        // returns true: line piece does not undergo a discontinuity in coordinates
+}
+
+bool WVFStudy::psphere_to_viewcoordpair_discontinuousx( double * p, double * q, double * u1, double * u2, double * u3, double * u4 )
+{
+    /*
+        when plotting a line, one checks plot coordinates for both endpoints.
+        Normally, this is just it.
+
+        However, when the plot canvas has a discontinuity (for example when plotting
+        two charts at infinity at the same time), this routine should be bypassed,
+        so that intermediate points ensure that the line plotting is done correctly.
+    */
+
+    if ( p[0]*q[0] < 0 ) {
+        double t,y,z;
+        t = q[0]/(q[0]-p[0]);
+        y = t*p[1] + (1-t)*q[1];
+        z = t*p[2] + (1-t)*q[2];
+
+        (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+        if ( p[0] < 0 ) {
+            (this->*sphere_to_viewcoord)( -1e-8, y, z, u2 );
+            (this->*sphere_to_viewcoord)( 1e-8, y, z, u3 );
+        } else {
+            (this->*sphere_to_viewcoord)( 1e-8, y, z, u2 );
+            (this->*sphere_to_viewcoord)( -1e-8, y, z, u3 );
+        }
+        (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u4 );
+        return false;
+    }
+
+    (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+    (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u2 );
+
+    return true;    // returns true: line piece does not undergo a discontinuity in coordinates
+}
+
+bool WVFStudy::psphere_to_viewcoordpair_discontinuousy( double * p, double * q, double * u1, double * u2, double * u3, double * u4 )
+{
+    /*
+        when plotting a line, one checks plot coordinates for both endpoints.
+        Normally, this is just it.
+
+        However, when the plot canvas has a discontinuity (for example when plotting
+        two charts at infinity at the same time), this routine should be bypassed,
+        so that intermediate points ensure that the line plotting is done correctly.
+    */
+
+    if ( p[1]*q[1] < 0 ) {
+        double t,x,z;
+        t = q[1]/(q[1]-p[1]);
+        x = t*p[0] + (1-t)*q[0];
+        z = t*p[2] + (1-t)*q[2];
+
+        (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+        if ( p[1] < 0 ) {
+            (this->*sphere_to_viewcoord)( x, -1e-8, z, u2 );
+            (this->*sphere_to_viewcoord)( x, 1e-8, z, u3 );
+        } else {
+            (this->*sphere_to_viewcoord)( x, 1e-8, z, u2 );
+            (this->*sphere_to_viewcoord)( x, -1e-8, z, u3 );
+        }
+        (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u4 );
+        return false;
+    }
+
+    (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+    (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u2 );
+
+    return true;    // returns true: line piece does not undergo a discontinuity in coordinates
+}
+
+
+bool WVFStudy::plsphere_to_viewcoordpair_discontinuousx( double * p, double * q, double * u1, double * u2, double * u3, double * u4 )
+{
+    double c[2],qx,qy,px,py;
+    double pp[3], qq[3];
+    double ap[2], aq[2];
+    double t, y;
+
+    if ( p[0] == 0 || q[0] == 0 ) {
+        plsphere_to_R2( p[0],p[1],p[2], c);
+        px = c[0];
+        py = c[1];
+        plsphere_to_R2( q[0],q[1],q[2], c);
+        qx = c[0];
+        qy = c[1];
+
+        if ( qx*px < 0 ) {
+            // the line y=0 has been crossed 
+            t = px/(px-qx);
+            y = t*qy + (1-t)*py;        // (x,0) is an intermediate point.
+
+            (this->*sphere_to_viewcoord)( 0, px, py, u1 );
+            if ( px < 0 ) {
+                (this->*sphere_to_viewcoord)( 0, -1e-8, y, u2 );
+                (this->*sphere_to_viewcoord)( 0,  1e-8, y, u3 );
+            } else {
+                (this->*sphere_to_viewcoord)( 0,  1e-8, y, u2 );
+                (this->*sphere_to_viewcoord)( 0, -1e-8, y, u3 );
+            }
+            (this->*sphere_to_viewcoord)( 0, qx, qy, u4 );
+            return false;
+        }
+        (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+        (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u2 );
+        return true;
+    }
+
+    // both p and q lie in the annulus.
+
+    if ( cos(p[2])*cos(q[2]) < 0 ) {
+        plsphere_annulus( p[0],p[1],p[2], ap );
+        plsphere_annulus( p[0],p[1],p[2], aq );
+
+        t = ap[0]/(ap[0]-aq[0]);
+        y = t*aq[1] + (1-t)*ap[1];
+
+        if ( cos(p[2])< 0 ) {
+            annulus_plsphere( -1e-8, y, pp );
+            annulus_plsphere( 1e-8, y, qq );
+        } else {
+            annulus_plsphere( 1e-8, y, pp );
+            annulus_plsphere( -1e-8, y, qq );
+        }
+        (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+        (this->*sphere_to_viewcoord)( pp[0], pp[1], pp[2], u2 );
+        (this->*sphere_to_viewcoord)( qq[0], qq[1], qq[2], u3 );
+        (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u4 );
+
+        return false;
+    }
+    (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+    (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u2 );
+    return true;
+}
+
+bool WVFStudy::plsphere_to_viewcoordpair_discontinuousy( double * p, double * q, double * u1, double * u2, double * u3, double * u4 )
+{
+    double c[2],qx,qy,px,py;
+    double pp[3], qq[3];
+    double ap[2], aq[2];
+    double t, x;
+
+    if ( p[0] == 0 || q[0] == 0 ) {
+        plsphere_to_R2( p[0],p[1],p[2], c);
+        px = c[0];
+        py = c[1];
+        plsphere_to_R2( q[0],q[1],q[2], c);
+        qx = c[0];
+        qy = c[1];
+
+        if ( qy*py < 0 ) {
+            // the line y=0 has been crossed 
+            t = py/(py-qy);
+            x = t*qx + (1-t)*px;        // (x,0) is an intermediate point.
+
+            (this->*sphere_to_viewcoord)( 0, px, py, u1 );
+            if ( py < 0 ) {
+                (this->*sphere_to_viewcoord)( 0, x,  -1e-8, u2 );
+                (this->*sphere_to_viewcoord)( 0, x,   1e-8, u3 );
+            } else {
+                (this->*sphere_to_viewcoord)( 0, x,   1e-8, u2 );
+                (this->*sphere_to_viewcoord)( 0, x,  -1e-8, u3 );
+            }
+            (this->*sphere_to_viewcoord)( 0, qx, qy, u4 );
+            return false;
+        }
+        (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+        (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u2 );
+        return true;
+    }
+
+    // both p and q lie in the annulus.
+
+    if ( sin(p[2])*sin(q[2]) < 0 ) {
+        plsphere_annulus( p[0],p[1],p[2], ap );
+        plsphere_annulus( p[0],p[1],p[2], aq );
+
+        t = ap[1]/(ap[1]-aq[1]);
+        x = t*aq[0] + (1-t)*ap[0];
+
+        if ( sin(p[2])< 0 ) {
+            annulus_plsphere( x, -1e-8, pp );
+            annulus_plsphere( x, 1e-8, qq );
+        } else {
+            annulus_plsphere( x, 1e-8, pp );
+            annulus_plsphere( x, -1e-8, qq );
+        }
+        (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+        (this->*sphere_to_viewcoord)( pp[0], pp[1], pp[2], u2 );
+        (this->*sphere_to_viewcoord)( qq[0], qq[1], qq[2], u3 );
+        (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u4 );
+
+        return false;
+    }
+    (this->*sphere_to_viewcoord)( p[0], p[1], p[2], u1 );
+    (this->*sphere_to_viewcoord)( q[0], q[1], q[2], u2 );
+    return true;
+}
+

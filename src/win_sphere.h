@@ -64,12 +64,16 @@
 class WWinSphere : public Wt::WPaintedWidget
 {
     static int numSpheres;
-    static WWinSphere **SphereList; //this could be implemented as a c++ vector
+    static WWinSphere **SphereList;
 
 public:
-    WWinSphere( Wt::WContainerWidget *parent=0,/* QStatusBar, bool, double, double, double, double*/
-                int width=255, int height=255 );
+    WWinSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="" );
     ~WWinSphere();
+
+    int width_;                 ///< width of the plotting area
+    int height_;                ///< height of the plotting area
+    WVFStudy *study_;            ///< WVFStudy class where results from Maple are stored
+    std::string basename_;
     
     //void paintSphere();
 
@@ -82,9 +86,6 @@ public:
 
     double horPixelsPerMM;
     double verPixelsPerMM;
-
-    int width_;
-    int height_;
 
     double x0, y0;              // world-coordinates of upper-left corner
     double x1, y1;              // world-coordinates of upper-right corner

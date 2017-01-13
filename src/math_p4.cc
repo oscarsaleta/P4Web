@@ -39,10 +39,10 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "math_p4.h"
-
 #include "file_tab.h"
-#include "math_charts.h"
+
+//#include "math_p4.h"
+//#include "math_charts.h"
 /*#include "win_intparams.h"
 #include "win_main.h"
 #include "win_plot.h"*/
@@ -50,7 +50,7 @@
 #include <cmath>
 
 
-bool less_poincare( double * p1, double * p2 )
+bool WVFStudy::less_poincare( double * p1, double * p2 )
 {
     if((p1[0]*p2[2])<(p2[0]*p1[2]))
         return 1;
@@ -59,22 +59,22 @@ bool less_poincare( double * p1, double * p2 )
     return  false ;
 }
 
-double eval_lc_poincare( double * pp,double a, double b, double c )
+double WVFStudy::eval_lc_poincare( double * pp,double a, double b, double c )
 {
     return (a*pp[0]+b*pp[1]+c*pp[2]);
 }
 
-double eval_lc_lyapunov( double * pp,double a, double b, double c )
+double WVFStudy::eval_lc_lyapunov( double * pp,double a, double b, double c )
 {
     if( pp[0] )
-        return (  a * pow(pp[1],VFResults.double_q)*cos(pp[2])
-                + b * pow(pp[1],VFResults.double_p)*sin(pp[2])
-                + c * pow(pp[1],VFResults.double_p_plus_q) );
+        return (  a * pow(pp[1],double_q)*cos(pp[2])
+                + b * pow(pp[1],double_p)*sin(pp[2])
+                + c * pow(pp[1],double_p_plus_q) );
     else
         return ( a * pp[1] + b * pp[2] + c );
 }
  
-bool less_lyapunov(double * p1, double * p2 )
+bool WVFStudy::less_lyapunov(double * p1, double * p2 )
 {
     double u[2],v[2];
 
@@ -87,9 +87,9 @@ bool less_lyapunov(double * p1, double * p2 )
     return 0;
 }  
 
-void set_current_step( double curstep )
+void WVFStudy::set_current_step( double curstep )
 {
-    VFResults.config_currentstep = curstep;
+    config_currentstep = curstep;
     
     /*if( p4startdlg != nullptr )
         if( p4startdlg->Plot_Window != nullptr )
