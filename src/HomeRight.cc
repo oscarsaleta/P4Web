@@ -19,7 +19,10 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent)
     setId("HomeRight");
     setStyleClass("half-box");
 
+
+    globalLogger__.debug("HomeRight :: setting up UI...");
     setupUI();
+    globalLogger__.debug("HomeRight :: setting up connectors...");
     setupConnectors();
 
     tabWidget_->setCurrentIndex(0);
@@ -108,10 +111,10 @@ void HomeRight::setupUI()
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
     // sphere (plot region)
-    sphere_ = new WWinSphere(plotContainer_,550,550);
-    sphere_->setId("sphere_");
-    sphere_->setMargin(5,Top);
-    plotContainer_->addWidget(sphere_);
+    //sphere_ = new WWinSphere(plotContainer_,550,550);
+    //sphere_->setId("sphere_");
+    //sphere_->setMargin(5,Top);
+    //plotContainer_->addWidget(sphere_);
 
     //TODO: add plot separatrices, orbits, etc buttons?
     /*plotButtonsToolbar_ = new WToolBar(plotContainer_);
@@ -243,11 +246,13 @@ void HomeRight::clearResults()
     globalLogger__.debug("HomeRight :: cleared results");
 }
 
-void HomeRight::onPlot(std::string basename, WFStudy study)
-{
-    if (sphere_ != nullptr)
+void HomeRight::onPlot(std::string basename)
+{ 
+    if (sphere_ != nullptr) {
         delete sphere_;
-    sphere_ = new WWinSphere(plotContainer_,550,550,study);
+        sphere_ = nullptr;
+    }
+    sphere_ = new WWinSphere(plotContainer_,550,550,basename);
     sphere_->setId("sphere_");
     sphere_->setMargin(5,Top);
     plotContainer_->addWidget(sphere_);

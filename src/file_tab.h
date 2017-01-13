@@ -357,7 +357,7 @@ enum TYPEOFVIEWS {
  * by type, etc), orbits, compute the coordinates for singularities in
  * different charts...
  */
-class WVFStudy : public Wt::WObject
+class WVFStudy //: public Wt::WObject
 {
 public:
     // general information
@@ -455,7 +455,7 @@ public:
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    void (*viewcoord_to_sphere)( double, double, double * );
+    void (WVFStudy::*viewcoord_to_sphere)( double, double, double * );
     /**
      * Sphere coordinates to current view coordinates
      *
@@ -463,7 +463,7 @@ public:
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    bool (*sphere_to_viewcoordpair)( double *, double *, double *, double *,
+    bool (WVFStudy::*sphere_to_viewcoordpair)( double *, double *, double *, double *,
         double *, double * );
 
     /**
@@ -473,7 +473,7 @@ public:
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    void (*finite_to_viewcoord)( double, double, double * );
+    void (WVFStudy::*finite_to_viewcoord)( double, double, double * );
     /**
      * Sphere coordinates to current view coordinates
      *
@@ -481,7 +481,7 @@ public:
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    void (*sphere_to_viewcoord)( double, double, double, double * );
+    void (WVFStudy::*sphere_to_viewcoord)( double, double, double, double * );
     /**
      * Check whether current view coordinates are valid
      *
@@ -489,7 +489,7 @@ public:
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    bool (*is_valid_viewcoord)( double, double, double * );
+    bool (WVFStudy::*is_valid_viewcoord)( double, double, double * );
     /**
      * Integrate separatrices in current sphere
      *
@@ -497,7 +497,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_separatrice.cc.
      */
-    void (*integrate_sphere_sep)( double, double, double, double *,
+    void (WVFStudy::*integrate_sphere_sep)( double, double, double, double *,
                                 double *, int *, int *, int *, int *, double, double );
     /**
      * U1 chart coordinates to sphere coordinates
@@ -506,7 +506,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*U1_to_sphere)( double, double, double * );
+    void (WVFStudy::*U1_to_sphere)( double, double, double * );
     /**
      * U2 chart coordinates to sphere coordinates
      *
@@ -514,7 +514,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*U2_to_sphere)( double, double, double * );
+    void (WVFStudy::*U2_to_sphere)( double, double, double * );
     /**
      * V1 chart coordinates to sphere coordinates
      *
@@ -522,7 +522,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*V1_to_sphere)( double, double, double * );
+    void (WVFStudy::*V1_to_sphere)( double, double, double * );
     /**
      * V2 chart coordinates to sphere coordinates
      *
@@ -530,7 +530,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*V2_to_sphere)( double, double, double * );
+    void (WVFStudy::*V2_to_sphere)( double, double, double * );
     /**
      * Sphere coordinates to U1 chart coordinates
      *
@@ -538,7 +538,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*sphere_to_U1)( double, double, double, double * );
+    void (WVFStudy::*sphere_to_U1)( double, double, double, double * );
     /**
      * Sphere coordinates to U2 chart coordinates
      *
@@ -546,7 +546,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*sphere_to_U2)( double, double, double, double * );
+    void (WVFStudy::*sphere_to_U2)( double, double, double, double * );
     /**
      * Sphere coordinates to V1 chart coordinates
      *
@@ -554,7 +554,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*sphere_to_V1)( double, double, double, double * );
+    void (WVFStudy::*sphere_to_V1)( double, double, double, double * );
     /**
      * Sphere coordinates to V2 chart coordinates
      *
@@ -562,7 +562,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*sphere_to_V2)( double, double, double, double * );
+    void (WVFStudy::*sphere_to_V2)( double, double, double, double * );
 
     /**
      * Sphere coordinates to R2 coordinates
@@ -571,7 +571,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*sphere_to_R2)( double, double, double, double * );
+    void (WVFStudy::*sphere_to_R2)( double, double, double, double * );
     /**
      * R2 coordinates to sphere coordinates
      *
@@ -579,7 +579,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (*R2_to_sphere)( double, double, double * );
+    void (WVFStudy::*R2_to_sphere)( double, double, double * );
     /**
      * Integrate an orbit in the current sphere
      *
@@ -587,7 +587,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_orbits.cc.
      */
-    void (*integrate_sphere_orbit)( double, double, double, double *,
+    void (WVFStudy::*integrate_sphere_orbit)( double, double, double, double *,
                                 double *, int *, int *, double, double );
     /**
      * Evaluate a limit cycle in the current sphere
@@ -596,7 +596,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_p4.cc.
      */
-    double (*eval_lc)( double *, double, double, double );
+    double (WVFStudy::*eval_lc)( double *, double, double, double );
     /**
      * Less method for current sphere
      *
@@ -604,7 +604,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_p4.cc.
      */
-    bool (*less2)( double *, double * );
+    bool (WVFStudy::*less2)( double *, double * );
     /**
      * Change direction in current sphere
      * 
@@ -612,7 +612,7 @@ public:
      * on the current sphere used). The functions are implemented in
      * math_changedir.h.
      */
-    int (*change_dir)( double * );
+    int (WVFStudy::*change_dir)( double * );
 
 public:
     /**
@@ -902,10 +902,6 @@ public:
 
     //void dump( Wt::WString basename, Wt::WString info="" );
 
-
-private:
-    //void dumpSeparatrices( Wt::WTextArea * m, sep * separ, int margin );
-    //void dumpSingularities( Wt::WTextArea * m, genericsingularity * p, const char * type, bool longversion );
     // -----------------------------------------------------------------------
     //                  IMPLEMENTATION OF THE POINCARE CHARTS
     // -----------------------------------------------------------------------
@@ -930,6 +926,26 @@ private:
     void psphere_to_UU1( double X, double Y, double Z, double * rcoord );
     void UU2_to_psphere( double z1, double z2, double * pcoord);
     void psphere_to_UU2( double X, double Y, double Z, double * rcoord );
+    // -----------------------------------------------------------------------
+    //                      math_p4.cc FUNCTIONS
+    // -----------------------------------------------------------------------
+    void set_current_step( double );
+    // -----------------------------------------------------------------------
+    //                      INTEGRATE BLOWUP FUNCTIONS
+    // -----------------------------------------------------------------------
+    void eval_blow_vec_field( double * y, double * f);
+    // -----------------------------------------------------------------------
+    //                      NUMERIC FUNCTIONS
+    // -----------------------------------------------------------------------
+    void rk78( void (WVFStudy::*deriv)( double *, double * ), double y[2], double * hh,
+                double hmi, double hma, double e1);
+
+private:
+    //void dumpSeparatrices( Wt::WTextArea * m, sep * separ, int margin );
+    //void dumpSingularities( Wt::WTextArea * m, genericsingularity * p, const char * type, bool longversion );
+    // -----------------------------------------------------------------------
+    //                  IMPLEMENTATION OF THE POINCARE CHARTS
+    // -----------------------------------------------------------------------
     bool isvalid_psphereviewcoord( double u, double v, double * pcoord );
     bool isvalid_U1viewcoord( double u, double v, double * pcoord );
     bool isvalid_U2viewcoord( double u, double v, double * pcoord );
@@ -1000,12 +1016,12 @@ private:
     bool plsphere_to_viewcoordpair_discontinuousy( double * p, double * q,
                                                    double * u1, double * u2, double * u3, double * u4 );
     // -----------------------------------------------------------------------
-    //                      PREVIOUSLY STATIC CHARTS FUNCTIONS
+    //                      STATIC CHARTS FUNCTIONS
     // -----------------------------------------------------------------------
-    //void cylinder_to_U1( double r, double theta, double * c);
-    //void cylinder_to_U2( double r, double theta, double * c );
-    //void cylinder_to_V1( double r, double theta, double * c);
-    //void cylinder_to_V2( double r, double theta, double * c);
+    //static void cylinder_to_U1( double r, double theta, double * c);
+    //static void cylinder_to_U2( double r, double theta, double * c );
+    //static void cylinder_to_V1( double r, double theta, double * c);
+    //static void cylinder_to_V2( double r, double theta, double * c);
     void U1_to_cylinder( double u, double s, double * c);
     void U2_to_cylinder( double u, double s, double * c);
     void V1_to_cylinder( double u, double s, double * c);
@@ -1014,16 +1030,19 @@ private:
     double dfunc_U1( double x);
     double func_U1_s0( double theta);
     double dfunc_U1_s0( double theta);
-    void U1_to_cylinder( double u, double s, double * c);
+    double func_U2(double x);
+    double dfunc_U2(double x);
+    double func_U2_s0(double theta);
+    double dfunc_U2_s0(double theta);
+    double func(double z);
+    double dfunc(double z);
     // -----------------------------------------------------------------------
     //                      NUMERIC FUNCTIONS
     // -----------------------------------------------------------------------
-    void bisection( double (* f)(double), double * x, double e );
-    double regula_falsi( double (*f)(double), double * x, double e );
-    double newton( double (*f)(double), double (*df)(double), double x, double e );
-    void rk78( void (*deriv)( double *, double * ), double y[2], double * hh,
-                double hmi, double hma, double e1);
-    double find_root( double (*f)(double), double (*df)(double), double * value );
+    void bisection( double (WVFStudy::*f)(double), double * x, double e );
+    double regula_falsi( double (WVFStudy::*f)(double), double * x, double e );
+    double newton( double (WVFStudy::*f)(double), double (WVFStudy::*df)(double), double x, double e );
+    double find_root( double (WVFStudy::*f)(double), double (WVFStudy::*df)(double), double * value );
     // -----------------------------------------------------------------------
     //                      SEPARATRICE INTEGRATION FUNCTIONS
     // -----------------------------------------------------------------------
@@ -1047,7 +1066,6 @@ private:
     // -----------------------------------------------------------------------
     double eval_lc_poincare( double * pp, double, double, double );
     double eval_lc_lyapunov( double * pp, double, double, double );
-    void set_current_step( double );
     bool less_poincare( double *, double * );
     bool less_lyapunov( double *, double * );
     // -----------------------------------------------------------------------
@@ -1055,6 +1073,7 @@ private:
     // -----------------------------------------------------------------------
     int change_dir_poincare( double * p );
     int change_dir_lyapunov( double * p );
+    
 
 };
 
@@ -1064,7 +1083,7 @@ private:
 /**
  * Shortcut to call a function on the global VFResults object
  */
-#define MATHFUNC(function) (*(VFResults.function))
+//#define MATHFUNC(function) (*(VFResults.function))
 
 /**
  * Global WVFStudy object to be used by the program

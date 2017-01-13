@@ -27,7 +27,7 @@
  * @author Oscar Saleta
  */
 
-#include "file_tab.h"
+//#include "file_tab.h"
 #include "win_sphere.h"
 
 #include <Wt/WContainerWidget>
@@ -115,7 +115,7 @@ public:
      * @param study    Class #WVFStudy where information about Maple execution
      * is stored.
      */
-    void onPlot(std::string basename, WVFStudy study);
+    void onPlot(std::string basename);
 
 private:
     Wt::WTabWidget *tabWidget_;

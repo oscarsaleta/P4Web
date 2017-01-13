@@ -59,12 +59,12 @@ void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep,int color);
 int findSepColor2(term2 *f,int type,double y[2]);
 int findSepColor3(term3 *f,int type,double y[2]);
 
-void integrate_poincare_sep( double p0, double p1, double p2, double * pcoord,
+/*void integrate_poincare_sep( double p0, double p1, double p2, double * pcoord,
                             double * hhi, int * type, int * color, int * dashes, int * dir,
                             double h_min, double h_max);
 void integrate_lyapunov_sep( double p0, double p1, double p2, double * pcoord,
                             double * hhi, int * type, int * color, int * dashes,
-                            int * dir, double h_min, double h_max);
+                            int * dir, double h_min, double h_max);*/
 
 int change_type(int type);
 

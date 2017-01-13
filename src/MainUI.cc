@@ -149,6 +149,7 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     globalLogger__.debug("MainUI :: title set up");
 
     // left widget (file upload, input, buttons)
+    globalLogger__.debug("MainUI :: creating HomeLeft...");
     leftContainer_ = new HomeLeft(root_);
     globalLogger__.debug("MainUI :: HomeLeft created");
 
@@ -157,6 +158,7 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     middleSpace_->setStyleClass("middle-box");
 
     // right widget (output text area, plots, legend)
+    globalLogger__.debug("MainUI :: creating HomeRight...");
     rightContainer_ = new HomeRight(root_);
     globalLogger__.debug("MainUI :: HomeRight created");
 

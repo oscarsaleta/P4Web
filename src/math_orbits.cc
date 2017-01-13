@@ -24,8 +24,8 @@
 
 #include "custom.h"
 #include "math_p4.h"
-#include "math_charts.h"
-#include "math_numerics.h"
+//#include "math_charts.h"
+//#include "math_numerics.h"
 #include "math_polynom.h"
 //#include "plot_tools.h"
 
@@ -207,15 +207,15 @@ void WVFStudy::integrate_poincare_orbit( double p0, double p1, double p2, double
 
     *dashes=true; *dir=1;
     if(pcoord[2]>ZCOORD) {
-        psphere_to_R2(study,p0,p1,p2,y);
-        rk78(eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
+        psphere_to_R2(p0,p1,p2,y);
+        rk78(&WVFStudy::eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
         R2_to_psphere(y[0],y[1],pcoord);
     } else {
         theta=atan2(fabs(p1),fabs(p0));
         if((theta<PI_DIV4) && (theta>-PI_DIV4)) {
             if(p0>0) {
-                psphere_to_U1(study,p0,p1,p2,y);
-                rk78(eval_U1_vec_field,y,hhi,h_min,h_max,study.config_tolerance);
+                psphere_to_U1(p0,p1,p2,y);
+                rk78(&WVFStudy::eval_U1_vec_field,y,hhi,h_min,h_max,config_tolerance);
                     if(y[1]>=0 || !singinf)
                         U1_to_psphere(y[0],y[1],pcoord);
                     else {
@@ -228,7 +228,7 @@ void WVFStudy::integrate_poincare_orbit( double p0, double p1, double p2, double
                     }
             } else {
                 psphere_to_V1(p0,p1,p2,y);
-                rk78(eval_V1_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                rk78(&WVFStudy::eval_V1_vec_field,y,hhi,h_min,h_max,config_tolerance);
                 if(y[1]>=0 || !singinf)
                     V1_to_psphere(y[0],y[1],pcoord);
                 else {
@@ -243,7 +243,7 @@ void WVFStudy::integrate_poincare_orbit( double p0, double p1, double p2, double
         } else {
             if(p1>0) {
                 psphere_to_U2(p0,p1,p2,y);
-                rk78(eval_U2_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                rk78(&WVFStudy::eval_U2_vec_field,y,hhi,h_min,h_max,config_tolerance);
                 if(y[1]>=0 || !singinf)
                     U2_to_psphere(y[0],y[1],pcoord);
                 else {
@@ -256,7 +256,7 @@ void WVFStudy::integrate_poincare_orbit( double p0, double p1, double p2, double
                 }
             } else {
                 psphere_to_V2(p0,p1,p2,y);
-                rk78(eval_V2_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                rk78(&WVFStudy::eval_V2_vec_field,y,hhi,h_min,h_max,config_tolerance);
                 if(y[1]>=0 || !singinf)
                     V2_to_psphere(y[0],y[1],pcoord);
                 else {
@@ -282,13 +282,13 @@ void WVFStudy::integrate_lyapunov_orbit( double p0, double p1, double p2, double
     if(p0==0)
     {
         y[0]=p1;y[1]=p2;
-        rk78(eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
+        rk78(&WVFStudy::eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
         R2_to_plsphere(y[0],y[1],pcoord);
     }
     else
     {
         y[0]=p1; y[1]=p2;
-        rk78(eval_vec_field_cyl,y,hhi,h_min,h_max,config_tolerance); 
+        rk78(&WVFStudy::eval_vec_field_cyl,y,hhi,h_min,h_max,config_tolerance); 
         if(y[1]>=TWOPI)y[1]-=TWOPI;
         cylinder_to_plsphere(y[0],y[1],pcoord);
     } 

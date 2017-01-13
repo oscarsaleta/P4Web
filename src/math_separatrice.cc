@@ -23,9 +23,9 @@
 #include "math_separatrice.h"
 
 #include "custom.h"
-#include "math_charts.h"
+#include "file_tab.h"
 #include "math_intblowup.h"
-#include "math_numerics.h"
+//#include "math_numerics.h"
 #include "math_p4.h"
 #include "math_polynom.h"
 #include "plot_tools.h"
@@ -44,7 +44,7 @@ int findSepColor2( term2 *f,int type,double y[2] )
 {
     int color;
 
-    if( eval_term2(f,y) >= 0 )
+    if ( eval_term2(f,y) >= 0 )
     {
         switch(type)
         {
@@ -73,7 +73,7 @@ int findSepColor3( term3 *f,int type,double y[2] )
 {
     int color;
 
-    if( eval_term3(f,y) >= 0 )
+    if ( eval_term3(f,y) >= 0 )
     {
         switch(type)
         {
@@ -106,23 +106,23 @@ void WVFStudy::integrate_poincare_sep( double p0, double p1, double p2, double *
     double y[2],theta;
 
     *dashes=true; *dir=1;
-    if(pcoord[2]>ZCOORD) {
+    if (pcoord[2]>ZCOORD) {
         psphere_to_R2(p0,p1,p2,y);
-        rk78(eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
+        rk78(&WVFStudy::eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
         R2_to_psphere(y[0],y[1],pcoord);
         *color = findSepColor2(gcf,*type,y);
     } else {
         theta = atan2(fabs(p1),fabs(p0)); 
-        if((theta<PI_DIV4) && (theta>-PI_DIV4)) {
-            if(p0>0) {
+        if ((theta<PI_DIV4) && (theta>-PI_DIV4)) {
+            if (p0>0) {
                 psphere_to_U1(p0,p1,p2,y);
-                rk78(eval_U1_vec_field,y,hhi,h_min,h_max,config_tolerance);
-                if(y[1]>=0 || !singinf) {
+                rk78(&WVFStudy::eval_U1_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                if (y[1]>=0 || !singinf) {
                     U1_to_psphere(y[0],y[1],pcoord);
                     *color=findSepColor2(gcf_U1,*type,y);
                 } else {
                     VV1_to_psphere(y[0],y[1],pcoord);
-                    if(dir_vec_field==1) {
+                    if (dir_vec_field==1) {
                         *dir=-1;
                         *hhi=-(*hhi);
                         *type=change_type(*type);
@@ -133,13 +133,13 @@ void WVFStudy::integrate_poincare_sep( double p0, double p1, double p2, double *
                 }  
             } else {
                 psphere_to_V1(p0,p1,p2,y);
-                rk78(eval_V1_vec_field,y,hhi,h_min,h_max,config_tolerance);
-                if(y[1]>=0 || !singinf) {
+                rk78(&WVFStudy::eval_V1_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                if (y[1]>=0 || !singinf) {
                     V1_to_psphere(y[0],y[1],pcoord); 
                     *color=findSepColor2(gcf_V1,*type,y);
                 } else {
                     UU1_to_psphere(y[0],y[1],pcoord); 
-                    if(dir_vec_field==1) {
+                    if (dir_vec_field==1) {
                         *dir=-1;
                         *hhi=-(*hhi);
                         *type=change_type(*type);
@@ -150,15 +150,15 @@ void WVFStudy::integrate_poincare_sep( double p0, double p1, double p2, double *
                 }        
             }
         } else {
-            if(p1>0) {
+            if (p1>0) {
                 psphere_to_U2(p0,p1,p2,y);
-                rk78(eval_U2_vec_field,y,hhi,h_min,h_max,config_tolerance);
-                if(y[1]>=0 || !singinf) {
+                rk78(&WVFStudy::eval_U2_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                if (y[1]>=0 || !singinf) {
                     U2_to_psphere(y[0],y[1],pcoord); 
                     *color=findSepColor2(gcf_U2,*type,y);
                 } else {
                     VV2_to_psphere(y[0],y[1],pcoord);
-                    if(dir_vec_field==1) {
+                    if (dir_vec_field==1) {
                         *dir=-1;
                         *hhi=-(*hhi);
                         *type=change_type(*type);
@@ -169,13 +169,13 @@ void WVFStudy::integrate_poincare_sep( double p0, double p1, double p2, double *
                 } 
             } else {
                 psphere_to_V2(p0,p1,p2,y);
-                rk78(eval_V2_vec_field,y,hhi,h_min,h_max,config_tolerance);
-                if(y[1]>=0 || !singinf) {
+                rk78(&WVFStudy::eval_V2_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                if (y[1]>=0 || !singinf) {
                     V2_to_psphere(y[0],y[1],pcoord);         
                     *color=findSepColor2(gcf_V2,*type,y);
                 } else {
                     UU2_to_psphere(y[0],y[1],pcoord); 
-                    if(dir_vec_field==1) {
+                    if (dir_vec_field==1) {
                         *dir=-1;
                         *hhi=-(*hhi);
                         *type=change_type(*type);
@@ -197,15 +197,15 @@ void WVFStudy::integrate_lyapunov_sep( double p0, double p1, double p2, double *
     double y[2];
 
     *dashes=true; *dir=1;
-    if( p0 == 0 ) {
+    if ( p0 == 0 ) {
         y[0]=p1;y[1]=p2;
-        rk78(eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
+        rk78(&WVFStudy::eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
         R2_to_plsphere(y[0],y[1],pcoord);
         *color=findSepColor2(gcf,*type,y);
     } else {
         y[0]=p1; y[1]=p2;
-        rk78(eval_vec_field_cyl,y,hhi,h_min,h_max,config_tolerance); 
-        if(y[1]>=TWOPI)y[1]-=TWOPI;
+        rk78(&WVFStudy::eval_vec_field_cyl,y,hhi,h_min,h_max,config_tolerance); 
+        if (y[1]>=TWOPI)y[1]-=TWOPI;
         cylinder_to_plsphere(y[0],y[1],pcoord);
         *color=findSepColor3(gcf_C,*type,y);
     } 
@@ -225,20 +225,22 @@ static orbits_points *integrate_sep( WWinSphere * spherewnd, double pcoord[3], d
     separatrice, because the separatrice is evaluate for the reduced
     vector field 
     */
-    if( VFResults.config_kindvf == INTCONFIG_ORIGINAL && MATHFUNC(change_dir)(pcoord))
-        hhi = - VFResults.config_step * dir; 
+    if ( spherewnd->study_->config_kindvf == INTCONFIG_ORIGINAL
+        && ((spherewnd->study_)->*(spherewnd->study_->change_dir))(pcoord) )
+        hhi = - spherewnd->study_->config_step * dir; 
     else
         hhi=(double)dir*step;
 
-    h_min=VFResults.config_hmi;
-    h_max=VFResults.config_hma;
+    h_min=spherewnd->study_->config_hmi;
+    h_max=spherewnd->study_->config_hma;
     copy_x_into_y(pcoord,pcoord2);
-    for(i=1;i<=points_to_int;++i) {
-        MATHFUNC(integrate_sphere_sep)(pcoord[0],pcoord[1],pcoord[2],pcoord,&hhi,&type,&color,&dashes,&d,h_min,h_max);     
+    for (i=1;i<=points_to_int;++i) {
+        ((spherewnd->study_)->*(spherewnd->study_->integrate_sphere_sep))
+            (pcoord[0],pcoord[1],pcoord[2],pcoord,&hhi,&type,&color,&dashes,&d,h_min,h_max);     
      
-        if( (i % UPDATEFREQ_STEPSIZE) == 0 )
-            set_current_step(fabs(hhi));
-        if(last_orbit==nullptr) {
+        if ( (i % UPDATEFREQ_STEPSIZE) == 0 )
+            spherewnd->study_->set_current_step(fabs(hhi));
+        if (last_orbit==nullptr) {
             first_orbit= new orbits_points;
             last_orbit=first_orbit; 
             h=dir;
@@ -250,17 +252,17 @@ static orbits_points *integrate_sep( WWinSphere * spherewnd, double pcoord[3], d
 
         copy_x_into_y(pcoord,last_orbit->pcoord);
         last_orbit->color=color;
-        last_orbit->dashes=dashes * VFResults.config_dashes;
+        last_orbit->dashes=dashes * spherewnd->study_->config_dashes;
         last_orbit->dir=d*h;
         last_orbit->type=type;
         last_orbit->next_point=nullptr;
-        if(dashes * VFResults.config_dashes)
+        if (dashes * spherewnd->study_->config_dashes)
             (*plot_l)(spherewnd,pcoord,pcoord2,color);
         else
             (*plot_p)(spherewnd,pcoord,color);
         copy_x_into_y(pcoord,pcoord2); 
     }
-    set_current_step(fabs(hhi));
+    spherewnd->study_->set_current_step(fabs(hhi));
     *orbit=last_orbit;
     return(first_orbit);   
 }
@@ -290,25 +292,26 @@ static double find_step( term1 * sep, double epsilon, int dir)
     double t,t1,t2,r0,a,b;
 
     t=epsilon*dir;
-    a=pow(epsilon-epsilon/100,2.0); b=pow(epsilon+epsilon/100,2.0);
+    a=pow(epsilon-epsilon/100,2.0);
+    b=pow(epsilon+epsilon/100,2.0);
     r0=pow(t,2.0)+pow(eval_term1(sep,t),2.0);
-    if((r0>a) && (r0<b))
+    if ((r0>a) && (r0<b))
         return(t);
-    if(r0<=a) {
+    if (r0<=a) {
         do { 
             t*=2.;
             r0=pow(t,2.0)+pow(eval_term1(sep,t),2.0);
         } while (r0<=a);
-        if(r0<b)
+        if (r0<b)
             t2=t;
         else {
             t1=t/2;
             t2=(t+t1)/2; 
             for(;;) {
                 r0=pow(t2,2.0)+pow(eval_term1(sep,t2),2.0);
-                if((r0>a) && (r0<b))
+                if ((r0>a) && (r0<b))
                     break;
-                if(r0<=a)
+                if (r0<=a)
                     t1=t2;
                 else 
                     t=t2;
@@ -316,20 +319,20 @@ static double find_step( term1 * sep, double epsilon, int dir)
             }
         }
     } else {
-        do{
+        do {
             t/=2.;
             r0=pow(t,2.0)+pow(eval_term1(sep,t),2.0);
         } while (r0>=b);
-        if(r0>a)
+        if (r0>a)
             t2=t;
         else {
             t1=2.*t;
             t2=(t+t1)/2;
-            for(;;){
+            for (;;) {
                 r0=pow(t2,2.0)+pow(eval_term1(sep,t2),2.0);
-                if((r0>a) && (r0<b))
+                if ((r0>a) && (r0<b))
                     break;
-                if(r0<=a)
+                if (r0<=a)
                     t=t2;
                 else
                     t1=t2;
@@ -351,167 +354,186 @@ orbits_points * plot_separatrice(WWinSphere * spherewnd, double x0, double y0,do
 
     /* if we have a line of singularities at infinity then we have to change the
     chart if the chart is V1 or V2 */
-    if(VFResults.singinf){if(chart==CHART_V1)chart=CHART_U1;
-              else if(chart==CHART_V2)chart=CHART_U2; 
-             }
+    if (spherewnd->study_->singinf) {
+        if (chart==CHART_V1)
+            chart=CHART_U1;
+        else if (chart==CHART_V2)
+            chart=CHART_U2; 
+    }
                 
     /* h=(epsilon/100)*sep1->direction; */
     h=find_step(sep1->separatrice,epsilon,sep1->direction)/100;
 
-    first_orbit= new orbits_points;//(struct orbits_points *) malloc(sizeof(struct orbits_points));
+    first_orbit= new orbits_points;
     last_orbit=first_orbit; 
     point[0]=x0;point[1]=y0;
-    switch(chart){
-        case CHART_R2: MATHFUNC(R2_to_sphere)(x0,y0,pcoord);
-            color=findSepColor2(VFResults.gcf,sep1->type,point);
-            break;
-        case CHART_U1: MATHFUNC(U1_to_sphere)(x0,y0,pcoord);
-            color=findSepColor2(VFResults.gcf_U1,sep1->type,point);
-            break;
-        case CHART_V1: MATHFUNC(V1_to_sphere)(x0,y0,pcoord);
-            if((VFResults.p==1) && (VFResults.q==1))psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
-                color=findSepColor2(VFResults.gcf_V1,sep1->type,point);
-            break;
-        case CHART_U2: MATHFUNC(U2_to_sphere)(x0,y0,pcoord);
-            color=findSepColor2(VFResults.gcf_U2,sep1->type,point);
-            break;
-        case CHART_V2: MATHFUNC(V2_to_sphere)(x0,y0,pcoord);
-            if((VFResults.p==1) && (VFResults.q==1))psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
-                color=findSepColor2(VFResults.gcf_U2,sep1->type,point);
-            break;
-        default:
-            color=0;
-            break;
+
+    switch (chart) {
+    case CHART_R2:
+        ((spherewnd->study_)->*(spherewnd->study_->R2_to_sphere))(x0,y0,pcoord);
+        color=findSepColor2(spherewnd->study_->gcf,sep1->type,point);
+        break;
+    case CHART_U1:
+        ((spherewnd->study_)->*(spherewnd->study_->U1_to_sphere))(x0,y0,pcoord);
+        color=findSepColor2(spherewnd->study_->gcf_U1,sep1->type,point);
+        break;
+    case CHART_V1:
+        ((spherewnd->study_)->*(spherewnd->study_->V1_to_sphere))(x0,y0,pcoord);
+        if ((spherewnd->study_->p==1) && (spherewnd->study_->q==1)){
+            spherewnd->study_->psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
+        }
+        color=findSepColor2(spherewnd->study_->gcf_V1,sep1->type,point);
+        break;
+    case CHART_U2:
+        ((spherewnd->study_)->*(spherewnd->study_->U2_to_sphere))(x0,y0,pcoord);
+        color=findSepColor2(spherewnd->study_->gcf_U2,sep1->type,point);
+        break;
+    case CHART_V2:
+        ((spherewnd->study_)->*(spherewnd->study_->V2_to_sphere))(x0,y0,pcoord);
+        if ((spherewnd->study_->p==1) && (spherewnd->study_->q==1)) {
+            spherewnd->study_->psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
+        }
+        color=findSepColor2(spherewnd->study_->gcf_U2,sep1->type,point);
+        break;
+    default:
+        color=0;
+        break;
     } 
 
     copy_x_into_y(pcoord,last_orbit->pcoord);
     type=sep1->type;
-    switch(sep1->type) {
-        case OT_STABLE:
-            dir=OT_STABLE;
-            break;
-        case OT_UNSTABLE:
-            dir=OT_UNSTABLE;
-            break;
-        case OT_CENT_STABLE:
-            dir=OT_STABLE;
-            break;    
-        case OT_CENT_UNSTABLE:
-            dir=OT_UNSTABLE;
-            break;
-        default:
-            dir = 0;
-            break;
-    }   
+
+    switch (sep1->type) {
+    case OT_STABLE:
+        dir=OT_STABLE;
+        break;
+    case OT_UNSTABLE:
+        dir=OT_UNSTABLE;
+        break;
+    case OT_CENT_STABLE:
+        dir=OT_STABLE;
+        break;    
+    case OT_CENT_UNSTABLE:
+        dir=OT_UNSTABLE;
+        break;
+    default:
+        dir = 0;
+        break;
+    }  
+
     last_orbit->color = color;
     last_orbit->dashes = 0;
     copy_x_into_y(pcoord,pcoord2);
-    for(i=0;i<=99;i++) {
+    for (i=0;i<=99;i++) {
         t = t+h;
         y = eval_term1(sep1->separatrice,t);
-        if((t*t+y*y)>epsilon*epsilon)
+        if ((t*t+y*y)>epsilon*epsilon)
             break; 
-        if(sep1->d) {
-            point[0] = x0+a11*y+a12*t;point[1]=y0+a21*y+a22*t;
+        if (sep1->d) {
+            point[0] = x0+a11*y+a12*t;
+            point[1]=y0+a21*y+a22*t;
         } else {
-            point[0] = x0+a11*t+a12*y;point[1]=y0+a21*t+a22*y;
+            point[0] = x0+a11*t+a12*y;
+            point[1]=y0+a21*t+a22*y;
         }
         last_orbit->next_point = new orbits_points;
         last_orbit = last_orbit->next_point;
-        dashes = true; 
+        dashes = true;
+
         switch(chart) {
-            case CHART_R2:
-                MATHFUNC(R2_to_sphere)(point[0],point[1],pcoord);
-                color = findSepColor2(VFResults.gcf,sep1->type,point);
-                break;
-            case CHART_U1:
-                if(point[1]>=0 || !VFResults.singinf) {
-                    MATHFUNC(U1_to_sphere)(point[0],point[1],pcoord);
-                    if(!ok) {
-                        dashes = false;
-                        ok = true;
-                        if(VFResults.dir_vec_field==1)
-                            dir *= -1;
-                    }
+        case CHART_R2:
+            ((spherewnd->study_)->*(spherewnd->study_->R2_to_sphere))
+                (point[0],point[1],pcoord);
+            color = findSepColor2(spherewnd->study_->gcf,sep1->type,point);
+            break;
+        case CHART_U1:
+            if (point[1]>=0 || !spherewnd->study_->singinf) {
+                ((spherewnd->study_)->*(spherewnd->study_->U1_to_sphere))(point[0],point[1],pcoord);
+                if (!ok) {
+                    dashes = false;
+                    ok = true;
+                    if (spherewnd->study_->dir_vec_field==1)
+                        dir *= -1;
+                }
+                type = sep1->type;
+                color = findSepColor2(spherewnd->study_->gcf_U1,type,point);
+            } else {
+                spherewnd->study_->VV1_to_psphere(point[0],point[1],pcoord);
+                if (ok) {
+                    dashes = false;
+                    ok = false;
+                    if (spherewnd->study_->dir_vec_field==1)
+                        dir *= -1;
+                }
+                spherewnd->study_->psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
+                if (spherewnd->study_->dir_vec_field==1)
+                    type = change_type(sep1->type); 
+                else
                     type = sep1->type;
-                    color = findSepColor2(VFResults.gcf_U1,type,point);
-                } else {
-                    VV1_to_psphere(point[0],point[1],pcoord);
-                    if(ok) {
-                        dashes = false;
-                        ok = false;
-                        if (VFResults.dir_vec_field==1)
-                            dir *= -1;
-                    }
-                    psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
-                    if (VFResults.dir_vec_field==1)
-                        type = change_type(sep1->type); 
-                    else
-                        type = sep1->type;
-                    color = findSepColor2(VFResults.gcf_V1,type,point);
-                } 
-                break;
-            case CHART_V1:
-                MATHFUNC(V1_to_sphere)(point[0],point[1],pcoord);
-                if((VFResults.p==1) && (VFResults.q==1))
-                    psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
-                color = findSepColor2(VFResults.gcf_V1,sep1->type,point);
-                break;
-            case CHART_U2:
-                if (point[1]>=0 || !VFResults.singinf) {
-                    MATHFUNC(U2_to_sphere)(point[0],point[1],pcoord);
-                    if (!ok) {
-                        dashes = false;
-                        ok = true;
-                        if(VFResults.dir_vec_field==1)
-                            dir *= -1;
-                    }
+                color = findSepColor2(spherewnd->study_->gcf_V1,type,point);
+            } 
+            break;
+        case CHART_V1:
+            ((spherewnd->study_)->*(spherewnd->study_->V1_to_sphere))(point[0],point[1],pcoord);
+            if ((spherewnd->study_->p==1) && (spherewnd->study_->q==1))
+                spherewnd->study_->psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
+            color = findSepColor2(spherewnd->study_->gcf_V1,sep1->type,point);
+            break;
+        case CHART_U2:
+            if (point[1]>=0 || !spherewnd->study_->singinf) {
+                ((spherewnd->study_)->*(spherewnd->study_->U2_to_sphere))(point[0],point[1],pcoord);
+                if (!ok) {
+                    dashes = false;
+                    ok = true;
+                    if (spherewnd->study_->dir_vec_field==1)
+                        dir *= -1;
+                }
+                type = sep1->type;
+                color = findSepColor2(spherewnd->study_->gcf_U2,type,point);
+            } else {
+                spherewnd->study_->VV2_to_psphere(point[0],point[1],pcoord);
+                if (ok) {
+                    dashes = false;
+                    ok = false;
+                    if (spherewnd->study_->dir_vec_field==1)
+                        dir *= -1;
+                }
+                spherewnd->study_->psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
+                if (spherewnd->study_->dir_vec_field==1)
+                    type = change_type(sep1->type); 
+                else
                     type = sep1->type;
-                    color = findSepColor2(VFResults.gcf_U2,type,point);
-                } else {
-                    VV2_to_psphere(point[0],point[1],pcoord);
-                    if(ok) {
-                        dashes = false;
-                        ok = false;
-                        if(VFResults.dir_vec_field==1)
-                            dir *= -1;
-                    }
-                    psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
-                    if (VFResults.dir_vec_field==1)
-                        type = change_type(sep1->type); 
-                    else
-                        type = sep1->type;
-                    color = findSepColor2(VFResults.gcf_V2,type,point);
-                }                     
-                break;
-            case CHART_V2:
-                MATHFUNC(V2_to_sphere)(point[0],point[1],pcoord);
-                if ((VFResults.p==1) && (VFResults.q==1))
-                    psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
-                color=findSepColor2(VFResults.gcf_V2,sep1->type,point);
-                break;
+                color = findSepColor2(spherewnd->study_->gcf_V2,type,point);
+            }                     
+            break;
+        case CHART_V2:
+            ((spherewnd->study_)->*(spherewnd->study_->V2_to_sphere))(point[0],point[1],pcoord);
+            if ((spherewnd->study_->p==1) && (spherewnd->study_->q==1))
+                spherewnd->study_->psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
+            color=findSepColor2(spherewnd->study_->gcf_V2,sep1->type,point);
+            break;
         }  
 
         copy_x_into_y(pcoord,last_orbit->pcoord);
         last_orbit->color=color;
-        last_orbit->dashes=dashes * VFResults.config_dashes;
+        last_orbit->dashes=dashes * spherewnd->study_->config_dashes;
         last_orbit->dir=dir; 
         last_orbit->type=type;
-        if(last_orbit->dashes)
+        if (last_orbit->dashes)
             (*plot_l)(spherewnd,pcoord,pcoord2,color);
         else
             (*plot_p)(spherewnd,pcoord,color);
         copy_x_into_y(pcoord,pcoord2);
     } 
 
-    last_orbit->next_point = integrate_sep(spherewnd,pcoord,VFResults.config_step,last_orbit->dir,type,VFResults.config_intpoints,&sep2); 
+    last_orbit->next_point = integrate_sep(spherewnd,pcoord,spherewnd->study_->config_step,last_orbit->dir,type,spherewnd->study_->config_intpoints,&sep2); 
     *orbit = sep2; 
     return(first_orbit);
 } 
  
 static double power(double a,double b)
 {
-    if(b==0)
+    if (b==0)
         return(1.);
     else
         return(pow(a,b));
@@ -541,10 +563,10 @@ static orbits_points * plot_sep_blow_up( WWinSphere * spherewnd, double x0, doub
 
     /* if we have a line of singularities at infinity then we have to change the
     chart if the chart is V1 or V2 */
-    if (VFResults.singinf) {
+    if (spherewnd->study_->singinf) {
         if (chart==CHART_V1)
             chart = CHART_U1;
-        else if(chart==CHART_V2)
+        else if (chart==CHART_V2)
             chart = CHART_U2; 
     }
 
@@ -554,41 +576,53 @@ static orbits_points * plot_sep_blow_up( WWinSphere * spherewnd, double x0, doub
     type = de_sep->type;
 
     switch ( de_sep->type ) {
-        case OT_STABLE:         dir=OT_STABLE;      break;
-        case OT_UNSTABLE:       dir=OT_UNSTABLE;    break;
-        case OT_CENT_STABLE:    dir=OT_STABLE;      break;
-        case OT_CENT_UNSTABLE:  dir=OT_UNSTABLE;    break;
-        default:                dir=0;              break;
+    case OT_STABLE:
+        dir=OT_STABLE;
+        break;
+    case OT_UNSTABLE:
+        dir=OT_UNSTABLE;
+        break;
+    case OT_CENT_STABLE:
+        dir=OT_STABLE;
+        break;
+    case OT_CENT_UNSTABLE:
+        dir=OT_UNSTABLE;
+        break;
+    default:
+        dir=0;
+        break;
     }
-    first_orbit= new orbits_points;//(struct orbits_points *) malloc(sizeof(struct orbits_points));
+    first_orbit= new orbits_points;
     last_orbit=first_orbit;
     point[0]=x0;point[1]=y0;
     switch (chart) {
-        case CHART_R2:
-            MATHFUNC(R2_to_sphere)(x0,y0,pcoord);
-            color = findSepColor2(VFResults.gcf,de_sep->type,point);
-            break;
-        case CHART_U1:
-            MATHFUNC(U1_to_sphere)(x0,y0,pcoord);
-            color=findSepColor2(VFResults.gcf_U1,de_sep->type,point);
-            break;
-        case CHART_V1:
-            MATHFUNC(V1_to_sphere)(x0,y0,pcoord);
-            if((VFResults.p==1) && (VFResults.q==1))psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
-            color=findSepColor2(VFResults.gcf_V1,de_sep->type,point);
-            break;
-        case CHART_U2:
-            MATHFUNC(U2_to_sphere)(x0,y0,pcoord);
-            color=findSepColor2(VFResults.gcf_U2,de_sep->type,point);
-            break;
-        case CHART_V2:
-            MATHFUNC(V2_to_sphere)(x0,y0,pcoord);
-            if((VFResults.p==1) && (VFResults.q==1))psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
-            color=findSepColor2(VFResults.gcf_V2,de_sep->type,point);
-            break;
-        default:
-            color= 0;
-            break;
+    case CHART_R2:
+        ((spherewnd->study_)->*(spherewnd->study_->R2_to_sphere))(x0,y0,pcoord);
+        color = findSepColor2(spherewnd->study_->gcf,de_sep->type,point);
+        break;
+    case CHART_U1:
+        ((spherewnd->study_)->*(spherewnd->study_->U1_to_sphere))(x0,y0,pcoord);
+        color=findSepColor2(spherewnd->study_->gcf_U1,de_sep->type,point);
+        break;
+    case CHART_V1:
+        ((spherewnd->study_)->*(spherewnd->study_->V1_to_sphere))(x0,y0,pcoord);
+        if ((spherewnd->study_->p==1) && (spherewnd->study_->q==1))
+            spherewnd->study_->psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
+        color=findSepColor2(spherewnd->study_->gcf_V1,de_sep->type,point);
+        break;
+    case CHART_U2:
+        ((spherewnd->study_)->*(spherewnd->study_->U2_to_sphere))(x0,y0,pcoord);
+        color=findSepColor2(spherewnd->study_->gcf_U2,de_sep->type,point);
+        break;
+    case CHART_V2:
+        ((spherewnd->study_)->*(spherewnd->study_->V2_to_sphere))(x0,y0,pcoord);
+        if ((spherewnd->study_->p==1) && (spherewnd->study_->q==1))
+            spherewnd->study_->psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
+        color=findSepColor2(spherewnd->study_->gcf_V2,de_sep->type,point);
+        break;
+    default:
+        color= 0;
+        break;
     }
     copy_x_into_y(pcoord,last_orbit->pcoord);
     last_orbit->color = color;
@@ -602,72 +636,72 @@ static orbits_points * plot_sep_blow_up( WWinSphere * spherewnd, double x0, doub
         y = eval_term1(de_sep->sep,t);
         make_transformations(de_sep->trans,de_sep->x0+de_sep->a11*t+de_sep->a12*y,de_sep->y0+de_sep->a21*t+de_sep->a22*y,point);
         switch(chart){
-            case CHART_R2:
-                MATHFUNC(R2_to_sphere)(point[0],point[1],pcoord);
-                color = findSepColor2(VFResults.gcf,de_sep->type,point);
-                break;
-            case CHART_U1:
-                if (point[1]>=0 || !VFResults.singinf) {
-                    MATHFUNC(U1_to_sphere)(point[0],point[1],pcoord);
-                    if (!ok) {
-                        dashes = false;
-                        ok = true;
-                    }
-                    type = de_sep->type;
-                    color = findSepColor2(VFResults.gcf_U1,type,point);
-                } else {
-                    VV1_to_psphere(point[0],point[1],pcoord);
-                    if (ok) {
-                        dashes = false;
-                        ok = false;
-                    }
-                    psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
-                    if (VFResults.dir_vec_field==1)
-                        type = change_type(de_sep->type); 
-                    else
-                        type = de_sep->type;
-                    color = findSepColor2(VFResults.gcf_V1,type,point);
-                } 
-                break;
-            case CHART_V1: 
-                MATHFUNC(V1_to_sphere)(point[0],point[1],pcoord);
-                if ((VFResults.p==1) && (VFResults.q==1))
-                    psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
-                color = findSepColor2(VFResults.gcf_V1,de_sep->type,point);
-                break;
-            case CHART_U2:
-                if (point[1]>=0 || !VFResults.singinf) {
-                    MATHFUNC(U2_to_sphere)(point[0],point[1],pcoord);
-                    if (!ok) {
-                        dashes = false;
-                        ok = true;
-                    }
-                    type = de_sep->type;
-                    color = findSepColor2(VFResults.gcf_U2,type,point);
-                } else {
-                    VV2_to_psphere(point[0],point[1],pcoord);
-                    if (ok) {
-                        dashes = false;
-                        ok = false;
-                    }
-                    psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
-                    if (VFResults.dir_vec_field==1)
-                        type = change_type(de_sep->type); 
-                    else
-                        type = de_sep->type;
-                    color = findSepColor2(VFResults.gcf_V2,type,point);
+        case CHART_R2:
+            ((spherewnd->study_)->*(spherewnd->study_->R2_to_sphere))(point[0],point[1],pcoord);
+            color = findSepColor2(spherewnd->study_->gcf,de_sep->type,point);
+            break;
+        case CHART_U1:
+            if (point[1]>=0 || !spherewnd->study_->singinf) {
+                ((spherewnd->study_)->*(spherewnd->study_->U1_to_sphere))(point[0],point[1],pcoord);
+                if (!ok) {
+                    dashes = false;
+                    ok = true;
                 }
-                break;
-            case CHART_V2: 
-                MATHFUNC(V2_to_sphere)(point[0],point[1],pcoord);
-                if((VFResults.p==1) && (VFResults.q==1))
-                    psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
-                color = findSepColor2(VFResults.gcf_V2,de_sep->type,point);
-                break;
+                type = de_sep->type;
+                color = findSepColor2(spherewnd->study_->gcf_U1,type,point);
+            } else {
+                spherewnd->study_->VV1_to_psphere(point[0],point[1],pcoord);
+                if (ok) {
+                    dashes = false;
+                    ok = false;
+                }
+                spherewnd->study_->psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
+                if (spherewnd->study_->dir_vec_field==1)
+                    type = change_type(de_sep->type); 
+                else
+                    type = de_sep->type;
+                color = findSepColor2(spherewnd->study_->gcf_V1,type,point);
+            } 
+            break;
+        case CHART_V1: 
+            ((spherewnd->study_)->*(spherewnd->study_->V1_to_sphere))(point[0],point[1],pcoord);
+            if ((spherewnd->study_->p==1) && (spherewnd->study_->q==1))
+                spherewnd->study_->psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
+            color = findSepColor2(spherewnd->study_->gcf_V1,de_sep->type,point);
+            break;
+        case CHART_U2:
+            if (point[1]>=0 || !spherewnd->study_->singinf) {
+                ((spherewnd->study_)->*(spherewnd->study_->U2_to_sphere))(point[0],point[1],pcoord);
+                if (!ok) {
+                    dashes = false;
+                    ok = true;
+                }
+                type = de_sep->type;
+                color = findSepColor2(spherewnd->study_->gcf_U2,type,point);
+            } else {
+                spherewnd->study_->VV2_to_psphere(point[0],point[1],pcoord);
+                if (ok) {
+                    dashes = false;
+                    ok = false;
+                }
+                spherewnd->study_->psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
+                if (spherewnd->study_->dir_vec_field==1)
+                    type = change_type(de_sep->type); 
+                else
+                    type = de_sep->type;
+                color = findSepColor2(spherewnd->study_->gcf_V2,type,point);
+            }
+            break;
+        case CHART_V2: 
+            ((spherewnd->study_)->*(spherewnd->study_->V2_to_sphere))(point[0],point[1],pcoord);
+            if ((spherewnd->study_->p==1) && (spherewnd->study_->q==1))
+                spherewnd->study_->psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
+            color = findSepColor2(spherewnd->study_->gcf_V2,de_sep->type,point);
+            break;
         }
         copy_x_into_y(pcoord,last_orbit->pcoord);
         last_orbit->color = color;
-        last_orbit->dashes = dashes * VFResults.config_dashes;
+        last_orbit->dashes = dashes * spherewnd->study_->config_dashes;
         last_orbit->dir = dir;
         last_orbit->type = type;
         if (last_orbit->dashes)
@@ -679,10 +713,10 @@ static orbits_points * plot_sep_blow_up( WWinSphere * spherewnd, double x0, doub
     de_sep->point[0] = t;
     de_sep->point[1] = y;
     de_sep->blow_up_vec_field = true;
-    last_orbit->next_point = integrate_blow_up(spherewnd,pcoord2,de_sep,VFResults.config_step,dir,last_orbit->type,&sep,chart);
+    last_orbit->next_point = integrate_blow_up(spherewnd,pcoord2,de_sep,spherewnd->study_->config_step,dir,last_orbit->type,&sep,chart);
     //last_orbit->next_point = integrate_blow_up(spherewnd,//x0,y0,
     //pcoord2,de_sep,/*point,*/
-    //VFResults.config_step,dir,last_orbit->type,&sep,chart);
+    //spherewnd->study_->config_step,dir,last_orbit->type,&sep,chart);
     *orbit = sep; 
     return(first_orbit); 
 }
@@ -693,21 +727,29 @@ void start_plot_saddle_sep( WWinSphere * spherewnd )
     double p[3];
     orbits_points *points;
 
-    draw_sep(spherewnd,spherewnd->study_.selected_sep->first_sep_point);
-    if(spherewnd->study_.selected_sep->last_sep_point) {
-        copy_x_into_y(spherewnd->study_.selected_sep->last_sep_point->pcoord,p);
-        spherewnd->study_.selected_sep->last_sep_point->next_point =
-            integrate_sep(spherewnd, p, spherewnd->study_.config_currentstep, spherewnd->study_.selected_sep->last_sep_point->dir, 
-                    spherewnd->study_.selected_sep->last_sep_point->type,spherewnd->study_.config_intpoints,&points);
-        spherewnd->study_.selected_sep->last_sep_point = points;
+    draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
+    if (spherewnd->study_->selected_sep->last_sep_point) {
+        copy_x_into_y(spherewnd->study_->selected_sep->last_sep_point->pcoord, p);
+        spherewnd->study_->selected_sep->last_sep_point->next_point =
+            integrate_sep(spherewnd, p,
+                spherewnd->study_->config_currentstep,
+                spherewnd->study_->selected_sep->last_sep_point->dir,
+                spherewnd->study_->selected_sep->last_sep_point->type,
+                spherewnd->study_->config_intpoints, &points);
+        spherewnd->study_->selected_sep->last_sep_point = points;
     } else {
-        spherewnd->study_.selected_sep->first_sep_point =
-            plot_separatrice(spherewnd, spherewnd->study_.selected_saddle_point->x0, spherewnd->study_.selected_saddle_point->y0,
-                    spherewnd->study_.selected_saddle_point->a11, spherewnd->study_.selected_saddle_point->a12,
-                    spherewnd->study_.selected_saddle_point->a21,spherewnd->study_.selected_saddle_point->a22,
-                    spherewnd->study_.selected_saddle_point->epsilon, spherewnd->study_.selected_sep,&points,
-                    spherewnd->study_.selected_saddle_point->chart);
-        spherewnd->study_.selected_sep->last_sep_point = points;
+        spherewnd->study_->selected_sep->first_sep_point =
+            plot_separatrice(spherewnd,
+                spherewnd->study_->selected_saddle_point->x0,
+                spherewnd->study_->selected_saddle_point->y0,
+                spherewnd->study_->selected_saddle_point->a11,
+                spherewnd->study_->selected_saddle_point->a12,
+                spherewnd->study_->selected_saddle_point->a21,
+                spherewnd->study_->selected_saddle_point->a22,
+                spherewnd->study_->selected_saddle_point->epsilon,
+                spherewnd->study_->selected_sep, &points,
+                spherewnd->study_->selected_saddle_point->chart);
+        spherewnd->study_->selected_sep->last_sep_point = points;
     }
 }
 
@@ -716,27 +758,30 @@ void cont_plot_saddle_sep( WWinSphere * spherewnd )
     double p[3];
     orbits_points *points;
 
-    copy_x_into_y(VFResults.selected_sep->last_sep_point->pcoord,p);
-    VFResults.selected_sep->last_sep_point->next_point =
-        integrate_sep(spherewnd, p, VFResults.config_currentstep,VFResults.selected_sep->last_sep_point->dir,
-                VFResults.selected_sep->last_sep_point->type,VFResults.config_intpoints,&points);
-    VFResults.selected_sep->last_sep_point = points;
+    copy_x_into_y(spherewnd->study_->selected_sep->last_sep_point->pcoord,p);
+    spherewnd->study_->selected_sep->last_sep_point->next_point =
+        integrate_sep(spherewnd, p,
+            spherewnd->study_->config_currentstep,
+            spherewnd->study_->selected_sep->last_sep_point->dir,
+            spherewnd->study_->selected_sep->last_sep_point->type,
+            spherewnd->study_->config_intpoints, &points);
+    spherewnd->study_->selected_sep->last_sep_point = points;
 }
 
 void plot_next_saddle_sep( WWinSphere * spherewnd )
 {
-    draw_sep(spherewnd,VFResults.selected_sep->first_sep_point);
-    if ( !(VFResults.selected_sep=VFResults.selected_sep->next_sep) )
-        VFResults.selected_sep = VFResults.selected_saddle_point->separatrices;
+    draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
+    if ( !(spherewnd->study_->selected_sep=spherewnd->study_->selected_sep->next_sep) )
+        spherewnd->study_->selected_sep = spherewnd->study_->selected_saddle_point->separatrices;
     start_plot_saddle_sep( spherewnd );
 }
 
 void select_next_saddle_sep( WWinSphere * spherewnd )
 {
-    draw_sep(spherewnd,VFResults.selected_sep->first_sep_point);
-    if( !(VFResults.selected_sep = VFResults.selected_sep->next_sep) )
-        VFResults.selected_sep = VFResults.selected_saddle_point->separatrices;
-    draw_selected_sep(spherewnd,VFResults.selected_sep->first_sep_point,CW_SEP);
+    draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
+    if ( !(spherewnd->study_->selected_sep = spherewnd->study_->selected_sep->next_sep) )
+        spherewnd->study_->selected_sep = spherewnd->study_->selected_saddle_point->separatrices;
+    draw_selected_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point,CW_SEP);
 } 
             
 static void plot_all_saddle_sep(WWinSphere * spherewnd, saddle *point)
@@ -745,15 +790,15 @@ static void plot_all_saddle_sep(WWinSphere * spherewnd, saddle *point)
     orbits_points *points;
     double p[3];
 
-    while(point != nullptr) {
+    while (point != nullptr) {
         if ( point->notadummy ) {
             sep1 = point->separatrices;
-            while(sep1) {
-                if(sep1->last_sep_point) {
+            while (sep1) {
+                if (sep1->last_sep_point) {
                     copy_x_into_y(sep1->last_sep_point->pcoord,p);
                     sep1->last_sep_point->next_point =
-                        integrate_sep(spherewnd, p, VFResults.config_currentstep,sep1->last_sep_point->dir,
-                                sep1->last_sep_point->type, VFResults.config_intpoints,&points);
+                        integrate_sep(spherewnd, p, spherewnd->study_->config_currentstep,sep1->last_sep_point->dir,
+                                sep1->last_sep_point->type, spherewnd->study_->config_intpoints,&points);
                     sep1->last_sep_point = points;
                 } else {
                     sep1->first_sep_point = plot_separatrice(spherewnd,point->x0,point->y0,
@@ -772,21 +817,21 @@ void start_plot_se_sep( WWinSphere * spherewnd )
     orbits_points *points;
     double p[3];
 
-    draw_sep(spherewnd,VFResults.selected_sep->first_sep_point); 
-    if(VFResults.selected_sep->last_sep_point) {
-        copy_x_into_y(VFResults.selected_sep->last_sep_point->pcoord,p);
-        VFResults.selected_sep->last_sep_point->next_point = 
-            integrate_sep(spherewnd, p, VFResults.config_currentstep, VFResults.selected_sep->last_sep_point->dir,
-                    VFResults.selected_sep->last_sep_point->type, VFResults.config_intpoints, &points);
-        VFResults.selected_sep->last_sep_point = points;               
+    draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point); 
+    if (spherewnd->study_->selected_sep->last_sep_point) {
+        copy_x_into_y(spherewnd->study_->selected_sep->last_sep_point->pcoord,p);
+        spherewnd->study_->selected_sep->last_sep_point->next_point = 
+            integrate_sep(spherewnd, p, spherewnd->study_->config_currentstep, spherewnd->study_->selected_sep->last_sep_point->dir,
+                    spherewnd->study_->selected_sep->last_sep_point->type, spherewnd->study_->config_intpoints, &points);
+        spherewnd->study_->selected_sep->last_sep_point = points;               
     } else { 
-        VFResults.selected_sep->first_sep_point = 
-            plot_separatrice(spherewnd,VFResults.selected_se_point->x0,VFResults.selected_se_point->y0, 
-                    VFResults.selected_se_point->a11, VFResults.selected_se_point->a12,
-                    VFResults.selected_se_point->a21, VFResults.selected_se_point->a22,
-                    VFResults.selected_se_point->epsilon, VFResults.selected_sep, &points,
-                    VFResults.selected_se_point->chart);   
-        VFResults.selected_sep->last_sep_point = points;
+        spherewnd->study_->selected_sep->first_sep_point = 
+            plot_separatrice(spherewnd,spherewnd->study_->selected_se_point->x0,spherewnd->study_->selected_se_point->y0, 
+                    spherewnd->study_->selected_se_point->a11, spherewnd->study_->selected_se_point->a12,
+                    spherewnd->study_->selected_se_point->a21, spherewnd->study_->selected_se_point->a22,
+                    spherewnd->study_->selected_se_point->epsilon, spherewnd->study_->selected_sep, &points,
+                    spherewnd->study_->selected_se_point->chart);   
+        spherewnd->study_->selected_sep->last_sep_point = points;
     }
 }
 
@@ -795,28 +840,28 @@ void cont_plot_se_sep( WWinSphere * spherewnd )
     double p[3];
     orbits_points *points;
 
-    copy_x_into_y(VFResults.selected_sep->last_sep_point->pcoord,p);
-    VFResults.selected_sep->last_sep_point->next_point =
-        integrate_sep(spherewnd,p,VFResults.config_currentstep, VFResults.selected_sep->last_sep_point->dir,
-                VFResults.selected_sep->last_sep_point->type, VFResults.config_intpoints, &points);
-    VFResults.selected_sep->last_sep_point = points;
+    copy_x_into_y(spherewnd->study_->selected_sep->last_sep_point->pcoord,p);
+    spherewnd->study_->selected_sep->last_sep_point->next_point =
+        integrate_sep(spherewnd,p,spherewnd->study_->config_currentstep, spherewnd->study_->selected_sep->last_sep_point->dir,
+                spherewnd->study_->selected_sep->last_sep_point->type, spherewnd->study_->config_intpoints, &points);
+    spherewnd->study_->selected_sep->last_sep_point = points;
 }
 
 void plot_next_se_sep( WWinSphere * spherewnd )
 {
-    draw_sep(spherewnd,VFResults.selected_sep->first_sep_point);
-    if( !(VFResults.selected_sep = VFResults.selected_sep->next_sep) )
-        VFResults.selected_sep = VFResults.selected_se_point->separatrices;
+    draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
+    if ( !(spherewnd->study_->selected_sep = spherewnd->study_->selected_sep->next_sep) )
+        spherewnd->study_->selected_sep = spherewnd->study_->selected_se_point->separatrices;
     start_plot_se_sep( spherewnd );
 }        
 
 
 void select_next_se_sep( WWinSphere * spherewnd )
 {
-    draw_sep(spherewnd,VFResults.selected_sep->first_sep_point);
-    if( !(VFResults.selected_sep = VFResults.selected_sep->next_sep) )
-        VFResults.selected_sep = VFResults.selected_se_point->separatrices;
-    draw_selected_sep(spherewnd,VFResults.selected_sep->first_sep_point,CW_SEP);
+    draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
+    if ( !(spherewnd->study_->selected_sep = spherewnd->study_->selected_sep->next_sep) )
+        spherewnd->study_->selected_sep = spherewnd->study_->selected_se_point->separatrices;
+    draw_selected_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point,CW_SEP);
 }  
 
 static void plot_all_se_sep(WWinSphere * spherewnd, semi_elementary *point)
@@ -825,26 +870,24 @@ static void plot_all_se_sep(WWinSphere * spherewnd, semi_elementary *point)
     orbits_points *points;
     double p[3];
 
-    while(point!=nullptr)
-    {
-        if(point->notadummy)
-        {
+    while (point!=nullptr) {
+        if (point->notadummy) {
             sep1=point->separatrices;
-            while( sep1 != nullptr )
-            {
-                if(sep1->last_sep_point)
-                {
+            while ( sep1 != nullptr ) {
+                if (sep1->last_sep_point) {
                     copy_x_into_y(sep1->last_sep_point->pcoord,p);
-                    sep1->last_sep_point->next_point=integrate_sep( spherewnd, p,VFResults.config_currentstep,
-                    sep1->last_sep_point->dir,
-                    sep1->last_sep_point->type,VFResults.config_intpoints,&points);
+                    sep1->last_sep_point->next_point =
+                        integrate_sep( spherewnd, p,
+                            spherewnd->study_->config_currentstep,
+                            sep1->last_sep_point->dir,
+                            sep1->last_sep_point->type,
+                            spherewnd->study_->config_intpoints, &points);
                     sep1->last_sep_point=points;
-                }
-                else
-                {
-                    sep1->first_sep_point=plot_separatrice(spherewnd, point->x0,point->y0,
-                    point->a11,point->a12,point->a21,point->a22,point->epsilon,
-                    sep1,&points,point->chart);
+                } else {
+                    sep1->first_sep_point =
+                        plot_separatrice(spherewnd, point->x0,point->y0,
+                            point->a11,point->a12,point->a21,point->a22,
+                            point->epsilon,sep1,&points,point->chart);
                     sep1->last_sep_point=points;
                 }
                 sep1=sep1->next_sep;
@@ -859,53 +902,43 @@ void start_plot_de_sep( WWinSphere * spherewnd )
   orbits_points *points;
   double p[3];
   
-    draw_sep(spherewnd,VFResults.selected_de_sep->first_sep_point); 
-    if( VFResults.selected_de_sep->last_sep_point )
-    {
-        if( VFResults.selected_de_sep->blow_up_vec_field )
-        {
-            copy_x_into_y( VFResults.selected_de_sep->last_sep_point->pcoord, p );
-            VFResults.selected_de_sep->last_sep_point->next_point = integrate_blow_up(
-                spherewnd,
-                //VFResults.selected_de_point->x0,
-                //VFResults.selected_de_point->y0,
-                p,
-                VFResults.selected_de_sep,
-                VFResults.config_currentstep,
-                VFResults.selected_de_sep->last_sep_point->dir,
-                VFResults.selected_de_sep->last_sep_point->type,
-                &points,
-                VFResults.selected_de_point->chart );
+    draw_sep(spherewnd,spherewnd->study_->selected_de_sep->first_sep_point); 
+    if ( spherewnd->study_->selected_de_sep->last_sep_point ) {
+        if ( spherewnd->study_->selected_de_sep->blow_up_vec_field ) {
+            copy_x_into_y( spherewnd->study_->selected_de_sep->last_sep_point->pcoord, p );
+            spherewnd->study_->selected_de_sep->last_sep_point->next_point =
+                integrate_blow_up( spherewnd, p,
+                    spherewnd->study_->selected_de_sep,
+                    spherewnd->study_->config_currentstep,
+                    spherewnd->study_->selected_de_sep->last_sep_point->dir,
+                    spherewnd->study_->selected_de_sep->last_sep_point->type,
+                    &points,
+                    spherewnd->study_->selected_de_point->chart );
             
-            VFResults.selected_de_sep->last_sep_point = points;
+            spherewnd->study_->selected_de_sep->last_sep_point = points;
+        } else {
+            copy_x_into_y( spherewnd->study_->selected_de_sep->last_sep_point->pcoord, p );
+            spherewnd->study_->selected_de_sep->last_sep_point->next_point =
+                integrate_sep( spherewnd, p,
+                    spherewnd->study_->config_currentstep,
+                    spherewnd->study_->selected_de_sep->last_sep_point->dir,
+                    spherewnd->study_->selected_de_sep->last_sep_point->type,
+                    spherewnd->study_->config_intpoints,
+                    &points );
+            
+            spherewnd->study_->selected_de_sep->last_sep_point = points;               
         }
-        else
-        {
-            copy_x_into_y( VFResults.selected_de_sep->last_sep_point->pcoord, p );
-            VFResults.selected_de_sep->last_sep_point->next_point = integrate_sep(
-                spherewnd,
-                p,
-                VFResults.config_currentstep,
-                VFResults.selected_de_sep->last_sep_point->dir,
-                VFResults.selected_de_sep->last_sep_point->type,
-                VFResults.config_intpoints,
+    } else { 
+        spherewnd->study_->selected_de_sep->first_sep_point =
+            plot_sep_blow_up( spherewnd,
+                spherewnd->study_->selected_de_point->x0,
+                spherewnd->study_->selected_de_point->y0,
+                spherewnd->study_->selected_de_point->chart,
+                spherewnd->study_->selected_de_point->epsilon,
+                spherewnd->study_->selected_de_sep,
                 &points );
-            
-            VFResults.selected_de_sep->last_sep_point = points;               
-        }
-    }
-    else
-    { 
-        VFResults.selected_de_sep->first_sep_point = plot_sep_blow_up(
-            spherewnd,
-            VFResults.selected_de_point->x0,
-            VFResults.selected_de_point->y0,
-            VFResults.selected_de_point->chart,
-            VFResults.selected_de_point->epsilon,
-            VFResults.selected_de_sep,
-            &points );
 
-            VFResults.selected_de_sep->last_sep_point = points;
+            spherewnd->study_->selected_de_sep->last_sep_point = points;
     }
 }
 
@@ -914,51 +947,48 @@ void cont_plot_de_sep( WWinSphere * spherewnd )
     double p[3];
     orbits_points * points;
 
-    copy_x_into_y( VFResults.selected_de_sep->last_sep_point->pcoord, p );
-    if( VFResults.selected_de_sep->blow_up_vec_field )
-    {
-        VFResults.selected_de_sep->last_sep_point->next_point = integrate_blow_up(
+    copy_x_into_y( spherewnd->study_->selected_de_sep->last_sep_point->pcoord, p );
+    if ( spherewnd->study_->selected_de_sep->blow_up_vec_field ) {
+        spherewnd->study_->selected_de_sep->last_sep_point->next_point = integrate_blow_up(
                     spherewnd,
-                    //VFResults.selected_de_point->x0,
-                    //VFResults.selected_de_point->y0,
+                    //spherewnd->study_->selected_de_point->x0,
+                    //spherewnd->study_->selected_de_point->y0,
                     p,
-                    VFResults.selected_de_sep,
-                    VFResults.config_currentstep,
-                    VFResults.selected_de_sep->last_sep_point->dir,
-                    VFResults.selected_de_sep->last_sep_point->type,
+                    spherewnd->study_->selected_de_sep,
+                    spherewnd->study_->config_currentstep,
+                    spherewnd->study_->selected_de_sep->last_sep_point->dir,
+                    spherewnd->study_->selected_de_sep->last_sep_point->type,
                     &points,
-                    VFResults.selected_de_point->chart );
-    }
-    else 
-    {
-        VFResults.selected_de_sep->last_sep_point->next_point = integrate_sep(
+                    spherewnd->study_->selected_de_point->chart );
+    } else {
+        spherewnd->study_->selected_de_sep->last_sep_point->next_point = integrate_sep(
                     spherewnd,
                     p,
-                    VFResults.config_currentstep,
-                    VFResults.selected_de_sep->last_sep_point->dir,
-                    VFResults.selected_de_sep->last_sep_point->type,
-                    VFResults.config_intpoints,
+                    spherewnd->study_->config_currentstep,
+                    spherewnd->study_->selected_de_sep->last_sep_point->dir,
+                    spherewnd->study_->selected_de_sep->last_sep_point->type,
+                    spherewnd->study_->config_intpoints,
                     &points);
     }
     
-    VFResults.selected_de_sep->last_sep_point = points; 
+    spherewnd->study_->selected_de_sep->last_sep_point = points; 
 }
 
 void plot_next_de_sep( WWinSphere * spherewnd )
 {
-    draw_sep(spherewnd,VFResults.selected_de_sep->first_sep_point);
-    if( !(VFResults.selected_de_sep = VFResults.selected_de_sep->next_blow_up_point) )
-        VFResults.selected_de_sep = VFResults.selected_de_point->blow_up;
+    draw_sep(spherewnd,spherewnd->study_->selected_de_sep->first_sep_point);
+    if ( !(spherewnd->study_->selected_de_sep = spherewnd->study_->selected_de_sep->next_blow_up_point) )
+        spherewnd->study_->selected_de_sep = spherewnd->study_->selected_de_point->blow_up;
     start_plot_de_sep( spherewnd );
 }        
 
 
 void select_next_de_sep( WWinSphere * spherewnd )
 {
-    draw_sep(spherewnd,VFResults.selected_de_sep->first_sep_point);
-    if( !(VFResults.selected_de_sep = VFResults.selected_de_sep->next_blow_up_point) )
-        VFResults.selected_de_sep = VFResults.selected_de_point->blow_up;
-    draw_selected_sep(spherewnd,VFResults.selected_de_sep->first_sep_point,CW_SEP);
+    draw_sep(spherewnd,spherewnd->study_->selected_de_sep->first_sep_point);
+    if ( !(spherewnd->study_->selected_de_sep = spherewnd->study_->selected_de_sep->next_blow_up_point) )
+        spherewnd->study_->selected_de_sep = spherewnd->study_->selected_de_point->blow_up;
+    draw_selected_sep(spherewnd,spherewnd->study_->selected_de_sep->first_sep_point,CW_SEP);
 }  
 
 static void plot_all_de_sep( WWinSphere * spherewnd, struct degenerate *point)
@@ -967,25 +997,29 @@ static void plot_all_de_sep( WWinSphere * spherewnd, struct degenerate *point)
     orbits_points *sep;
     double p[3];
 
-    while(point != nullptr)
-    {
-        if(point->notadummy)
-        {
+    while (point != nullptr) {
+        if (point->notadummy) {
             de_sep=point->blow_up;
-            while(de_sep != nullptr)
-            {
-                if(de_sep->last_sep_point)
-                {
+            while (de_sep != nullptr) {
+                if (de_sep->last_sep_point) {
                     copy_x_into_y(de_sep->last_sep_point->pcoord,p);
-                    if(de_sep->blow_up_vec_field )
-                        de_sep->last_sep_point->next_point =integrate_blow_up(spherewnd,//point->x0,point->y0,
-                                                            p,de_sep,VFResults.config_currentstep,de_sep->last_sep_point->dir,de_sep->last_sep_point->type,&sep,point->chart);
-                    else
-                        de_sep->last_sep_point->next_point=integrate_sep(spherewnd,p,VFResults.config_currentstep,de_sep->last_sep_point->dir,de_sep->last_sep_point->type,VFResults.config_intpoints,&sep);
+                    if (de_sep->blow_up_vec_field ) {
+                        de_sep->last_sep_point->next_point =
+                            integrate_blow_up( spherewnd, p, de_sep,
+                                spherewnd->study_->config_currentstep,
+                                de_sep->last_sep_point->dir,
+                                de_sep->last_sep_point->type,
+                                &sep,point->chart);
+                    } else {
+                        de_sep->last_sep_point->next_point =
+                            integrate_sep(spherewnd,p,
+                                spherewnd->study_->config_currentstep,
+                                de_sep->last_sep_point->dir,
+                                de_sep->last_sep_point->type,
+                                spherewnd->study_->config_intpoints,&sep);
+                    }
                     de_sep->last_sep_point=sep;
-                }
-                else
-                {
+                } else {
                     de_sep->first_sep_point=plot_sep_blow_up(spherewnd,point->x0,point->y0,point->chart,point->epsilon,de_sep,&sep);
                     de_sep->last_sep_point=sep;
                 }
@@ -998,48 +1032,50 @@ static void plot_all_de_sep( WWinSphere * spherewnd, struct degenerate *point)
                        
 void plot_all_sep( WWinSphere * spherewnd )
 {
-    plot_all_saddle_sep( spherewnd, VFResults.first_saddle_point );
-    plot_all_se_sep( spherewnd, VFResults.first_se_point ); 
-    plot_all_de_sep( spherewnd, VFResults.first_de_point );
+    plot_all_saddle_sep( spherewnd, spherewnd->study_->first_saddle_point );
+    plot_all_se_sep( spherewnd, spherewnd->study_->first_se_point ); 
+    plot_all_de_sep( spherewnd, spherewnd->study_->first_de_point );
 }  
 
 void draw_sep( WWinSphere * spherewnd, orbits_points *sep )
 {
     double pcoord[3];
 
-    if(sep)
+    if (sep) {
         do {
-            if(sep->dashes)
+            if (sep->dashes)
                 (*plot_l)(spherewnd, sep->pcoord,pcoord,sep->color);
             else
                 (*plot_p)(spherewnd, sep->pcoord,sep->color);
             copy_x_into_y(sep->pcoord,pcoord);
         } while ( (sep = sep->next_point) != nullptr );
+    }
 }
 
 void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep,int color)
 {
     double pcoord[3];
 
-    if (sep)
+    if (sep) {
         do {
-        if(sep->dashes)
-            (*plot_l)(spherewnd, sep->pcoord,pcoord,color);
-        else
-            (*plot_p)(spherewnd, sep->pcoord,color);
-        copy_x_into_y(sep->pcoord,pcoord);
+            if (sep->dashes)
+                (*plot_l)(spherewnd, sep->pcoord,pcoord,color);
+            else
+                (*plot_p)(spherewnd, sep->pcoord,color);
+            copy_x_into_y(sep->pcoord,pcoord);
         } while ( (sep = sep->next_point) != nullptr );
+    }
 }
 
 void change_epsilon_saddle( WWinSphere * spherewnd, double epsilon)
 {
     sep *separatrice;
 
-    VFResults.selected_saddle_point->epsilon = epsilon;
-    separatrice = VFResults.selected_saddle_point->separatrices;
+    spherewnd->study_->selected_saddle_point->epsilon = epsilon;
+    separatrice = spherewnd->study_->selected_saddle_point->separatrices;
     while (separatrice!=nullptr) {
         draw_selected_sep(spherewnd,separatrice->first_sep_point,CBACKGROUND);
-        VFResults.deleteOrbitPoint(separatrice->first_sep_point);
+        spherewnd->study_->deleteOrbitPoint(separatrice->first_sep_point);
         separatrice->last_sep_point = nullptr;
         separatrice->first_sep_point = nullptr;
         separatrice = separatrice->next_sep;
@@ -1050,11 +1086,11 @@ void change_epsilon_se( WWinSphere * spherewnd, double epsilon)
 {
     sep *separatrice;
 
-    VFResults.selected_se_point->epsilon=epsilon;
-    separatrice=VFResults.selected_se_point->separatrices;
-    while( separatrice != nullptr) {
+    spherewnd->study_->selected_se_point->epsilon=epsilon;
+    separatrice=spherewnd->study_->selected_se_point->separatrices;
+    while ( separatrice != nullptr) {
         draw_selected_sep(spherewnd,separatrice->first_sep_point,CBACKGROUND);
-        VFResults.deleteOrbitPoint(separatrice->first_sep_point);
+        spherewnd->study_->deleteOrbitPoint(separatrice->first_sep_point);
         separatrice->last_sep_point = nullptr;
         separatrice->first_sep_point = nullptr;
         separatrice=separatrice->next_sep;
@@ -1065,11 +1101,11 @@ void change_epsilon_de( WWinSphere * spherewnd, double epsilon)
 {
     blow_up_points *separatrice;
 
-    VFResults.selected_de_point->epsilon=epsilon;
-    separatrice=VFResults.selected_de_point->blow_up;
+    spherewnd->study_->selected_de_point->epsilon=epsilon;
+    separatrice=spherewnd->study_->selected_de_point->blow_up;
     while (separatrice != nullptr) {
         draw_selected_sep(spherewnd, separatrice->first_sep_point,CBACKGROUND);
-        VFResults.deleteOrbitPoint(separatrice->first_sep_point);
+        spherewnd->study_->deleteOrbitPoint(separatrice->first_sep_point);
         separatrice->last_sep_point=nullptr;
         separatrice->first_sep_point=nullptr;
         separatrice=separatrice->next_blow_up_point;

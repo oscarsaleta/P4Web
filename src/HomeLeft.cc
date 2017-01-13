@@ -21,7 +21,6 @@
 
 #include "HomeLeft.h"
 
-#include "file_tab.h"
 #include "MyLogger.h"
 
 #include <chrono>
@@ -410,13 +409,13 @@ void HomeLeft::prepareSaveFile()
 
 void HomeLeft::onPlot()
 {
-    if ( !study_.readTables(fileUploadName_) ) {
+    if ( /*!study_.readTables(fileUploadName_)*/ fileUploadName_.empty() ) {
         errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
     } else {
-        VFResults.setupCoordinateTransformations();
+        //study_.setupCoordinateTransformations();
 
         globalLogger__.debug("HomeLeft :: sending onPlot signal");
-        onPlotSignal_.emit(fileUploadName_,study_);
+        onPlotSignal_.emit(fileUploadName_);
     }
 }
 

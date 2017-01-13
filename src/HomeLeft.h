@@ -5,7 +5,7 @@
  * @file HomeLeft.h
  * @author Oscar Saleta
  */
-#include "file_tab.h"
+//#include "file_tab.h"
 
 #include <Wt/WContainerWidget>
 #include <Wt/WSignal>
@@ -47,11 +47,9 @@ public:
     /**
      * Method that sends a signal when the plot button is pressed in order to display a plot
      */
-    Wt::Signal<std::string, WVFStudy>& onPlotSignal(); 
+    Wt::Signal<std::string>& onPlotSignal(); 
     
 private:
-    WVFStudy study_;
-
     Wt::WGroupBox *fileUploadBox_;
     Wt::WFileUpload *fileUploadWidget_;
     std::string fileUploadName_;
@@ -86,7 +84,7 @@ private:
 
     Wt::Signal<std::string> evaluatedSignal_;
     Wt::Signal<std::string> errorSignal_;
-    Wt::Signal<std::string, WVFStudy> onPlotSignal_;
+    Wt::Signal<std::string> onPlotSignal_;
 
 
 };
