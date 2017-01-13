@@ -27,6 +27,7 @@
  * @author Oscar Saleta
  */
 
+#include "file_tab.h"
 #include "win_sphere.h"
 
 #include <Wt/WContainerWidget>
@@ -111,8 +112,10 @@ public:
      * 
      * @param basename This is a filename for the Maple results file. The
      * #WWinSphere class needs this file to parse it and paint accordingly.
+     * @param study    Class #WVFStudy where information about Maple execution
+     * is stored.
      */
-    void onPlot(std::string basename);
+    void onPlot(std::string basename, WVFStudy study);
 
 private:
     Wt::WTabWidget *tabWidget_;

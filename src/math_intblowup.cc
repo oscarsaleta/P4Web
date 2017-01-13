@@ -54,14 +54,14 @@ struct orbits_points * integrate_blow_up( WWinSphere * spherewnd, //double x0, d
 
     vec_field[0]=de_sep->vector_field[0];
     vec_field[1]=de_sep->vector_field[1];
-    if( VFResults.plweights == false && (chart==CHART_V1 || chart==CHART_V2))
-        dir=VFResults.dir_vec_field*dir; 
+    if( spherewnd->study_.plweights == false && (chart==CHART_V1 || chart==CHART_V2))
+        dir=spherewnd->study_.dir_vec_field*dir; 
  
     hhi=(double)dir*step;
     y[0]=de_sep->point[0]; y[1]=de_sep->point[1];
-    for(i=1;i<=VFResults.config_intpoints;++i)
+    for(i=1;i<=spherewnd->study_.config_intpoints;++i)
     {
-        rk78(eval_blow_vec_field,y,&hhi,VFResults.config_hmi,VFResults.config_hma,VFResults.config_tolerance); 
+        rk78(eval_blow_vec_field,y,&hhi,spherewnd->study_.config_hmi,spherewnd->study_.config_hma,spherewnd->study_.config_tolerance); 
         make_transformations(de_sep->trans,
                             de_sep->x0+de_sep->a11*y[0]+de_sep->a12*y[1],
                             de_sep->y0+de_sep->a21*y[0]+de_sep->a22*y[1],point);
@@ -69,21 +69,21 @@ struct orbits_points * integrate_blow_up( WWinSphere * spherewnd, //double x0, d
         switch(chart)
         {
         case CHART_R2:
-            MATHFUNC(R2_to_sphere)(point[0],point[1],pcoord);
-            color=findSepColor2(VFResults.gcf,type,point);
+            spherewnd->study_.R2_to_sphere(point[0],point[1],pcoord);
+            color=findSepColor2(spherewnd->study_.gcf,type,point);
             break;
 
         case CHART_U1:
-            if(point[1]>=0 || !VFResults.singinf)
+            if(point[1]>=0 || !spherewnd->study_.singinf)
             {
-                MATHFUNC(U1_to_sphere)(point[0],point[1],pcoord);
+                spherewnd->study_.U1_to_sphere(point[0],point[1],pcoord);
                 if(!ok)
                 {
                     dashes=false; ok=true;
-                    if(VFResults.dir_vec_field==1)dir*=-1;
+                    if(spherewnd->study_.dir_vec_field==1)dir*=-1;
                 }
                 type=de_sep->type;
-                color=findSepColor2(VFResults.gcf_U1,type,point);   
+                color=findSepColor2(spherewnd->study_.gcf_U1,type,point);   
             }
             else
             {
@@ -91,56 +91,56 @@ struct orbits_points * integrate_blow_up( WWinSphere * spherewnd, //double x0, d
                 if(ok)
                 {
                     dashes=false; ok=false;
-                    if(VFResults.dir_vec_field==1)dir*=-1;
+                    if(spherewnd->study_.dir_vec_field==1)dir*=-1;
                 }
-                if(VFResults.dir_vec_field==1)
+                if(spherewnd->study_.dir_vec_field==1)
                     type=change_type(de_sep->type);
                 else
                     type=de_sep->type;
 
                 psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
-                color=findSepColor2(VFResults.gcf_V1,type,point);
+                color=findSepColor2(spherewnd->study_.gcf_V1,type,point);
             }
             break;
 
         case CHART_V1:
-            MATHFUNC(V1_to_sphere)(point[0],point[1],pcoord);
-            if(VFResults.plweights == false)
+            spherewnd->study_.V1_to_sphere(point[0],point[1],pcoord);
+            if(spherewnd->study_.plweights == false)
                 psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],point);
-            color=findSepColor2(VFResults.gcf_V1,type,point);
+            color=findSepColor2(spherewnd->study_.gcf_V1,type,point);
             break;
 
         case CHART_U2:
-            if(point[1]>=0 || !VFResults.singinf)
+            if(point[1]>=0 || !spherewnd->study_.singinf)
             {
-                MATHFUNC(U2_to_sphere)(point[0],point[1],pcoord);
+                spherewnd->study_.U2_to_sphere(point[0],point[1],pcoord);
                 if(!ok)
                 {
                     dashes=false; ok=true;
-                    if(VFResults.dir_vec_field==1)dir*=-1;
+                    if(spherewnd->study_.dir_vec_field==1)dir*=-1;
                 }
                 type=de_sep->type;
-                color=findSepColor2(VFResults.gcf_U2,type,point);
+                color=findSepColor2(spherewnd->study_.gcf_U2,type,point);
             }
             else
             {
                 VV2_to_psphere(point[0],point[1],pcoord);
                 if(ok){dashes=false; ok=false;
-                if(VFResults.dir_vec_field==1)dir*=-1;}
-                if(VFResults.dir_vec_field==1)
+                if(spherewnd->study_.dir_vec_field==1)dir*=-1;}
+                if(spherewnd->study_.dir_vec_field==1)
                     type=change_type(de_sep->type);
                 else
                     type=de_sep->type;
                 psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
-                color=findSepColor2(VFResults.gcf_V2,type,point);
+                color=findSepColor2(spherewnd->study_.gcf_V2,type,point);
             }
             break;
 
         case CHART_V2:
-            MATHFUNC(V2_to_sphere)(point[0],point[1],pcoord);
-            if(VFResults.plweights == false)
+            spherewnd->study_.V2_to_sphere(point[0],point[1],pcoord);
+            if(spherewnd->study_.plweights == false)
                 psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],point);
-            color=findSepColor2(VFResults.gcf_V2,type,point);
+            color=findSepColor2(spherewnd->study_.gcf_V2,type,point);
             break;
         
         default:
@@ -159,8 +159,8 @@ struct orbits_points * integrate_blow_up( WWinSphere * spherewnd, //double x0, d
         }
         last_orbit->pcoord[0]=pcoord[0]; last_orbit->pcoord[1]=pcoord[1];
         last_orbit->pcoord[2]=pcoord[2]; last_orbit->color=color;
-        last_orbit->dashes=dashes * VFResults.config_dashes;
-        last_orbit->dir=((VFResults.plweights == false) && (chart==CHART_V1 || chart==CHART_V2)) ? VFResults.dir_vec_field*dir : dir;
+        last_orbit->dashes=dashes * spherewnd->study_.config_dashes;
+        last_orbit->dir=((spherewnd->study_.plweights == false) && (chart==CHART_V1 || chart==CHART_V2)) ? spherewnd->study_.dir_vec_field*dir : dir;
         last_orbit->type=type;
         last_orbit->next_point=nullptr;
         if(last_orbit->dashes)

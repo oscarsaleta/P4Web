@@ -56,7 +56,7 @@
 
 using namespace Wt;
 
-WVFStudy VFResults;
+//WVFStudy VFResults;
 
 /*
     This file contains the code to read the information from reduce/maple.
@@ -113,7 +113,7 @@ WVFStudy::WVFStudy()
     q = 1;
     typeofstudy = TYPEOFSTUDY_ALL;
     singinf = false;
-    VFResults.dir_vec_field = 1;
+    dir_vec_field = 1;
 
     // initialize parameters
 
@@ -217,7 +217,7 @@ void WVFStudy::deleteVF()
     q = 1;
     typeofstudy = TYPEOFSTUDY_ALL;
     singinf = false;
-    VFResults.dir_vec_field = 1;
+    dir_vec_field = 1;
 
     lasterror = "";
 }
@@ -560,7 +560,7 @@ bool WVFStudy::readTables( std::string basename )
     }
     else
     {
-        if( fscanf( fp, "%d %d", &flag, &VFResults.dir_vec_field ) != 2 )
+        if( fscanf( fp, "%d %d", &flag, &dir_vec_field ) != 2 )
         {
             fprintf(stderr,"Cannot read sing-at-infinity flag and directions flag in %s_vec.tab\n",basename.c_str());
             deleteVF();
@@ -1503,7 +1503,7 @@ bool WVFStudy::readSemiElementaryPoint( FILE * fp )
         point->next_se = new semi_elementary;
         point->next_se->x0 = point->x0;
         point->next_se->y0 = 0.0;
-        if( VFResults.dir_vec_field == 1 )
+        if( dir_vec_field == 1 )
             point->next_se->type = point->type;
         else
             switch( point->type )
@@ -1619,7 +1619,7 @@ bool WVFStudy::readStrongFocusPoint( FILE * fp )
         point->x0 = last->x0;
         point->y0 = 0.0;
         point->chart = (( point->chart == CHART_U1 ) ? CHART_V1 : CHART_V2 );
-        point->stable = last->stable * ((VFResults.dir_vec_field == -1) ? -1 : 1);
+        point->stable = last->stable * ((dir_vec_field == -1) ? -1 : 1);
     }  
 
     return true;
@@ -1700,7 +1700,7 @@ bool WVFStudy::readWeakFocusPoint( FILE * fp )
         point->next_wf->x0 = point->x0;
         point->next_wf->y0 = 0.0;
 
-        if( VFResults.dir_vec_field == 1 )
+        if( dir_vec_field == 1 )
             point->next_wf->type = point->type;
         else
             switch( point->type )
@@ -1871,7 +1871,7 @@ bool WVFStudy::readNodePoint( FILE * fp )
         point->x0 = last->x0;
         point->y0 = 0.0;
         point->chart = (last->chart == CHART_U1) ? CHART_V1 : CHART_V2;
-        point->stable = last->stable * ( VFResults.dir_vec_field == -1 ) ? -1 : 1;
+        point->stable = last->stable * ( dir_vec_field == -1 ) ? -1 : 1;
     }
 
     return true;
@@ -2122,7 +2122,7 @@ void WVFStudy::dump( WString basename, WString info )
             (float)double_q_minus_1, (float)double_q_minus_p ))
     DUMP(( "  Range x: [%g,%g] Range y: [%g,%g]", (float)xmin, (float)xmax, (float)ymin, (float)ymax ))
     DUMP(( "  Line at infinity singular? %d", singinf ))
-    DUMP(( "  Direction of vector field: %d", VFResults.dir_vec_field ))
+    DUMP(( "  Direction of vector field: %d", dir_vec_field ))
     DUMP(( " " ))
     DUMP(( "Vector Fields" ))
     DUMP(( "-------------" ))

@@ -54,6 +54,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluat
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box"));
 
+    // set UI and connect signals
     setupUI();
     setupConnectors();
 
@@ -409,13 +410,13 @@ void HomeLeft::prepareSaveFile()
 
 void HomeLeft::onPlot()
 {
-    if ( !VFResults.readTables(fileUploadName_) ) {
+    if ( !study_.readTables(fileUploadName_) ) {
         errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
     } else {
         VFResults.setupCoordinateTransformations();
 
         globalLogger__.debug("HomeLeft :: sending onPlot signal");
-        onPlotSignal_.emit(fileUploadName_);
+        onPlotSignal_.emit(fileUploadName_,study_);
     }
 }
 

@@ -43,7 +43,9 @@
 #ifndef MATH_NUMERICS_H
 #define MATH_NUMERICS_H
 
-
+static void bisection( double (* f)(double), double * x, double e );
+static double regula_falsi( double (*f)(double), double * x, double e );
+double newton( double (*f)(double), double (*df)(double), double x, double e );
 void rk78( void (*deriv)( double *, double * ), double y[2], double * hh,
             double hmi, double hma, double e1);
 double find_root( double (*f)(double), double (*df)(double), double * value );

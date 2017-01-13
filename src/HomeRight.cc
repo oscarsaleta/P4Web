@@ -243,8 +243,15 @@ void HomeRight::clearResults()
     globalLogger__.debug("HomeRight :: cleared results");
 }
 
-void HomeRight::onPlot(std::string basename)
+void HomeRight::onPlot(std::string basename, WFStudy study)
 {
+    if (sphere_ != nullptr)
+        delete sphere_;
+    sphere_ = new WWinSphere(plotContainer_,550,550,study);
+    sphere_->setId("sphere_");
+    sphere_->setMargin(5,Top);
+    plotContainer_->addWidget(sphere_);
+
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
     globalLogger__.debug("HomeRight :: reacted to onPlot signal");

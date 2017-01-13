@@ -323,11 +323,11 @@ struct weak_focus
 #define SETYPE_SADDLENODE_UNSTABSEP     1
 #define SETYPE_SADDLENODE_UNSTABSEP2    2
 
-#define OT_STABLE           STYPE_STABLE
-#define OT_UNSTABLE         STYPE_UNSTABLE
-#define OT_CENT_STABLE      STYPE_CENSTABLE
-#define OT_CENT_UNSTABLE    STYPE_CENUNSTABLE
-#define OT_ORBIT            STYPE_ORBIT
+#define OT_STABLE           STYPE_STABLE        ///< orbit type stable
+#define OT_UNSTABLE         STYPE_UNSTABLE      ///< orbit type unstable
+#define OT_CENT_STABLE      STYPE_CENSTABLE     ///< orbit type center stable
+#define OT_CENT_UNSTABLE    STYPE_CENUNSTABLE   ///< orbit type center unstable
+#define OT_ORBIT            STYPE_ORBIT         ///< orbit type orbit
 
 /**
  * Enum for the possible types of views
@@ -452,49 +452,50 @@ public:
      * Current view coordinates to sphere coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current view coordinates). The functions are declared in
-     * math_charts.h.
+     * on the current view coordinates). The functions are implemented in
+     * math_charts.cc.
      */
     void (*viewcoord_to_sphere)( double, double, double * );
     /**
      * Sphere coordinates to current view coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current view coordinates). The functions are declared in
-     * math_charts.h.
+     * on the current view coordinates). The functions are implemented in
+     * math_charts.cc.
      */
-    bool (*sphere_to_viewcoordpair)( double *, double *, double *, double *, double *, double * );
+    bool (*sphere_to_viewcoordpair)( double *, double *, double *, double *,
+        double *, double * );
 
     /**
      * Finite coordinates to current view coordinates
      * 
      * This is a pointer to a function (which function will depend
-     * on the current view coordinates). The functions are declared in
-     * math_charts.h.
+     * on the current view coordinates). The functions are implemented in
+     * math_charts.cc.
      */
     void (*finite_to_viewcoord)( double, double, double * );
     /**
      * Sphere coordinates to current view coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current view coordinates). The functions are declared in
-     * math_charts.h.
+     * on the current view coordinates). The functions are implemented in
+     * math_charts.cc.
      */
     void (*sphere_to_viewcoord)( double, double, double, double * );
     /**
      * Check whether current view coordinates are valid
      *
      * This is a pointer to a function (which function will depend
-     * on the current view coordinates). The functions are declared in
-     * math_charts.h.
+     * on the current view coordinates). The functions are implemented in
+     * math_charts.cc.
      */
     bool (*is_valid_viewcoord)( double, double, double * );
     /**
      * Integrate separatrices in current sphere
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_separatrice.h.
+     * on the current sphere used). The functions are implemented in
+     * math_separatrice.cc.
      */
     void (*integrate_sphere_sep)( double, double, double, double *,
                                 double *, int *, int *, int *, int *, double, double );
@@ -502,64 +503,64 @@ public:
      * U1 chart coordinates to sphere coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*U1_to_sphere)( double, double, double * );
     /**
      * U2 chart coordinates to sphere coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*U2_to_sphere)( double, double, double * );
     /**
      * V1 chart coordinates to sphere coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*V1_to_sphere)( double, double, double * );
     /**
      * V2 chart coordinates to sphere coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*V2_to_sphere)( double, double, double * );
     /**
      * Sphere coordinates to U1 chart coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*sphere_to_U1)( double, double, double, double * );
     /**
      * Sphere coordinates to U2 chart coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*sphere_to_U2)( double, double, double, double * );
     /**
      * Sphere coordinates to V1 chart coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*sphere_to_V1)( double, double, double, double * );
     /**
      * Sphere coordinates to V2 chart coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*sphere_to_V2)( double, double, double, double * );
 
@@ -567,24 +568,24 @@ public:
      * Sphere coordinates to R2 coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*sphere_to_R2)( double, double, double, double * );
     /**
      * R2 coordinates to sphere coordinates
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_charts.h.
+     * on the current sphere used). The functions are implemented in
+     * math_charts.cc.
      */
     void (*R2_to_sphere)( double, double, double * );
     /**
      * Integrate an orbit in the current sphere
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_orbits.h.
+     * on the current sphere used). The functions are implemented in
+     * math_orbits.cc.
      */
     void (*integrate_sphere_orbit)( double, double, double, double *,
                                 double *, int *, int *, double, double );
@@ -592,23 +593,23 @@ public:
      * Evaluate a limit cycle in the current sphere
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_p4.h.
+     * on the current sphere used). The functions are implemented in
+     * math_p4.cc.
      */
     double (*eval_lc)( double *, double, double, double );
     /**
      * Less method for current sphere
      *
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
-     * math_p4.h.
+     * on the current sphere used). The functions are implemented in
+     * math_p4.cc.
      */
     bool (*less2)( double *, double * );
     /**
      * Change direction in current sphere
      * 
      * This is a pointer to a function (which function will depend
-     * on the current sphere used). The functions are declared in
+     * on the current sphere used). The functions are implemented in
      * math_changedir.h.
      */
     int (*change_dir)( double * );
@@ -617,11 +618,11 @@ public:
     /**
      * Constructor method
      */
-    WVFStudy();                 // constructor
+    WVFStudy();
     /**
      * Destructor method
      */
-    ~WVFStudy();                // destructor
+    ~WVFStudy();
 
 public:
 
@@ -894,16 +895,166 @@ public:
      *
      * Depending on which view coordinates we want to use,
      * this function links the pointers to the actual functions that we
-     * will need (see @f math_charts.h, @f math_p4.h, @f math_changedir.h,
-     * @f math_orbits.h).
+     * will need (see @f math_charts.cc, @f math_p4.cc, @f math_changedir.cc,
+     * @f math_orbits.cc).
      */
     void setupCoordinateTransformations( void );    // see math_p4.cpp
 
     //void dump( Wt::WString basename, Wt::WString info="" );
 
+
 private:
-    void dumpSeparatrices( Wt::WTextArea * m, sep * separ, int margin );
-    void dumpSingularities( Wt::WTextArea * m, genericsingularity * p, const char * type, bool longversion );
+    //void dumpSeparatrices( Wt::WTextArea * m, sep * separ, int margin );
+    //void dumpSingularities( Wt::WTextArea * m, genericsingularity * p, const char * type, bool longversion );
+    // -----------------------------------------------------------------------
+    //                  IMPLEMENTATION OF THE POINCARE CHARTS
+    // -----------------------------------------------------------------------
+    void R2_to_psphere( double x, double y, double * pcoord );
+    void psphere_to_R2( double X, double Y, double Z, double * rcoord );
+    void psphere_ucircle( double X, double Y, double Z, double * ucoord);
+    void ucircle_psphere( double u, double v, double * pcoord );
+    void finite_ucircle( double x, double y, double * ucoord);
+    void psphere_to_U1( double X, double Y, double Z, double * rcoord);
+    void psphere_to_U2( double X, double Y, double Z, double * rcoord);
+    void psphere_to_V1( double X, double Y, double Z, double * rcoord);
+    void psphere_to_V2( double X, double Y, double Z, double * rcoord);
+    void U1_to_psphere( double z1, double z2, double * pcoord);
+    void V1_to_psphere( double z1, double z2, double * pcoord);
+    void U2_to_psphere( double z1, double z2, double * pcoord);
+    void V2_to_psphere( double z1, double z2, double * pcoord);
+    void VV1_to_psphere( double z1, double z2, double * pcoord);
+    void psphere_to_VV1( double X, double Y, double Z, double * rcoord );
+    void VV2_to_psphere( double z1, double z2, double * pcoord);
+    void psphere_to_VV2( double X, double Y, double Z, double * rcoord );
+    void UU1_to_psphere( double z1, double z2, double * pcoord);
+    void psphere_to_UU1( double X, double Y, double Z, double * rcoord );
+    void UU2_to_psphere( double z1, double z2, double * pcoord);
+    void psphere_to_UU2( double X, double Y, double Z, double * rcoord );
+    bool isvalid_psphereviewcoord( double u, double v, double * pcoord );
+    bool isvalid_U1viewcoord( double u, double v, double * pcoord );
+    bool isvalid_U2viewcoord( double u, double v, double * pcoord );
+    bool isvalid_V1viewcoord( double u, double v, double * pcoord );
+    bool isvalid_V2viewcoord( double u, double v, double * pcoord );
+    bool isvalid_R2viewcoord( double u, double v, double * pcoord );
+    void psphere_to_xyrevU1( double X, double Y, double Z, double * rcoord);
+    void psphere_to_xyrevV1( double X, double Y, double Z, double * rcoord);
+    void xyrevU1_to_psphere( double z1, double z2, double * pcoord);
+    void xyrevV1_to_psphere( double z1, double z2, double * pcoord);
+    // -----------------------------------------------------------------------
+    //              IMPLEMENTATION OF THE POINCARE-LYPANOV CHARTS
+    // -----------------------------------------------------------------------
+    bool isvalid_plsphereviewcoord( double u, double v, double * pcoord );
+    // -----------------------------------------------------------------------
+    //                          ANNULUS_PLSPHERE
+    // -----------------------------------------------------------------------
+    void annulus_plsphere( double x, double y, double * p);
+    // -----------------------------------------------------------------------
+    //                          PLSPHERE_ANNULUS
+    // -----------------------------------------------------------------------
+    void plsphere_annulus( double x, double y, double z, double * u );
+    // -----------------------------------------------------------------------
+    //                          R2_TO_PLSPHERE
+    // -----------------------------------------------------------------------
+    void R2_to_plsphere( double x, double y, double * pcoord);
+    // -----------------------------------------------------------------------
+    //                          plsphere_to_R2
+    // -----------------------------------------------------------------------
+    void plsphere_to_R2( double ch, double u, double v, double * c);
+    // -----------------------------------------------------------------------
+    //                          FINITE_ANNULUS
+    // -----------------------------------------------------------------------
+    void finite_annulus( double x, double y, double * u );
+    void cylinder_to_plsphere( double r, double theta, double * pcoord);
+    void U1_to_plsphere( double x0, double y0, double * pcoord);
+    void xyrevU1_to_plsphere( double z1, double z2, double * pcoord);
+    void V1_to_plsphere( double x0, double y0, double * pcoord);
+    void xyrevV1_to_plsphere( double z1, double z2, double * pcoord);
+    void U2_to_plsphere( double x0, double y0, double * pcoord);
+    void V2_to_plsphere( double x0, double y0, double * pcoord);
+    void identitytrf_R2(double x,double y, double * ucoord );
+    double floatinfinity( void );
+    void plsphere_to_U1( double ch, double x, double y, double * rcoord );
+    void plsphere_to_xyrevU1( double ch, double x, double y, double * rcoord);
+    void plsphere_to_U2( double ch, double x, double y, double * rcoord );
+    void plsphere_to_V1( double ch, double x, double y, double * rcoord );
+    void plsphere_to_xyrevV1( double ch, double x, double y, double * rcoord);
+    void plsphere_to_V2( double ch, double x, double y, double * rcoord );
+    // -----------------------------------------------------------------------
+    //                      EVALUATION OF VECTOR FIELDS
+    // -----------------------------------------------------------------------
+    void eval_r_vec_field( double * y, double * f );
+    void eval_U1_vec_field( double * y, double * f );
+    void eval_U2_vec_field( double * y, double * f );
+    void eval_V1_vec_field( double * y, double * f );
+    void eval_V2_vec_field( double * y, double * f );
+    void eval_vec_field_cyl( double * y, double * f );
+    void default_finite_to_viewcoord( double x, double y, double * ucoord);
+    bool default_sphere_to_viewcoordpair( double * p, double * q,
+                                          double * u1, double * u2, double * u3, double * u4 );
+    bool psphere_to_viewcoordpair_discontinuousx( double * p, double * q,
+                                                  double * u1, double * u2, double * u3, double * u4 );
+    bool psphere_to_viewcoordpair_discontinuousy( double * p, double * q,
+                                                  double * u1, double * u2, double * u3, double * u4 );
+    bool plsphere_to_viewcoordpair_discontinuousx( double * p, double * q,
+                                                   double * u1, double * u2, double * u3, double * u4 );
+    bool plsphere_to_viewcoordpair_discontinuousy( double * p, double * q,
+                                                   double * u1, double * u2, double * u3, double * u4 );
+    // -----------------------------------------------------------------------
+    //                      PREVIOUSLY STATIC CHARTS FUNCTIONS
+    // -----------------------------------------------------------------------
+    //void cylinder_to_U1( double r, double theta, double * c);
+    //void cylinder_to_U2( double r, double theta, double * c );
+    //void cylinder_to_V1( double r, double theta, double * c);
+    //void cylinder_to_V2( double r, double theta, double * c);
+    void U1_to_cylinder( double u, double s, double * c);
+    void U2_to_cylinder( double u, double s, double * c);
+    void V1_to_cylinder( double u, double s, double * c);
+    void V2_to_cylinder( double u, double s, double * c);
+    double func_U1( double x );
+    double dfunc_U1( double x);
+    double func_U1_s0( double theta);
+    double dfunc_U1_s0( double theta);
+    void U1_to_cylinder( double u, double s, double * c);
+    // -----------------------------------------------------------------------
+    //                      NUMERIC FUNCTIONS
+    // -----------------------------------------------------------------------
+    void bisection( double (* f)(double), double * x, double e );
+    double regula_falsi( double (*f)(double), double * x, double e );
+    double newton( double (*f)(double), double (*df)(double), double x, double e );
+    void rk78( void (*deriv)( double *, double * ), double y[2], double * hh,
+                double hmi, double hma, double e1);
+    double find_root( double (*f)(double), double (*df)(double), double * value );
+    // -----------------------------------------------------------------------
+    //                      SEPARATRICE INTEGRATION FUNCTIONS
+    // -----------------------------------------------------------------------
+    void integrate_poincare_sep( double p0, double p1, double p2, double * pcoord,
+                            double * hhi, int * type, int * color, int * dashes, int * dir,
+                            double h_min, double h_max);
+    void integrate_lyapunov_sep( double p0, double p1, double p2, double * pcoord,
+                            double * hhi, int * type, int * color, int * dashes,
+                            int * dir, double h_min, double h_max);
+    // -----------------------------------------------------------------------
+    //                      ORBIT INTEGRATION FUNCTIONS
+    // -----------------------------------------------------------------------
+    void integrate_poincare_orbit( double p0, double p1, double p2, double * pcoord,
+                                double * hhi, int * dashes, int * dir,
+                                double h_min, double h_max );
+    void integrate_lyapunov_orbit( double p0, double p1, double p2, double * pcoord,
+                                double * hhi, int * dashes, int * dir,
+                                double h_min, double h_max );
+    // -----------------------------------------------------------------------
+    //                      math_p4.cc FUNCTIONS
+    // -----------------------------------------------------------------------
+    double eval_lc_poincare( double * pp, double, double, double );
+    double eval_lc_lyapunov( double * pp, double, double, double );
+    void set_current_step( double );
+    bool less_poincare( double *, double * );
+    bool less_lyapunov( double *, double * );
+    // -----------------------------------------------------------------------
+    //                      CHANGE DIRECTION OF VECTOR FIELD
+    // -----------------------------------------------------------------------
+    int change_dir_poincare( double * p );
+    int change_dir_lyapunov( double * p );
 
 };
 
@@ -918,7 +1069,7 @@ private:
 /**
  * Global WVFStudy object to be used by the program
  */
-extern WVFStudy VFResults;  // (VFResults.p,VFResults.q) are lyapunov weights
+//extern WVFStudy VFResults;  // (VFResults.p,VFResults.q) are lyapunov weights
 
 #define LINESTYLE_DASHES    1
 #define LINESTYLE_POINTS    0

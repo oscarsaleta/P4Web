@@ -64,12 +64,13 @@
 class WWinSphere : public Wt::WPaintedWidget
 {
     static int numSpheres;
-    static WWinSphere **SphereList; //this could be implemented as a c++ vector
+    static WWinSphere **SphereList;
 
 public:
-    WWinSphere( Wt::WContainerWidget *parent=0,/* QStatusBar, bool, double, double, double, double*/
-                int width=255, int height=255 );
+    WWinSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, WVFStudy *study=0 );
     ~WWinSphere();
+
+    WVFStudy study_;            ///< WVFStudy class where results from Maple are stored
     
     //void paintSphere();
 

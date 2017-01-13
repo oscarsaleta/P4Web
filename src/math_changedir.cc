@@ -24,11 +24,10 @@
    is possible that we have to change the direction */
 
 
-#include "math_changedir.h"
+#include "file_tab.h"
 
 #include "custom.h"
 #include "math_p4.h"
-#include "math_charts.h"
 #include "math_polynom.h"
 
 #include <cmath>
@@ -38,7 +37,7 @@
 //                          CHANGE_DIR_POINCARE
 // -----------------------------------------------------------------------
 
-int change_dir_poincare( double p[3] )
+int WVFStudy::change_dir_poincare( double p[3] )
 {
     double y[2];
     double theta;
@@ -48,7 +47,7 @@ int change_dir_poincare( double p[3] )
         // finite point
 
         psphere_to_R2( p[0], p[1], p[2], y );
-        if( eval_term2( VFResults.gcf, y) >= 0 )
+        if( eval_term2( gcf, y) >= 0 )
             return 0;
         else
             return 1;
@@ -61,7 +60,7 @@ int change_dir_poincare( double p[3] )
         if( p[0] > 0 )
         {
             psphere_to_U1( p[0], p[1], p[2], y );
-            if( eval_term2( VFResults.gcf_U1, y ) >= 0 )
+            if( eval_term2( gcf_U1, y ) >= 0 )
                 return 0;
             else
                 return 1;
@@ -69,7 +68,7 @@ int change_dir_poincare( double p[3] )
         else
         {
             psphere_to_V1( p[0], p[1], p[2], y );
-            if( eval_term2( VFResults.gcf_V1, y ) >= 0 )
+            if( eval_term2( gcf_V1, y ) >= 0 )
                 return 0;
             else
                 return 1;
@@ -80,7 +79,7 @@ int change_dir_poincare( double p[3] )
         if( p[1] > 0 )
         {
             psphere_to_U2( p[0], p[1], p[2], y );
-            if( eval_term2( VFResults.gcf_U2, y ) >= 0 )
+            if( eval_term2( gcf_U2, y ) >= 0 )
                 return 0;
             else
                 return 1;
@@ -88,7 +87,7 @@ int change_dir_poincare( double p[3] )
         else
         {
             psphere_to_V2( p[0], p[1], p[2], y );
-            if( eval_term2( VFResults.gcf_V2, y ) >= 0 )
+            if( eval_term2( gcf_V2, y ) >= 0 )
                 return 0;
             else
                 return 1;
@@ -100,7 +99,7 @@ int change_dir_poincare( double p[3] )
 //                          CHANGE_DIR_LYAPUNOV
 // -----------------------------------------------------------------------
 
-int change_dir_lyapunov( double p[3] )
+int WVFStudy::change_dir_lyapunov( double p[3] )
 {
     double y[2];
 
@@ -108,7 +107,7 @@ int change_dir_lyapunov( double p[3] )
     {
         y[0] = p[1];
         y[1] = p[2];
-        if( eval_term2( VFResults.gcf, y ) >= 0 )
+        if( eval_term2( gcf, y ) >= 0 )
             return 0;
         else
             return 1;
@@ -117,7 +116,7 @@ int change_dir_lyapunov( double p[3] )
     {
         y[0] = p[1];
         y[1] = p[2];
-        if( eval_term3( VFResults.gcf_C, y ) >= 0 )
+        if( eval_term3( gcf_C, y ) >= 0 )
             return 0;
         else
             return 1;

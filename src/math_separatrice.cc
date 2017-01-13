@@ -40,7 +40,7 @@ void (*cont_plot_sep)( WWinSphere * ) = nullptr;
 void (*plot_next_sep)( WWinSphere * ) = nullptr;
 void (*select_next_sep)( WWinSphere * ) = nullptr;
 
-int findSepColor2(term2 *f,int type,double y[2])
+int findSepColor2( term2 *f,int type,double y[2] )
 {
     int color;
 
@@ -69,7 +69,7 @@ int findSepColor2(term2 *f,int type,double y[2])
     return(color);
 }
 
-int findSepColor3(term3 *f,int type,double y[2])
+int findSepColor3( term3 *f,int type,double y[2] )
 {
     int color;
 
@@ -99,89 +99,89 @@ int findSepColor3(term3 *f,int type,double y[2])
 }
 
 /*integrate poincare sphere case p=q=1 */
-void integrate_poincare_sep( double p0, double p1, double p2, double *pcoord,
+void WVFStudy::integrate_poincare_sep( double p0, double p1, double p2, double *pcoord,
                             double *hhi, int *type, int *color, int *dashes, int *dir,
-                            double h_min, double h_max)
+                            double h_min, double h_max )
 {
     double y[2],theta;
 
     *dashes=true; *dir=1;
     if(pcoord[2]>ZCOORD) {
         psphere_to_R2(p0,p1,p2,y);
-        rk78(eval_r_vec_field,y,hhi,h_min,h_max,VFResults.config_tolerance);
+        rk78(eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
         R2_to_psphere(y[0],y[1],pcoord);
-        *color = findSepColor2(VFResults.gcf,*type,y);
+        *color = findSepColor2(gcf,*type,y);
     } else {
         theta = atan2(fabs(p1),fabs(p0)); 
         if((theta<PI_DIV4) && (theta>-PI_DIV4)) {
             if(p0>0) {
                 psphere_to_U1(p0,p1,p2,y);
-                rk78(eval_U1_vec_field,y,hhi,h_min,h_max,VFResults.config_tolerance);
-                if(y[1]>=0 || !VFResults.singinf) {
+                rk78(eval_U1_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                if(y[1]>=0 || !singinf) {
                     U1_to_psphere(y[0],y[1],pcoord);
-                    *color=findSepColor2(VFResults.gcf_U1,*type,y);
+                    *color=findSepColor2(gcf_U1,*type,y);
                 } else {
                     VV1_to_psphere(y[0],y[1],pcoord);
-                    if(VFResults.dir_vec_field==1) {
+                    if(dir_vec_field==1) {
                         *dir=-1;
                         *hhi=-(*hhi);
                         *type=change_type(*type);
                     }
                     psphere_to_V1(pcoord[0],pcoord[1],pcoord[2],y);
-                    *color=findSepColor2(VFResults.gcf_V1,*type,y);
+                    *color=findSepColor2(gcf_V1,*type,y);
                     *dashes=false;
                 }  
             } else {
                 psphere_to_V1(p0,p1,p2,y);
-                rk78(eval_V1_vec_field,y,hhi,h_min,h_max,VFResults.config_tolerance);
-                if(y[1]>=0 || !VFResults.singinf) {
+                rk78(eval_V1_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                if(y[1]>=0 || !singinf) {
                     V1_to_psphere(y[0],y[1],pcoord); 
-                    *color=findSepColor2(VFResults.gcf_V1,*type,y);
+                    *color=findSepColor2(gcf_V1,*type,y);
                 } else {
                     UU1_to_psphere(y[0],y[1],pcoord); 
-                    if(VFResults.dir_vec_field==1) {
+                    if(dir_vec_field==1) {
                         *dir=-1;
                         *hhi=-(*hhi);
                         *type=change_type(*type);
                     }
                     psphere_to_U1(pcoord[0],pcoord[1],pcoord[2],y);
-                    *color=findSepColor2(VFResults.gcf_U1,*type,y);
+                    *color=findSepColor2(gcf_U1,*type,y);
                     *dashes=false;
                 }        
             }
         } else {
             if(p1>0) {
                 psphere_to_U2(p0,p1,p2,y);
-                rk78(eval_U2_vec_field,y,hhi,h_min,h_max,VFResults.config_tolerance);
-                if(y[1]>=0 || !VFResults.singinf) {
+                rk78(eval_U2_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                if(y[1]>=0 || !singinf) {
                     U2_to_psphere(y[0],y[1],pcoord); 
-                    *color=findSepColor2(VFResults.gcf_U2,*type,y);
+                    *color=findSepColor2(gcf_U2,*type,y);
                 } else {
                     VV2_to_psphere(y[0],y[1],pcoord);
-                    if(VFResults.dir_vec_field==1) {
+                    if(dir_vec_field==1) {
                         *dir=-1;
                         *hhi=-(*hhi);
                         *type=change_type(*type);
                     }
                     psphere_to_V2(pcoord[0],pcoord[1],pcoord[2],y);
-                    *color=findSepColor2(VFResults.gcf_V2,*type,y);
+                    *color=findSepColor2(gcf_V2,*type,y);
                     *dashes=false;
                 } 
             } else {
                 psphere_to_V2(p0,p1,p2,y);
-                rk78(eval_V2_vec_field,y,hhi,h_min,h_max,VFResults.config_tolerance);
-                if(y[1]>=0 || !VFResults.singinf) {
+                rk78(eval_V2_vec_field,y,hhi,h_min,h_max,config_tolerance);
+                if(y[1]>=0 || !singinf) {
                     V2_to_psphere(y[0],y[1],pcoord);         
-                    *color=findSepColor2(VFResults.gcf_V2,*type,y);
+                    *color=findSepColor2(gcf_V2,*type,y);
                 } else {
                     UU2_to_psphere(y[0],y[1],pcoord); 
-                    if(VFResults.dir_vec_field==1) {
+                    if(dir_vec_field==1) {
                         *dir=-1;
                         *hhi=-(*hhi);
                         *type=change_type(*type);
                     }
                     psphere_to_U2(pcoord[0],pcoord[1],pcoord[2],y);
-                    *color=findSepColor2(VFResults.gcf_U2,*type,y);
+                    *color=findSepColor2(gcf_U2,*type,y);
                     *dashes=false; 
                 }      
             }
@@ -190,24 +190,24 @@ void integrate_poincare_sep( double p0, double p1, double p2, double *pcoord,
 }
 
 /* integrate on the Poincare-Lyapunov sphere */
-void integrate_lyapunov_sep( double p0, double p1, double p2, double * pcoord,
+void WVFStudy::integrate_lyapunov_sep( double p0, double p1, double p2, double * pcoord,
                             double * hhi, int * type, int * color, int * dashes,
-                            int * dir, double h_min, double h_max)
+                            int * dir, double h_min, double h_max )
 {
     double y[2];
 
     *dashes=true; *dir=1;
     if( p0 == 0 ) {
         y[0]=p1;y[1]=p2;
-        rk78(eval_r_vec_field,y,hhi,h_min,h_max,VFResults.config_tolerance);
+        rk78(eval_r_vec_field,y,hhi,h_min,h_max,config_tolerance);
         R2_to_plsphere(y[0],y[1],pcoord);
-        *color=findSepColor2(VFResults.gcf,*type,y);
+        *color=findSepColor2(gcf,*type,y);
     } else {
         y[0]=p1; y[1]=p2;
-        rk78(eval_vec_field_cyl,y,hhi,h_min,h_max,VFResults.config_tolerance); 
+        rk78(eval_vec_field_cyl,y,hhi,h_min,h_max,config_tolerance); 
         if(y[1]>=TWOPI)y[1]-=TWOPI;
         cylinder_to_plsphere(y[0],y[1],pcoord);
-        *color=findSepColor3(VFResults.gcf_C,*type,y);
+        *color=findSepColor3(gcf_C,*type,y);
     } 
 }
 
@@ -693,21 +693,21 @@ void start_plot_saddle_sep( WWinSphere * spherewnd )
     double p[3];
     orbits_points *points;
 
-    draw_sep(spherewnd,VFResults.selected_sep->first_sep_point);
-    if(VFResults.selected_sep->last_sep_point) {
-        copy_x_into_y(VFResults.selected_sep->last_sep_point->pcoord,p);
-        VFResults.selected_sep->last_sep_point->next_point =
-            integrate_sep(spherewnd, p, VFResults.config_currentstep, VFResults.selected_sep->last_sep_point->dir, 
-                    VFResults.selected_sep->last_sep_point->type,VFResults.config_intpoints,&points);
-        VFResults.selected_sep->last_sep_point = points;
+    draw_sep(spherewnd,spherewnd->study_.selected_sep->first_sep_point);
+    if(spherewnd->study_.selected_sep->last_sep_point) {
+        copy_x_into_y(spherewnd->study_.selected_sep->last_sep_point->pcoord,p);
+        spherewnd->study_.selected_sep->last_sep_point->next_point =
+            integrate_sep(spherewnd, p, spherewnd->study_.config_currentstep, spherewnd->study_.selected_sep->last_sep_point->dir, 
+                    spherewnd->study_.selected_sep->last_sep_point->type,spherewnd->study_.config_intpoints,&points);
+        spherewnd->study_.selected_sep->last_sep_point = points;
     } else {
-        VFResults.selected_sep->first_sep_point =
-            plot_separatrice(spherewnd, VFResults.selected_saddle_point->x0, VFResults.selected_saddle_point->y0,
-                    VFResults.selected_saddle_point->a11, VFResults.selected_saddle_point->a12,
-                    VFResults.selected_saddle_point->a21,VFResults.selected_saddle_point->a22,
-                    VFResults.selected_saddle_point->epsilon, VFResults.selected_sep,&points,
-                    VFResults.selected_saddle_point->chart);
-        VFResults.selected_sep->last_sep_point = points;
+        spherewnd->study_.selected_sep->first_sep_point =
+            plot_separatrice(spherewnd, spherewnd->study_.selected_saddle_point->x0, spherewnd->study_.selected_saddle_point->y0,
+                    spherewnd->study_.selected_saddle_point->a11, spherewnd->study_.selected_saddle_point->a12,
+                    spherewnd->study_.selected_saddle_point->a21,spherewnd->study_.selected_saddle_point->a22,
+                    spherewnd->study_.selected_saddle_point->epsilon, spherewnd->study_.selected_sep,&points,
+                    spherewnd->study_.selected_saddle_point->chart);
+        spherewnd->study_.selected_sep->last_sep_point = points;
     }
 }
 

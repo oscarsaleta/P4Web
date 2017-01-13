@@ -43,6 +43,7 @@
 #include "win_sphere.h"
 
 #include "custom.h"
+#include "file_tab.h"
 #include "math_p4.h"
 //#include "math_findpoint.h"
 //#include "math_limitcycles.h"
@@ -75,8 +76,8 @@ WWinSphere * * WWinSphere::SphereList = nullptr;
 
 // parameters _x1,... are irrelevant if isZoom is false
 
-WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height )
-    : width_(width), height_(height)
+WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, WVFStudy study)
+    : width_(width), height_(height), study_(study)
 {
     ReverseYaxis = false;
     //PainterCache = nullptr;
@@ -707,23 +708,23 @@ bool WWinSphere::getChartPos( int chart, double x0, double y0, double * pos )
     switch( chart )
     {
     case CHART_R2:
-        MATHFUNC(finite_to_viewcoord)( x0, y0, pos );
+        study_.finite_to_viewcoord( x0, y0, pos );
         break;
     case CHART_U1:
-        MATHFUNC(U1_to_sphere)( x0, 0, pcoord );
-        MATHFUNC(sphere_to_viewcoord)( pcoord[0], pcoord[1], pcoord[2], pos );
+        study_.U1_to_sphere( x0, 0, pcoord );
+        study_.sphere_to_viewcoord( pcoord[0], pcoord[1], pcoord[2], pos );
         break;
     case CHART_U2:
-        MATHFUNC(U2_to_sphere)( x0, 0, pcoord );
-        MATHFUNC(sphere_to_viewcoord)( pcoord[0], pcoord[1], pcoord[2], pos );
+        study_.U2_to_sphere( x0, 0, pcoord );
+        study_.sphere_to_viewcoord( pcoord[0], pcoord[1], pcoord[2], pos );
         break;
     case CHART_V1:
-        MATHFUNC(V1_to_sphere)( x0, 0, pcoord );
-        MATHFUNC(sphere_to_viewcoord)( pcoord[0], pcoord[1], pcoord[2], pos );
+        study_.V1_to_sphere( x0, 0, pcoord );
+        study_.sphere_to_viewcoord( pcoord[0], pcoord[1], pcoord[2], pos );
         break;
     case CHART_V2:
-        MATHFUNC(V2_to_sphere)( x0, 0, pcoord );
-        MATHFUNC(sphere_to_viewcoord)( pcoord[0], pcoord[1], pcoord[2], pos );
+        study_.V2_to_sphere( x0, 0, pcoord );
+        study_.sphere_to_viewcoord( pcoord[0], pcoord[1], pcoord[2], pos );
         break;
     }
 

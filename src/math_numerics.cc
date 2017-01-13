@@ -9,7 +9,7 @@
 //
 // -----------------------------------------------------------------------
 
-#include "math_numerics.h"
+#include "file_tab.h"
 
 #include "math_p4.h"
 
@@ -26,7 +26,7 @@ static double PRECISION2 = 1e-8;
 //
 // dx is a pointer to an array of two elements
 
-static void bisection( double (* f)(double), double * x, double e )
+void WVFStudy::bisection( double (* f)(double), double * x, double e )
 {
 	double fx0, fmid, xmid;
 
@@ -60,7 +60,7 @@ static void bisection( double (* f)(double), double * x, double e )
 //
 // x is an array of two elements
 
-static double regula_falsi( double (*f)(double), double * x, double e )
+double WVFStudy::regula_falsi( double (*f)(double), double * x, double e )
 {
 	double x2;
 	double y;
@@ -89,7 +89,7 @@ static double regula_falsi( double (*f)(double), double * x, double e )
 //								NEWTON
 // -----------------------------------------------------------------------
 
-double newton( double (*f)(double), double (*df)(double), double x, double e )
+double WVFStudy::newton( double (*f)(double), double (*df)(double), double x, double e )
 {
 	double dx;
 
@@ -113,7 +113,7 @@ double newton( double (*f)(double), double (*df)(double), double x, double e )
 //
 // value is a pointer to an array of two elements
 
-double find_root( double (*f)(double), double (*df)(double), double * value )
+double WVFStudy::find_root( double (*f)(double), double (*df)(double), double * value )
 {
 	double y;
 
@@ -128,8 +128,8 @@ double find_root( double (*f)(double), double (*df)(double), double * value )
 //								RK78
 // -----------------------------------------------------------------------
 
-void rk78( void (*deriv)( double *, double * ), double y[2], double * hh,
-			double hmi, double hma, double e1)
+void WVFStudy::rk78( void (*deriv)( double *, double * ), double y[2],
+	double * hh, double hmi, double hma, double e1)
 {
 	double beta[79],c[11],d,dd,e3,h,r[13][2],b[2],f[2];
 	int k;
