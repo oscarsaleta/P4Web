@@ -2,6 +2,7 @@
 #define HOMELEFT_H
 
 /*!
+ * @brief Left side of UI
  * @file HomeLeft.h
  * @author Oscar Saleta
  */

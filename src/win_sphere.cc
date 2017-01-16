@@ -47,7 +47,7 @@
 #include "math_p4.h"
 //#include "math_findpoint.h"
 //#include "math_limitcycles.h"
-#include "math_orbits.h"
+//#include "math_orbits.h"
 #include "math_separatrice.h"
 //#include "math_gcf.h"
 #include "plot_points.h"

@@ -43,31 +43,35 @@
 #ifndef MATH_P4_H
 #define MATH_P4_H
 
+/*!
+ * @brief Some mathematical-related definitions and macros
+ * @file math_p4.h
+ */
+
 #include "file_tab.h"
 
-#define MIN_FLOAT   -1.0E32
-#define MAX_FLOAT   1.0E32
+#define MIN_FLOAT   -1.0E32     ///< minimum single precision floating point
+#define MAX_FLOAT   1.0E32      ///< maximum single precision floating point
 
-#define p4_finite std::isfinite
+#define p4_finite std::isfinite /**< macro for accessing the standard function
+                                that checks if a number is finite */
 
-#define PI 3.1415926535897932384626433832
-#define PI_DIV2 (PI/2.)
-#define PI_DIV4 (PI/4.)
-#define TWOPI (2.0*PI)
+#define PI 3.1415926535897932384626433832   ///< Pi
+#define PI_DIV2 (PI/2.)                     ///< Pi/2
+#define PI_DIV4 (PI/4.)                     ///< Pi/4
+#define TWOPI (2.0*PI)                      ///< 2*Pi
 
-#define __minus_one_to_q    pow(-1.0,double_q)                   // (-1)^q
-#define __minus_one_to_p    pow(-1.0,double_p)                   // (-1)^p
-#define __one_over_p        (1.0/double_p)                       // 1/p
-#define __one_over_q        (1.0/double_q)                       // 1/q
+#define __minus_one_to_q    pow(-1.0,double_q)  ///< (-1)^q
+#define __minus_one_to_p    pow(-1.0,double_p)  ///< (-1)^p
+#define __one_over_p        (1.0/double_p)      ///< 1/p
+#define __one_over_q        (1.0/double_q)      ///< 1/q
 
-
+/**
+ * Copy a length 3 array into another
+ * @param x input array
+ * @param y copy array
+ */
 void copy_x_into_y( double * x, double * y );
-/*double eval_lc_poincare( double * pp, double, double, double );
-double eval_lc_lyapunov( double * pp, double, double, double );
-void set_current_step( double );
-
-bool less_poincare( double *, double * );
-bool less_lyapunov( double *, double * );*/
 
 
 #endif /* MATH_P4_H */

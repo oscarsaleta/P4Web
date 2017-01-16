@@ -34,13 +34,13 @@
 #include <cmath>
 
 
-void (*change_epsilon)( WWinSphere *, double ) = nullptr;
+/*void (*change_epsilon)( WWinSphere *, double ) = nullptr;
 void (*start_plot_sep)( WWinSphere * ) = nullptr;
 void (*cont_plot_sep)( WWinSphere * ) = nullptr;
 void (*plot_next_sep)( WWinSphere * ) = nullptr;
-void (*select_next_sep)( WWinSphere * ) = nullptr;
+void (*select_next_sep)( WWinSphere * ) = nullptr;*/
 
-int findSepColor2( term2 *f,int type,double y[2] )
+int findSepColor2( P4POLYNOM2 f, int type, double y[2] )
 {
     int color;
 
@@ -69,7 +69,7 @@ int findSepColor2( term2 *f,int type,double y[2] )
     return(color);
 }
 
-int findSepColor3( term3 *f,int type,double y[2] )
+int findSepColor3( P4POLYNOM3 f, int type, double y[2] )
 {
     int color;
 
@@ -571,7 +571,6 @@ static orbits_points * plot_sep_blow_up( WWinSphere * spherewnd, double x0, doub
     }
 
     h = epsilon/100; 
-    /*   h=find_step(de_sep->sep,epsilon,1.0)/100;  */
 
     type = de_sep->type;
 
@@ -714,14 +713,11 @@ static orbits_points * plot_sep_blow_up( WWinSphere * spherewnd, double x0, doub
     de_sep->point[1] = y;
     de_sep->blow_up_vec_field = true;
     last_orbit->next_point = integrate_blow_up(spherewnd,pcoord2,de_sep,spherewnd->study_->config_step,dir,last_orbit->type,&sep,chart);
-    //last_orbit->next_point = integrate_blow_up(spherewnd,//x0,y0,
-    //pcoord2,de_sep,/*point,*/
-    //spherewnd->study_->config_step,dir,last_orbit->type,&sep,chart);
     *orbit = sep; 
     return(first_orbit); 
 }
 
-
+/*
 void start_plot_saddle_sep( WWinSphere * spherewnd )
 {
     double p[3];
@@ -782,7 +778,7 @@ void select_next_saddle_sep( WWinSphere * spherewnd )
     if ( !(spherewnd->study_->selected_sep = spherewnd->study_->selected_sep->next_sep) )
         spherewnd->study_->selected_sep = spherewnd->study_->selected_saddle_point->separatrices;
     draw_selected_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point,CW_SEP);
-} 
+}*/ 
             
 static void plot_all_saddle_sep(WWinSphere * spherewnd, saddle *point)
 {
@@ -811,7 +807,7 @@ static void plot_all_saddle_sep(WWinSphere * spherewnd, saddle *point)
         point = point->next_saddle;
     }
 }
-
+/*
 void start_plot_se_sep( WWinSphere * spherewnd )
 {
     orbits_points *points;
@@ -863,7 +859,7 @@ void select_next_se_sep( WWinSphere * spherewnd )
         spherewnd->study_->selected_sep = spherewnd->study_->selected_se_point->separatrices;
     draw_selected_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point,CW_SEP);
 }  
-
+*/
 static void plot_all_se_sep(WWinSphere * spherewnd, semi_elementary *point)
 {
     sep *sep1;
@@ -896,7 +892,7 @@ static void plot_all_se_sep(WWinSphere * spherewnd, semi_elementary *point)
         point=point->next_se;
     }
 }    
-
+/*
 void start_plot_de_sep( WWinSphere * spherewnd )
 {
   orbits_points *points;
@@ -990,7 +986,7 @@ void select_next_de_sep( WWinSphere * spherewnd )
         spherewnd->study_->selected_de_sep = spherewnd->study_->selected_de_point->blow_up;
     draw_selected_sep(spherewnd,spherewnd->study_->selected_de_sep->first_sep_point,CW_SEP);
 }  
-
+*/
 static void plot_all_de_sep( WWinSphere * spherewnd, struct degenerate *point)
 {
     blow_up_points *de_sep;
@@ -1029,7 +1025,8 @@ static void plot_all_de_sep( WWinSphere * spherewnd, struct degenerate *point)
         point=point->next_de;
     }
 }
-                       
+
+
 void plot_all_sep( WWinSphere * spherewnd )
 {
     plot_all_saddle_sep( spherewnd, spherewnd->study_->first_saddle_point );

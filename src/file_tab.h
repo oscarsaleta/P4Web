@@ -4,7 +4,7 @@
 #define FILE_TAB_H
 
 /*!
- * Code for reading results from Maple
+ * @brief Code for reading results from Maple
  * @file file_tab.h
  * 
  * This file contains the code to read the information from maple.
@@ -939,34 +939,164 @@ public:
      * Results depend on the config_projection value
      */
     void ucircle_psphere( double u, double v, double * pcoord );
+    /**
+     * Finite coordinates to circle projection
+     * @param x      coordinate 1 of plane
+     * @param y      coordinate 2 of plane
+     * @param ucoord length 2 vector where circle coordinates will be stored
+     *
+     * Results depend on the config_projection value
+     */
     void finite_ucircle( double x, double y, double * ucoord);
+    /**
+     * Poincaré sphere to U1 chart coordinates
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where U1 coordinates will be stored
+     */
     void psphere_to_U1( double X, double Y, double Z, double * rcoord);
+    /**
+     * Poincaré sphere to U2 chart coordinates
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where U2 coordinates will be stored
+     */
     void psphere_to_U2( double X, double Y, double Z, double * rcoord);
+    /**
+     * Poincaré sphere to V1 chart coordinates
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where V1 coordinates will be stored
+     */
     void psphere_to_V1( double X, double Y, double Z, double * rcoord);
+    /**
+     * Poincaré sphere to V2 chart coordinates
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where V2 coordinates will be stored
+     */
     void psphere_to_V2( double X, double Y, double Z, double * rcoord);
+    /**
+     * U1 chart to Poincaré sphere coordinates
+     * @param z1     coordinate 1 of U1 chart
+     * @param z2     coordinate 2 of U1 chart
+     * @param pcoord length 3 vector where Poincaré sphere coordinates will be stored
+     */
     void U1_to_psphere( double z1, double z2, double * pcoord);
+    /**
+     * V1 chart to Poincaré sphere coordinates
+     * @param z1     coordinate 1 of V1 chart
+     * @param z2     coordinate 2 of V1 chart
+     * @param pcoord length 3 vector where Poincaré sphere coordinates will be stored
+     */
     void V1_to_psphere( double z1, double z2, double * pcoord);
+    /**
+     * U2 chart to Poincaré sphere coordinates
+     * @param z1     coordinate 1 of U2 chart
+     * @param z2     coordinate 2 of U2 chart
+     * @param pcoord length 3 vector where Poincaré sphere coordinates will be stored
+     */
     void U2_to_psphere( double z1, double z2, double * pcoord);
+    /**
+     * V2 chart to Poincaré sphere coordinates
+     * @param z1     coordinate 1 of V2 chart
+     * @param z2     coordinate 2 of V2 chart
+     * @param pcoord length 3 vector where Poincaré sphere coordinates will be stored
+     */
     void V2_to_psphere( double z1, double z2, double * pcoord);
+    /**
+     * U1 to Poincaré sphere and then change sign of coordinates
+     * @param z1     coordinate 1 of U1 chart
+     * @param z2     coordinate 2 of U1 chart
+     * @param pcoord length 3 vector where Poincaré sphere coordinates will be stored
+     */
     void VV1_to_psphere( double z1, double z2, double * pcoord);
+    /**
+     * Change sign of Poincaré sphere coords and then project on U1
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where U1 chart coordinates will be stored
+     */
     void psphere_to_VV1( double X, double Y, double Z, double * rcoord );
+    /**
+     * U2 to Poincaré sphere and then change sign of coordinates
+     * @param z1     coordinate 1 of U2 chart
+     * @param z2     coordinate 2 of U2 chart
+     * @param pcoord length 3 vector where Poincaré sphere coordinates will be stored
+     */
     void VV2_to_psphere( double z1, double z2, double * pcoord);
+    /**
+     * Change sign of Poincaré sphere coords and then project on U2
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where U2 chart coordinates will be stored
+     */
     void psphere_to_VV2( double X, double Y, double Z, double * rcoord );
+    /**
+     * V1 to Poincaré sphere and then change sign of coordinates
+     * @param z1     coordinate 1 of V1 chart
+     * @param z2     coordinate 2 of V1 chart
+     * @param pcoord length 3 vector where Poincaré sphere coordinates will be stored
+     */
     void UU1_to_psphere( double z1, double z2, double * pcoord);
+    /**
+     * Change sign of Poincaré sphere coords and then project on V1
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where V1 chart coordinates will be stored
+     */
     void psphere_to_UU1( double X, double Y, double Z, double * rcoord );
+    /**
+     * V2 to Poincaré sphere and then change sign of coordinates
+     * @param z1     coordinate 1 of V2 chart
+     * @param z2     coordinate 2 of V2 chart
+     * @param pcoord length 3 vector where Poincaré sphere coordinates will be stored
+     */
     void UU2_to_psphere( double z1, double z2, double * pcoord);
+    /**
+     * Change sign of Poincaré sphere coords and then project on V2
+     * @param X      coordinate 1 of Poincaré sphere
+     * @param Y      coordinate 2 of Poincaré sphere
+     * @param Z      coordinate 3 of Poincaré sphere
+     * @param rcoord length 2 vector where V2 chart coordinates will be stored
+     */
     void psphere_to_UU2( double X, double Y, double Z, double * rcoord );
     // -----------------------------------------------------------------------
     //                      math_p4.cc FUNCTIONS
     // -----------------------------------------------------------------------
+    /**
+     * Set current step size of integration
+     * @param double step size
+     */
     void set_current_step( double );
     // -----------------------------------------------------------------------
     //                      INTEGRATE BLOWUP FUNCTIONS
     // -----------------------------------------------------------------------
+    /**
+     * Evaluate blowup vector field
+     * @param y point to evaluate
+     * @param f vector for storing the result
+     */
     void eval_blow_vec_field( double * y, double * f);
     // -----------------------------------------------------------------------
     //                      NUMERIC FUNCTIONS
     // -----------------------------------------------------------------------
+    /**
+     * Runge-Kutta order 7/8 numeric integration
+     * @param deriv function to integrate, takes a member function of WVFStudy
+     * @param y[2]  integration limits
+     * @param hh    initial step size
+     * @param hmi   minimum step size
+     * @param hma   maximum step size
+     * @param e1    epsilon
+     */
     void rk78( void (WVFStudy::*deriv)( double *, double * ), double y[2], double * hh,
                 double hmi, double hma, double e1);
 
@@ -1120,8 +1250,8 @@ private:
  */
 //extern WVFStudy VFResults;  // (VFResults.p,VFResults.q) are lyapunov weights
 
-#define LINESTYLE_DASHES    1
-#define LINESTYLE_POINTS    0
+#define LINESTYLE_DASHES    1   ///< style for dashed lines in plot
+#define LINESTYLE_POINTS    0   ///< style for dot lines in plot
 
 
 #endif /*FILE_TAB_H*/

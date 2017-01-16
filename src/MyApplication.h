@@ -23,6 +23,7 @@
 #define MYAPPLICATION_H
 
 /*!
+ * @brief Application class for the website backend
  * @file MyApplication.h
  * @author Oscar Saleta
  */

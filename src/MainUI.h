@@ -23,6 +23,7 @@
 #define MAINUI_H_
 
 /*!
+ * @brief Main container for UI
  * @file MainUI.h
  * @author Oscar Saleta
  */

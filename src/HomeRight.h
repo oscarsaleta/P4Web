@@ -23,6 +23,7 @@
 #define HOMERIGHT_H
 
 /*!
+ * @brief Right side of the UI
  * @file HomeRight.h
  * @author Oscar Saleta
  */

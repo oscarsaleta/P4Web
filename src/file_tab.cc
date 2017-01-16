@@ -45,8 +45,8 @@
 #include "math_p4.h"
 //#include "math_charts.h"
 #include "math_separatrice.h"
-#include "math_changedir.h"
-#include "math_orbits.h"
+//#include "math_changedir.h"
+//#include "math_orbits.h"
 #include "math_polynom.h"
 //#include "p4application.h"
 
@@ -2433,14 +2433,6 @@ void WVFStudy::setupCoordinateTransformations( void )
 //                  IMPLEMENTATION OF THE POINCARE CHARTS
 // -----------------------------------------------------------------------
 
-// declared in math_p4.cc
-void copy_x_into_y( double * x, double * y )
-{
-    y[0] = x[0];
-    y[1] = x[1];
-    y[2] = x[2];
-}
-
 void WVFStudy::R2_to_psphere( double x, double y, double * pcoord )
 {
     double s;
@@ -3635,3 +3627,44 @@ bool WVFStudy::plsphere_to_viewcoordpair_discontinuousy( double * p, double * q,
     return true;
 }
 
+bool WVFStudy::less_poincare( double * p1, double * p2 )
+{
+    if((p1[0]*p2[2])<(p2[0]*p1[2]))
+        return 1;
+    if(((p1[0]*p2[2])==(p2[0]*p1[2])) && ((p1[1]*p2[2])<(p2[1]*p1[2])))
+        return  true ;
+    return  false ;
+}
+
+double WVFStudy::eval_lc_poincare( double * pp,double a, double b, double c )
+{
+    return (a*pp[0]+b*pp[1]+c*pp[2]);
+}
+
+double WVFStudy::eval_lc_lyapunov( double * pp,double a, double b, double c )
+{
+    if( pp[0] )
+        return (  a * pow(pp[1],double_q)*cos(pp[2])
+                + b * pow(pp[1],double_p)*sin(pp[2])
+                + c * pow(pp[1],double_p_plus_q) );
+    else
+        return ( a * pp[1] + b * pp[2] + c );
+}
+ 
+bool WVFStudy::less_lyapunov(double * p1, double * p2 )
+{
+    double u[2],v[2];
+
+    plsphere_annulus(p1[0],p1[1],p1[2],u);
+    plsphere_annulus(p2[0],p2[1],p2[2],v);
+    if(u[0]<v[0])
+        return 1;
+    if((u[0]==v[0]) && (u[1]<v[1]))
+        return 1;
+    return 0;
+}  
+
+void WVFStudy::set_current_step( double curstep )
+{
+    config_currentstep = curstep;
+}

@@ -23,12 +23,28 @@
 #ifndef MATH_INTBLOWUP_H
 #define MATH_INTBLOWUP_H
 
+/*!
+ * @brief File that contains the function for integrating a blowup
+ * @file math_intblowup.h
+ */
+
 #include "file_tab.h"
 #include "win_sphere.h"
 
-//void eval_blow_vec_field( double * y, double * f);
+/**
+ * Integrate blowup separatrices for a non elementary singular point
+ * @param  spherewnd sphere object of the study
+ * @param  pcoord2   coordinates in Poincaré sphere
+ * @param  de_sep    blowup separatrices
+ * @param  step      step size for integration
+ * @param  dir       direction for integration
+ * @param  type      stability type of singularity
+ * @param  orbit     linked list where last orbit will be stored
+ * @param  chart     chart in which to perform computations
+ * @return           pointer to first orbit
+ */
 orbits_points * integrate_blow_up( WWinSphere * spherewnd, double * pcoord2,
-                    blow_up_points * de_sep, double step,int dir, int type,
+                    blow_up_points * de_sep, double step, int dir, int type,
                     orbits_points ** orbit, int chart );
 
 #endif // MATH_INTBLOWUP_H

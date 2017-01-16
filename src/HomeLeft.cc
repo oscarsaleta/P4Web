@@ -21,6 +21,7 @@
 
 #include "HomeLeft.h"
 
+#include "custom.h"
 #include "MyLogger.h"
 
 #include <chrono>
@@ -281,7 +282,7 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
     WString str_sumtablepath = "/usr/local/p4/sumtables/";
     WString str_removecmd = "rm";
     WString str_simplify = "false";
-    WString str_simplifycmd = "proc(expr) try radsimp(simplify(expr),ratdenom) catch: simplify(expr) end try end";
+    WString str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
     WString str_critpoints = "0";
     WString str_saveall = "false";
     WString str_vectable = fname+"_vec.tab";
