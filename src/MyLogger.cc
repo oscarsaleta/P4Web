@@ -13,7 +13,7 @@ MyLogger::MyLogger(std::string fname)
     addField("type",false);
     addField("message",true);
     setFile(fname);
-    configure("*");
+    configure("*"); // configure for showing all logs
 }
 
 MyLogger::~MyLogger()
