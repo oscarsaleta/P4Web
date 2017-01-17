@@ -19,6 +19,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*!
+ * @mainpage P4 web version, a Wt-based C++ web application for computing planar polynomial phase portraits.
+ * @author Oscar Saleta Reig
+ *
+ * This is a WIP. Main planned features are:
+ * * Basic UI for introducing a vector field and viewing computed results (DONE)
+ * * Interface for uploading scripts saved from P4 (DONE)
+ * * Functionality for saving the vector field in a P4-friendly script (DONE)
+ * * Basic plotting functionality: circle at infinity, singularities and separatrices (DONE)
+ * * Full doxygen documentation
+ * * Authentication framework (WIP)
+ * * Advanced and unlocked settings for logged-in users
+ * * Further functionality from P4: Poincaré-Lyapunov sphere, orbit integration, etc.
+ *
+ * The mathematical code of this application is based on the Qt-based C++ code of P4.
+ * That said, the code has been heavily modified because this application uses <b>NO Qt</b>
+ * classes or functions. The UI and backend elements have been build from zero using the
+ * <b>Wt library</b> (<a href="https://www.webtoolkit.eu/wt">https://www.webtoolkit.eu/wt</a>),
+ * because it is highly convenient to create web applications based on existing C++ code.
+ */
+
+
 #include "MyApplication.h"
 
 #include <Wt/WServer>

@@ -19,7 +19,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #include "MyApplication.h"
+#include "MyLogger.h"
 
 #include <Wt/Auth/AuthModel>
 #include <Wt/Auth/AuthWidget>
@@ -40,13 +42,18 @@ MyApplication::MyApplication(const WEnvironment &env) : WApplication(env), sessi
     root()->addWidget(authWidget);
 
     messageResourceBundle().use(appRoot()+"resources/strings");
+
     mainUI_ = new MainUI();
     mainUI_->setupUI(root());
+
+    globalLogger__.debug("MyApplication :: created correctly");
 }
+
 
 MyApplication::~MyApplication()
 {
     delete mainUI_;
+    globalLogger__.debug("MyApplication :: deleted correctly");
 }
 
 void MyApplication::authEvent()

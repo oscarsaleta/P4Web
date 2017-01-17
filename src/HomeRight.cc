@@ -1,6 +1,7 @@
 #include "HomeRight.h"
 
 #include "file_tab.h"
+#include "MyLogger.h"
 
 #include <iostream>
 #include <fstream>
@@ -13,14 +14,53 @@
 using namespace Wt;
 
 
-HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_(0)
+HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent)
 {
     setId("HomeRight");
     setStyleClass("half-box");
 
+
+    globalLogger__.debug("HomeRight :: setting up UI...");
+    setupUI();
+    globalLogger__.debug("HomeRight :: setting up connectors...");
+    setupConnectors();
+
+    tabWidget_->setCurrentIndex(0);
+
+    globalLogger__.debug("HomeRight :: created correctly");
+}
+
+HomeRight::~HomeRight()
+{
+    // sphere
+    delete sphere_;
+    // output tab
+    delete fullResButton_;
+    delete finResButton_;
+    delete infResButton_;
+    delete clearOutputButton_;
+    delete outputButtonsToolbar_;
+    delete outputTextArea_;
+    delete outputContainer_;
+    // plot tab
+    /*delete clearPlotButton_;
+    delete plotPointsButton_;
+    delete plotSeparatricesButton_;
+    delete plotButtonsToolbar_;*/
+    delete plotContainer_;
+    // legend tab
+    delete legend_;
+    delete legendContainer_;
+    // tab widget
+    delete tabWidget_;
+
+    globalLogger__.debug("HomeRight :: deleted correctly");
+}
+
+void HomeRight::setupUI()
+{
     tabWidget_ = new WTabWidget(this);
     tabWidget_->setId("tabWidget_");
-
 
     // output tab ----
     outputContainer_ = new WContainerWidget();
@@ -64,12 +104,6 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     clearOutputButton_->setStyleClass("btn-warning btn");
     outputButtonsToolbar_->addButton(clearOutputButton_);
 
-    fullResButton_->clicked().connect(this,&HomeRight::fullResults);
-    finResButton_->clicked().connect(this,&HomeRight::showFinResults);
-    infResButton_->clicked().connect(this,&HomeRight::showInfResults);
-    clearOutputButton_->clicked().connect(this,&HomeRight::clearResults);
-
-    
 
     // plot tab ----
     plotContainer_ =  new WContainerWidget();
@@ -77,10 +111,10 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
     // sphere (plot region)
-    sphere_ = new WWinSphere(plotContainer_,550,550);
-    sphere_->setId("sphere_");
-    sphere_->setMargin(5,Top);
-    plotContainer_->addWidget(sphere_);
+    //sphere_ = new WWinSphere(plotContainer_,550,550);
+    //sphere_->setId("sphere_");
+    //sphere_->setMargin(5,Top);
+    //plotContainer_->addWidget(sphere_);
 
     //TODO: add plot separatrices, orbits, etc buttons?
     /*plotButtonsToolbar_ = new WToolBar(plotContainer_);
@@ -105,11 +139,7 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     clearPlotButton_->setStyleClass("btn-warning btn");
     plotButtonsToolbar_->addButton(clearPlotButton_);
 
-    plotPointsButton_->clicked().connect(this,&HomeRight::plotSingularPoints);
-    plotSeparatricesButton_->clicked().connect(this,&HomeRight::plotSeparatrices);
-    clearPlotButton_->clicked().connect(this,&HomeRight::clearPlot);*/
-
-
+*/
     
     // legend tab ----
     legendContainer_ = new WContainerWidget();
@@ -123,83 +153,60 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent), flag_
     legend_->setMargin(5,Top);
     legendContainer_->addWidget(legend_);
 
-
-
-    tabWidget_->setCurrentIndex(0);
-
+    globalLogger__.debug("HomeRight :: UI set up");
 
 }
 
-HomeRight::~HomeRight()
+void HomeRight::setupConnectors()
 {
-    // sphere
-    delete sphere_;
-    // output tab
-    delete fullResButton_;
-    delete finResButton_;
-    delete infResButton_;
-    delete clearOutputButton_;
-    delete outputButtonsToolbar_;
-    delete outputTextArea_;
-    delete outputContainer_;
-    // plot tab
-    /*delete clearPlotButton_;
-    delete plotPointsButton_;
-    delete plotSeparatricesButton_;
-    delete plotButtonsToolbar_;*/
-    delete plotContainer_;
-    // legend tab
-    delete legend_;
-    delete legendContainer_;
-    // tab widget
-    delete tabWidget_;
+    // output buttons
+    fullResButton_->clicked().connect(this,&HomeRight::fullResults);
+    finResButton_->clicked().connect(this,&HomeRight::showFinResults);
+    infResButton_->clicked().connect(this,&HomeRight::showInfResults);
+    clearOutputButton_->clicked().connect(this,&HomeRight::clearResults);
+    // plot buttons
+    /*plotPointsButton_->clicked().connect(this,&HomeRight::plotSingularPoints);
+    plotSeparatricesButton_->clicked().connect(this,&HomeRight::plotSeparatrices);
+    clearPlotButton_->clicked().connect(this,&HomeRight::clearPlot);*/
+
+    globalLogger__.debug("HomeRight :: connectors set up");
 }
 
-void HomeRight::readResults(int k, std::string fileName)
+void HomeRight::readResults(std::string fileName)
 {
     tabWidget_->setCurrentIndex(0);
-    if (k!=0) {
-    //    fullResults_ = "Unauthorised operation. IP will be logged.";
-    } else {
-        std::ifstream resultsFile;
-        std::string line;
+    
+    std::ifstream resultsFile;
+    std::string line;
 
-        fileName_ = fileName;
-        flag_ = 0;
+    fileName_ = fileName;
 
-        // read full results
-        fullResults_ = "";
-        resultsFile.open((fileName_+".res").c_str());
-        if (resultsFile.is_open()) {
-            while(getline(resultsFile,line))
-                fullResults_ += line + "\n";
-            resultsFile.close();
-        } else {
-            flag_ = 1;
-        }
+    // read full results
+    fullResults_ = "";
+    resultsFile.open((fileName_+".res").c_str());
+    if (resultsFile.is_open()) {
+        while(getline(resultsFile,line))
+            fullResults_ += line + "\n";
+        resultsFile.close();
+    }
 
-        // read finite singular points results
-        finResults_ = "";
-        resultsFile.open((fileName_+"_fin.res").c_str());
-        if(resultsFile.is_open()) {
-            while (getline(resultsFile,line))
-                finResults_ += line + "\n";
-            resultsFile.close();
-        } else {
-            flag_ = 1;
-        }
-        
-        // add title for infinite region (missing in inf.res)
-        infResults_ = "AT THE INFINITE REGION \n";
-        // read infinite singular points results
-        resultsFile.open((fileName_+"_inf.res").c_str());
-        if(resultsFile.is_open()) {
-            while(getline(resultsFile,line))
-                infResults_ += line + "\n";
-            resultsFile.close();
-        } else {
-            flag_ = 1;
-        }
+    // read finite singular points results
+    finResults_ = "";
+    resultsFile.open((fileName_+"_fin.res").c_str());
+    if(resultsFile.is_open()) {
+        while (getline(resultsFile,line))
+            finResults_ += line + "\n";
+        resultsFile.close();
+    }
+    
+    // add title for infinite region (missing in inf.res)
+    infResults_ = "AT THE INFINITE REGION \n";
+    // read infinite singular points results
+    resultsFile.open((fileName_+"_inf.res").c_str());
+    if(resultsFile.is_open()) {
+        while(getline(resultsFile,line))
+            infResults_ += line + "\n";
+        resultsFile.close();
     }
 
     fullResults();
@@ -213,38 +220,46 @@ void HomeRight::printError(std::string error)
 
 void HomeRight::fullResults()
 {
-    if (flag_ == 0) {
-        outputTextAreaContent_ = fullResults_;
-        outputTextArea_->setText(outputTextAreaContent_);
-    }
+    outputTextAreaContent_ = fullResults_;
+    outputTextArea_->setText(outputTextAreaContent_);
+    globalLogger__.debug("HomeRight :: showing full results");
 }
 
 void HomeRight::showFinResults()
 {
-    if (flag_ == 0) {
-        outputTextAreaContent_ = finResults_;
-        outputTextArea_->setText(outputTextAreaContent_);
-    }
+    outputTextAreaContent_ = finResults_;
+    outputTextArea_->setText(outputTextAreaContent_);
+    globalLogger__.debug("HomeRight :: showing finite results");
 }
 
 void HomeRight::showInfResults()
 {
-    if (flag_ == 0) {
-        outputTextAreaContent_ = infResults_;
-        outputTextArea_->setText(outputTextAreaContent_);
-    }
+    outputTextAreaContent_ = infResults_;
+    outputTextArea_->setText(outputTextAreaContent_);
+    globalLogger__.debug("HomeRight :: showing infinite results");
 }
 
 void HomeRight::clearResults()
 {
     outputTextArea_->setText("");
     outputTextAreaContent_ = "";
+    globalLogger__.debug("HomeRight :: cleared results");
 }
 
 void HomeRight::onPlot(std::string basename)
-{
+{ 
+    if (sphere_ != nullptr) {
+        delete sphere_;
+        sphere_ = nullptr;
+    }
+    sphere_ = new WWinSphere(plotContainer_,550,550,basename);
+    sphere_->setId("sphere_");
+    sphere_->setMargin(5,Top);
+    plotContainer_->addWidget(sphere_);
+
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
+    globalLogger__.debug("HomeRight :: reacted to onPlot signal");
 }
 
 /*void HomeRight::clearPlot()

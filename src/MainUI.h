@@ -22,14 +22,39 @@
 #ifndef MAINUI_H_
 #define MAINUI_H_
 
+/*!
+ * @brief Main container for UI
+ * @file MainUI.h
+ * @author Oscar Saleta
+ */
+
 #include <Wt/WContainerWidget>
 
 class HomeLeft;
 class HomeRight;
 
+/** 
+ * Auxiliary class for organizing the different elements of the UI
+ * 
+ * @class MainUI
+ *
+ * MainUI is a class without a constructor. We only need to call its setupUI()
+ * function from #MyApplication and we get the different UI elements connected
+ * through this class.
+ * 
+ * This allows us to make some objects (#HomeRight) react to signals emitted by
+ * others (#HomeLeft) without making everything global.
+ */
 class MainUI
 {
 public:
+    /** 
+     * Sets up the UI of the web app from the root, to control every part of it
+     *
+     * This function is called from the #MyApplication when the program starts.
+     * 
+     * @param *pageRoot lowest level of the web page UI, will contain every other widget
+     */
     void setupUI(Wt::WContainerWidget *pageRoot);
 
 private:
@@ -56,8 +81,6 @@ private:
 
     Wt::WText *title_;
     Wt::WText *subtitle_;
-
-
 
     void addAllStyleSheets();
 };

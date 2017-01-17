@@ -43,24 +43,52 @@
 #ifndef MATH_POLYNOM_H
 #define MATH_POLYNOM_H
 
+/*!
+ * @brief Polynomial related functions
+ * @file math_polynom.h
+ */
 
 #include "file_tab.h"
 
+/**
+ * Calculates p(t) for a polynomial p and a value t
+ * @param  p     Polynomial p
+ * @param  value Value t
+ * @return       Result p(t)
+ */
+double eval_term1( P4POLYNOM1 p, double value);
+/**
+ * Calculates f(x,y) for a polynomial f and values x and y.
+ * @param  f     Polynomial f
+ * @param  value Array (x,y)
+ * @return       Result f(x,y)
+ */
+double eval_term2( P4POLYNOM2 f, double * value);
+/**
+ * Calculates F( r, cos(theta), sin(theta) ) for a polynomial F
+ * and values of r and theta
+ * @param  F     Polynomial F
+ * @param  value Array (r,theta)
+ * @return       Result F(r,cos(theta),sin(theta))
+ */
+double eval_term3( P4POLYNOM3 F, double * value);
 
-double eval_term1( P4POLYNOM1, double );
-double eval_term2( P4POLYNOM2, double * );
-double eval_term3( P4POLYNOM3, double * );
-
+/**
+ * Delete a one variable polynomial
+ * @param p polynomial
+ */
 void delete_term1( P4POLYNOM1 p );
+/**
+ * Delete a two variables polynomial
+ * @param p polynomial
+ */
 void delete_term2( P4POLYNOM2 p );
+/**
+ * Delete a three variables polynomial
+ * @param p polynomial
+ */
 void delete_term3( P4POLYNOM3 p );
 
-const char * dumpPoly1( P4POLYNOM1 f, const char * x );
-const char * dumpPoly2( P4POLYNOM2 f, const char * x, const char * y );
-const char * dumpPoly3( P4POLYNOM3 f, const char * x, const char * y, const char * z );
-
-char * printterm2( char * buf, term2 * f, bool isfirst, const char * x, const char * y );
-char * printterm3( char * buf, term3 * f, bool isfirst, const char * r, const char * Co, const char * Si );
 
 
 #endif // MATH_POLYNOM_H

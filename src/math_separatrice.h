@@ -23,55 +23,120 @@
 #ifndef MATH_SEPARATRICE_H
 #define MATH_SEPARATRICE_H
 
+/*!
+ * @brief Functions for integrating and plotting separatrices
+ * @file math_separatrice.h
+ */
 
 #include "file_tab.h"
 #include "win_sphere.h"
 
 
-extern void (*change_epsilon)( WWinSphere *, double );
+/*extern void (*change_epsilon)( WWinSphere *, double );
 extern void (*start_plot_sep)( WWinSphere * );
 extern void (*cont_plot_sep)( WWinSphere * );
 extern void (*plot_next_sep)( WWinSphere * );
 extern void (*select_next_sep)( WWinSphere * );
 
-void start_plot_saddle_sep( WWinSphere * );
-void cont_plot_saddle_sep( WWinSphere * );
-void plot_next_saddle_sep( WWinSphere * );
-void select_next_saddle_sep( WWinSphere * );
-void change_epsilon_saddle( WWinSphere *, double );
+void start_plot_saddle_sep( WWinSphere * spherewnd );
+void cont_plot_saddle_sep( WWinSphere * spherewnd );
+void plot_next_saddle_sep( WWinSphere * spherewnd );
+void select_next_saddle_sep( WWinSphere * spherewnd );
+void change_epsilon_saddle( WWinSphere * spherewnd, double e );
 
-void start_plot_se_sep( WWinSphere * );
-void cont_plot_se_sep( WWinSphere * );
-void plot_next_se_sep( WWinSphere * );
-void select_next_se_sep( WWinSphere * );
-void change_epsilon_se( WWinSphere *, double );
+void start_plot_se_sep( WWinSphere * spherewnd );
+void cont_plot_se_sep( WWinSphere * spherewnd );
+void plot_next_se_sep( WWinSphere * spherewnd );
+void select_next_se_sep( WWinSphere * spherewnd );
+void change_epsilon_se( WWinSphere * spherewnd, double e);
 
-void start_plot_de_sep( WWinSphere * );
-void cont_plot_de_sep( WWinSphere * );
-void plot_next_de_sep( WWinSphere * );
-void select_next_de_sep( WWinSphere * );
-void change_epsilon_de( WWinSphere *, double );
+void start_plot_de_sep( WWinSphere * spherewnd );
+void cont_plot_de_sep( WWinSphere * spherewnd );
+void plot_next_de_sep( WWinSphere * spherewnd );
+void select_next_de_sep( WWinSphere * spherewnd );
+void change_epsilon_de( WWinSphere * spherewnd, double e );*/
 
+/**
+ * Compute all separatrices for all singularities
+ * @param spherewnd sphere object where the study and plot are stored
+ */
 void plot_all_sep( WWinSphere * spherewnd );
+/**
+ * Draw separatrice
+ * @param spherewnd sphere object
+ * @param sep       separatrice
+ *
+ * This function draws a separatrice with its default color
+ */
 void draw_sep( WWinSphere * spherewnd, orbits_points *sep );
-void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep,int color);
+/**
+ * Draw separatrice with specified color
+ * @param spherewnd sphere object
+ * @param sep       separatrice
+ * @param color     color (given by definitions from colors.h)
+ *
+ * Same as draw_sep() but with a custom color
+ */
+void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep, int color);
 
-int findSepColor2(term2 *f,int type,double y[2]);
-int findSepColor3(term3 *f,int type,double y[2]);
+/**
+ * Find color for a P4POLYNOM2 of a given type at a given point
+ * @param f     polynomial
+ * @param type  type of stability
+ * @param y     point
+ * @return      color code
+ */
+int findSepColor2(P4POLYNOM2 f, int type, double y[2]);
+/**
+ * Find color for a P4POLYNOM3 of a given type at a given point
+ * @param f     polynomial
+ * @param type  type of stability
+ * @param y     point
+ * @return      color code
+ */
+int findSepColor3(P4POLYNOM3 f, int type, double y[2]);
 
-void integrate_poincare_sep( double p0, double p1, double p2, double * pcoord,
-                            double * hhi, int * type, int * color, int * dashes, int * dir,
-                            double h_min, double h_max);
-void integrate_lyapunov_sep( double p0, double p1, double p2, double * pcoord,
-                            double * hhi, int * type, int * color, int * dashes,
-                            int * dir, double h_min, double h_max);
-
+/**
+ * Change type from stable to unstable (or from unstable to stable)
+ * @param  type type of stability
+ * @return      opposite type of stability
+ */
 int change_type(int type);
 
+/**
+ * Separatrices for saddle or saddle-node singularities
+ * @param  spherewnd sphere object
+ * @param  x0        integration limits
+ * @param  y0        integration limits
+ * @param  a11       transformation matrix
+ * @param  a12       transformation matrix
+ * @param  a21       transformation matrix
+ * @param  a22       transformation matrix
+ * @param  epsilon   radius for boundary around singularity where to start integration
+ * @param  sep1      Taylor approximation of invariant manifold of singularity
+ * @param  orbit     linked list where integrated separatrice is stored
+ * @param  chart     chart in which integration is performed
+ * @return           pointer to first element of the linked list that is
+ *                           the integrated separatrice
+ *
+ * When the singularity is a saddle or saddle-node, first we use the Taylor
+ * approximation of the invariant manifold until we meet the boundary of a 
+ * circle of radius epsilon.
+ *
+ * Then we integrate using WVFStudy::rk78() (calling WVFStudy::integrate_poincare_sep()
+ * or WVFStudy::integrate_lyapunov_sep() depending on which sphere are we working on).
+ */
 orbits_points * plot_separatrice(WWinSphere * spherewnd, double x0, double y0,double a11, double a12,
                                         double a21, double a22, double epsilon, sep * sep1,
                                         orbits_points ** orbit, short int chart);
 
+/**
+ * Apply a list of transformations to a point
+ * @param trans linked list of transformations
+ * @param x0    initial coordinates
+ * @param y0    initial coordinates
+ * @param point array for storing final coordinates
+ */
 void make_transformations(transformations * trans, double x0, double y0, double * point);
 
 

@@ -43,10 +43,11 @@
 #include "win_sphere.h"
 
 #include "custom.h"
+#include "file_tab.h"
 #include "math_p4.h"
 //#include "math_findpoint.h"
 //#include "math_limitcycles.h"
-#include "math_orbits.h"
+//#include "math_orbits.h"
 #include "math_separatrice.h"
 //#include "math_gcf.h"
 #include "plot_points.h"
@@ -75,12 +76,14 @@ WWinSphere * * WWinSphere::SphereList = nullptr;
 
 // parameters _x1,... are irrelevant if isZoom is false
 
-WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height )
-    : width_(width), height_(height)
+WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::string basename)
+    : width_(width), height_(height), basename_(basename), parentWnd(parent)
 {
+    study_ = new WVFStudy();
+
     ReverseYaxis = false;
     //PainterCache = nullptr;
-    isPainterCacheDirty = true;
+    //isPainterCacheDirty = true;
     //AnchorMap = nullptr;
     //refreshTimeout = nullptr;
     //SelectingTimer = nullptr;
@@ -94,30 +97,29 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height )
         SphereList[numSpheres-2]->next = this;
     }
 
-    parentWnd = parent;
     //setMinimumSize(MINWIDTHPLOTWINDOW,MINHEIGHTPLOTWINDOW);         // THIS IS THE MINIMUM SIZE
     /*setWidth(parent->width());
     setHeight(parent->height());
     w = this->width().toPixels();
     h = this->height().toPixels();*/
     resize(width_,height_);
-    w = width_;
-    h = height_;
-    idealh = w;
-    SelectingPointStep =0;
+    //w = width_;
+    //h = height_;
+    //idealh = w;
+    //SelectingPointStep =0;
 
     //horPixelsPerMM = ((double)w) / ((double)widthMM());
     //verPixelsPerMM = ((double)h) / ((double)heightMM());
 
     //setMouseTracking(true);
     //msgBar = bar;
-    selectingZoom = false;
-    selectingLCSection = false;
+    //selectingZoom = false;
+    //selectingLCSection = false;
     //setFocusPolicy( Qt::ClickFocus );
     //setWindowFlags( windowFlags() );
     next = nullptr;
 
-    iszoom = false;
+    //iszoom = false;
     /*iszoom = isZoom;
     if( isZoom )
     {
@@ -170,6 +172,13 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height )
 
 void WWinSphere::SetupPlot( void )
 {
+    if (!study_->readTables(basename_)) {
+        //parent()->printError("Error while reading results. Evaluate the vector field first");
+        delete this;
+        return;
+    } else
+        study_->setupCoordinateTransformations();
+
     struct P4POLYLINES * t;
     /*QPalette palette;
 
@@ -192,19 +201,19 @@ void WWinSphere::SetupPlot( void )
         t = nullptr;
     }
 
-    if( !iszoom )
+    //if( !iszoom )
     {
-        switch( VFResults.typeofview )
+        switch( study_->typeofview )
         {
         case TYPEOFVIEW_PLANE:
         case TYPEOFVIEW_U1:
         case TYPEOFVIEW_U2:
         case TYPEOFVIEW_V1:
         case TYPEOFVIEW_V2:
-            x0 = VFResults.xmin;
-            y0 = VFResults.ymin;
-            x1 = VFResults.xmax;
-            y1 = VFResults.ymax;
+            x0 = study_->xmin;
+            y0 = study_->ymin;
+            x1 = study_->xmax;
+            y1 = study_->ymax;
             break;
         case TYPEOFVIEW_SPHERE:
             x0 = -1.1;
@@ -218,31 +227,31 @@ void WWinSphere::SetupPlot( void )
     dx = x1-x0;
     dy = y1-y0;
 
-    double idealhd;
+    //double idealhd;
     
-    idealhd = w;
-    idealhd = (idealhd/dx)*dy;
+    //idealhd = w;
+    //idealhd = (idealhd/dx)*dy;
 
-    idealh = (int)(idealhd+.5);
+    //idealh = (int)(idealhd+.5);
 
-    /*switch( VFResults.typeofview )
+    /*switch( study_->typeofview )
     {
     case TYPEOFVIEW_PLANE:  chartstring = "";   break;
     case TYPEOFVIEW_SPHERE: chartstring = "";   break;
-    case TYPEOFVIEW_U1:     chartstring = makechartstring( VFResults.p, VFResults.q, true, false ); break;
-    case TYPEOFVIEW_U2:     chartstring = makechartstring( VFResults.p, VFResults.q, false, false );break;
-    case TYPEOFVIEW_V1:     chartstring = makechartstring( VFResults.p, VFResults.q, true, true );  break;
-    case TYPEOFVIEW_V2:     chartstring = makechartstring( VFResults.p, VFResults.q, false, true ); break;
+    case TYPEOFVIEW_U1:     chartstring = makechartstring( study_->p, study_->q, true, false ); break;
+    case TYPEOFVIEW_U2:     chartstring = makechartstring( study_->p, study_->q, false, false );break;
+    case TYPEOFVIEW_V1:     chartstring = makechartstring( study_->p, study_->q, true, true );  break;
+    case TYPEOFVIEW_V2:     chartstring = makechartstring( study_->p, study_->q, false, true ); break;
     }*/
 
-    if( VFResults.typeofview == TYPEOFVIEW_SPHERE )
+    if( study_->typeofview == TYPEOFVIEW_SPHERE )
     {
         CircleAtInfinity = produceEllipse( 0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0) );
-        if( VFResults.plweights )
+        if( study_->plweights )
             PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
     }
     
-    isPainterCacheDirty = true;
+    //isPainterCacheDirty = true;
 }
 
 WWinSphere::~WWinSphere()
@@ -478,10 +487,10 @@ WWinSphere::~WWinSphere()
         delete t;//free( t );
         t = nullptr;
     }
-    if( VFResults.typeofview == TYPEOFVIEW_SPHERE )
+    if( study_->typeofview == TYPEOFVIEW_SPHERE )
     {
         CircleAtInfinity = produceEllipse( 0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0) );
-        if( VFResults.plweights )
+        if( study_->plweights )
             PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
     }
 
@@ -495,7 +504,7 @@ WWinSphere::~WWinSphere()
         QPainter paint( PainterCache );
         paint.fillRect(0,0,width(),height(), QColor( QXFIGCOLOR(CBACKGROUND) ) );
         
-        if( VFResults.singinf )
+        if( study_->singinf )
             paint.setPen( QXFIGCOLOR(CSING) );
         else
             paint.setPen( QXFIGCOLOR(CLINEATINFINITY) );
@@ -506,11 +515,11 @@ WWinSphere::~WWinSphere()
         // since it is not good to do drawing for all spheres every time we
         // get a paint event from windows
 
-        if( VFResults.typeofview != TYPEOFVIEW_PLANE )
+        if( study_->typeofview != TYPEOFVIEW_PLANE )
         {
-            if( VFResults.typeofview == TYPEOFVIEW_SPHERE )
+            if( study_->typeofview == TYPEOFVIEW_SPHERE )
             {
-                if( VFResults.plweights )
+                if( study_->plweights )
                     plotPoincareLyapunovSphere();
                 else
                     plotPoincareSphere();
@@ -556,20 +565,15 @@ WWinSphere::~WWinSphere()
 
 void WWinSphere::paintEvent( WPaintDevice * p )
 {
-    //UNUSED(p);
     SetupPlot();
     WPainter paint(p);
     paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
-    /*if (VFResults.singinf)
-        paint.setPen(WPen(QXFIGCOLOR(CSING)));
-    else
-        paint.setPen(WPen(QXFIGCOLOR(CLINEATINFINITY)));*/
     staticPainter = &paint;
-    if( VFResults.typeofview != TYPEOFVIEW_PLANE )
+    if( study_->typeofview != TYPEOFVIEW_PLANE )
     {
-        if( VFResults.typeofview == TYPEOFVIEW_SPHERE )
+        if( study_->typeofview == TYPEOFVIEW_SPHERE )
         {
-            if( VFResults.plweights ) {
+            if( study_->plweights ) {
                 plotPoincareLyapunovSphere(); //not used
             }
             else {
@@ -637,7 +641,7 @@ double WWinSphere::coWorldX( int x )
     double wx;
 
     wx = (double)x;
-    wx /= (w-1);
+    wx /= (width_-1);
     return (wx*dx + x0);
 }
 
@@ -645,8 +649,8 @@ double WWinSphere::coWorldY( int y )
 {
     double wy;
 
-    wy = (double)(h-1-y);
-    wy /= (h-1);
+    wy = (double)(height_-1-y);
+    wy /= (height_-1);
     return (wy*dy + y0);
 }
 
@@ -656,11 +660,11 @@ int WWinSphere::coWinX( double x )
     int iwx;
 
     wx = (x-x0)/dx;
-    wx *= w-1;
+    wx *= width_-1;
 
     iwx = (int)(wx+0.5);        // +0.5 to round upwards
-    if( iwx >= w )
-        iwx = w-1;
+    if( iwx >= width_ )
+        iwx = width_-1;
 
     return iwx;
 }
@@ -670,7 +674,7 @@ int WWinSphere::coWinH( double deltax )
     double wx;
 
     wx = deltax/dx;
-    wx *= w-1;
+    wx *= width_-1;
     return (int)(wx+0.5);
 }
 
@@ -679,7 +683,7 @@ int WWinSphere::coWinV( double deltay )
     double wy;
 
     wy = deltay/dy;
-    wy *= h-1;
+    wy *= height_-1;
     return (int)(wy+0.5);
 }
 
@@ -689,41 +693,41 @@ int WWinSphere::coWinY( double y )
     int iwy;
 
     wy = (y-y0)/dy;
-    wy *= h-1;
+    wy *= height_-1;
 
     iwy = (int)(wy+0.5);        // +0.5 to round upwards
-    if( iwy >= h )
-        iwy = h-1;
+    if( iwy >= height_ )
+        iwy = height_-1;
 
-    return ( ReverseYaxis ) ? iwy : h-1-iwy;        // on screen: vertical axis orientation is reversed
+    return ( ReverseYaxis ) ? iwy : height_-1-iwy;        // on screen: vertical axis orientation is reversed
 }
 
 
 
-bool WWinSphere::getChartPos( int chart, double x0, double y0, double * pos )
+bool WWinSphere::getChartPos( int chart, double x1, double y1, double * pos )
 {
     double pcoord[3];
 
     switch( chart )
     {
     case CHART_R2:
-        MATHFUNC(finite_to_viewcoord)( x0, y0, pos );
+        (study_->*(study_->finite_to_viewcoord))( x1, y1, pos );
         break;
     case CHART_U1:
-        MATHFUNC(U1_to_sphere)( x0, 0, pcoord );
-        MATHFUNC(sphere_to_viewcoord)( pcoord[0], pcoord[1], pcoord[2], pos );
+        (study_->*(study_->U1_to_sphere))( x1, 0, pcoord );
+        (study_->*(study_->sphere_to_viewcoord))( pcoord[0], pcoord[1], pcoord[2], pos );
         break;
     case CHART_U2:
-        MATHFUNC(U2_to_sphere)( x0, 0, pcoord );
-        MATHFUNC(sphere_to_viewcoord)( pcoord[0], pcoord[1], pcoord[2], pos );
+        (study_->*(study_->U2_to_sphere))( x1, 0, pcoord );
+        (study_->*(study_->sphere_to_viewcoord))( pcoord[0], pcoord[1], pcoord[2], pos );
         break;
     case CHART_V1:
-        MATHFUNC(V1_to_sphere)( x0, 0, pcoord );
-        MATHFUNC(sphere_to_viewcoord)( pcoord[0], pcoord[1], pcoord[2], pos );
+        (study_->*(study_->V1_to_sphere))( x1, 0, pcoord );
+        (study_->*(study_->sphere_to_viewcoord))( pcoord[0], pcoord[1], pcoord[2], pos );
         break;
     case CHART_V2:
-        MATHFUNC(V2_to_sphere)( x0, 0, pcoord );
-        MATHFUNC(sphere_to_viewcoord)( pcoord[0], pcoord[1], pcoord[2], pos );
+        (study_->*(study_->V2_to_sphere))( x1, 0, pcoord );
+        (study_->*(study_->sphere_to_viewcoord))( pcoord[0], pcoord[1], pcoord[2], pos );
         break;
     }
 
@@ -935,17 +939,17 @@ void WWinSphere::plotPoints( void )
     struct semi_elementary * sep;
     struct degenerate * dp;
 
-    for( sp = VFResults.first_saddle_point; sp != nullptr; sp = sp->next_saddle )
+    for( sp = study_->first_saddle_point; sp != nullptr; sp = sp->next_saddle )
         plotPoint( sp );
-    for( np = VFResults.first_node_point; np != nullptr; np = np->next_node )
+    for( np = study_->first_node_point; np != nullptr; np = np->next_node )
         plotPoint( np );
-    for( wfp = VFResults.first_wf_point; wfp != nullptr; wfp = wfp->next_wf )
+    for( wfp = study_->first_wf_point; wfp != nullptr; wfp = wfp->next_wf )
         plotPoint( wfp );
-    for( sfp = VFResults.first_sf_point; sfp != nullptr; sfp = sfp->next_sf )
+    for( sfp = study_->first_sf_point; sfp != nullptr; sfp = sfp->next_sf )
         plotPoint( sfp );
-    for( sep = VFResults.first_se_point; sep != nullptr; sep = sep->next_se )
+    for( sep = study_->first_se_point; sep != nullptr; sep = sep->next_se )
         plotPoint( sep );
-    for( dp = VFResults.first_de_point; dp != nullptr; dp = dp->next_de )
+    for( dp = study_->first_de_point; dp != nullptr; dp = dp->next_de )
         plotPoint( dp );
 }
 
@@ -981,17 +985,17 @@ void WWinSphere::plotSeparatrices( void )
     struct semi_elementary * sep;
     struct degenerate * dp;
 
-    for( sp = VFResults.first_saddle_point; sp != nullptr; sp = sp->next_saddle )
+    for( sp = study_->first_saddle_point; sp != nullptr; sp = sp->next_saddle )
         plotPointSeparatrices( sp );
-    for( sep = VFResults.first_se_point; sep != nullptr; sep = sep->next_se )
+    for( sep = study_->first_se_point; sep != nullptr; sep = sep->next_se )
         plotPointSeparatrices( sep );
-    for( dp = VFResults.first_de_point; dp != nullptr; dp = dp->next_de )
+    for( dp = study_->first_de_point; dp != nullptr; dp = dp->next_de )
         plotPointSeparatrices( dp );
 }
 
 /*void WWinSphere::plotGcf(void )
 {
-    draw_gcf( this, VFResults.gcf_points, CSING, 1 );
+    draw_gcf( this, study_->gcf_points, CSING, 1 );
 }*/
 
 
@@ -1189,7 +1193,7 @@ void WWinSphere::plotPoincareSphere( void )
     int color;
     WPainterPath path;
     P4POLYLINES * circlePoint = CircleAtInfinity;
-    color = VFResults.singinf ? CSING : CLINEATINFINITY;
+    color = study_->singinf ? CSING : CLINEATINFINITY;
     staticPainter->setPen(QXFIGCOLOR(color));
     while( circlePoint != nullptr )
     {
@@ -1208,7 +1212,7 @@ void WWinSphere::plotPoincareLyapunovSphere( void )
     P4POLYLINES * p;
 
     p = CircleAtInfinity;
-    color = VFResults.singinf ? CSING : CLINEATINFINITY;
+    color = study_->singinf ? CSING : CLINEATINFINITY;
 
     staticPainter->setPen( QXFIGCOLOR(color) );
     while( p != nullptr )
@@ -1231,14 +1235,14 @@ void WWinSphere::plotPoincareLyapunovSphere( void )
 
 void WWinSphere::plotLineAtInfinity( void )
 {
-    switch( VFResults.typeofview )
+    switch( study_->typeofview )
     {
     case TYPEOFVIEW_U1:
     case TYPEOFVIEW_V1:
         if( x0 < 0.0 && x1 > 0.0 )
         {
             staticPainter->setPen( QXFIGCOLOR(CLINEATINFINITY) );
-            staticPainter->drawLine( coWinX(0.0), 0, coWinX(0.0), h-1 );
+            staticPainter->drawLine( coWinX(0.0), 0, coWinX(0.0), height_-1 );
         }
         break;
     case TYPEOFVIEW_U2:
@@ -1246,7 +1250,7 @@ void WWinSphere::plotLineAtInfinity( void )
         if( y0 < 0.0 && y1 > 0.0 )
         {
             staticPainter->setPen( QXFIGCOLOR(CLINEATINFINITY) );
-            staticPainter->drawLine( 0, coWinY(0.0), w-1, coWinY(0.0) );
+            staticPainter->drawLine( 0, coWinY(0.0), width_-1, coWinY(0.0) );
         }
 
         break;
@@ -1391,13 +1395,13 @@ void WWinSphere::drawPoint( double x, double y, int color )
 
 
 
-void WWinSphere::refresh( void )
+/*void WWinSphere::refresh( void )
 {
-    isPainterCacheDirty = true;
+    //isPainterCacheDirty = true;
     update();
-}
+}*/
 
-void WWinSphere::CalculateHeightFromWidth( int * width, int * height, int maxheight = -1, double aspectratio = 1  )
+/*void WWinSphere::CalculateHeightFromWidth( int * width, int * height, int maxheight = -1, double aspectratio = 1  )
 {
     // given an optimal width in *width, this procedure calculates the
     // corresponding height in order to maintain the given aspectratio
@@ -1426,7 +1430,7 @@ void WWinSphere::CalculateHeightFromWidth( int * width, int * height, int maxhei
 
         *width = (int)(w+0.5);
     }
-}
+}*/
 
 
 /*void WWinSphere::prepareDrawing()
@@ -1468,20 +1472,16 @@ void WWinSphere::CalculateHeightFromWidth( int * width, int * height, int maxhei
     }
 }*/
 
-void WWinSphere::Signal_Evaluating( void )
+/*void WWinSphere::Signal_Evaluating( void )
 {
-/*
     QPalette palette;
     palette.setColor(backgroundRole(), QXFIGCOLOR(spherebgcolor = CBACKGROUND) );
     setPalette(palette);
-*/
 }
 
 void WWinSphere::Signal_Changed( void )
 {
-/*
     QPalette palette;
     palette.setColor(backgroundRole(), QXFIGCOLOR(spherebgcolor = DARKGRAY) );
     setPalette(palette);
-*/
-}
+}*/

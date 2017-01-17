@@ -43,6 +43,10 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+/*!
+ * @brief Definitions for colors
+ * @file color.h
+ */
 
 #include <Wt/WColor>
 
@@ -51,53 +55,64 @@
 // XFIG 3.1 DEFAULT COLOR TABLE
 //
 
-#define BLACK			0		// pure black
-#define BLUE			1		// pure blue
-#define GREEN			2		// pure green
-#define CYAN			3		// pure cyan
-#define RED				4		// pure red
-#define MAGENTA			5		// pure magenta
-#define YELLOW			6		// pure yellow
-#define WHITE			7		// pure white
-#define BLUE1			8		// 4 shades of blue (dark to light)
-#define BLUE2			9
-#define BLUE3			10
-#define BLUE4			11
-#define GREEN1			12		// 3 shades of green (dark to light)
-#define GREEN2			13
-#define GREEN3			14
-#define CYAN1			15		// 3 shades of cyan (dark to light)
-#define CYAN2			16
-#define CYAN3			17
-#define RED1			18		// 3 shades of red (dark to light)
-#define RED2			19
-#define RED3			20
-#define MAGENTA1		21		// 3 shades of magenta (dark to light)
-#define MAGENTA2		22
-#define MAGENTA3		23
-#define BROWN1			24		// 3 shades of brown (dark to light)
-#define BROWN2			25
-#define BROWN3			26
-#define PINK1			27		// 3 shades of pink (dark to light)
-#define PINK2			28
-#define PINK3			29
-#define PINK4			30
-#define GOLD			31		// gold
+#define BLACK           0       ///< pure black
+#define BLUE            1       ///< pure blue
+#define GREEN           2       ///< pure green
+#define CYAN            3       ///< pure cyan
+#define RED             4       ///< pure red
+#define MAGENTA         5       ///< pure magenta
+#define YELLOW          6       ///< pure yellow
+#define WHITE           7       ///< pure white
+#define BLUE1           8       ///< shades of blue (darkest)
+#define BLUE2           9       ///< shades of blue (dark)
+#define BLUE3           10      ///< shades of blue (light)
+#define BLUE4           11      ///< shades of blue (lightest)
+#define GREEN1          12      ///< shades of green (dark)
+#define GREEN2          13      ///< shades of green (normal)
+#define GREEN3          14      ///< shades of green (light)
+#define CYAN1           15      ///< shades of cyan (dark)
+#define CYAN2           16      ///< shades of cyan (normal)
+#define CYAN3           17      ///< shades of cyan (light)
+#define RED1            18      ///< shades of red (dark)
+#define RED2            19      ///< shades of red (normal)
+#define RED3            20      ///< shades of red (light)
+#define MAGENTA1        21      ///< shades of magenta (dark)
+#define MAGENTA2        22      ///< shades of magenta (normal)
+#define MAGENTA3        23      ///< shades of magenta (light)
+#define BROWN1          24      ///< shades of brown (dark)
+#define BROWN2          25      ///< shades of brown (normal)
+#define BROWN3          26      ///< shades of brown (light)
+#define PINK1           27      ///< shades of pink (darkest)
+#define PINK2           28      ///< shades of pink (dark)
+#define PINK3           29      ///< shades of pink (light)
+#define PINK4           30      ///< shades of pink (lightest)
+#define GOLD            31      ///< gold
 
 
-#define NUMXFIGCOLORS	32
-#define DARKGRAY		NUMXFIGCOLORS
+#define NUMXFIGCOLORS   32              ///< number of colors
+#define DARKGRAY        NUMXFIGCOLORS   ///< dark gray
 
-#define QXFIGCOLOR(x)	Wt::WColor( XFigToRGB[x].r, XFigToRGB[x].g, XFigToRGB[x].b )
+/**
+ * Macro for defining a color
+ * @param  x int (color code as defined in this file)
+ * @return   object of class Wt::WColor with rgb as given by XFigToRGB
+ */
+#define QXFIGCOLOR(x)   Wt::WColor( XFigToRGB[x].r, XFigToRGB[x].g, XFigToRGB[x].b )
 
+/**
+ * Struct that holds the RGB value of a color
+ */
 struct P4RGBITEM
 {
-	int r;
-	int g;
-	int b;
+    int r;  ///< red
+    int g;  ///< green
+    int b;  ///< blue
 };
 
-extern P4RGBITEM XFigToRGB[NUMXFIGCOLORS];	// defined in win_legend.cpp
+/**
+ * Global struct array (one for each color defined in this file)
+ */
+extern P4RGBITEM XFigToRGB[NUMXFIGCOLORS];
 
 
 #endif /* COLOR_H */

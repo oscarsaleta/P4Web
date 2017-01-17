@@ -22,17 +22,40 @@
 #ifndef MYAPPLICATION_H
 #define MYAPPLICATION_H
 
+/*!
+ * @brief Application class for the website backend
+ * @file MyApplication.h
+ * @author Oscar Saleta
+ */
+
 #include <Wt/WApplication>
 
 #include "MainUI.h"
 #include "Session.h"
 
 
-
+/** 
+ * Application class that links server and UI
+ * 
+ * @class MyApplication
+ *
+ * This class simply creates the application framework for
+ * P4Web to run, and then creates an object of type #MainUI
+ * to hold the UI elements of the webpage.
+ */
 class MyApplication : public Wt::WApplication
 {
 public:
+    /** 
+     * Constructor for MyApplication
+     *
+     * Simply runs #MainUI::setupUI() to generate a UI object
+     */
     MyApplication(const Wt::WEnvironment &env);
+
+    /** 
+     * Destructor for MyApplication
+     */
     ~MyApplication();
     
     void authEvent();
