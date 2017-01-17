@@ -40,6 +40,6 @@ set (WT_PROJECT_TARGET P4Web.wt)
 
 add_executable(${WT_PROJECT_TARGET} ${WT_PROJECT_SOURCE})
 
-target_link_libraries(${WT_PROJECT_TARGET} ${WT_CONNECTOR} wt ${Boost_LIBRARIES})
+target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wt )
 
 include_directories(/usr/local/include/Wt ${Boost_INCLUDE_DIR})
