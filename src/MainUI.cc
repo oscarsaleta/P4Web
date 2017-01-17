@@ -51,7 +51,7 @@ void MainUI::setupUI(WContainerWidget *pageRoot)
     WBootstrapTheme *theme = new WBootstrapTheme();
     theme->setVersion(WBootstrapTheme::Version3);
     WApplication::instance()->setTheme(theme);
-    WApplication::instance()->setTitle("P4 Web v0.2 pre-alpha");
+    WApplication::instance()->setTitle(WString::tr("wapplication.settitle"));
     // add our own CSS file for some tweaks
     addAllStyleSheets();
 

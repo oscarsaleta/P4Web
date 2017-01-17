@@ -65,8 +65,7 @@ void plotEllipse( QPainter * p, int cx, int cy, int a, int b, int color, bool do
     p->setPen( pen );
     p->drawEllipse( cx-a, cy-b, a+a, b+b );
 
-    if( dotted )
-    {
+    if( dotted ) {
         pen.setStyle( Qt::SolidLine );
         p->setPen(pen);
     }
@@ -80,18 +79,13 @@ void spherePlotLine( WWinSphere * sp, double * p1, double * p2, int color )
     double ucoord3[2];
     double ucoord4[2];
 
-    if( ((sp->study_)->*(sp->study_->sphere_to_viewcoordpair))(p1,p2,ucoord1,ucoord2,ucoord3,ucoord4) )
-    {
-        while( sp != nullptr )
-        {
+    if( ((sp->study_)->*(sp->study_->sphere_to_viewcoordpair))(p1,p2,ucoord1,ucoord2,ucoord3,ucoord4) ) {
+        while( sp != nullptr ) {
             sp->drawLine( ucoord1[0], ucoord1[1], ucoord2[0], ucoord2[1], color );
             sp = sp->next;
         }
-    }
-    else
-    {
-        while( sp != nullptr )
-        {
+    } else {
+        while( sp != nullptr ) {
             sp->drawLine( ucoord1[0], ucoord1[1], ucoord2[0], ucoord2[1], color );
             sp->drawLine( ucoord3[0], ucoord3[1], ucoord4[0], ucoord4[1], color );
             sp = sp->next;
@@ -105,8 +99,7 @@ void spherePlotPoint( WWinSphere * sp, double * p, int color )
 
     ((sp->study_)->*(sp->study_->sphere_to_viewcoord))(p[0],p[1],p[2],ucoord);
 
-    while( sp != nullptr )
-    {
+    while( sp != nullptr ) {
         sp->drawPoint( ucoord[0], ucoord[1], color );
         sp = sp->next;
     }
@@ -119,12 +112,9 @@ void spherePlotPoint( WWinSphere * sp, double * p, int color )
     double ucoord3[2];
     double ucoord4[2];
 
-    if( ((sp->study_)->*(sp->study_->sphere_to_viewcoordpair))(p1,p2,ucoord1,ucoord2,ucoord3,ucoord4) )
-    {
+    if( ((sp->study_)->*(sp->study_->sphere_to_viewcoordpair))(p1,p2,ucoord1,ucoord2,ucoord3,ucoord4) ) {
         sp->printLine( ucoord1[0], ucoord1[1], ucoord2[0], ucoord2[1], color );
-    }
-    else
-    {
+    } else {
         sp->printLine( ucoord1[0], ucoord1[1], ucoord2[0], ucoord2[1], color );
         sp->printLine( ucoord3[0], ucoord3[1], ucoord4[0], ucoord4[1], color );
     }
@@ -152,33 +142,28 @@ bool lineRectangleIntersect( double & x1, double & y1, double & x2, double & y2,
 {
     double dx, dy;
 
-    if( std::isnan(x1) || std::isnan(x2) || std::isnan(y1) || std::isnan(y2) ||
-        !p4_finite(x1) || !p4_finite(x2) || !p4_finite(y1) || !p4_finite(y2) )
-    {
+    if ( std::isnan(x1) || std::isnan(x2) || std::isnan(y1) || std::isnan(y2) ||
+        !p4_finite(x1) || !p4_finite(x2) || !p4_finite(y1) || !p4_finite(y2) ) {
         return false;
     }
 
-    if( (x1 < xmin && x2 < xmin) || (x1 > xmax && x2 > xmax) ||
-        (y1 < ymin && y2 < ymin) || (y1 > ymax && y2 > ymax) )
-    {
+    if ( (x1 < xmin && x2 < xmin) || (x1 > xmax && x2 > xmax) ||
+        (y1 < ymin && y2 < ymin) || (y1 > ymax && y2 > ymax) ) {
         // early out when it is easily seen that the line does not cut the window:
-
         return false;
     }
 
     dx = x2-x1;
     dy = y2-y1;
 
-    if( fabs(dx) < fabs(dy) )
-    {
+    if ( fabs(dx) < fabs(dy) ) {
         if( fabs(dy)==0 )
             return false;
 
         return lineRectangleIntersect( y1, x1, y2, x2, ymin, ymax, xmin, xmax );
     }
 
-    if( dx < 0 )
-    {
+    if( dx < 0 ) {
         return lineRectangleIntersect( x2, y2, x1, y1, xmin, xmax, ymin, ymax );
     }
 
@@ -187,8 +172,7 @@ bool lineRectangleIntersect( double & x1, double & y1, double & x2, double & y2,
     // Since dx > 0, and since we have done the early-out test,
     //   we know that x2 >= xmin and x1 <= xmax.
 
-    if( x1 < xmin )
-    {
+    if( x1 < xmin ) {
         x1 = xmin;
         y1 = y2 + dy/dx*(xmin-x2);
 
@@ -197,25 +181,20 @@ bool lineRectangleIntersect( double & x1, double & y1, double & x2, double & y2,
 
     // now check y1:
 
-    if( dy > 0 )
-    {
+    if( dy > 0 ) {
         if( y1 > ymax )
             return false;       // y will be increasing, and is already too large
-        if( y1 < ymin )
-        {
+        if( y1 < ymin ) {
             if( y2 + (dy/dx)/(xmax-x2) < ymin )
                 return false;   // y is increasing, but will never reach ymin quickly enough for x in [xmin,xmax].
 
             y1 = ymin;
             x1 = x2 + dx/dy*(ymin-y2);      // calculate intersection point.
         }
-    }
-    else
-    {
+    } else {
         if( y1 < ymin )
             return false;
-        if( y1 > ymax )
-        {
+        if( y1 > ymax ) {
             if( y2 + (dy/dx)/(xmax-x2) > ymax )
                 return false;
 
@@ -227,26 +206,20 @@ bool lineRectangleIntersect( double & x1, double & y1, double & x2, double & y2,
     // here: (x1,y1) is inside the rectangle.
     //   we hence know that xmin <= x1 < x2  (since dx>0).
 
-    if( x2 > xmax )
-    {
+    if( x2 > xmax ) {
         x2 = xmax;
         y2 = y1 + dy/dx*(xmax-x1);
 
         // now, we know that xmin <= x1 < x2 <= xmax.
     }
 
-    if( dy < 0 )
-    {
-        if( y2 < ymin )
-        {
+    if( dy < 0 ) {
+        if( y2 < ymin ) {
             y2 = ymin;
             x2 = x1 + dx/dy*(ymin-y1);      // calculate intersection point.
         }
-    }
-    else
-    {
-        if( y2 > ymax )
-        {
+    } else {
+        if( y2 > ymax ) {
             y2 = ymax;
             x2 = x1 + dx/dy*(ymax-y1);
         }

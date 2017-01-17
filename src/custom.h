@@ -194,7 +194,7 @@ struct P4POLYLINES
         "proc(expr) try radsimp(simplify(expr),ratdenom) catch: simplify(expr) end try end";
 
 
-#define ZCOORD          (sqrt(2)/2)     /** Determine when the point (in the R2-chart)
+#define ZCOORD          (sqrt(2)/2)     /**< Determine when the point (in the R2-chart)
                                         of the orbit goes to infinity.
                                         If z coord on the poincare sphere is less than
                                         ZCOORD then point goes to infinity */

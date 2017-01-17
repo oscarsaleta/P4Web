@@ -73,7 +73,7 @@ void draw_sep( WWinSphere * spherewnd, orbits_points *sep );
  * Draw separatrice with specified color
  * @param spherewnd sphere object
  * @param sep       separatrice
- * @param color     color (given by definitions from #colors.h)
+ * @param color     color (given by definitions from colors.h)
  *
  * Same as draw_sep() but with a custom color
  */
@@ -83,7 +83,7 @@ void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep, int color);
  * Find color for a P4POLYNOM2 of a given type at a given point
  * @param f     polynomial
  * @param type  type of stability
- * @param y[2]  point
+ * @param y     point
  * @return      color code
  */
 int findSepColor2(P4POLYNOM2 f, int type, double y[2]);
@@ -91,7 +91,7 @@ int findSepColor2(P4POLYNOM2 f, int type, double y[2]);
  * Find color for a P4POLYNOM3 of a given type at a given point
  * @param f     polynomial
  * @param type  type of stability
- * @param y[2]  point
+ * @param y     point
  * @return      color code
  */
 int findSepColor3(P4POLYNOM3 f, int type, double y[2]);
@@ -104,24 +104,39 @@ int findSepColor3(P4POLYNOM3 f, int type, double y[2]);
 int change_type(int type);
 
 /**
- * Integrate a separatrice
+ * Separatrices for saddle or saddle-node singularities
  * @param  spherewnd sphere object
  * @param  x0        integration limits
  * @param  y0        integration limits
- * @param  a11       [description]
- * @param  a12       [description]
- * @param  a21       [description]
- * @param  a22       [description]
- * @param  epsilon   [description]
- * @param  sep1      [description]
- * @param  orbit     [description]
- * @param  chart     [description]
- * @return           [description]
+ * @param  a11       transformation matrix
+ * @param  a12       transformation matrix
+ * @param  a21       transformation matrix
+ * @param  a22       transformation matrix
+ * @param  epsilon   radius for boundary around singularity where to start integration
+ * @param  sep1      Taylor approximation of invariant manifold of singularity
+ * @param  orbit     linked list where integrated separatrice is stored
+ * @param  chart     chart in which integration is performed
+ * @return           pointer to first element of the linked list that is
+ *                           the integrated separatrice
+ *
+ * When the singularity is a saddle or saddle-node, first we use the Taylor
+ * approximation of the invariant manifold until we meet the boundary of a 
+ * circle of radius epsilon.
+ *
+ * Then we integrate using WVFStudy::rk78() (calling WVFStudy::integrate_poincare_sep()
+ * or WVFStudy::integrate_lyapunov_sep() depending on which sphere are we working on).
  */
 orbits_points * plot_separatrice(WWinSphere * spherewnd, double x0, double y0,double a11, double a12,
                                         double a21, double a22, double epsilon, sep * sep1,
                                         orbits_points ** orbit, short int chart);
 
+/**
+ * Apply a list of transformations to a point
+ * @param trans linked list of transformations
+ * @param x0    initial coordinates
+ * @param y0    initial coordinates
+ * @param point array for storing final coordinates
+ */
 void make_transformations(transformations * trans, double x0, double y0, double * point);
 
 

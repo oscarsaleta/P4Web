@@ -94,7 +94,7 @@
 
 /**
  * Macro for defining a color
- * @param  b int (color code as defined in this file)
+ * @param  x int (color code as defined in this file)
  * @return   object of class Wt::WColor with rgb as given by XFigToRGB
  */
 #define QXFIGCOLOR(x)   Wt::WColor( XFigToRGB[x].r, XFigToRGB[x].g, XFigToRGB[x].b )

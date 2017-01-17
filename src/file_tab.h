@@ -4,14 +4,13 @@
 #define FILE_TAB_H
 
 /*!
- * @brief Code for reading results from Maple
+ * @brief This file implements the class WVFStudy and defines singularities/separatrices structs
  * @file file_tab.h
  * 
  * This file contains the code to read the information from maple.
  * The relevant structures for saddles etc are set up here.
  */
 
-#include <Wt/WObject>
 #include <Wt/WString>
 #include <Wt/WTextArea>
 
@@ -40,10 +39,10 @@ typedef struct term1 * P4POLYNOM1;
  */
 struct term2
 {
-    int exp_x; ///< x exponent (i) */
-    int exp_y; ///< y exponent (j) */
-    double coeff; /** coefficient (a) */
-    struct term2 * next_term2; ///< next term2 (linked list) */
+    int exp_x; ///< x exponent (i) 
+    int exp_y; ///< y exponent (j) 
+    double coeff; ///< coefficient (a)
+    struct term2 * next_term2; ///< next term2 (linked list) 
 };
 
 /**
@@ -86,7 +85,7 @@ struct orbits_points
                          or 
                          on the poincare-lyapunov sphere 
                          -> p=(0,x,y) or p=(1,r,theta) */
-    int dashes;
+    int dashes;         ///< indicates if the line is dashed or continuous
     int dir;            ///< if we have a line of sing at infinity and have to change */
     int type;           /**< the direction if we integrate the orbit of separatrice 
                          and sometimes the type */
@@ -125,8 +124,14 @@ struct orbits
  */
 struct transformations
 {
-    double x0, y0;                      ///< translation point 
-    int c1,c2, d1,d2,d3,d4;             ///< coefficients for F(x,y) 
+    double x0;          ///< translation point 
+    double y0;          ///< translation point 
+    int c1;             ///< coefficients for F(x,y)
+    int c2;             ///< coefficients for F(x,y)
+    int d1;             ///< coefficients for F(x,y)
+    int d2;             ///< coefficients for F(x,y)
+    int d3;             ///< coefficients for F(x,y)
+    int d4;             ///< coefficients for F(x,y) 
     int d;                              ///< X/x^d
     struct transformations * next_trans; /**< pointer to next transformations (linked
                                             list) */
@@ -203,12 +208,18 @@ struct saddle
     struct saddle * next_saddle;        ///< next saddle
     int chart;                          ///< chart where the singularity is located
 
-    double epsilon;
-    int notadummy;
+    double epsilon;                     /**< radius of sphere up to which separatrices
+                                            are painted as the Taylor approximation
+                                            of the invariant manifold */
+    int notadummy;                      /**< flag that indicates that this singularity
+                                            does not come from a blowup of a degenerate */
 
     struct sep * separatrices;          ///< separatrices for this singularity
     struct term2 * vector_field[2];     ///< vector field {xdot,ydot}
-    double a11,a12,a21,a22;             ///< transformation matrix
+    double a11;                         ///< transformation matrix
+    double a12;                         ///< transformation matrix
+    double a21;                         ///< transformation matrix
+    double a22;                         ///< transformation matrix
 };
 
 /**
@@ -221,12 +232,18 @@ struct semi_elementary
     struct semi_elementary * next_se;   ///< next semi-elementary
     int chart;                          ///< chart where the singularity is located
 
-    double epsilon;
-    int notadummy;
+    double epsilon;                     /**< radius of sphere up to which separatrices
+                                            are painted as the Taylor approximation
+                                            of the invariant manifold */
+    int notadummy;                      /**< flag that indicates that this singularity
+                                            does not come from a blowup of a degenerate */
     
     struct sep * separatrices;          ///< center sep (t,f(t)), sep (g(t),t)
     struct term2 * vector_field[2];     ///< vector field
-    double a11,a12,a21,a22;             ///< transformation matrix
+    double a11;                         ///< transformation matrix
+    double a12;                         ///< transformation matrix
+    double a21;                         ///< transformation matrix
+    double a22;                         ///< transformation matrix
 
     int type;                           ///< type of semi-elementary point
 };
@@ -241,8 +258,11 @@ struct degenerate
     struct degenerate * next_de;        ///< next degenerate
     int chart;                          ///< chart where the singularity is located
     
-    double epsilon;
-    int notadummy;
+    double epsilon;                     /**< radius of sphere up to which separatrices
+                                            are computed as the Taylor approximation of
+                                            blow up separatrices */
+    int notadummy;                      /**< flag that indicates that this singularity
+                                            does not come from a blowup of a degenerate */
 
     struct blow_up_points * blow_up;    ///< blow up points for the degenerate singularity
 };
@@ -320,8 +340,8 @@ struct weak_focus
 #define FOCUSTYPE_STABLE    (-1)    ///< weak focus type stable
 #define FOCUSTYPE_CENTER    4       ///< weak focus type center
 
-#define SETYPE_SADDLENODE_UNSTABSEP     1
-#define SETYPE_SADDLENODE_UNSTABSEP2    2
+#define SETYPE_SADDLENODE_UNSTABSEP     1   ///< semi-elementary saddle node unstable separatrice 1
+#define SETYPE_SADDLENODE_UNSTABSEP2    2   ///< semi-elementary saddle node unstable separatrice 2
 
 #define OT_STABLE           STYPE_STABLE        ///< orbit type stable
 #define OT_UNSTABLE         STYPE_UNSTABLE      ///< orbit type unstable
@@ -357,7 +377,7 @@ enum TYPEOFVIEWS {
  * by type, etc), orbits, compute the coordinates for singularities in
  * different charts...
  */
-class WVFStudy //: public Wt::WObject
+class WVFStudy
 {
 public:
     // general information
@@ -381,10 +401,10 @@ public:
     double xmax;        ///< in case of local study
     double ymin;        ///< in case of local study
     double ymax;        ///< in case of local study
-    bool singinf;
-    int dir_vec_field;
+    bool singinf;       ///< flag for looking for singularities at infinity
+    int dir_vec_field;  ///< direction of vector field
 
-    Wt::WString lasterror;
+    Wt::WString lasterror;  ///< last error emitted
 
     // vector field in various charts
 
@@ -874,6 +894,8 @@ public:
     /**
      * Read blowup points from file
      * @param  fp input file
+     * @param  b  blowup struct
+     * @param  n  number of points to read
      * @return    @c true if no error or @c false if erro
      *
      * This function is called by readDegeneratePoint().
@@ -895,8 +917,8 @@ public:
      *
      * Depending on which view coordinates we want to use,
      * this function links the pointers to the actual functions that we
-     * will need (see @f math_charts.cc, @f math_p4.cc, @f math_changedir.cc,
-     * @f math_orbits.cc).
+     * will need (see math_charts.cc, math_p4.cc, math_changedir.cc,
+     * math_orbits.cc).
      */
     void setupCoordinateTransformations( void );    // see math_p4.cpp
 
@@ -1073,9 +1095,9 @@ public:
     // -----------------------------------------------------------------------
     /**
      * Set current step size of integration
-     * @param double step size
+     * @param curstep step size
      */
-    void set_current_step( double );
+    void set_current_step( double curstep);
     // -----------------------------------------------------------------------
     //                      INTEGRATE BLOWUP FUNCTIONS
     // -----------------------------------------------------------------------
@@ -1091,7 +1113,7 @@ public:
     /**
      * Runge-Kutta order 7/8 numeric integration
      * @param deriv function to integrate, takes a member function of WVFStudy
-     * @param y[2]  integration limits
+     * @param y     integration limits
      * @param hh    initial step size
      * @param hmi   minimum step size
      * @param hma   maximum step size
@@ -1236,19 +1258,6 @@ private:
     
 
 };
-
-//#define DUMP(x) m->append( s.sprintf x );
-//#define DUMPSTR(x) m->append( x );
-
-/**
- * Shortcut to call a function on the global VFResults object
- */
-//#define MATHFUNC(function) (*(VFResults.function))
-
-/**
- * Global WVFStudy object to be used by the program
- */
-//extern WVFStudy VFResults;  // (VFResults.p,VFResults.q) are lyapunov weights
 
 #define LINESTYLE_DASHES    1   ///< style for dashed lines in plot
 #define LINESTYLE_POINTS    0   ///< style for dot lines in plot

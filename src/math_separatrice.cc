@@ -431,10 +431,10 @@ orbits_points * plot_separatrice(WWinSphere * spherewnd, double x0, double y0,do
             break; 
         if (sep1->d) {
             point[0] = x0+a11*y+a12*t;
-            point[1]=y0+a21*y+a22*t;
+            point[1] = y0+a21*y+a22*t;
         } else {
             point[0] = x0+a11*t+a12*y;
-            point[1]=y0+a21*t+a22*y;
+            point[1] = y0+a21*t+a22*y;
         }
         last_orbit->next_point = new orbits_points;
         last_orbit = last_orbit->next_point;
