@@ -33,18 +33,20 @@ MyApplication::MyApplication(const WEnvironment &env) : WApplication(env), sessi
 {
     session_.login().changed().connect(this, &MyApplication::authEvent);
 
+    // login widget
     Auth::AuthWidget *authWidget = new Auth::AuthWidget(Session::auth(), session_.users(), session_.login());
     authWidget->model()->addPasswordAuth(&Session::passwordAuth());
     authWidget->model()->addOAuth(Session::oAuth());
+    authWidget->registrationModel()->setMinLoginNameLength(3);
     authWidget->setRegistrationEnabled(true);
 
     authWidget->processEnvironment();
-    root()->addWidget(authWidget);
+    //root()->addWidget(authWidget);
 
     messageResourceBundle().use(appRoot()+"resources/strings");
 
-    mainUI_ = new MainUI();
-    mainUI_->setupUI(root());
+    mainUI_ = new MainUI(root());
+    mainUI_->setupUI(authWidget);
 
     globalLogger__.debug("MyApplication :: created correctly");
 }

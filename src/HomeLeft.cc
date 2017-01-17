@@ -48,7 +48,9 @@
 
 using namespace Wt;
 
-HomeLeft::HomeLeft(WContainerWidget *parent) : WContainerWidget(parent), evaluatedSignal_(this), errorSignal_(this), onPlotSignal_(this)
+HomeLeft::HomeLeft(WContainerWidget *parent, Auth::AuthWidget *authWidget)
+    : WContainerWidget(parent), authWidget_(authWidget),
+    evaluatedSignal_(this), errorSignal_(this), onPlotSignal_(this)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
@@ -81,6 +83,8 @@ HomeLeft::~HomeLeft()
 
 void HomeLeft::setupUI()
 {
+    addWidget(authWidget_);
+
     // File upload box
     fileUploadBox_ = new WGroupBox(this);
     fileUploadBox_->setId("fileUploadBox_");

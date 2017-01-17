@@ -80,13 +80,23 @@ Wt::Auth::AbstractUserDatabase& Session::users()
     return *users_;
 }
 
-dbo::ptr<User> Session::user() const
+dbo::ptr<User> Session::user()
 {
     if (login_.loggedIn()) {
-        dbo::ptr<AuthInfo> authInfo = users_->find(login_.user());
-        return authInfo->user();
+        return user(login_.user());
     } else
         return dbo::ptr<User>();
+}
+
+dbo::ptr<User> Session::user(const Auth::User& authUser)
+{
+    dbo::ptr<AuthInfo> authInfo = users_->find(authUser);
+    dbo::ptr<User> user = authInfo->user();
+    if (!user) {
+        user = add(new User());
+        authInfo.modify()->setUser(user);
+    }
+    return user;
 }
 
 const Wt::Auth::AuthService& Session::auth()

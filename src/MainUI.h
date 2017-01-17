@@ -28,6 +28,7 @@
  * @author Oscar Saleta
  */
 
+#include <Wt/Auth/AuthWidget>
 #include <Wt/WContainerWidget>
 
 class HomeLeft;
@@ -48,6 +49,11 @@ class HomeRight;
 class MainUI
 {
 public:
+    /**
+     * Constructor
+     * @param root Root container widget
+     */
+    MainUI(Wt::WContainerWidget *root = 0);
     /** 
      * Sets up the UI of the web app from the root, to control every part of it
      *
@@ -55,12 +61,12 @@ public:
      * 
      * @param *pageRoot lowest level of the web page UI, will contain every other widget
      */
-    void setupUI(Wt::WContainerWidget *pageRoot);
+    void setupUI(Wt::Auth::AuthWidget *authWidget);
 
 private:
     Wt::WContainerWidget *root_;
     
-    Wt::WNavigationBar *navbar_;
+    //Wt::WNavigationBar *navbar_;
 
     Wt::WMenu *nvLeftMenu_;
     Wt::WContainerWidget *nvLeftMenuHomeContainer_;

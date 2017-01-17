@@ -32,6 +32,10 @@ set (WT_PROJECT_SOURCE
   plot_points.cc
   plot_tools.h
   plot_tools.cc
+  Session.h
+  Session.cc
+  User.h
+  User.cc
   win_sphere.h
   win_sphere.cc
   )
@@ -40,6 +44,6 @@ set (WT_PROJECT_TARGET P4Web.wt)
 
 add_executable(${WT_PROJECT_TARGET} ${WT_PROJECT_SOURCE})
 
-target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wt )
+target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wtdbo wtdbosqlite3 wt )
 
 include_directories(/usr/local/include/Wt ${Boost_INCLUDE_DIR})
