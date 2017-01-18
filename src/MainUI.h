@@ -28,7 +28,8 @@
  * @author Oscar Saleta
  */
 
-#include <Wt/Auth/AuthWidget>
+#include "MyAuthWidget.h"
+
 #include <Wt/WContainerWidget>
 
 class HomeLeft;
@@ -54,6 +55,8 @@ public:
      * @param root Root container widget
      */
     MainUI(Wt::WContainerWidget *root = 0);
+    ~MainUI();
+
     /** 
      * Sets up the UI of the web app from the root, to control every part of it
      *
@@ -61,14 +64,14 @@ public:
      * 
      * @param *pageRoot lowest level of the web page UI, will contain every other widget
      */
-    void setupUI(Wt::Auth::AuthWidget *authWidget);
+    void setupUI(MyAuthWidget *authWidget);
 
 private:
     Wt::WContainerWidget *root_;
     
     //Wt::WNavigationBar *navbar_;
 
-    Wt::WMenu *nvLeftMenu_;
+    /*Wt::WMenu *nvLeftMenu_;
     Wt::WContainerWidget *nvLeftMenuHomeContainer_;
     Wt::WMenuItem *nvLeftMenuHomeItem_;
     Wt::WContainerWidget *nvLeftMenuPlotContainer_;
@@ -80,15 +83,13 @@ private:
     Wt::WPopupMenu *nvRightPopup_;
     Wt::WMenuItem *nvRightPopupButton_;
     Wt::WMenuItem *nvRightPopupMenuHelpDocItem_;
-    Wt::WMenuItem *nvRightPopupMenuHelpAboutItem_;
+    Wt::WMenuItem *nvRightPopupMenuHelpAboutItem_;*/
 
     HomeLeft *leftContainer_;
     HomeRight *rightContainer_;
 
     Wt::WText *title_;
     Wt::WText *subtitle_;
-
-    void addAllStyleSheets();
 };
 
 #endif // MAINUI_H

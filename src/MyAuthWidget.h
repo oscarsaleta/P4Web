@@ -5,10 +5,10 @@
 
 class Session;
 
-class AuthWidget : public Wt::Auth::AuthWidget
+class MyAuthWidget : public Wt::Auth::AuthWidget
 {
 public:
-    AuthWidget (Session& session);
+    MyAuthWidget (Session& session);
 
     virtual Wt::WWidget *createRegistrationView(const Wt::Auth::Identity& id);
 

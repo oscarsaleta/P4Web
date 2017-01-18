@@ -20,7 +20,8 @@ public:
     Session(const std::string& sqliteDb);
     ~Session();
 
-    dbo::ptr<User> user() const;
+    dbo::ptr<User> user();
+    dbo::ptr<User> user(const Wt::Auth::User& user);
 
     Wt::Auth::AbstractUserDatabase& users();
     Wt::Auth::Login& login() { return login_; }

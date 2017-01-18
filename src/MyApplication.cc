@@ -21,29 +21,43 @@
 
 
 #include "MyApplication.h"
+#include "MyAuthWidget.h"
 #include "MyLogger.h"
 
 #include <Wt/Auth/AuthModel>
 #include <Wt/Auth/AuthWidget>
 #include <Wt/Auth/PasswordService>
 
+#include <Wt/WBootstrapTheme>
+
 using namespace Wt;
 
-MyApplication::MyApplication(const WEnvironment &env) : WApplication(env), session_(appRoot()+"auth.db")
+MyApplication::MyApplication(const WEnvironment &env)
+    :   WApplication(env), session_(appRoot() + "auth.db")
 {
     session_.login().changed().connect(this, &MyApplication::authEvent);
 
+    // set Bootstrap 3 theme
+    WBootstrapTheme *theme = new WBootstrapTheme(this);
+    theme->setVersion(WBootstrapTheme::Version3);
+    setTheme(theme);
+    setTitle(WString::tr("wapplication.settitle"));
+    // add our own CSS file for some tweaks
+    addAllStyleSheets();
+    messageResourceBundle().use(appRoot()+"resources/strings");
+    messageResourceBundle().use(appRoot()+"resources/templates");
+
+
     // login widget
-    Auth::AuthWidget *authWidget = new Auth::AuthWidget(Session::auth(), session_.users(), session_.login());
+    MyAuthWidget *authWidget = new MyAuthWidget(session_);
+    authWidget->setId("authWidget");
     authWidget->model()->addPasswordAuth(&Session::passwordAuth());
     authWidget->model()->addOAuth(Session::oAuth());
-    authWidget->registrationModel()->setMinLoginNameLength(3);
     authWidget->setRegistrationEnabled(true);
 
     authWidget->processEnvironment();
     //root()->addWidget(authWidget);
 
-    messageResourceBundle().use(appRoot()+"resources/strings");
 
     mainUI_ = new MainUI(root());
     mainUI_->setupUI(authWidget);
@@ -61,8 +75,14 @@ MyApplication::~MyApplication()
 void MyApplication::authEvent()
 {
     if (session_.login().loggedIn()) {
-        const Auth::User& u = session_.login().user();
-        Wt::log("notice") << "User" << u.id() << " (" << u.identity(Auth::Identity::LoginName) << ") logged in.";
+        globalLogger__.info("User "+session_.login().user().id()+" logged in.");
+        Wt::Dbo::Transaction t(session_);
+        dbo::ptr<User> user = session_.user();
     } else
-        Wt::log("notice") << "User logged out";
+        globalLogger__.info("User logged out.");
+}
+
+void MyApplication::addAllStyleSheets()
+{
+    useStyleSheet("resources/main.css");
 }

@@ -74,3 +74,13 @@ body{
 #title_ {
   text-align: center;
 }
+
+.Wt-auth-icon {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 5px;
+}
+
+#login-forms {
+  margin-right: -50px;
+}

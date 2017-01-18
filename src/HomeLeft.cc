@@ -48,7 +48,7 @@
 
 using namespace Wt;
 
-HomeLeft::HomeLeft(WContainerWidget *parent, Auth::AuthWidget *authWidget)
+HomeLeft::HomeLeft(WContainerWidget *parent, MyAuthWidget *authWidget)
     : WContainerWidget(parent), authWidget_(authWidget),
     evaluatedSignal_(this), errorSignal_(this), onPlotSignal_(this)
 {

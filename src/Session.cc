@@ -88,7 +88,7 @@ dbo::ptr<User> Session::user()
         return dbo::ptr<User>();
 }
 
-dbo::ptr<User> Session::user(const Auth::User& authUser)
+dbo::ptr<User> Session::user(const Wt::Auth::User& authUser)
 {
     dbo::ptr<AuthInfo> authInfo = users_->find(authUser);
     dbo::ptr<User> user = authInfo->user();

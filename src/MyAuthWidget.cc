@@ -1,17 +1,19 @@
-#include "AuthWidget.h"
+#include "MyAuthWidget.h"
 
 #include "RegistrationView.h"
+#include "Session.h"
 
 using namespace Wt;
 
-AuthWidget::AuthWidget (Session& session)
+MyAuthWidget::MyAuthWidget (Session& session)
     : Auth::AuthWidget(Session::auth(), session.users(), session.login()),
     session_(session)
 {
-
+    setTemplateText(tr("template.login"));
+    updateView(new WFormModel(this));
 }
 
-WWidget *AuthWidget::CreateRegistrationView (const Auth::Identity& id)
+WWidget *MyAuthWidget::createRegistrationView (const Auth::Identity& id)
 {
     RegistrationView *w = new RegistrationView(session_, this);
     Auth::RegistrationModel *model = createRegistrationModel();

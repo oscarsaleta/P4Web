@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <messages xmlns:if="Wt.WTemplate.conditions">
+  
   <message id="template.registration">
     <div class="Wt-form Wt-auth-registration">
       <h2>${tr:Wt.Auth.registration-form-title}</h2>
@@ -34,11 +35,6 @@
           </label>
           ${email}
         ${</if:email>}
-
-	<label for="${id:favourite-pet}">Favourite pet:
-	  ${favourite-pet-info class="Wt-info"}
-	</label>
-	${favourite-pet}
       </div>
 
       ${<if:oauth>}
@@ -55,4 +51,37 @@
       </div>
     </div>
   </message>
+
+  <message id="Wt.Auth.template.login">
+    <div class="span8 offset2 Wt-auth-login">
+      <legend>${tr:Wt.Auth.login-form-title}</legend>
+      <p>${tr:Wt.Auth.login-form-info}</p>
+
+      <div class="form-horizontal" id="login-forms">
+        ${<if:passwords>}
+          ${block:Wt.Auth.field2 user-name user-name-label}
+          ${block:Wt.Auth.field password}
+          ${block:Wt.Auth.field remember-me}
+        ${</if:passwords>}
+
+        ${<if:oauth>}
+          <div class="control-group">
+            <div class="controls">
+              Or use ${icons}
+            </div>
+          </div>
+        ${</if:oauth>}
+
+        <div class="form-actions">
+          <p>${login class="btn btn-primary"}
+          ${lost-password class="btn btn-link"} ${sep}
+          ${register class="btn btn-link"}</p>
+        </div>
+      </div>
+    </div>
+  </message>
+
+  <message id="Wt.Auth.remember-me">Stay logged in</message>
+
+  
 </messages>

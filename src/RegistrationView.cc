@@ -1,5 +1,4 @@
 #include "RegistrationView.h"
-
 #include "UserDetailsModel.h"
 
 #include <Wt/WLineEdit>
@@ -10,27 +9,23 @@ RegistrationView::RegistrationView(Session& session, Auth::AuthWidget *authWidge
     :   Auth::RegistrationWidget(authWidget), session_(session)
 {
     setTemplateText(tr("template.registration"));
-    detailsModel_ = new UserDetailsModel(session_, this);
-
+    detailsModel_ = new UserDetailsModel(session_,this);
     updateView(detailsModel_);
 }
 
-Wt::WFormWidget *RegistrationView::createFormWidget(WFormModel::Field field)
+WFormWidget *RegistrationView::createFormWidget(WFormModel::Field field)
 {
-    if (field == UserDetailsModel::FavouritePetField)
-        return new WLineEdit;
-    else
-        return Auth::RegistrationWidget::createFormWidget(field);
+    return Auth::RegistrationWidget::createFormWidget(field);
 }
 
 bool RegistrationView::validate()
 {
     bool result = Auth::RegistrationWidget::validate();
+
     updateModel(detailsModel_);
     if (!detailsModel_->validate())
         result = false;
     updateView(detailsModel_);
-
     return result;
 }
 

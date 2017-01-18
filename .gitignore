@@ -1,4 +1,4 @@
 doxygen/
-bin/
-.d/
+build/
 log.txt
+*.bak

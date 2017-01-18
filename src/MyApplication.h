@@ -28,11 +28,10 @@
  * @author Oscar Saleta
  */
 
-#include <Wt/WApplication>
-
 #include "MainUI.h"
 #include "Session.h"
 
+#include <Wt/WApplication>
 
 /** 
  * Application class that links server and UI
@@ -63,6 +62,8 @@ public:
 private:
     MainUI *mainUI_;
     Session session_;
+
+    void addAllStyleSheets();
 };
 
 #endif // MYAPPLICATION_H

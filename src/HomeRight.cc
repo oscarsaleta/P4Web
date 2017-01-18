@@ -32,6 +32,7 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent)
 
 HomeRight::~HomeRight()
 {
+    /*
     // sphere
     delete sphere_;
     // output tab
@@ -41,18 +42,18 @@ HomeRight::~HomeRight()
     delete clearOutputButton_;
     delete outputButtonsToolbar_;
     delete outputTextArea_;
-    delete outputContainer_;
+    delete outputContainer_;*/
     // plot tab
     /*delete clearPlotButton_;
     delete plotPointsButton_;
     delete plotSeparatricesButton_;
     delete plotButtonsToolbar_;*/
-    delete plotContainer_;
+    /*delete plotContainer_;
     // legend tab
     delete legend_;
     delete legendContainer_;
     // tab widget
-    delete tabWidget_;
+    delete tabWidget_;*/
 
     globalLogger__.debug("HomeRight :: deleted correctly");
 }

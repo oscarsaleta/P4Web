@@ -27,7 +27,6 @@
 #include "MyLogger.h"
 
 #include <Wt/WApplication>
-#include <Wt/WBootstrapTheme>
 #include <Wt/WGroupBox>
 #include <Wt/WLink>
 #include <Wt/WMenu>
@@ -49,15 +48,15 @@ MainUI::MainUI(WContainerWidget *root) : root_(root)
     root_->setInline(false);
 }
 
-void MainUI::setupUI(Auth::AuthWidget *authWidget)
+MainUI::~MainUI()
 {
-    // set Bootstrap 3 theme
-    WBootstrapTheme *theme = new WBootstrapTheme();
-    theme->setVersion(WBootstrapTheme::Version3);
-    WApplication::instance()->setTheme(theme);
-    WApplication::instance()->setTitle(WString::tr("wapplication.settitle"));
-    // add our own CSS file for some tweaks
-    addAllStyleSheets();
+    delete leftContainer_;
+    delete rightContainer_;
+}
+
+void MainUI::setupUI(MyAuthWidget *authWidget)
+{
+
 
     // title
     title_ = new WText(WString::tr("mainui.pagetitle"));
@@ -92,9 +91,4 @@ void MainUI::setupUI(Auth::AuthWidget *authWidget)
     root_->addWidget(rightContainer_);
 
     globalLogger__.debug("MainUI :: MainUI set up");
-}
-
-void MainUI::addAllStyleSheets()
-{
-    WApplication::instance()->useStyleSheet(WLink("resources/main.css"));
 }
