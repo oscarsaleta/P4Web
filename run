@@ -1,0 +1,3 @@
+#!/bin/bash
+
+build/src/P4Web.wt -c "wt_config.xml" --docroot "." --http-address 0::0 --http-port 8090
