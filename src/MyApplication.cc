@@ -56,7 +56,6 @@ MyApplication::MyApplication(const WEnvironment &env)
     authWidget->setRegistrationEnabled(true);
 
     authWidget->processEnvironment();
-    //root()->addWidget(authWidget);
 
 
     mainUI_ = new MainUI(root());

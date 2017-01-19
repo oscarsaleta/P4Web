@@ -8,7 +8,9 @@
  */
 
 #include "MyAuthWidget.h"
+
 #include <Wt/WContainerWidget>
+#include <Wt/WPanel>
 #include <Wt/WSignal>
 
 /** 
@@ -38,6 +40,8 @@ public:
      */
     ~HomeLeft();
 
+    void changeLoginPanelTitle();
+
     /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
@@ -52,6 +56,7 @@ public:
     Wt::Signal<std::string>& onPlotSignal(); 
     
 private:
+    Wt::WPanel *loginPanel_;
     MyAuthWidget *authWidget_;
 
     Wt::WGroupBox *fileUploadBox_;
@@ -70,6 +75,10 @@ private:
     std::string saveFileName_;
     Wt::WFileResource *saveFileResource_;
 
+    Wt::Signal<std::string> evaluatedSignal_;
+    Wt::Signal<std::string> errorSignal_;
+    Wt::Signal<std::string> onPlotSignal_;
+
     void setupUI();
     void setupConnectors();
 
@@ -85,11 +94,6 @@ private:
     void prepareSaveFile();
 
     void onPlot();
-
-    Wt::Signal<std::string> evaluatedSignal_;
-    Wt::Signal<std::string> errorSignal_;
-    Wt::Signal<std::string> onPlotSignal_;
-
 
 };
 

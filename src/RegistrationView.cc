@@ -8,7 +8,7 @@ using namespace Wt;
 RegistrationView::RegistrationView(Session& session, Auth::AuthWidget *authWidget)
     :   Auth::RegistrationWidget(authWidget), session_(session)
 {
-    setTemplateText(tr("template.registration"));
+    //setTemplateText(tr("Wt.Auth.template.registration"));
     detailsModel_ = new UserDetailsModel(session_,this);
     updateView(detailsModel_);
 }

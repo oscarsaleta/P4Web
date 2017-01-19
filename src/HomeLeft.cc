@@ -35,6 +35,7 @@
 #include <vector>
 
 #include <Wt/WAnchor>
+#include <Wt/WAnimation>
 #include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WFileResource>
@@ -45,6 +46,8 @@
 #include <Wt/WLength>
 #include <Wt/WLineEdit>
 #include <Wt/WString>
+
+#include <Wt/Auth/Identity>
 
 using namespace Wt;
 
@@ -83,8 +86,17 @@ HomeLeft::~HomeLeft()
 
 void HomeLeft::setupUI()
 {
-    addWidget(authWidget_);
+    loginPanel_ = new WPanel();
+    loginPanel_->setId("loginPanel_");
+    loginPanel_->setCollapsible(true);
+    changeLoginPanelTitle();
+    WAnimation animation(WAnimation::SlideInFromTop,WAnimation::EaseOut,100);
+    loginPanel_->setAnimation(animation);
+    loginPanel_->setCentralWidget(authWidget_);
+    addWidget(loginPanel_);
 
+    authWidget_->login().changed().connect(this,&HomeLeft::changeLoginPanelTitle);
+    
     // File upload box
     fileUploadBox_ = new WGroupBox(this);
     fileUploadBox_->setId("fileUploadBox_");
@@ -414,16 +426,26 @@ void HomeLeft::prepareSaveFile()
 
 void HomeLeft::onPlot()
 {
-    if ( /*!study_.readTables(fileUploadName_)*/ fileUploadName_.empty() ) {
+    if ( fileUploadName_.empty() ) {
         errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
     } else {
-        //study_.setupCoordinateTransformations();
-
         globalLogger__.debug("HomeLeft :: sending onPlot signal");
         onPlotSignal_.emit(fileUploadName_);
     }
 }
 
+
+
+void HomeLeft::changeLoginPanelTitle()
+{
+    if (authWidget_->login().loggedIn()) {
+        loginPanel_->setTitle("Logged in as " +
+            authWidget_->login().user().identity(Auth::Identity::LoginName));
+    } else {
+        loginPanel_->setTitle("Login");
+    }
+    loginPanel_->setCollapsed(true);
+}
 
 
 
