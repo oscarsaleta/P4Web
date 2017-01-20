@@ -1,5 +1,9 @@
 #include "Session.h"
 
+#include "MyLogger.h"
+
+#include <Wt/WApplication>
+
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/HashFunction>
 #include <Wt/Auth/PasswordService>
@@ -10,9 +14,11 @@
 #include <Wt/Auth/Dbo/AuthInfo>
 #include <Wt/Auth/Dbo/UserDatabase>
 
+using namespace Wt;
+
 namespace
 {
-    class MyOAuth : public std::vector<const Wt::Auth::OAuthService *>
+    class MyOAuth : public std::vector<const Auth::OAuthService *>
     {
     public:
         ~MyOAuth()
@@ -22,62 +28,59 @@ namespace
         }
     };
 
-    Wt::Auth::AuthService myAuthService;
-    Wt::Auth::PasswordService myPasswordService(myAuthService);
+    Auth::AuthService myAuthService;
+    Auth::PasswordService myPasswordService(myAuthService);
     MyOAuth myOAuthServices;
 }
 
 void Session::configureAuth()
 {
-    myAuthService.setAuthTokensEnabled(true,"logincookie");
+    myAuthService.setAuthTokensEnabled(true,"p4webcookie");
     myAuthService.setEmailVerificationEnabled(true);
     myAuthService.setEmailVerificationRequired(false);
 
-    Wt::Auth::PasswordVerifier *verifier = new Wt::Auth::PasswordVerifier();
-    verifier->addHashFunction(new Wt::Auth::BCryptHashFunction(7));
-    myPasswordService.setVerifier(verifier);
-    myPasswordService.setAttemptThrottlingEnabled(true);
-    myPasswordService.setStrengthValidator(new Wt::Auth::PasswordStrengthValidator());
+    Auth::PasswordVerifier *verifier = new Auth::PasswordVerifier();
+    verifier->addHashFunction(new Auth::BCryptHashFunction(7));
 
-    if (Wt::Auth::GoogleService::configured())
-        myOAuthServices.push_back(new Wt::Auth::GoogleService(myAuthService));
-    if (Wt::Auth::FacebookService::configured())
-        myOAuthServices.push_back(new Wt::Auth::FacebookService(myAuthService));
+    myPasswordService.setVerifier(verifier);
+    myPasswordService.setStrengthValidator(new Auth::PasswordStrengthValidator());
+    myPasswordService.setAttemptThrottlingEnabled(true);
+
+    /*if (Auth::GoogleService::configured())
+        myOAuthServices.push_back(new Auth::GoogleService(myAuthService));
+    if (Auth::FacebookService::configured())
+        myOAuthServices.push_back(new Auth::FacebookService(myAuthService));*/
 
     for (unsigned i=0; i<myOAuthServices.size(); ++i)
         myOAuthServices[i]->generateRedirectEndpoint();
 }
 
-Session::Session(const std::string& sqliteDb) : connection_(sqliteDb)
+Session::Session() :
+    sqlite3_(WApplication::instance()->appRoot()+"auth.db")
 {
-    connection_.setProperty("show-queries","true");
+    session_.setConnection(sqlite3_);
+    sqlite3_.setProperty("show-queries","true");
 
-    setConnection(connection_);
+    session_.mapClass<User>("user");
+    session_.mapClass<AuthInfo>("auth_info");
+    session_.mapClass<AuthInfo::AuthIdentityType>("auth_identity");
+    session_.mapClass<AuthInfo::AuthTokenType>("auth_token");
 
-    mapClass<User>("user");
-    mapClass<AuthInfo>("auth_info");
-    mapClass<AuthInfo::AuthIdentityType>("auth_identity");
-    mapClass<AuthInfo::AuthTokenType>("auth_token");
-
+    users_ = new UserDatabase(session_);
+    Dbo::Transaction transaction(session_);
     try {
-        createTables();
-        std::cerr << "Created database." << std::endl;
-    } catch (std::exception& e) {
-        std::cerr << e.what() << std::endl;
-        std::cerr << "Using existing database";
+        session_.createTables();
+        globalLogger__.info("Created database.");
+    } catch (...) {
+        //std::cerr << e.what() << std::endl;
+        globalLogger__.info("Using existing database");
     }
-
-    users_ = new UserDatabase(*this);
+    transaction.commit();
 }
 
 Session::~Session()
 {
     delete users_;
-}
-
-Wt::Auth::AbstractUserDatabase& Session::users()
-{
-    return *users_;
 }
 
 dbo::ptr<User> Session::user()
@@ -93,23 +96,36 @@ dbo::ptr<User> Session::user(const Wt::Auth::User& authUser)
     dbo::ptr<AuthInfo> authInfo = users_->find(authUser);
     dbo::ptr<User> user = authInfo->user();
     if (!user) {
-        user = add(new User());
+        user = session_.add(new User());
         authInfo.modify()->setUser(user);
     }
     return user;
 }
 
-const Wt::Auth::AuthService& Session::auth()
+std::string Session::userName() const
+{
+  if (login_.loggedIn())
+    return login_.user().identity(Auth::Identity::LoginName).toUTF8();
+  else
+    return std::string();
+}
+
+Auth::AbstractUserDatabase& Session::users()
+{
+    return *users_;
+}
+
+const Auth::AuthService& Session::auth()
 {
     return myAuthService;
 }
 
-const Wt::Auth::PasswordService& Session::passwordAuth()
+const Auth::AbstractPasswordService& Session::passwordAuth()
 {
     return myPasswordService;
 }
 
-const std::vector<const Wt::Auth::OAuthService *>& Session::oAuth()
+const std::vector<const Auth::OAuthService *>& Session::oAuth()
 {
     return myOAuthServices;
 }

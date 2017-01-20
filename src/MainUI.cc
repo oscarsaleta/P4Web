@@ -39,13 +39,19 @@
 #include <Wt/WText>
 #include <Wt/WVBoxLayout>
 
+#include <Wt/Dbo/Transaction>
+
 using namespace Wt;
 
-MainUI::MainUI(WContainerWidget *root) : root_(root)
+MainUI::MainUI(WContainerWidget *parent) :
+    WContainerWidget(parent)
 {
-    root_->setId("root_");
-    root_->setStyleClass(WString::fromUTF8("container"));
-    root_->setInline(false);
+    session_.login().changed().connect(this,&MainUI::onAuthEvent);
+
+    setupUI();
+
+    WApplication::instance()->internalPathChanged().connect(this, &MainUI::handlePathChange);
+    
 }
 
 MainUI::~MainUI()
@@ -54,26 +60,69 @@ MainUI::~MainUI()
     delete rightContainer_;
 }
 
-void MainUI::setupUI(MyAuthWidget *authWidget)
+void MainUI::setupUI()
 {
+    setId("MainUI");
+    setStyleClass("container");
+    setInline(false);
+
+    loginMessageContainer_ = new WContainerWidget(this);
+    loginMessageContainer_->setId("loginMessageContainer_");
+    addWidget(loginMessageContainer_);
+
+    loginText_ = new WText(WString::tr("mainui.logintext-default"),loginMessageContainer_);
+    loginText_->setInline(true);
+    loginMessageContainer_->addWidget(loginText_);
+
+    logoutAnchor_ = new WAnchor("/login","Logout",loginMessageContainer_);
+    logoutAnchor_->setLink(WLink(WLink::InternalPath,"/login"));
+    logoutAnchor_->setInline(true);
+    logoutAnchor_->hide();
+    loginMessageContainer_->addWidget(logoutAnchor_);
+
+    loginAnchor_ = new WAnchor("/login","Login",loginMessageContainer_);
+    loginAnchor_->setLink(WLink(WLink::InternalPath,"/login"));
+    loginAnchor_->setInline(true);
+    loginMessageContainer_->addWidget(loginAnchor_);
+
+
     // title
     title_ = new WText(WString::tr("mainui.pagetitle"));
     title_->setId("title_");
     title_->setStyleClass("page-header center");
-    root_->addWidget(title_);
+    addWidget(title_);
     globalLogger__.debug("MainUI :: title set up");
+
+    // this is used to change page content
+    mainStack_ = new WStackedWidget();
+    mainStack_->setId("mainStack_");
+    addWidget(mainStack_);
+
+    // login widget
+    authWidget_ = new MyAuthWidget(session_, mainStack_);
+    authWidget_->setId("authWidget_");
+    authWidget_->model()->addPasswordAuth(&Session::passwordAuth());
+    authWidget_->model()->addOAuth(Session::oAuth());
+    authWidget_->setRegistrationEnabled(true);
+
+    authWidget_->processEnvironment();
+
+    // this holds the main page content
+    pageContainer_ = new WContainerWidget(mainStack_);
+    pageContainer_->setId("pageContainer_");
+    //addWidget(pageContainer_);
 
     // left widget (file upload, input, buttons)
     globalLogger__.debug("MainUI :: creating HomeLeft...");
-    leftContainer_ = new HomeLeft(root_,authWidget);
+    leftContainer_ = new HomeLeft(pageContainer_);
     globalLogger__.debug("MainUI :: HomeLeft created");
-    root_->addWidget(leftContainer_);
+    pageContainer_->addWidget(leftContainer_);
 
     // right widget (output text area, plots, legend)
     globalLogger__.debug("MainUI :: creating HomeRight...");
-    rightContainer_ = new HomeRight(root_);
+    rightContainer_ = new HomeRight(pageContainer_);
     globalLogger__.debug("MainUI :: HomeRight created");
-    root_->addWidget(rightContainer_);
+    pageContainer_->addWidget(rightContainer_);
 
     // connect signals sent from left to actions performed by right
     leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
@@ -82,4 +131,47 @@ void MainUI::setupUI(MyAuthWidget *authWidget)
     globalLogger__.debug("MainUI :: signals connected");
 
     globalLogger__.debug("MainUI :: MainUI set up");
+    handlePathChange();
+}
+
+void MainUI::onAuthEvent()
+{
+    if (session_.login().loggedIn()) {
+        globalLogger__.info("User "+session_.login().user().id()+" logged in.");
+        setLoginIndicator(session_.userName());
+    } else {
+        globalLogger__.info("User logged out.");
+        setLogoutIndicator();
+    }
+    WApplication::instance()->setInternalPath("/",true);
+}
+
+void MainUI::handlePathChange()
+{
+    WApplication *app = WApplication::instance();
+
+    if (app->internalPath() == "/login")
+        if (session_.login().loggedIn()) {
+            session_.login().logout();
+        } else
+            mainStack_->setCurrentWidget(authWidget_);
+    else {
+        mainStack_->setCurrentWidget(pageContainer_);
+        globalLogger__.info("MainUI: setting main page as current view");
+    }
+}
+
+void MainUI::setLoginIndicator(std::string userName)
+{
+    loginText_->setText(WString::tr("mainui.logintext-user").arg(userName));
+    loginAnchor_->hide();
+    loginText_->show();
+    logoutAnchor_->show();
+}
+
+void MainUI::setLogoutIndicator()
+{
+    loginText_->setText(WString::tr("mainui.logintext-default"));
+    logoutAnchor_->hide();
+    loginAnchor_->show();
 }

@@ -32,11 +32,9 @@
 
 using namespace Wt;
 
-MyApplication::MyApplication(const WEnvironment &env)
-    :   WApplication(env), session_(appRoot() + "auth.db")
+MyApplication::MyApplication(const WEnvironment &env) :
+    WApplication(env)
 {
-    session_.login().changed().connect(this, &MyApplication::authEvent);
-
     // set Bootstrap 3 theme
     WBootstrapTheme *theme = new WBootstrapTheme(this);
     theme->setVersion(WBootstrapTheme::Version3);
@@ -52,18 +50,8 @@ MyApplication::MyApplication(const WEnvironment &env)
     messageResourceBundle().use(appRoot()+"xml/mail_strings");
 
 
-    // login widget
-    MyAuthWidget *authWidget = new MyAuthWidget(session_);
-    authWidget->setId("authWidget");
-    authWidget->model()->addPasswordAuth(&Session::passwordAuth());
-    authWidget->model()->addOAuth(Session::oAuth());
-    authWidget->setRegistrationEnabled(true);
-
-    authWidget->processEnvironment();
-
 
     mainUI_ = new MainUI(root());
-    mainUI_->setupUI(authWidget);
 
     globalLogger__.debug("MyApplication :: created correctly");
 }
@@ -75,15 +63,6 @@ MyApplication::~MyApplication()
     globalLogger__.debug("MyApplication :: deleted correctly");
 }
 
-void MyApplication::authEvent()
-{
-    if (session_.login().loggedIn()) {
-        globalLogger__.info("User "+session_.login().user().id()+" logged in.");
-        Wt::Dbo::Transaction t(session_);
-        dbo::ptr<User> user = session_.user();
-    } else
-        globalLogger__.info("User logged out.");
-}
 
 void MyApplication::addAllStyleSheets()
 {

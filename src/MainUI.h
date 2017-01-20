@@ -28,9 +28,15 @@
  * @author Oscar Saleta
  */
 
-#include "MyAuthWidget.h"
-
 #include <Wt/WContainerWidget>
+
+#include "HomeLeft.h"
+#include "HomeRight.h"
+#include "MyAuthWidget.h"
+#include "Session.h"
+
+#include <Wt/WStackedWidget>
+#include <Wt/WText>
 
 class HomeLeft;
 class HomeRight;
@@ -47,14 +53,14 @@ class HomeRight;
  * This allows us to make some objects (#HomeRight) react to signals emitted by
  * others (#HomeLeft) without making everything global.
  */
-class MainUI
+class MainUI : public Wt::WContainerWidget
 {
 public:
     /**
      * Constructor
-     * @param root Root container widget
+     * @param parent Root container widget
      */
-    MainUI(Wt::WContainerWidget *root = 0);
+    MainUI(Wt::WContainerWidget *parent = 0);
     /**
      * Destructor
      */
@@ -67,16 +73,31 @@ public:
      * 
      * @param *pageRoot lowest level of the web page UI, will contain every other widget
      */
-    void setupUI(MyAuthWidget *authWidget);
+    void setupUI();
+
+    void onAuthEvent();
+    void handlePathChange();
 
 private:
-    Wt::WContainerWidget *root_;
-    
+    Session session_;
+    MyAuthWidget *authWidget_;
+
+    Wt::WContainerWidget *loginMessageContainer_;
+    Wt::WText *loginText_;
+    Wt::WAnchor *loginAnchor_;
+    Wt::WAnchor *logoutAnchor_;
+
+    Wt::WStackedWidget *mainStack_;
+    Wt::WContainerWidget *pageContainer_;
+
     HomeLeft *leftContainer_;
     HomeRight *rightContainer_;
 
     Wt::WText *title_;
     Wt::WText *subtitle_;
+
+    void setLoginIndicator(std::string userName);
+    void setLogoutIndicator();
 };
 
 #endif // MAINUI_H

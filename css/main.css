@@ -1,11 +1,10 @@
-body{
+body {
 	margin      : 95 ;
 	padding     : 95 ;
 	font-family : "helvetica", arial;
 }
 
-#root_
-{
+#MainUI {
 	position        : fixed;
 	left            : 0    ;
 	top             : 0    ;
@@ -13,6 +12,10 @@ body{
 	width           : 100% ;
 	background-color: white;
 	overflow-y      : auto ;
+}
+
+#loginMessageContainer_ {
+  text-align: right;
 }
 
 .btn.disabled {
@@ -77,16 +80,15 @@ body{
   text-align: center;
 }
 
-.Wt-auth-icon {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 5px;
-}
-
 #login-forms {
   margin-right: -50px;
 }
 
 #loginPanel_ {
   margin-top: -5px;
+}
+
+.Wt-auth-login {
+  margin: auto;
+  width: 550px;
 }

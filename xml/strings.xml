@@ -25,4 +25,12 @@
     y'=
   </message>
 
+  <message id="mainui.logintext-default">
+    Not logged in. 
+  </message>
+
+  <message id="mainui.logintext-user">
+    Logged in as {1}. 
+  </message>
+
 </messages>

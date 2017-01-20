@@ -34,27 +34,23 @@
 #include <unistd.h>
 #include <vector>
 
-#include <Wt/WAnchor>
 #include <Wt/WAnimation>
 #include <Wt/WApplication>
 #include <Wt/WBreak>
-#include <Wt/WFileResource>
-#include <Wt/WFileUpload>
-#include <Wt/WGroupBox>
-#include <Wt/WPushButton>
-#include <Wt/WText>
 #include <Wt/WLength>
-#include <Wt/WLineEdit>
 #include <Wt/WString>
 
 #include <Wt/Auth/Identity>
 
 using namespace Wt;
 
-HomeLeft::HomeLeft(WContainerWidget *parent, MyAuthWidget *authWidget)
-    : WContainerWidget(parent), authWidget_(authWidget),
-    evaluatedSignal_(this), errorSignal_(this), onPlotSignal_(this)
+HomeLeft::HomeLeft(WContainerWidget *parent) :
+    WContainerWidget(parent),
+    evaluatedSignal_(this),
+    errorSignal_(this),
+    onPlotSignal_(this)
 {
+
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box-left"));
@@ -86,7 +82,9 @@ HomeLeft::~HomeLeft()
 
 void HomeLeft::setupUI()
 {
-    loginPanel_ = new WPanel();
+    
+
+    /*loginPanel_ = new WPanel();
     loginPanel_->setId("loginPanel_");
     loginPanel_->setCollapsible(true);
     changeLoginPanelTitle();
@@ -95,8 +93,10 @@ void HomeLeft::setupUI()
     loginPanel_->setCentralWidget(authWidget_);
     addWidget(loginPanel_);
 
-    authWidget_->login().changed().connect(this,&HomeLeft::changeLoginPanelTitle);
+    authWidget_->login().changed().connect(this,&HomeLeft::changeLoginPanelTitle);*/
     
+    
+
     // File upload box
     fileUploadBox_ = new WGroupBox(this);
     fileUploadBox_->setId("fileUploadBox_");
@@ -165,6 +165,7 @@ void HomeLeft::setupUI()
     saveButton_->setDisabled(true);
     equationsBox_->addWidget(saveButton_);
 
+    
     globalLogger__.debug("HomeLeft :: UI set up");
 
 }
@@ -444,16 +445,7 @@ void HomeLeft::onPlot()
 
 
 
-void HomeLeft::changeLoginPanelTitle()
-{
-    if (authWidget_->login().loggedIn()) {
-        loginPanel_->setTitle("Logged in as " +
-            authWidget_->login().user().identity(Auth::Identity::LoginName));
-    } else {
-        loginPanel_->setTitle("Login");
-    }
-    loginPanel_->setCollapsed(true);
-}
+
 
 
 

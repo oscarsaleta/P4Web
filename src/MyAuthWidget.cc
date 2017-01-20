@@ -1,12 +1,11 @@
 #include "MyAuthWidget.h"
 
 #include "RegistrationView.h"
-#include "Session.h"
 
 using namespace Wt;
 
-MyAuthWidget::MyAuthWidget (Session& session)
-    : Auth::AuthWidget(Session::auth(), session.users(), session.login()),
+MyAuthWidget::MyAuthWidget (Session& session, WContainerWidget *parent)
+    : Auth::AuthWidget(Session::auth(), session.users(), session.login(), parent),
     session_(session)
 {
     setTemplateText(tr("template.login"));

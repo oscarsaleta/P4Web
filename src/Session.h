@@ -12,26 +12,28 @@ namespace dbo = Wt::Dbo;
 
 typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 
-class Session : public dbo::Session
+class Session
 {
 public:
     static void configureAuth();
 
-    Session(const std::string& sqliteDb);
+    Session();
     ~Session();
-
-    dbo::ptr<User> user();
-    dbo::ptr<User> user(const Wt::Auth::User& user);
 
     Wt::Auth::AbstractUserDatabase& users();
     Wt::Auth::Login& login() { return login_; }
 
+    dbo::ptr<User> user();
+    dbo::ptr<User> user(const Wt::Auth::User& authUser);
+    std::string userName() const;
+
     static const Wt::Auth::AuthService& auth();
-    static const Wt::Auth::PasswordService& passwordAuth();
+    static const Wt::Auth::AbstractPasswordService& passwordAuth();
     static const std::vector<const Wt::Auth::OAuthService *>& oAuth();
 
 private:
-    dbo::backend::Sqlite3 connection_;
+    dbo::backend::Sqlite3 sqlite3_;
+    mutable dbo::Session session_;
     UserDatabase *users_;
     Wt::Auth::Login login_;
 };

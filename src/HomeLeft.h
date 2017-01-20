@@ -6,12 +6,21 @@
  * @file HomeLeft.h
  * @author Oscar Saleta
  */
+#include <Wt/WContainerWidget>
 
 #include "MyAuthWidget.h"
+#include "Session.h"
 
-#include <Wt/WContainerWidget>
+#include <Wt/WAnchor>
+#include <Wt/WFileResource>
+#include <Wt/WFileUpload>
+#include <Wt/WGroupBox>
+#include <Wt/WLineEdit>
 #include <Wt/WPanel>
+#include <Wt/WPushButton>
+#include <Wt/WText>
 #include <Wt/WSignal>
+
 
 /** 
  * This class holds the UI from the left side of the website
@@ -34,7 +43,7 @@ public:
      * Constructor method for HomeLeft
      * @param parent Parent container widget
      */
-    HomeLeft(Wt::WContainerWidget *parent = 0, MyAuthWidget *authWidget = 0);
+    HomeLeft(Wt::WContainerWidget *parent = 0);
     /** 
      * Destructor method for HomeLeft
      */
@@ -54,10 +63,10 @@ public:
      * Method that sends a signal when the plot button is pressed in order to display a plot
      */
     Wt::Signal<std::string>& onPlotSignal(); 
-    
+
 private:
-    Wt::WPanel *loginPanel_;
-    MyAuthWidget *authWidget_;
+    /*Wt::WPanel *loginPanel_;
+    MyAuthWidget *authWidget_;*/
 
     Wt::WGroupBox *fileUploadBox_;
     Wt::WFileUpload *fileUploadWidget_;
