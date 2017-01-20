@@ -2,11 +2,11 @@
 <messages>
 
   <message id="wapplication.settitle">
-    P4 Web v1.0 beta
+    WP4 v0.2 beta
   </message>
 
   <message id="mainui.pagetitle">
-    <h1>P4: Planar Polynomial Phase Portraits</h1>
+    <h1>WP4: Planar Polynomial Phase Portraits</h1>
   </message>
 
   <message id="homeleft.fuploadboxtitle">

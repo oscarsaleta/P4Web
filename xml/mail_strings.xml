@@ -15,9 +15,9 @@
 
     {3}
 
-    We hope you enjoy P4 Web,
+    We hope you enjoy WP4,
 
-    The P4 Web team.
+    The WP4 team.
   </message>
 
   <message id="Wt.Auth.confirmmail.htmlbody">
@@ -36,9 +36,9 @@
     
     <b>{3}</b>
 
-    <p>We hope you enjoy P4 Web,</p>
+    <p>We hope you enjoy WP4,</p>
 
-    <p>The P4 Web team.</p>
+    <p>The WP4 team.</p>
   </message>
 
   <message id="Wt.Auth.lostpasswordmail.htmlbody">
@@ -60,9 +60,9 @@
     
     <b>{3}</b>
 
-    <p>We hope you enjoy P4 Web,</p>
+    <p>We hope you enjoy WP4,</p>
 
-    <p>The P4 Web team.</p>
+    <p>The WP4 team.</p>
   </message>
 
 </messages>

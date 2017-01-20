@@ -1,4 +1,4 @@
-# P4Web, web version of P4 (Polynomial Planar Phase Portraits)
+# WP4, web version of P4 (Polynomial Planar Phase Portraits)
 
 *This project is in an early development stage.*
 

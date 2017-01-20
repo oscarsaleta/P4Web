@@ -92,3 +92,7 @@ body {
   margin: auto;
   width: 550px;
 }
+
+#loginMessageContainer_ {
+  margin-bottom: -50px;
+}
