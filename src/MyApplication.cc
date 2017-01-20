@@ -44,8 +44,12 @@ MyApplication::MyApplication(const WEnvironment &env)
     setTitle(WString::tr("wapplication.settitle"));
     // add our own CSS file for some tweaks
     addAllStyleSheets();
-    messageResourceBundle().use(appRoot()+"resources/strings");
-    messageResourceBundle().use(appRoot()+"resources/templates");
+
+    // add resource files for strings and templates
+    messageResourceBundle().use(appRoot()+"xml/strings");
+    messageResourceBundle().use(appRoot()+"xml/templates");
+    // install sendmail in order for this to work
+    messageResourceBundle().use(appRoot()+"xml/mail_strings");
 
 
     // login widget
@@ -83,5 +87,5 @@ void MyApplication::authEvent()
 
 void MyApplication::addAllStyleSheets()
 {
-    useStyleSheet("resources/main.css");
+    useStyleSheet("css/main.css");
 }

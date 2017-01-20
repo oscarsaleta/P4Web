@@ -56,8 +56,6 @@ MainUI::~MainUI()
 
 void MainUI::setupUI(MyAuthWidget *authWidget)
 {
-
-
     // title
     title_ = new WText(WString::tr("mainui.pagetitle"));
     title_->setId("title_");
@@ -69,26 +67,19 @@ void MainUI::setupUI(MyAuthWidget *authWidget)
     globalLogger__.debug("MainUI :: creating HomeLeft...");
     leftContainer_ = new HomeLeft(root_,authWidget);
     globalLogger__.debug("MainUI :: HomeLeft created");
-
-    // middle space (aligns other widgets to left and right)
-    WContainerWidget *middleSpace_ = new WContainerWidget(root_);
-    middleSpace_->setStyleClass("middle-box");
+    root_->addWidget(leftContainer_);
 
     // right widget (output text area, plots, legend)
     globalLogger__.debug("MainUI :: creating HomeRight...");
     rightContainer_ = new HomeRight(root_);
     globalLogger__.debug("MainUI :: HomeRight created");
+    root_->addWidget(rightContainer_);
 
     // connect signals sent from left to actions performed by right
     leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
     leftContainer_->onPlotSignal().connect(rightContainer_,&HomeRight::onPlot);
     globalLogger__.debug("MainUI :: signals connected");
-
-    // add the widgets
-    root_->addWidget(leftContainer_);
-    root_->addWidget(middleSpace_);
-    root_->addWidget(rightContainer_);
 
     globalLogger__.debug("MainUI :: MainUI set up");
 }

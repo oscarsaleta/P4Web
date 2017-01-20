@@ -84,6 +84,7 @@ private:
 
     void fileUploaded();
     void fileTooLarge();
+    void parseInputFile();
 
     std::string openTempStream(std::string, std::string, std::ofstream&);
     void prepareMapleFile();

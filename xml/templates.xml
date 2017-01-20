@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<messages xmlns:if="Wt.WTemplate.conditions">
+  
+  <message id="Wt.Auth.template.login">
+    <div class="span8 offset2 Wt-auth-login">
+      <!--<legend>${tr:Wt.Auth.login-form-title}</legend>-->
+      <p>${tr:Wt.Auth.login-form-info}</p>
+
+      <div class="form-horizontal" id="login-forms">
+        ${<if:passwords>}
+          ${block:Wt.Auth.field2 user-name user-name-label}
+          ${block:Wt.Auth.field password}
+          ${block:Wt.Auth.field remember-me}
+        ${</if:passwords>}
+
+        ${<if:oauth>}
+          <div class="control-group">
+            <div class="controls">
+              Or use ${icons}
+            </div>
+          </div>
+        ${</if:oauth>}
+
+        <div class="form-actions">
+          <p>${login class="btn btn-primary"}
+          ${register class="btn btn-default"}
+          ${lost-password class="btn btn-default"}</p>
+        </div>
+      </div>
+    </div>
+  </message>
+
+  <message id="Wt.Auth.remember-me">Remember</message>
+
+  <message id="Wt.Auth.template.logged-in">
+    <div class="Wt-auth-logged-in">
+      <b>${user-name}</b> ${logout class="btn-warning"}
+    </div>
+  </message>
+
+
+</messages>

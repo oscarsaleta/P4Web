@@ -25,17 +25,19 @@ body{
 	font-size: 0;
 }
 
-.half-box {
-	display: inline-block;
-	width: 47.5%;
-	font-size: 14px;
+.half-box-left {
+  float: left;
+  width: 580px;
   margin-top: 10px;
   vertical-align: top;
+  font-size: 14px;
 }
-.middle-box {
-  display: inline-block;
-  width: 5%;
-  content: " ";
+.half-box-right {
+  margin-top: 10px;
+  float: right;
+  width: 600px;
+  vertical-align: top;
+  font-size: 14px;
 }
 
 /* inline load button */

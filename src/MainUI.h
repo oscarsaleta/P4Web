@@ -55,6 +55,9 @@ public:
      * @param root Root container widget
      */
     MainUI(Wt::WContainerWidget *root = 0);
+    /**
+     * Destructor
+     */
     ~MainUI();
 
     /** 
@@ -69,22 +72,6 @@ public:
 private:
     Wt::WContainerWidget *root_;
     
-    //Wt::WNavigationBar *navbar_;
-
-    /*Wt::WMenu *nvLeftMenu_;
-    Wt::WContainerWidget *nvLeftMenuHomeContainer_;
-    Wt::WMenuItem *nvLeftMenuHomeItem_;
-    Wt::WContainerWidget *nvLeftMenuPlotContainer_;
-    Wt::WMenuItem *nvLeftMenuPlotItem_;
-    Wt::WContainerWidget *nvLeftMenuSettingsContainer_;
-    Wt::WMenuItem *nvLeftMenuSettingsItem_;
-
-    Wt::WMenu *nvRightMenu_;
-    Wt::WPopupMenu *nvRightPopup_;
-    Wt::WMenuItem *nvRightPopupButton_;
-    Wt::WMenuItem *nvRightPopupMenuHelpDocItem_;
-    Wt::WMenuItem *nvRightPopupMenuHelpAboutItem_;*/
-
     HomeLeft *leftContainer_;
     HomeRight *rightContainer_;
 

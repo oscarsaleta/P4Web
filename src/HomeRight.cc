@@ -17,7 +17,7 @@ using namespace Wt;
 HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent)
 {
     setId("HomeRight");
-    setStyleClass("half-box");
+    setStyleClass("half-box-right");
 
 
     globalLogger__.debug("HomeRight :: setting up UI...");

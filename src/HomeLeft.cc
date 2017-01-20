@@ -57,7 +57,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent, MyAuthWidget *authWidget)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
-    setStyleClass(WString::fromUTF8("half-box"));
+    setStyleClass(WString::fromUTF8("half-box-left"));
 
     // set UI and connect signals
     setupUI();
@@ -202,6 +202,8 @@ void HomeLeft::setupConnectors()
 
 void HomeLeft::fileUploaded()
 {
+    xEquationInput_->setText("");
+    yEquationInput_->setText("");
     // input validation
     std::string extension = fileUploadWidget_->clientFileName().toUTF8().substr(fileUploadWidget_->clientFileName().toUTF8().find_last_of(".")+1);
     if (extension != "inp") {
@@ -212,6 +214,19 @@ void HomeLeft::fileUploaded()
 
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
+    parseInputFile();
+    
+}
+
+void HomeLeft::fileTooLarge()
+{
+    errorSignal_.emit("File too large.");
+    globalLogger__.warning("HomeLeft :: Client tried to upload file too large.");
+}
+
+
+void HomeLeft::parseInputFile()
+{
     // read file and fill xEquationInput and yEquationInput
     std::ifstream f;
     std::string line;
@@ -226,11 +241,11 @@ void HomeLeft::fileUploaded()
         i++;    
         }
         if (f.eof() && i<12) {
-            errorSignal_.emit("End-Of-File reached prematurely.");
+            errorSignal_.emit("Invalid input file.");
             globalLogger__.error("HomeLeft :: EOF while reading input file uploaded with name "+fileUploadName_);
             fileUploadName_ = "";
         } else if (f.bad()) {
-            errorSignal_.emit("Input/Output error.");
+            errorSignal_.emit("Invalid input file.");
             globalLogger__.error("HomeLeft :: I/O error while reading input file uploaded with name "+fileUploadName_);
             fileUploadName_ = "";
         } else {
@@ -239,16 +254,9 @@ void HomeLeft::fileUploaded()
             globalLogger__.info("HomeLeft :: Input file uploaded with name "+fileUploadName_);
         }
         f.close();
-        
     }
-    
 }
 
-void HomeLeft::fileTooLarge()
-{
-    errorSignal_.emit("File too large.");
-    globalLogger__.warning("HomeLeft :: Client tried to upload file too large.");
-}
 
 std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std::ofstream &f)
 {
