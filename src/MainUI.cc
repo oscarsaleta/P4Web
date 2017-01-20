@@ -24,8 +24,10 @@
 #include "file_tab.h"
 #include "HomeLeft.h"
 #include "HomeRight.h"
+#include "MyAuthWidget.h"
 #include "MyLogger.h"
 
+#include <Wt/WAnchor>
 #include <Wt/WApplication>
 #include <Wt/WGroupBox>
 #include <Wt/WLink>
@@ -137,10 +139,10 @@ void MainUI::setupUI()
 void MainUI::onAuthEvent()
 {
     if (session_.login().loggedIn()) {
-        globalLogger__.info("User "+session_.login().user().id()+" logged in.");
+        globalLogger__.info("Auth :: User "+session_.userName()+" logged in.");
         setLoginIndicator(session_.userName());
     } else {
-        globalLogger__.info("User logged out.");
+        globalLogger__.info("Auth :: User logged out.");
         setLogoutIndicator();
     }
     WApplication::instance()->setInternalPath("/",true);
@@ -157,7 +159,7 @@ void MainUI::handlePathChange()
             mainStack_->setCurrentWidget(authWidget_);
     else {
         mainStack_->setCurrentWidget(pageContainer_);
-        globalLogger__.info("MainUI: setting main page as current view");
+        globalLogger__.debug("MainUI :: setting main page as current view");
     }
 }
 

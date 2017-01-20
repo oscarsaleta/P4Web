@@ -2,6 +2,7 @@
 
 #include "file_tab.h"
 #include "MyLogger.h"
+#include "win_sphere.h"
 
 #include <iostream>
 #include <fstream>
@@ -9,7 +10,11 @@
 
 #include <Wt/WBreak>
 #include <Wt/WGroupBox>
+#include <Wt/WImage>
 #include <Wt/WMenuItem>
+#include <Wt/WPushButton>
+#include <Wt/WTabWidget>
+#include <Wt/WToolBar>
 
 using namespace Wt;
 

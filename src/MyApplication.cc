@@ -19,14 +19,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "MyApplication.h"
-#include "MyAuthWidget.h"
-#include "MyLogger.h"
 
-#include <Wt/Auth/AuthModel>
-#include <Wt/Auth/AuthWidget>
-#include <Wt/Auth/PasswordService>
+#include "MainUI.h"
+#include "MyLogger.h"
 
 #include <Wt/WBootstrapTheme>
 

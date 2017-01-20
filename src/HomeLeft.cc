@@ -34,11 +34,18 @@
 #include <unistd.h>
 #include <vector>
 
+#include <Wt/WAnchor>
 #include <Wt/WAnimation>
 #include <Wt/WApplication>
 #include <Wt/WBreak>
+#include <Wt/WFileResource>
+#include <Wt/WFileUpload>
+#include <Wt/WGroupBox>
 #include <Wt/WLength>
-#include <Wt/WString>
+#include <Wt/WLineEdit>
+#include <Wt/WPanel>
+#include <Wt/WPushButton>
+#include <Wt/WText>
 
 #include <Wt/Auth/Identity>
 

@@ -28,17 +28,11 @@
  * @author Oscar Saleta
  */
 
-//#include "file_tab.h"
-#include "win_sphere.h"
-
 #include <Wt/WContainerWidget>
 
-#include <Wt/WImage>
-#include <Wt/WPushButton>
 #include <Wt/WString>
-#include <Wt/WTabWidget>
-#include <Wt/WTextArea>
-#include <Wt/WToolBar>
+
+class WWinSphere;
 
 /** 
  * This class holds the UI from the right side of the website

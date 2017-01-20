@@ -30,7 +30,7 @@
 
 #include <Wt/WApplication>
 
-#include "MainUI.h"
+class MainUI;
 
 /** 
  * Application class that links server and UI

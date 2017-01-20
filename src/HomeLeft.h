@@ -8,19 +8,8 @@
  */
 #include <Wt/WContainerWidget>
 
-#include "MyAuthWidget.h"
-#include "Session.h"
 
-#include <Wt/WAnchor>
-#include <Wt/WFileResource>
-#include <Wt/WFileUpload>
-#include <Wt/WGroupBox>
-#include <Wt/WLineEdit>
-#include <Wt/WPanel>
-#include <Wt/WPushButton>
-#include <Wt/WText>
 #include <Wt/WSignal>
-
 
 /** 
  * This class holds the UI from the left side of the website
@@ -49,8 +38,6 @@ public:
      */
     ~HomeLeft();
 
-    void changeLoginPanelTitle();
-
     /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
@@ -65,9 +52,6 @@ public:
     Wt::Signal<std::string>& onPlotSignal(); 
 
 private:
-    /*Wt::WPanel *loginPanel_;
-    MyAuthWidget *authWidget_;*/
-
     Wt::WGroupBox *fileUploadBox_;
     Wt::WFileUpload *fileUploadWidget_;
     std::string fileUploadName_;

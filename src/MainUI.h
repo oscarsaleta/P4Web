@@ -30,16 +30,11 @@
 
 #include <Wt/WContainerWidget>
 
-#include "HomeLeft.h"
-#include "HomeRight.h"
-#include "MyAuthWidget.h"
 #include "Session.h"
-
-#include <Wt/WStackedWidget>
-#include <Wt/WText>
 
 class HomeLeft;
 class HomeRight;
+class MyAuthWidget;
 
 /** 
  * Auxiliary class for organizing the different elements of the UI
@@ -69,13 +64,23 @@ public:
     /** 
      * Sets up the UI of the web app from the root, to control every part of it
      *
-     * This function is called from the #MyApplication when the program starts.
-     * 
-     * @param *pageRoot lowest level of the web page UI, will contain every other widget
+     * This function is called from the constructor.
      */
     void setupUI();
 
+    /**
+     * Event triggered when a user authenticates or logs out
+     *
+     * Here we can customize the user experience for those who logged in, so
+     * we can show them more options or tweak some program variables.
+     */
     void onAuthEvent();
+
+    /**
+     * Function that handles an internal path change
+     *
+     * We use this to go in and out of the login page
+     */
     void handlePathChange();
 
 private:
