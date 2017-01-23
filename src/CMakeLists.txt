@@ -8,7 +8,7 @@ set (WT_PROJECT_SOURCE
   ${files_src}
   )
 
-set (WT_PROJECT_TARGET P4Web.wt)
+set (WT_PROJECT_TARGET WP4.wt)
 
 add_executable(${WT_PROJECT_TARGET} ${WT_PROJECT_SOURCE})
 

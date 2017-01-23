@@ -30,7 +30,11 @@
   </message>
 
   <message id="mainui.logintext-user">
-    Logged in as {1}. 
+    Logged in as <b>{1}</b>. 
+  </message>
+
+  <message id="homeleft.settingsboxtitle">
+    Evaluation parameters
   </message>
 
 </messages>

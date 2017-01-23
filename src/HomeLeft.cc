@@ -38,6 +38,7 @@
 #include <Wt/WAnimation>
 #include <Wt/WApplication>
 #include <Wt/WBreak>
+#include <Wt/WButtonGroup>
 #include <Wt/WFileResource>
 #include <Wt/WFileUpload>
 #include <Wt/WGroupBox>
@@ -45,7 +46,8 @@
 #include <Wt/WLineEdit>
 #include <Wt/WPanel>
 #include <Wt/WPushButton>
-#include <Wt/WText>
+#include <Wt/WRadioButton>
+#include <Wt/WLabel>
 
 #include <Wt/Auth/Identity>
 
@@ -55,7 +57,9 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     WContainerWidget(parent),
     evaluatedSignal_(this),
     errorSignal_(this),
-    onPlotSignal_(this)
+    onPlotSignal_(this),
+    loggedIn_(false),
+    settingsBox_(nullptr)
 {
 
     // set CSS class for inline 50% of the screen
@@ -65,6 +69,19 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     // set UI and connect signals
     setupUI();
     setupConnectors();
+
+    // set up maple parameters that will not change
+    str_bindir = "/usr/local/p4/bin/";
+    str_p4m = str_bindir+"p4.m";
+    str_tmpdir = "/tmp/";
+    str_lypexe = "lyapunov";
+    str_sepexe = "separatrice";
+    str_exeprefix = "";
+    str_platform = "LINUX";
+    str_sumtablepath = "/usr/local/p4/sumtables/";
+    str_removecmd = "rm";
+    str_simplify = "false";
+    str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
 
     globalLogger__.debug("HomeLeft :: created correctly");
 }
@@ -89,25 +106,11 @@ HomeLeft::~HomeLeft()
 
 void HomeLeft::setupUI()
 {
-    
-
-    /*loginPanel_ = new WPanel();
-    loginPanel_->setId("loginPanel_");
-    loginPanel_->setCollapsible(true);
-    changeLoginPanelTitle();
-    WAnimation animation(WAnimation::SlideInFromTop,WAnimation::EaseOut,100);
-    loginPanel_->setAnimation(animation);
-    loginPanel_->setCentralWidget(authWidget_);
-    addWidget(loginPanel_);
-
-    authWidget_->login().changed().connect(this,&HomeLeft::changeLoginPanelTitle);*/
-    
-    
 
     // File upload box
     fileUploadBox_ = new WGroupBox(this);
     fileUploadBox_->setId("fileUploadBox_");
-    fileUploadBox_->setTitle(tr("homeleft.fuploadboxtitle"));
+    fileUploadBox_->setTitle(WString::tr("homeleft.fuploadboxtitle"));
     addWidget(fileUploadBox_);
 
     fileUploadWidget_ = new WFileUpload(fileUploadBox_);
@@ -122,27 +125,29 @@ void HomeLeft::setupUI()
     // Equation boxes
     equationsBox_ = new WGroupBox(this);
     equationsBox_->setId("equationsBox_");
-    equationsBox_->setTitle(tr("homeleft.equationboxtitle"));
+    equationsBox_->setTitle(WString::tr("homeleft.equationboxtitle"));
     addWidget(equationsBox_);
 
-    xLabel_ = new WText(WString::tr("homeleft.xprimelabel"), equationsBox_);
+    xLabel_ = new WLabel(WString::tr("homeleft.xprimelabel"), equationsBox_);
     xLabel_->setId("xLabel_");
-    equationsBox_->addWidget(xLabel_);
+    //equationsBox_->addWidget(xLabel_);
 
     xEquationInput_ = new WLineEdit();
     xEquationInput_->setId("xEquationInput_");
     xEquationInput_->setStyleClass(WString::fromUTF8("equation-editor"));
+    xLabel_->setBuddy(xEquationInput_);
     equationsBox_->addWidget(xEquationInput_);
 
     equationsBox_->addWidget(new WBreak);
 
-    yLabel_ = new WText(WString::tr("homeleft.yprimelabel"), equationsBox_);
+    yLabel_ = new WLabel(WString::tr("homeleft.yprimelabel"), equationsBox_);
     yLabel_->setId("yLabel_");
-    equationsBox_->addWidget(yLabel_);
+    //equationsBox_->addWidget(yLabel_);
 
     yEquationInput_ = new WLineEdit();
     yEquationInput_->setId("yEquationInput_");
     yEquationInput_->setStyleClass(WString::fromUTF8("equation-editor"));
+    yLabel_->setBuddy(yEquationInput_);
     equationsBox_->addWidget(yEquationInput_);
 
     equationsBox_->addWidget(new WBreak);
@@ -172,7 +177,13 @@ void HomeLeft::setupUI()
     saveButton_->setDisabled(true);
     equationsBox_->addWidget(saveButton_);
 
-    
+    clearButton_ = new WPushButton("Clear",equationsBox_);
+    clearButton_->setId("clearButton_");
+    clearButton_->setStyleClass("btn btn-warning");
+    clearButton_->setInline(true);
+    clearButton_->setMargin(5,Left);
+    equationsBox_->addWidget(clearButton_);
+
     globalLogger__.debug("HomeLeft :: UI set up");
 
 }
@@ -187,6 +198,10 @@ void HomeLeft::setupConnectors()
     // buttons
     evalButton_->clicked().connect(this,&HomeLeft::evaluate);
     plotButton_->clicked().connect(this,&HomeLeft::onPlot);
+    clearButton_->clicked().connect(std::bind([=] () {
+        xEquationInput_->setText(std::string());
+        yEquationInput_->setText(std::string());
+    }));
 
     // enable buttons if line edits have content
     xEquationInput_->textInput().connect(std::bind([=] () {
@@ -210,8 +225,8 @@ void HomeLeft::setupConnectors()
 
 void HomeLeft::fileUploaded()
 {
-    xEquationInput_->setText("");
-    yEquationInput_->setText("");
+    xEquationInput_->setText(std::string());
+    yEquationInput_->setText(std::string());
     // input validation
     std::string extension = fileUploadWidget_->clientFileName().toUTF8().substr(fileUploadWidget_->clientFileName().toUTF8().find_last_of(".")+1);
     if (extension != "inp") {
@@ -297,45 +312,56 @@ void HomeLeft::prepareMapleFile()
         fileUploadName_ = openTempStream("/tmp",".mpl",mplFile);
     }
 
+    if (!loggedIn_) {
+        str_critpoints = "0";
+        str_saveall = "false";
+        str_vectable = fileUploadName_+"_vec.tab";
+        str_fintab = fileUploadName_+"_fin.tab";
+        str_finres = fileUploadName_+"_fin.res";
+        str_inftab = fileUploadName_+"_inf.tab";
+        str_infres = fileUploadName_+"_inf.res";
+        str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
+        str_gcf = "0";
+        str_numeric = "true";
+        str_epsilon = "0.01";
+        str_testsep = "false";
+        str_precision = "8";
+        str_precision0 = "0";
+        str_taylor = "6";
+        str_numericlevel = "10";
+        str_maxlevel = "20";
+        str_weaklevel = "0";
+        str_userp = "1";
+        str_userq = "1";
+    } else {
+        str_critpoints = "0";
+        str_saveall = "false";
+        str_vectable = fileUploadName_+"_vec.tab";
+        str_fintab = fileUploadName_+"_fin.tab";
+        str_finres = fileUploadName_+"_fin.res";
+        str_inftab = fileUploadName_+"_inf.tab";
+        str_infres = fileUploadName_+"_inf.res";
+        str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
+        str_gcf = "0";
+        str_numeric = "true";
+        str_epsilon = "0.01";
+        str_testsep = "false";
+        str_precision = "8";
+        str_precision0 = "0";
+        str_taylor = "6";
+        str_numericlevel = "10";
+        str_maxlevel = "20";
+        str_weaklevel = "0";
+        str_userp = "1";
+        str_userq = "1";
+    }
+
     if (mplFile.is_open())
         fillMapleScript(fileUploadName_,mplFile);
 }
 
 void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
 {
-
-    WString str_bindir = "/usr/local/p4/bin/";
-    WString str_p4m = str_bindir+"p4.m";
-    WString str_tmpdir = "/tmp/";
-    WString str_lypexe = "lyapunov";
-    WString str_sepexe = "separatrice";
-    WString str_exeprefix = "";
-    WString str_platform = "LINUX";
-    WString str_sumtablepath = "/usr/local/p4/sumtables/";
-    WString str_removecmd = "rm";
-    WString str_simplify = "false";
-    WString str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
-    WString str_critpoints = "0";
-    WString str_saveall = "false";
-    WString str_vectable = fname+"_vec.tab";
-    WString str_fintab = fname+"_fin.tab";
-    WString str_finres = fname+"_fin.res";
-    WString str_inftab = fname+"_inf.tab";
-    WString str_infres = fname+"_inf.res";
-    WString str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
-    WString str_gcf = "0";
-    WString str_numeric = "true";
-    WString str_epsilon = "0.01";
-    WString str_testsep = "false";
-    WString str_precision = "8";
-    WString str_precision0 = "0";
-    WString str_taylor = "6";
-    WString str_numericlevel = "10";
-    WString str_maxlevel = "20";
-    WString str_weaklevel = "0";
-    WString str_userp = "1";
-    WString str_userq = "1";
-
     f << "restart;" << std::endl;
     f << "read( \"" << str_p4m << "\" );" << std::endl;
     f << "user_bindir := \"" << str_bindir << "\":" << std::endl;
@@ -387,6 +413,7 @@ void HomeLeft::evaluate()
 
     std::string command = "maple -z --secure-read=/tmp/*,/usr/local/p4/bin/*,/usr/local/p4/sum_tables/* --secure-write=/tmp/*,/usr/local/p4/sum_tables/* --secure-extcall=/usr/local/p4/bin/lyapunov,/usr/local/p4/bin/separatrice "+fileUploadName_+".mpl > "+fileUploadName_+".res";
     globalLogger__.debug("HomeLeft :: Maple system command: "+command);
+
     int status = system(command.c_str());
     if (status == 0) {
         evaluatedSignal_.emit(fileUploadName_);
@@ -451,8 +478,44 @@ void HomeLeft::onPlot()
 }
 
 
+void HomeLeft::showSettings()
+{
+    loggedIn_ = true;
+    if (settingsBox_ != nullptr) {
+        delete settingsBox_;
+        settingsBox_ = nullptr;
+    }
+    settingsBox_ = new WGroupBox(this);
+    settingsBox_->setId("settingsBox_");
+    settingsBox_->setTitle(WString::tr("homeleft.settingsboxtitle"));
+    settingsBox_->setMargin(15,Top);
+    addWidget(settingsBox_);
 
+    // calculations
+    calculationsLabel_ = new WLabel("Calculations:",settingsBox_);
+    calculationsLabel_->setId("calculationsLabel_");
+    calculationsLabel_->setInline(true);
+    calculationsLabel_->setMargin(5,Right);
+    //settingsBox_->addWidget(calculationsLabel_);
+    calculationsBtnGroup_ = new WButtonGroup(settingsBox_);
+    calculationsAlgebraicBtn_ = new WRadioButton("Algebraic",settingsBox_);
+    calculationsLabel_->setBuddy(calculationsAlgebraicBtn_);
+    calculationsBtnGroup_->addButton(calculationsAlgebraicBtn_);
+    settingsBox_->addWidget(calculationsAlgebraicBtn_);
+    calculationsNumericBtn_ = new WRadioButton("Numeric",settingsBox_);
+    calculationsBtnGroup_->addButton(calculationsNumericBtn_);
+    settingsBox_->addWidget(calculationsNumericBtn_);
+    calculationsBtnGroup_->setSelectedButtonIndex(1);
+}
 
+void HomeLeft::hideSettings()
+{
+    loggedIn_ = false;
+    if (settingsBox_ != nullptr) {        
+        delete settingsBox_;
+        settingsBox_ = nullptr;
+    }
+}
 
 
 

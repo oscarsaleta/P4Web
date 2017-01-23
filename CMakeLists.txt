@@ -1,9 +1,9 @@
 cmake_minimum_required (VERSION 3.0)
 
-project(P4Web)
-set (P4Web_VERSION_MAJOR 0)
-set (P4Web_VERSION_MINOR 1)
-set (P4Web_VERSION_PATCH 0)
+project(WP4)
+set (WP4_VERSION_MAJOR 0)
+set (WP4_VERSION_MINOR 1)
+set (WP4_VERSION_PATCH 0)
 
 set (WT_CONNECTOR "wthttp" CACHE STRING "Connector used (wthttp or wtfcgi)")
 

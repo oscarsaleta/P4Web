@@ -107,8 +107,6 @@ void MainUI::setupUI()
     authWidget_->model()->addOAuth(Session::oAuth());
     authWidget_->setRegistrationEnabled(true);
 
-    authWidget_->processEnvironment();
-
     // this holds the main page content
     pageContainer_ = new WContainerWidget(mainStack_);
     pageContainer_->setId("pageContainer_");
@@ -133,6 +131,8 @@ void MainUI::setupUI()
     globalLogger__.debug("MainUI :: signals connected");
 
     globalLogger__.debug("MainUI :: MainUI set up");
+
+    authWidget_->processEnvironment();
     handlePathChange();
 }
 
@@ -141,8 +141,10 @@ void MainUI::onAuthEvent()
     if (session_.login().loggedIn()) {
         globalLogger__.info("Auth :: User "+session_.userName()+" logged in.");
         setLoginIndicator(session_.userName());
+        leftContainer_->showSettings();
     } else {
         globalLogger__.info("Auth :: User logged out.");
+        leftContainer_->hideSettings();
         setLogoutIndicator();
     }
     WApplication::instance()->setInternalPath("/",true);

@@ -57,7 +57,7 @@ int main (int argc, char **argv)
 {
     try {
         WServer server(argc, argv, WTHTTP_CONFIGURATION);
-        server.addEntryPoint(Wt::Application,createApplication);
+        server.addEntryPoint(Wt::Application,createApplication,std::string(),"favicon.ico");
         Session::configureAuth();
         server.run();
 

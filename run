@@ -1,3 +1,0 @@
-#!/bin/bash
-
-build/src/P4Web.wt --docroot="." --approot="." --http-address 0::0 --http-port 8090

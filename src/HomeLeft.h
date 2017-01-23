@@ -39,6 +39,15 @@ public:
     ~HomeLeft();
 
     /**
+     * Show additional settings for a logged in user
+     */
+    void showSettings();
+    /**
+     * Hide additional settings (when a user logs out)
+     */
+    void hideSettings();
+
+    /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
     Wt::Signal<std::string>& evaluatedSignal();
@@ -52,42 +61,93 @@ public:
     Wt::Signal<std::string>& onPlotSignal(); 
 
 private:
+    /* PUBLIC UI (no need to log in) */
     Wt::WGroupBox *fileUploadBox_;
     Wt::WFileUpload *fileUploadWidget_;
     std::string fileUploadName_;
 
     Wt::WGroupBox *equationsBox_;
-    Wt::WText *xLabel_;
+    Wt::WLabel *xLabel_;
     Wt::WLineEdit *xEquationInput_;
-    Wt::WText *yLabel_;
+    Wt::WLabel *yLabel_;
     Wt::WLineEdit *yEquationInput_;
     Wt::WPushButton *evalButton_;
     Wt::WPushButton *plotButton_;
+    Wt::WPushButton *clearButton_;
 
     Wt::WAnchor *saveButton_;
     std::string saveFileName_;
     Wt::WFileResource *saveFileResource_;
 
+    /* PRIVATE UI (log in needed) */
+    Wt::WGroupBox *settingsBox_;
+    Wt::WLabel *calculationsLabel_;
+    Wt::WButtonGroup *calculationsBtnGroup_;
+    Wt::WRadioButton *calculationsAlgebraicBtn_;
+    Wt::WRadioButton *calculationsNumericBtn_;
+
+    /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
     Wt::Signal<std::string> errorSignal_;
     Wt::Signal<std::string> onPlotSignal_;
 
+    /* FUNCTIONS */
+    // sets up public UI
     void setupUI();
+    // sets up connectors for buttons, forms, etc
     void setupConnectors();
-
+    // what to do when file is uploaded
     void fileUploaded();
+    // what to do when uploaded file is too large
     void fileTooLarge();
+    // read uploaded file
     void parseInputFile();
-
+    // open writable file with random name in tmp folder
     std::string openTempStream(std::string, std::string, std::ofstream&);
+    // prepare to write the maple script
     void prepareMapleFile();
+    // write the options inside the maple script
     void fillMapleScript(std::string, std::ofstream&);
+    // run maple on the script
     void evaluate();
-
-    void saveFile();
+    // write a tmp save file in server for download
     void prepareSaveFile();
-
+    // what to do when plot button is pressed
     void onPlot();
+
+    /* MAPLE FILE PARAMETERS */
+    bool loggedIn_;
+    Wt::WString str_bindir;
+    Wt::WString str_p4m;
+    Wt::WString str_tmpdir;
+    Wt::WString str_lypexe;
+    Wt::WString str_sepexe;
+    Wt::WString str_exeprefix;
+    Wt::WString str_platform;
+    Wt::WString str_sumtablepath;
+    Wt::WString str_removecmd;
+    Wt::WString str_simplify;
+    Wt::WString str_simplifycmd;
+    Wt::WString str_critpoints;
+    Wt::WString str_saveall;
+    Wt::WString str_vectable;
+    Wt::WString str_fintab;
+    Wt::WString str_finres;
+    Wt::WString str_inftab;
+    Wt::WString str_infres;
+    Wt::WString str_userf;
+    Wt::WString str_gcf;
+    Wt::WString str_numeric;
+    Wt::WString str_epsilon;
+    Wt::WString str_testsep;
+    Wt::WString str_precision;
+    Wt::WString str_precision0;
+    Wt::WString str_taylor;
+    Wt::WString str_numericlevel;
+    Wt::WString str_maxlevel;
+    Wt::WString str_weaklevel;
+    Wt::WString str_userp;
+    Wt::WString str_userq;
 
 };
 
