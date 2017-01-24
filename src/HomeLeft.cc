@@ -18,6 +18,7 @@
  *  You should have received a copy of the GNU Lesser General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 
 #include "HomeLeft.h"
 
@@ -28,9 +29,11 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
 
@@ -313,15 +316,16 @@ void HomeLeft::prepareMapleFile()
         fileUploadName_ = openTempStream("/tmp",".mpl",mplFile);
     }
 
+    str_vectable = fileUploadName_+"_vec.tab";
+    str_fintab = fileUploadName_+"_fin.tab";
+    str_finres = fileUploadName_+"_fin.res";
+    str_inftab = fileUploadName_+"_inf.tab";
+    str_infres = fileUploadName_+"_inf.res";
+    str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
+
     if (!loggedIn_) {
         str_critpoints = "0";
         str_saveall = "false";
-        str_vectable = fileUploadName_+"_vec.tab";
-        str_fintab = fileUploadName_+"_fin.tab";
-        str_finres = fileUploadName_+"_fin.res";
-        str_inftab = fileUploadName_+"_inf.tab";
-        str_infres = fileUploadName_+"_inf.res";
-        str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
         str_gcf = "0";
         str_numeric = "true";
         str_epsilon = "0.01";
@@ -337,22 +341,16 @@ void HomeLeft::prepareMapleFile()
     } else {
         str_critpoints = "0";
         str_saveall = "false";
-        str_vectable = fileUploadName_+"_vec.tab";
-        str_fintab = fileUploadName_+"_fin.tab";
-        str_finres = fileUploadName_+"_fin.res";
-        str_inftab = fileUploadName_+"_inf.tab";
-        str_infres = fileUploadName_+"_inf.res";
-        str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
         str_gcf = "0";
-        str_numeric = "true";
-        str_epsilon = "0.01";
-        str_testsep = "false";
-        str_precision = "8";
-        str_precision0 = "0";
-        str_taylor = "6";
-        str_numericlevel = "10";
-        str_maxlevel = "20";
-        str_weaklevel = "0";
+        str_numeric = (calculationsBtnGroup_->checkedId() == Numeric) ? "true" : "false";
+        str_epsilon = std::to_string(epsilonSpinBox_->value());
+        str_testsep = (separatricesBtnGroup_->checkedId() == No) ? "false" : "true";
+        str_precision = std::to_string(accuracySpinBox_->value());
+        str_precision0 = std::to_string(precisionSpinBox_->value());
+        str_taylor = std::to_string(levAppSpinBox_->value());
+        str_numericlevel = std::to_string(numericLevelSpinBox_->value());
+        str_maxlevel = std::to_string(maxLevelSpinBox_->value());
+        str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
         str_userp = "1";
         str_userq = "1";
     }
@@ -382,7 +380,11 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
     f << "finite_res := \"" << str_finres << "\":" << std::endl;
     f << "infinite_table := \"" << str_inftab << "\":" << std::endl;
     f << "infinite_res := \"" << str_infres << "\":" << std::endl;
-    f << "user_f := " << str_userf << ":" << std::endl;
+    f << "if (type(parse(\"" << xEquationInput_->text() << "\"),polynom)) then" << std::endl;
+    f << "  if (type(parse(\"" << yEquationInput_->text() << "\"),polynom)) then" << std::endl;
+    f << "    user_f := " << str_userf << ":" << std::endl;
+    f << "  else `quit(1)` end if:" << std::endl;
+    f << "else `quit(1)` end if:" << std::endl;
     f << "user_gcf := " << str_gcf << ":" << std::endl;
     f << "user_numeric :=" << str_numeric << ":" << std::endl;
     f << "epsilon := " << str_epsilon << ":" << std::endl;
@@ -412,18 +414,36 @@ void HomeLeft::evaluate()
 
     prepareMapleFile();
 
-    std::string command = "maple -z --secure-read=/tmp/*,/usr/local/p4/bin/*,/usr/local/p4/sum_tables/* --secure-write=/tmp/*,/usr/local/p4/sum_tables/* --secure-extcall=/usr/local/p4/bin/lyapunov,/usr/local/p4/bin/separatrice "+fileUploadName_+".mpl > "+fileUploadName_+".res";
-    globalLogger__.debug("HomeLeft :: Maple system command: "+command);
-
-    int status = system(command.c_str());
-    if (status == 0) {
-        evaluatedSignal_.emit(fileUploadName_);
-        globalLogger__.info("HomeLeft :: Maple script successfully executed");
-    } else {
-        errorSignal_.emit("Maple error.");
+    pid_t pid = fork();
+    if (pid < 0) {
+        errorSignal_.emit("Fork error");
         globalLogger__.error("HomeLeft :: error during Maple script execution");
+    } else if (pid == 0) {
+        // create vector of arguments for execvp
+        std::vector<char *> commands;
+        commands.push_back("maple");
+        char *aux = new char [fileUploadName_.length()+1];
+        std::strcpy(aux,fileUploadName_.c_str());
+        std::strcat(aux,".mpl");
+        commands.push_back(aux);
+        commands.push_back(nullptr);
+        // output from this thread goes to "fileUploadName_.res"
+        int fd = open((fileUploadName_+".res").c_str(),O_WRONLY|O_CREAT|O_TRUNC,0666);
+        dup2(fd,1);
+        // execute command
+        char **command = commands.data();
+        int status = execvp(command[0],command);
+    } else {
+        int status;
+        waitpid(pid,&status,0);
+        if (status == 0) {
+            evaluatedSignal_.emit(fileUploadName_);
+            globalLogger__.info("HomeLeft :: Maple script successfully executed");
+        } else {
+            errorSignal_.emit("Maple error: "+std::to_string(status));
+            globalLogger__.error("HomeLeft :: error during Maple script execution");
+        }
     }
-    
 }
 
 
@@ -489,7 +509,7 @@ void HomeLeft::showSettings()
     settingsBox_ = new WGroupBox(this);
     settingsBox_->setId("settingsBox_");
     settingsBox_->setTitle(WString::tr("homeleft.settingsboxtitle"));
-    settingsBox_->setMargin(15,Top);
+    settingsBox_->setMargin(35,Top);
     addWidget(settingsBox_);
 
     WRadioButton *button;
@@ -531,7 +551,7 @@ void HomeLeft::showSettings()
     label->setToolTip(WString::tr("tooltip.accuracy"),XHTMLText);
     accuracySpinBox_ = new WSpinBox(settingsBox_);
     accuracySpinBox_->setStyleClass("spin-box");
-    accuracySpinBox_->setRange(1,16);
+    accuracySpinBox_->setRange(1,14);
     accuracySpinBox_->setValue(8);
     accuracySpinBox_->setInline(true);
     label->setBuddy(accuracySpinBox_);
@@ -580,12 +600,40 @@ void HomeLeft::showSettings()
     label->setBuddy(numericLevelSpinBox_);
 
     // maximum level
+    label = new WLabel("Maximum level:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.maximum-level"),XHTMLText);
+    label->setMargin(20,Left);
+    maxLevelSpinBox_ = new WSpinBox(settingsBox_);
+    maxLevelSpinBox_->setStyleClass("spin-box");
+    maxLevelSpinBox_->setRange(15,25);
+    maxLevelSpinBox_->setValue(20);
+    label->setBuddy(maxLevelSpinBox_);
     
+    new WBreak(settingsBox_);
 
-    /*Wt::WSpinBox        *maxLevelSpinBox_;
-    Wt::WSpinBox        *maxWeakLevelSpinBox_;
-    Wt::WSpinBox        *PLWeightPSpinBox_;
-    Wt::WSpinBox        *PLWeightQSpinBox_;*/
+    // max weakness level
+    label = new WLabel("Maximum weakness level:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.maximum-weakness-level"),XHTMLText);
+    maxWeakLevelSpinBox_ = new WSpinBox(settingsBox_);
+    maxWeakLevelSpinBox_->setStyleClass("spin-box");
+    maxWeakLevelSpinBox_->setRange(0,8);
+    maxWeakLevelSpinBox_->setValue(4);
+    label->setBuddy(maxWeakLevelSpinBox_);
+
+    levAppSpinBox_->disable();
+    numericLevelSpinBox_->disable();
+    maxLevelSpinBox_->disable();
+    separatricesBtnGroup_->checkedChanged().connect(std::bind([=] () {
+        if (separatricesBtnGroup_->checkedId()==No) {
+            levAppSpinBox_->disable();
+            numericLevelSpinBox_->disable();
+            maxLevelSpinBox_->disable();
+        } else {
+            levAppSpinBox_->enable();
+            numericLevelSpinBox_->enable();
+            maxLevelSpinBox_->enable();
+        }
+    }));
 
 }
 

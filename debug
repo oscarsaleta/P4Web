@@ -3,4 +3,4 @@
 PATH_TO_SCRIPT=$(cd ${0%/*} && echo $PWD/${0##*/})
 PROGRAMPREFIX=`dirname "$PATH_TO_SCRIPT"`
 
-gdb --args $PROGRAMPREFIX/build/src/WP4.wt --docroot $PROGRAMPREFIX/ --approot $PROGRAMPREFIX/ --http-port 8080 --http-addr 0.0.0.0 $@
+gdb --args $PROGRAMPREFIX/build/src/WP4.wt --docroot $PROGRAMPREFIX/ --approot $PROGRAMPREFIX/ --http-port 8080 --http-addr 0::0 $@

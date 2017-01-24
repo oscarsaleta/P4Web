@@ -71,4 +71,8 @@
     <p>Maximum order of Taylor approximation. Stop testing separatrices at this order.</p>
   </message>
 
+  <message id="tooltip.maximum-weakness-level">
+    <p>Maximum order of Lyapunov constants to be computed for weak foci.</p>
+  </message>
+
 </messages>
