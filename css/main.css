@@ -14,10 +14,6 @@ body {
 	overflow-y      : auto ;
 }
 
-#loginMessageContainer_ {
-  text-align: right;
-}
-
 .btn.disabled {
   cursor: auto;
 }
@@ -80,14 +76,7 @@ body {
   text-align: center;
 }
 
-#login-forms {
-  margin-right: -50px;
-}
-
-#loginPanel_ {
-  margin-top: -5px;
-}
-
+/* login page and login status message */
 .Wt-auth-login {
   margin: auto;
   width: 550px;
@@ -95,4 +84,19 @@ body {
 
 #loginMessageContainer_ {
   margin-bottom: -50px;
+  text-align: right;
+}
+
+/* spin boxes */
+.spin-box {
+  display: inline;
+  width: 25%;
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+.radio-button {
+  margin-left: 10px;
+  margin-right: 10px;
+  margin-bottom: 5px;
 }

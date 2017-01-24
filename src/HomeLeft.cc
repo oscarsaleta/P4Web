@@ -39,17 +39,18 @@
 #include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WButtonGroup>
+#include <Wt/WDoubleSpinBox>
+#include <Wt/WDoubleValidator>
 #include <Wt/WFileResource>
 #include <Wt/WFileUpload>
 #include <Wt/WGroupBox>
+#include <Wt/WLabel>
 #include <Wt/WLength>
 #include <Wt/WLineEdit>
 #include <Wt/WPanel>
 #include <Wt/WPushButton>
 #include <Wt/WRadioButton>
-#include <Wt/WLabel>
-
-#include <Wt/Auth/Identity>
+#include <Wt/WSpinBox>
 
 using namespace Wt;
 
@@ -491,21 +492,101 @@ void HomeLeft::showSettings()
     settingsBox_->setMargin(15,Top);
     addWidget(settingsBox_);
 
+    WRadioButton *button;
+    WLabel *label;
+
     // calculations
-    calculationsLabel_ = new WLabel("Calculations:",settingsBox_);
-    calculationsLabel_->setId("calculationsLabel_");
-    calculationsLabel_->setInline(true);
-    calculationsLabel_->setMargin(5,Right);
-    //settingsBox_->addWidget(calculationsLabel_);
     calculationsBtnGroup_ = new WButtonGroup(settingsBox_);
-    calculationsAlgebraicBtn_ = new WRadioButton("Algebraic",settingsBox_);
-    calculationsLabel_->setBuddy(calculationsAlgebraicBtn_);
-    calculationsBtnGroup_->addButton(calculationsAlgebraicBtn_);
-    settingsBox_->addWidget(calculationsAlgebraicBtn_);
-    calculationsNumericBtn_ = new WRadioButton("Numeric",settingsBox_);
-    calculationsBtnGroup_->addButton(calculationsNumericBtn_);
-    settingsBox_->addWidget(calculationsNumericBtn_);
-    calculationsBtnGroup_->setSelectedButtonIndex(1);
+    label = new WLabel("Calculations:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.calculations"),XHTMLText);
+    button = new WRadioButton("Algebraic",settingsBox_);
+    button->addStyleClass("radio-button");
+    //button->setMargin(10,Left|Right);
+    label->setBuddy(button);
+    calculationsBtnGroup_->addButton(button,Algebraic);
+    button = new WRadioButton("Numeric",settingsBox_);
+    button->addStyleClass("radio-button");
+    calculationsBtnGroup_->addButton(button,Numeric);
+    calculationsBtnGroup_->setCheckedButton(calculationsBtnGroup_->button(Numeric));
+
+    // separatrices
+    separatricesBtnGroup_ = new WButtonGroup(settingsBox_);
+    label = new WLabel("Test separatrices:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.separatrices"),XHTMLText);
+    label->setMargin(20,Left);
+    button = new WRadioButton("Yes",settingsBox_);
+    button->addStyleClass("radio-button");
+    //button->setMargin(10,Left|Right);
+    label->setBuddy(button);
+    separatricesBtnGroup_->addButton(button,Yes);
+    button = new WRadioButton("No",settingsBox_);
+    button->addStyleClass("radio-button");
+    separatricesBtnGroup_->addButton(button,No);
+    separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(No));
+
+    new WBreak(settingsBox_);
+
+    // accuracy
+    label = new WLabel("Accuracy:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.accuracy"),XHTMLText);
+    accuracySpinBox_ = new WSpinBox(settingsBox_);
+    accuracySpinBox_->setStyleClass("spin-box");
+    accuracySpinBox_->setRange(1,16);
+    accuracySpinBox_->setValue(8);
+    accuracySpinBox_->setInline(true);
+    label->setBuddy(accuracySpinBox_);
+
+    // precision
+    label = new WLabel("Precision:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.precision"),XHTMLText);
+    label->setMargin(20,Left);
+    precisionSpinBox_ = new WSpinBox(settingsBox_);
+    precisionSpinBox_->setStyleClass("spin-box");
+    precisionSpinBox_->setRange(0,8);
+    precisionSpinBox_->setValue(0);
+    label->setBuddy(precisionSpinBox_);
+
+    new WBreak(settingsBox_);
+
+    // epsilon
+    label = new WLabel("Epsilon:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.epsilon"),XHTMLText);
+    epsilonSpinBox_ = new WDoubleSpinBox(settingsBox_);
+    epsilonSpinBox_->setStyleClass("spin-box");
+    epsilonSpinBox_->setDecimals(2);
+    epsilonSpinBox_->setSingleStep(0.01);
+    epsilonSpinBox_->setValue(0.01);
+    label->setBuddy(epsilonSpinBox_);
+
+    // level of approximation
+    label = new WLabel("Level of approximation:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.level-approximation"),XHTMLText);
+    label->setMargin(20,Left);
+    levAppSpinBox_ = new WSpinBox(settingsBox_);
+    levAppSpinBox_->setStyleClass("spin-box");
+    levAppSpinBox_->setRange(0,10);
+    levAppSpinBox_->setValue(6);
+    label->setBuddy(levAppSpinBox_);
+
+    new WBreak(settingsBox_);
+
+    // numeric level
+    label = new WLabel("Numeric level:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.numeric-level"),XHTMLText);
+    numericLevelSpinBox_ = new WSpinBox(settingsBox_);
+    numericLevelSpinBox_->setStyleClass("spin-box");
+    numericLevelSpinBox_->setRange(5,15);
+    numericLevelSpinBox_->setValue(8);
+    label->setBuddy(numericLevelSpinBox_);
+
+    // maximum level
+    
+
+    /*Wt::WSpinBox        *maxLevelSpinBox_;
+    Wt::WSpinBox        *maxWeakLevelSpinBox_;
+    Wt::WSpinBox        *PLWeightPSpinBox_;
+    Wt::WSpinBox        *PLWeightQSpinBox_;*/
+
 }
 
 void HomeLeft::hideSettings()

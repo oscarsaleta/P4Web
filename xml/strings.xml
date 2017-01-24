@@ -34,7 +34,41 @@
   </message>
 
   <message id="homeleft.settingsboxtitle">
-    Evaluation parameters
+    Evaluation parameters:
+  </message>
+
+  <message id="tooltip.calculations">
+    <p>Let the symbolic manipulator work in algebraic or numeric mode.</p>
+    <p>The symbolic package will automatically switch over to numeric
+      calculations whenever a symbolic study is impossible.</p>
+  </message>
+
+  <message id="tooltip.separatrices">
+    <p>Enable/disable numeric testing of the Taylor developments for separatrices.</p>
+  </message>
+
+  <message id="tooltip.accuracy">
+    <p>Number of digits required when checking for zero equality.</p>
+  </message>
+
+  <message id="tooltip.precision">
+    <p>Number of digits of numeric precision for all calculations. Use 0 for default double-precision</p>
+  </message>
+
+  <message id="tooltip.epsilon">
+    <p>Default epsilon for separatrices. Can take values from 0.01 to 0.3.</p>
+  </message>
+
+  <message id="tooltip.level-approximation">
+    <p>Order of Taylor approximation. This order is increased as long as the separatrice test fails.</p>
+  </message>
+
+  <message id="tooltip.numeric-level">
+    <p>Start working numerically when order of Taylor approximation reaches this level.</p>
+  </message>
+
+  <message id="tooltip.maximum-level">
+    <p>Maximum order of Taylor approximation. Stop testing separatrices at this order.</p>
   </message>
 
 </messages>

@@ -62,29 +62,41 @@ public:
 
 private:
     /* PUBLIC UI (no need to log in) */
-    Wt::WGroupBox *fileUploadBox_;
-    Wt::WFileUpload *fileUploadWidget_;
-    std::string fileUploadName_;
+    Wt::WGroupBox       *fileUploadBox_;
+    Wt::WFileUpload     *fileUploadWidget_;
+    std::string         fileUploadName_;
 
-    Wt::WGroupBox *equationsBox_;
-    Wt::WLabel *xLabel_;
-    Wt::WLineEdit *xEquationInput_;
-    Wt::WLabel *yLabel_;
-    Wt::WLineEdit *yEquationInput_;
-    Wt::WPushButton *evalButton_;
-    Wt::WPushButton *plotButton_;
-    Wt::WPushButton *clearButton_;
+    Wt::WGroupBox       *equationsBox_;
+    Wt::WLabel          *xLabel_;
+    Wt::WLineEdit       *xEquationInput_;
+    Wt::WLabel          *yLabel_;
+    Wt::WLineEdit       *yEquationInput_;
+    Wt::WPushButton     *evalButton_;
+    Wt::WPushButton     *plotButton_;
+    Wt::WPushButton     *clearButton_;
 
-    Wt::WAnchor *saveButton_;
-    std::string saveFileName_;
-    Wt::WFileResource *saveFileResource_;
+    Wt::WAnchor         *saveButton_;
+    std::string         saveFileName_;
+    Wt::WFileResource   *saveFileResource_;
 
     /* PRIVATE UI (log in needed) */
-    Wt::WGroupBox *settingsBox_;
-    Wt::WLabel *calculationsLabel_;
-    Wt::WButtonGroup *calculationsBtnGroup_;
-    Wt::WRadioButton *calculationsAlgebraicBtn_;
-    Wt::WRadioButton *calculationsNumericBtn_;
+    Wt::WGroupBox       *settingsBox_;
+    
+    Wt::WButtonGroup    *calculationsBtnGroup_;
+    enum Calculations   { Algebraic = 0, Numeric = 1 };
+
+    Wt::WButtonGroup    *separatricesBtnGroup_;
+    enum Separatrices   { Yes = 0, No = 1 };
+
+    Wt::WSpinBox        *accuracySpinBox_;
+    Wt::WSpinBox        *precisionSpinBox_;
+    Wt::WDoubleSpinBox  *epsilonSpinBox_;
+    Wt::WSpinBox        *levAppSpinBox_;
+    Wt::WSpinBox        *numericLevelSpinBox_;
+    Wt::WSpinBox        *maxLevelSpinBox_;
+    Wt::WSpinBox        *maxWeakLevelSpinBox_;
+    Wt::WSpinBox        *PLWeightPSpinBox_;
+    Wt::WSpinBox        *PLWeightQSpinBox_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
