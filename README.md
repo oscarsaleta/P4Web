@@ -27,7 +27,7 @@ The aim of this project is to create a web version of <a href="htpps://github.co
 **Requirements:**
 
 * Compilation: **Wt library** (`sudo apt install witty witty-dev` for Ubuntu) and **CMake** (`sudo apt install cmake`)
-* Execution: **P4** installed as root (see <a href="https://github.com/oscarsaleta/P4#installation">P4 repository</a> for install instructions) [<a name="footnote">1</a>], **Maple**.
+* Execution: **P4** installed as root (see <a href="https://github.com/oscarsaleta/P4#installation">P4 repository</a> for install instructions) [<a href="#footnote">1</a>], **Maple**.
 
 **Step by step:**
 
