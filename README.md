@@ -35,7 +35,10 @@ The aim of this project is to create a web version of <a href="htpps://github.co
 * Create a build directory: `mkdir build && cd build`,
 * Run CMake to generate the Makefiles: `cmake ..`,
 * If no errors appeared, a *Makefile* file should have been created. Run `make` to compile (you can run `make -j4`, for example, if your computer has 4 cores).
-* If no errors appeared, the Wt application is compiled and ready to run. Change dir to the root directory of the repository (`cd ..`) and run the *WP4* script: (`./WP4`).
+* If no errors appeared, the Wt application is compiled and ready to run. Change dir to the root directory of the repository (`cd ..`),
+* Change the name of the server configuration file: `cp wt_config.xml.example wt_config.xml`, and edit it.
+    - Uncomment the properties `auth-mail-sender-name` and `auth-mail-sender-address`, and set the address to a valid mail address. This enables email verification/password recovery.
+* Run the *WP4* script: (`./WP4`).
 * Now open a web browser and go to this address: `[0::0]:8080` to try out WP4.
 
 <sup>[1] Actually, only the separate executables *lyapunov* and *separatrices* are needed from the P4 suite. WP4 does not need or use the P4 Qt application itself for working.</sup>
