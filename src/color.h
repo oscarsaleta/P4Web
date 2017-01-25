@@ -88,8 +88,10 @@
 #define PINK4           30      ///< shades of pink (lightest)
 #define GOLD            31      ///< gold
 
+#define LIGHTGRAY       32      ///< light gray
 
-#define NUMXFIGCOLORS   32              ///< number of colors
+#define NUMXFIGCOLORS   33              ///< number of colors
+
 #define DARKGRAY        NUMXFIGCOLORS   ///< dark gray
 
 /**

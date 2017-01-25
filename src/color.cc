@@ -38,7 +38,10 @@ P4RGBITEM XFigToRGB[NUMXFIGCOLORS] =
     {255,161,161},      // PINK2
     {255,191,191},      // PINK3
     {255,224,224},      // PINK4
-    {255,214,  0}       // GOLD
+    {255,214,  0},      // GOLD
+
+    {208,208,208}       // LIGHT GRAY
+
 };
 
 
