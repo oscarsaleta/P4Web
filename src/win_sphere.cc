@@ -56,6 +56,7 @@
 
 #include <cmath>
 #include <Wt/WPainterPath>
+#include <Wt/WEvent>
 
 using namespace Wt;
 
@@ -82,13 +83,6 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     study_ = new WVFStudy();
 
     ReverseYaxis = false;
-    //PainterCache = nullptr;
-    //isPainterCacheDirty = true;
-    //AnchorMap = nullptr;
-    //refreshTimeout = nullptr;
-    //SelectingTimer = nullptr;
-
-//    setAttribute( Qt::WA_PaintOnScreen );
 
     SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
     SphereList[numSpheres++] = this;
@@ -97,78 +91,16 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
         SphereList[numSpheres-2]->next = this;
     }
 
-    //setMinimumSize(MINWIDTHPLOTWINDOW,MINHEIGHTPLOTWINDOW);         // THIS IS THE MINIMUM SIZE
-    /*setWidth(parent->width());
-    setHeight(parent->height());
-    w = this->width().toPixels();
-    h = this->height().toPixels();*/
     resize(width_,height_);
-    //w = width_;
-    //h = height_;
-    //idealh = w;
-    //SelectingPointStep =0;
-
-    //horPixelsPerMM = ((double)w) / ((double)widthMM());
-    //verPixelsPerMM = ((double)h) / ((double)heightMM());
-
-    //setMouseTracking(true);
-    //msgBar = bar;
-    //selectingZoom = false;
-    //selectingLCSection = false;
-    //setFocusPolicy( Qt::ClickFocus );
-    //setWindowFlags( windowFlags() );
+    
     next = nullptr;
-
-    //iszoom = false;
-    /*iszoom = isZoom;
-    if( isZoom )
-    {
-        x0 = _x1;
-        y0 = _y1;
-        
-        x1 = _x2;
-        y1 = _y2;
-    }*/
-
     CircleAtInfinity = nullptr;
     PLCircle = nullptr;
+
+    mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
+
 }
 
-
-
-/*static WString makechartstring( int p, int q, bool isu1v1chart, bool negchart )
-{
-    WString buf;
-
-    if( isu1v1chart )
-    {
-        // make { x = +/- 1/z2^p, y = z1/z2^q }
-
-        if( p != 1 && q != 1 )
-            buf.sprintf( "{x=%d/z2^%d,y=z1/z2^%d}", (int)(negchart ? -1 : 1), p, q );
-        else if( p == 1 && q != 1 )
-            buf.sprintf( "{x=%d/z2,y=z1/z2^%d}", (int)(negchart ? -1 : 1), q );
-        else if( p != 1 && q == 1 )
-            buf.sprintf( "{x=%d/z2^%d,y=z1/z2}", (int)(negchart ? -1 : 1), p );
-        else
-            buf.sprintf( "{x=%d/z2,y=z1/z2}", (int)(negchart ? -1 : 1) );
-    }
-    else
-    {
-        // make { x = 1/z2^p, y = +/- z1/z2^q }
-
-        if( p != 1 && q != 1 )
-            buf.sprintf( "{x=z1/z2^%d,y=%d/z2^%d}", p, (int)(negchart ? -1 : 1), q );
-        else if( p == 1 && q != 1 )
-            buf.sprintf( "{x=z1/z2,y=%d/z2^%d}", (int)(negchart ? -1 : 1), q );
-        else if( p != 1 && q == 1 )
-            buf.sprintf( "{x=z1/z2^%d,y=%d/z2}", p, (int)(negchart ? -1 : 1) );
-        else
-            buf.sprintf( "{x=z1/z2,y=%d/z2}", (int)(negchart ? -1 : 1) );
-    }
-
-    return (WString)buf;
-}*/
 
 void WWinSphere::SetupPlot( void )
 {
@@ -201,49 +133,30 @@ void WWinSphere::SetupPlot( void )
         t = nullptr;
     }
 
-    //if( !iszoom )
+    switch( study_->typeofview )
     {
-        switch( study_->typeofview )
-        {
-        case TYPEOFVIEW_PLANE:
-        case TYPEOFVIEW_U1:
-        case TYPEOFVIEW_U2:
-        case TYPEOFVIEW_V1:
-        case TYPEOFVIEW_V2:
-            x0 = study_->xmin;
-            y0 = study_->ymin;
-            x1 = study_->xmax;
-            y1 = study_->ymax;
-            break;
-        case TYPEOFVIEW_SPHERE:
-            x0 = -1.1;
-            y0 = -1.1;
-            x1 = 1.1;
-            y1 = 1.1;
-            break;
-        }
+    case TYPEOFVIEW_PLANE:
+    case TYPEOFVIEW_U1:
+    case TYPEOFVIEW_U2:
+    case TYPEOFVIEW_V1:
+    case TYPEOFVIEW_V2:
+        x0 = study_->xmin;
+        y0 = study_->ymin;
+        x1 = study_->xmax;
+        y1 = study_->ymax;
+        break;
+    case TYPEOFVIEW_SPHERE:
+        x0 = -1.1;
+        y0 = -1.1;
+        x1 = 1.1;
+        y1 = 1.1;
+        break;
     }
 
     dx = x1-x0;
     dy = y1-y0;
 
-    //double idealhd;
     
-    //idealhd = w;
-    //idealhd = (idealhd/dx)*dy;
-
-    //idealh = (int)(idealhd+.5);
-
-    /*switch( study_->typeofview )
-    {
-    case TYPEOFVIEW_PLANE:  chartstring = "";   break;
-    case TYPEOFVIEW_SPHERE: chartstring = "";   break;
-    case TYPEOFVIEW_U1:     chartstring = makechartstring( study_->p, study_->q, true, false ); break;
-    case TYPEOFVIEW_U2:     chartstring = makechartstring( study_->p, study_->q, false, false );break;
-    case TYPEOFVIEW_V1:     chartstring = makechartstring( study_->p, study_->q, true, true );  break;
-    case TYPEOFVIEW_V2:     chartstring = makechartstring( study_->p, study_->q, false, true ); break;
-    }*/
-
     if( study_->typeofview == TYPEOFVIEW_SPHERE )
     {
         CircleAtInfinity = produceEllipse( 0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0) );
@@ -251,7 +164,6 @@ void WWinSphere::SetupPlot( void )
             PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
     }
     
-    //isPainterCacheDirty = true;
 }
 
 WWinSphere::~WWinSphere()
@@ -289,279 +201,7 @@ WWinSphere::~WWinSphere()
         memmove( SphereList+i, SphereList+i+1, sizeof(WWinSphere *) * (numSpheres-i-1) );
 
     numSpheres--;
-    
-    /*if( PainterCache != nullptr )
-    {
-        delete PainterCache;
-        PainterCache = nullptr;
-    }*/
-    
-    /*if( AnchorMap != nullptr )
-    {
-        delete AnchorMap;
-        AnchorMap = nullptr;
-    }*/
-    
-    /*if( refreshTimeout != nullptr )
-    {
-        delete refreshTimeout;
-        refreshTimeout = nullptr;
-    }*/
-    /*if( SelectingTimer != nullptr )
-    {
-        delete SelectingTimer;
-        SelectingTimer = nullptr;
-    }*/
 }
-
-/*void WWinSphere::LoadAnchorMap( void )
-{
-     int x1,y1;
-     int x2,y2;
-     int aw,ah;         
-     int s;
-     if( selectingZoom )
-     {
-         x1 = zoomAnchor1.x();
-         y1 = zoomAnchor1.y();
-         x2 = zoomAnchor2.x();
-         y2 = zoomAnchor2.y();
-     }
-     else if( selectingLCSection )
-     {
-         x1 = lcAnchor1.x();
-         y1 = lcAnchor1.y();
-         x2 = lcAnchor2.x();
-         y2 = lcAnchor2.y();
-     }
-     else
-         return;
-     
-     if( x1 > x2 ) { s=x1; x1=x2; x2=s; }
-     if( y1 > y2 ) { s=y1; y1=y2; y2=s; }
-     if( x1 < 0 ) x1 = 0;
-     if( y1 < 0 ) y1 = 0;
-     if( x2 >= width() ) x2 = width()-1;
-     if( y2 >= height() ) y2 = height()-1;
-     
-     aw = x2-x1+1;
-     ah = y2-y1+1;*/
-     
-         
-/*     WString ms = msgBar->currentMessage();
-     WString as;
-     as.sprintf( " Load: (%d,%d,%d,%d)", x1,y1,aw,ah );
-     msgBar->showMessage(as+ms);
-*/     
-/*     if( AnchorMap != nullptr )
-     {
-         if( AnchorMap->width() < aw || AnchorMap->height() < ah )
-         {
-             delete AnchorMap;
-             AnchorMap = nullptr;
-             AnchorMap = new QPixmap( aw,ah );
-         }
-     }
-     else
-     {
-         AnchorMap = new QPixmap( aw,ah );
-     }
-     
-     if( PainterCache == nullptr )
-     {
-         delete AnchorMap;
-         AnchorMap = nullptr;
-         return;
-     }   
-
-     QPainter paint( AnchorMap );
-     if( selectingZoom )
-     {
-         // only copy rectangular edges, not inside
-      //   paint.drawPixmap (    0,    0, aw,  1, *PainterCache, x1, y1, aw, 1 );
-    //     paint.drawPixmap (    0, ah-1, aw,  1, *PainterCache, x1, y2, aw, 1 );
-  //       paint.drawPixmap (    0,    0,  1, ah, *PainterCache, x1, y1, 1, ah );
-//         paint.drawPixmap ( aw-1, 0,     1, ah, *PainterCache, x2, y1, 1, ah );
-
-         paint.drawPixmap ( 0, 0, aw, ah, *PainterCache, x1, y1, aw, ah );
-
-     }
-     else
-     {
-         paint.drawPixmap ( 0, 0, aw, ah, *PainterCache, x1, y1, aw, ah );
-     }
-}*/
-
-/*void WWinSphere::SaveAnchorMap( void )
-{
-     int x1,y1;
-     int x2,y2;
-     int aw,ah;         
-     int s;
-
-     if( AnchorMap == nullptr || PainterCache == nullptr || (!selectingZoom && !selectingLCSection) )
-         return;
-
-     if( selectingZoom )
-     {
-         x1 = zoomAnchor1.x();
-         y1 = zoomAnchor1.y();
-         x2 = zoomAnchor2.x();
-         y2 = zoomAnchor2.y();
-     }
-     if( selectingLCSection )
-     {
-         x1 = lcAnchor1.x();
-         y1 = lcAnchor1.y();
-         x2 = lcAnchor2.x();
-         y2 = lcAnchor2.y();
-     }
-     
-     if( x1 > x2 ) { s=x1; x1=x2; x2=s; }
-     if( y1 > y2 ) { s=y1; y1=y2; y2=s; }
-     if( x1 < 0 ) x1 = 0;
-     if( y1 < 0 ) y1 = 0;
-     if( x2 >= width() ) x2 = width()-1;
-     if( y2 >= height() ) y2 = height()-1;
-     
-     aw = x2-x1+1;
-     ah = y2-y1+1;*/
-/*         
-     WString ms = msgBar->currentMessage();
-     WString as;
-     as.sprintf( " Save: (%d,%d,%d,%d)", x1,y1,aw,ah );
-     msgBar->showMessage(as+ms);
-*/
-     /*QPainter paint( PainterCache );
-
-     if( selectingZoom )
-     {
-         // only copy rectangular edges, not inside
-//         paint.drawPixmap ( x1, y1, aw,  1, *AnchorMap,    0,    0, aw, 1 );
-  //       paint.drawPixmap ( x1, y2, aw,  1, *AnchorMap,    0, ah-1, aw, 1 );
-    //     paint.drawPixmap ( x1, y1,  1, ah, *AnchorMap,    0,    0, 1, ah );
-      //   paint.drawPixmap ( x2, y1,  1, ah, *AnchorMap, aw-1,    0, 1, ah );
-         paint.drawPixmap ( x1, y1, aw, ah, *AnchorMap, 0, 0, aw, ah );
-     }
-     else
-     {
-         //paint.drawPixmap ( x1, y1, aw, ah, *AnchorMap, 0, 0, aw, ah );
-     }
-     
-     update( x1,y1,aw,ah );
-}*/
-
-/*void WWinSphere::adjustToNewSize(void)
-{
-    double idealhd;
-    double reqratio;
-    double ratio;
-    WString buf;
-    struct P4POLYLINES * t;
-
-    w=width();
-    h=height();
-
-    idealhd = w;
-    idealhd = (idealhd/dx)*dy;
-
-    idealh = (int)(idealhd+.5);
-
-    reqratio = ( ((double)w)/horPixelsPerMM ) / ( idealh/verPixelsPerMM );
-    ratio = ( ((double)w)/horPixelsPerMM ) / ( ((double)h)/verPixelsPerMM );
-
-    buf.sprintf( "Aspect Ratio = %f\n", (float)(ratio/reqratio) );
-    //msgBar->showMessage(buf);
-
-    while( CircleAtInfinity != nullptr )
-    {
-        t = CircleAtInfinity;
-        CircleAtInfinity = t->next;
-        delete t;//free( t );
-        t = nullptr;
-    }
-    while( PLCircle != nullptr )
-    {
-        t = PLCircle;
-        PLCircle = t->next;
-        delete t;//free( t );
-        t = nullptr;
-    }
-    if( study_->typeofview == TYPEOFVIEW_SPHERE )
-    {
-        CircleAtInfinity = produceEllipse( 0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0) );
-        if( study_->plweights )
-            PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
-    }
-
-    if( PainterCache != nullptr )
-    {
-        delete PainterCache;
-        PainterCache = nullptr;
-        PainterCache = new QPixmap( size() );
-        isPainterCacheDirty = false;
-
-        QPainter paint( PainterCache );
-        paint.fillRect(0,0,width(),height(), QColor( QXFIGCOLOR(CBACKGROUND) ) );
-        
-        if( study_->singinf )
-            paint.setPen( QXFIGCOLOR(CSING) );
-        else
-            paint.setPen( QXFIGCOLOR(CLINEATINFINITY) );
-
-        staticPainter = &paint;
-
-        // Mental note: do not use prepareDrawing/FinishDrawing here,
-        // since it is not good to do drawing for all spheres every time we
-        // get a paint event from windows
-
-        if( study_->typeofview != TYPEOFVIEW_PLANE )
-        {
-            if( study_->typeofview == TYPEOFVIEW_SPHERE )
-            {
-                if( study_->plweights )
-                    plotPoincareLyapunovSphere();
-                else
-                    plotPoincareSphere();
-            }
-            else
-                plotLineAtInfinity();
-        }
-        // during resizing : only plot essential information
-//      plotSeparatrices();
-//      plotGcf();
-//      DrawOrbits(this);
-//      DrawLimitCycles(this);
-        plotPoints();
-
-        QColor c  = QXFIGCOLOR(WHITE);
-        c.setAlpha(128);
-        paint.setPen(c);
-        paint.drawText( 0, 0, width(), height(),
-                           Qt::AlignHCenter | Qt::AlignVCenter, "Resizing ...  " );
-
-        staticPainter = nullptr;*/
-
-        /*if( refreshTimeout != nullptr )
-            refreshTimeout->stop();
-        else
-        {
-            refreshTimeout = new QTimer();
-            connect( refreshTimeout, SIGNAL(timeout()), this, SLOT(refreshAfterResize()) );
-        }
-        refreshTimeout->start( 500 );*/
-/*    }
-}*/
-
-/*void WWinSphere::refreshAfterResize( void )
-{
-     if( refreshTimeout != nullptr )
-     {
-         delete refreshTimeout;
-         refreshTimeout = nullptr;
-     }
-    refresh();
-}*/
 
 void WWinSphere::paintEvent( WPaintDevice * p )
 {
@@ -593,48 +233,134 @@ void WWinSphere::paintEvent( WPaintDevice * p )
     
 }
 
-
-/*void WWinSphere::MarkSelection( int x1, int y1, int x2, int y2, int selectiontype )
+void WWinSphere::setChartString( int p, int q, bool isu1v1chart, bool negchart )
 {
-    int bx1, by1, bx2, by2;
-     
-    if( PainterCache == nullptr )
-          return;
-    
-    bx1 = (x1<x2) ? x1 : x2;
-    bx2 = (x1<x2) ? x2 : x1;
-    by1 = (y1<y2) ? y1 : y2;
-    by2 = (y1<y2) ? y2 : y1;
-    
-    if( bx1 < 0 ) bx1 = 0;
-    if( by1 < 0 ) by1 = 0;
-    if( bx2 >= width() ) bx2 = width()-1;
-    if( by2 >= height() ) by2 = height()-1;
-
-    QPainter p(PainterCache); 
-    QColor c;
-
-    switch(selectiontype )
-    {
-    case 0:
-        c = QXFIGCOLOR(WHITE);
-        c.setAlpha(32);
-        p.setPen(QXFIGCOLOR(WHITE));
-        p.setBrush(c);
-        if( bx1 == bx2 || by1 == by2 )
-           p.drawLine( bx1, by1, bx2, by2 );
+    WString buf;
+    if (isu1v1chart) {
+        // { x = +/- 1/z2^p, y = z1/z2^q }
+        if (p!=1 && q!=1)
+            buf = WString("[x={1}/z2^{2}, y=z1/z2^{3}]").arg((int)(negchart ? -1 : 1)).arg(p).arg(q);
+        else if (p==1 && q!=1)
+            buf = WString("[x={1}/z2, y=z1/z2^{2}]").arg((int)(negchart ? -1 : 1)).arg(q);
+        else if (p!=1 && q==1)
+            buf = WString("[x={1}/z2^{2}, y=z1/z2]").arg((int)(negchart ? -1 : 1)).arg(p);
         else
-           p.drawRect( bx1, by1, bx2-bx1, by2-by1 );
-        break;
-    
-    case 1:
-        p.setPen( QXFIGCOLOR(WHITE) );
-        p.drawLine( x1, y1, x2, y2 );
-        break;
+            buf = WString("[x={1}/z2, y=z1/z2]").arg((int)(negchart ? -1 : 1));
+    } else {
+        // { x = z1/z2^p, y = +/- 1/z2^q }
+        if (p!=1 && q!=1)
+            buf = WString("[x=1/z2^{1}, y={2}/z2^{3}]").arg(p).arg((int)(negchart ? -1 : 1)).arg(q);
+        else if (p==1 && q!=1)
+            buf = WString("[x=1/z2, y={1}/z2^{2}]").arg((int)(negchart ? -1 : 1)).arg(q);
+        else if (p!=1 && q==1)
+            buf = WString("[x=1/z2^{1}, y={2}/z2]").arg(p).arg((int)(negchart ? -1 : 1));
+        else
+            buf = WString("[x=1/z2, y={1}/z2]").arg((int)(negchart ? -1 : 1));
     }
-    update( bx1, by1, bx2-bx1+1, by2-by1+1 );
-}*/
+    chartString_ = buf;
+}
 
+void WWinSphere::mouseMovementEvent( WMouseEvent e )
+{
+    int x,y;
+    double wx,wy;
+    double ucoord[2];
+    WString buf;
+
+    x = e.widget().x;
+    y = e.widget().y;
+
+    wx = coWorldX(x);
+    wy = coWorldY(y);
+
+    double pcoord[3];
+    if ((study_->*(study_->is_valid_viewcoord))(wx,wy,pcoord)) {
+        switch (study_->typeofview) {
+        case TYPEOFVIEW_PLANE:
+            if (study_->typeofstudy == TYPEOFSTUDY_ONE)
+                buf = WString("Local study  (x,y) = ({1},{2})").arg(std::to_string(wx)).arg(std::to_string(wy));
+            else
+                buf = WString("Planar view  (x,y) = ({1},{2})").arg(std::to_string(wx)).arg(std::to_string(wy));
+            break;
+        case TYPEOFVIEW_SPHERE:
+            (study_->*(study_->sphere_to_R2))(pcoord[0],pcoord[1],pcoord[2],ucoord);
+            if (study_->p == 1 && study_->q == 1)
+                buf = WString("The Poincare sphere (x,y) = ({1},{2})").arg(std::to_string(ucoord[0])).arg(std::to_string(ucoord[1]));
+            else
+                buf = WString("The P-L sphere of type ({1},{2})  (x,y) = ({3},{4})").arg(study_->p).arg(study_->q).arg(std::to_string(ucoord[0])).arg(std::to_string(ucoord[1]));
+            break;
+        case TYPEOFVIEW_U1:
+            (study_->*(study_->sphere_to_U1))(pcoord[0],pcoord[1],pcoord[2],ucoord);
+            buf = WString("The {1} chart (z2,z1) = ({2},{3})")
+                .arg((ucoord[1]>=0 ? "U1" : "V1'"))
+                .arg(std::to_string(ucoord[1]))
+                .arg(std::to_string(ucoord[0]));
+            buf += " "+chartString_;
+            break;
+        case TYPEOFVIEW_V1:
+            (study_->*(study_->sphere_to_V1))(pcoord[0],pcoord[1],pcoord[2],ucoord);
+            if (!study_->plweights) {
+                ucoord[0] = -ucoord[0];
+                ucoord[1] = -ucoord[1];
+            }
+            buf = WString("The {1} chart (z2,z1) = ({2},{3})")
+                .arg((ucoord[1]>=0) ? "V1" : "U1'")
+                .arg(std::to_string(ucoord[1]))
+                .arg(std::to_string(ucoord[0]));
+            buf += " "+chartString_;
+            break;
+        case TYPEOFVIEW_U2:
+            (study_->*(study_->sphere_to_U2))(pcoord[0],pcoord[1],pcoord[2],ucoord);
+            buf = WString("The {1} chart (z1,z2) = ({2},{3})")
+                .arg((ucoord[1]>=0) ? "U2" : "V2'")
+                .arg(std::to_string(ucoord[0]))
+                .arg(std::to_string(ucoord[1]));
+            buf += " "+chartString_;
+            break;
+        case TYPEOFVIEW_V2:
+            (study_->*(study_->sphere_to_V2))(pcoord[0],pcoord[1],pcoord[2],ucoord);
+            if (!study_->plweights) {
+                ucoord[0] = -ucoord[0];
+                ucoord[1] = -ucoord[1];
+            }
+            buf = WString("The {1} chart (z1,z2) = ({2},{3})")
+                .arg((ucoord[1]>=0) ? "V2" : "U2'")
+                .arg(std::to_string(ucoord[0]))
+                .arg(std::to_string(ucoord[1]));
+            buf += " "+chartString_;
+            break;
+        }
+    } else {
+        switch (study_->typeofview) {
+        case TYPEOFVIEW_PLANE:
+            if (study_->typeofstudy == TYPEOFSTUDY_ONE)
+                buf = "Local study";
+            else
+                buf = "Planar view";
+            break;
+        case TYPEOFVIEW_SPHERE:
+            if (study_->p == 1 && study_->q ==1)
+                buf = "The Poincare sphere";
+            else
+                buf = WString("The P-L sphere of type ({1},{2})").arg(study_->p).arg(study_->q);
+            break;
+        case TYPEOFVIEW_U1:
+            buf = "The U1 chart";
+            break;
+        case TYPEOFVIEW_V1:
+            buf = "The V1 chart";
+            break;
+        case TYPEOFVIEW_U2:
+            buf = "The U2 chart";
+            break;
+        case TYPEOFVIEW_V2:
+            buf = "The V2 chart";
+            break;;
+        }
+    }
+    
+    plotCaption_ = buf;
+}
 
 double WWinSphere::coWorldX( int x )
 {
@@ -1209,27 +935,34 @@ void WWinSphere::plotPoincareSphere( void )
 void WWinSphere::plotPoincareLyapunovSphere( void )
 {
     int color;
-    P4POLYLINES * p;
-
-    p = CircleAtInfinity;
+    WPainterPath *path = new WPainterPath();
+    P4POLYLINES * p = CircleAtInfinity;
     color = study_->singinf ? CSING : CLINEATINFINITY;
-
     staticPainter->setPen( QXFIGCOLOR(color) );
     while( p != nullptr )
     {
-        staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2), coWinY(p->y2) );
+        path->moveTo(coWinX(p->x1),coWinY(p->y1));
+        path->lineTo(coWinX(p->x2),coWinY(p->y2));
+        //staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2), coWinY(p->y2) );
         p = p->next;
     }
+    path->closeSubPath();
+    staticPainter->drawPath(path->crisp());
 
     p = PLCircle;
     color = CLINEATINFINITY;
+    path = new WPainterPath();
 
     staticPainter->setPen( QXFIGCOLOR(color) );
     while( p != nullptr )
     {
-        staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2), coWinY(p->y2) );
+        path->moveTo(coWinX(p->x1),coWinY(p->y1));
+        path->lineTo(coWinX(p->x2),coWinY(p->y2));
+        //staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2), coWinY(p->y2) );
         p = p->next;
     }
+    path->closeSubPath();
+    staticPainter->drawPath(path->crisp());
     return;
 }
 

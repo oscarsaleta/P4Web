@@ -115,8 +115,6 @@ public:
     WVFStudy *study_;           ///< WVFStudy object which will parse results from Maple
     std::string basename_;      ///< filename where Maple output is stored
     
-    //void paintSphere();
-
     /**
      * X Coordinate change: from world (double) to window (int) coordinates
      * @param  x coordinate to transform
@@ -154,9 +152,6 @@ public:
      */
     int coWinV( double deltay );
 
-    //double horPixelsPerMM;
-    //double verPixelsPerMM;
-
     double x0;                  ///< world-coordinates of upper-left corner
     double y0;                  ///< world-coordinates of upper-left corner
     double x1;                  ///< world-coordinates of upper-right corner
@@ -164,8 +159,6 @@ public:
     double dx;                  ///< x1-x0
     double dy;                  ///< y1-y0
 
-    //QPixmap * PainterCache;
-    //bool isPainterCacheDirty;
     int paintedXMin;            /**< to know the update rectangle after painting
                                 we keep to smallest rectangle enclosing
                                 all painted objects. */
@@ -179,7 +172,8 @@ public:
                                 we keep to smallest rectangle enclosing
                                 all painted objects. */
 
-    //Wt::WString chartstring;
+    Wt::WString chartString_;
+    Wt::WString plotCaption_;
 
 protected:
     /**
@@ -209,6 +203,8 @@ private:
     P4POLYLINES * PLCircle;         /**< linked list of lines that form the Poincaré-
                                         Lyapunov circle */
     //QTimer * refreshTimeout;
+
+    void setChartString(int p, int q, bool isu1v1chart, bool negchart);
 
 public:
     int spherebgcolor;          ///< background color
@@ -332,8 +328,6 @@ public:
     void drawLine( double x1, double y1, double x2, double y2, int color );
     //void finishDrawing( void );
 
-    //void SaveAnchorMap( void );
-    //void LoadAnchorMap( void );
 
     /**
      * Setup everything before starting to plot
@@ -347,10 +341,9 @@ public:
      * new one depending on the configuration.
      */
     void SetupPlot( void );
-    //void refresh( void );
-    //void CalculateHeightFromWidth( int * width, int * height, int maxheight, double aspectratio );
-    //void refreshAfterResize( void );
     //void updatePointSelection( void );
+
+    void mouseMovementEvent( Wt::WMouseEvent e );
 
 //private:
     //bool selectingZoom;

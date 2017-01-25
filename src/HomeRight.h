@@ -110,6 +110,8 @@ public:
      */
     void onPlot(std::string basename);
 
+    void mouseMovedEvent( Wt::WMouseEvent e );
+
 private:
     Wt::WTabWidget *tabWidget_;
 
@@ -130,6 +132,7 @@ private:
     WWinSphere *sphere_;
 
     Wt::WContainerWidget *plotContainer_;
+    Wt::WText *plotCaption_;
     /*Wt::WToolBar *plotButtonsToolbar_;
     Wt::WPushButton *clearPlotButton_;
     Wt::WPushButton *plotPointsButton_;

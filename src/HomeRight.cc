@@ -9,6 +9,7 @@
 #include <string>
 
 #include <Wt/WBreak>
+#include <Wt/WEvent>
 #include <Wt/WGroupBox>
 #include <Wt/WImage>
 #include <Wt/WMenuItem>
@@ -267,9 +268,22 @@ void HomeRight::onPlot(std::string basename)
     sphere_->setMargin(5,Top);
     plotContainer_->addWidget(sphere_);
 
+    plotContainer_->addWidget(new WBreak(plotContainer_));
+
+    plotCaption_ = new WText(plotContainer_);
+    plotCaption_->setId("plotCaption_");
+    plotContainer_->addWidget(plotCaption_);
+
+    sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
+
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
     globalLogger__.debug("HomeRight :: reacted to onPlot signal");
+}
+
+void HomeRight::mouseMovedEvent( WMouseEvent e )
+{
+    plotCaption_->setText(sphere_->plotCaption_);
 }
 
 /*void HomeRight::clearPlot()
