@@ -6,12 +6,12 @@ The aim of this project is to create a web version of <a href="htpps://github.co
 
 ## Output view
 
-![capture1.png](resources/capture1.png)
+![capture1.png](screenshots/capture1.png)
 
 ## Plot view
 
-![capture2.png](resources/capture2.png)
+![capture2.png](screenshots/capture2.png)
 
 ## Login widget
 
-![capture3.png](resources/capture3.png)
+![capture3.png](screenshots/capture3.png)
