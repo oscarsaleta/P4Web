@@ -95,8 +95,6 @@ HomeLeft::~HomeLeft()
     delete fileUploadWidget_;
     delete fileUploadBox_;
 
-    delete xLabel_;
-    delete yLabel_;
     delete xEquationInput_;
     delete yEquationInput_;
     delete evalButton_;
@@ -126,32 +124,32 @@ void HomeLeft::setupUI()
 
     addWidget(new WBreak());
 
+    WLabel *label;
+
     // Equation boxes
     equationsBox_ = new WGroupBox(this);
     equationsBox_->setId("equationsBox_");
     equationsBox_->setTitle(WString::tr("homeleft.equationboxtitle"));
     addWidget(equationsBox_);
 
-    xLabel_ = new WLabel(WString::tr("homeleft.xprimelabel"), equationsBox_);
-    xLabel_->setId("xLabel_");
-    //equationsBox_->addWidget(xLabel_);
+    label = new WLabel(WString::tr("homeleft.xprimelabel"), equationsBox_);
+    label->setId("label");
 
     xEquationInput_ = new WLineEdit();
     xEquationInput_->setId("xEquationInput_");
     xEquationInput_->setStyleClass(WString::fromUTF8("equation-editor"));
-    xLabel_->setBuddy(xEquationInput_);
+    label->setBuddy(xEquationInput_);
     equationsBox_->addWidget(xEquationInput_);
 
     equationsBox_->addWidget(new WBreak);
 
-    yLabel_ = new WLabel(WString::tr("homeleft.yprimelabel"), equationsBox_);
-    yLabel_->setId("yLabel_");
-    //equationsBox_->addWidget(yLabel_);
+    label = new WLabel(WString::tr("homeleft.yprimelabel"), equationsBox_);
+    label->setId("label");
 
     yEquationInput_ = new WLineEdit();
     yEquationInput_->setId("yEquationInput_");
     yEquationInput_->setStyleClass(WString::fromUTF8("equation-editor"));
-    yLabel_->setBuddy(yEquationInput_);
+    label->setBuddy(yEquationInput_);
     equationsBox_->addWidget(yEquationInput_);
 
     equationsBox_->addWidget(new WBreak);
@@ -161,6 +159,7 @@ void HomeLeft::setupUI()
     evalButton_->setId("evalButton_");
     evalButton_->setStyleClass("btn btn-primary");
     evalButton_->setInline(true);
+    evalButton_->setToolTip(WString::tr("tooltip.homeleft-eval-button"),XHTMLText);
     equationsBox_->addWidget(evalButton_);
 
     // plot button
@@ -169,6 +168,7 @@ void HomeLeft::setupUI()
     plotButton_->setStyleClass("btn btn-default");
     plotButton_->setInline(true);
     plotButton_->setMargin(5,Left);
+    plotButton_->setToolTip(WString::tr("tooltip.homeleft-plot-button"),XHTMLText);
     equationsBox_->addWidget(plotButton_);
 
     // save file button (actually, it's a WAnchor)
@@ -179,6 +179,7 @@ void HomeLeft::setupUI()
     saveButton_->setInline(true);
     saveButton_->setMargin(5,Left);
     saveButton_->setDisabled(true);
+    saveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
     equationsBox_->addWidget(saveButton_);
 
     clearButton_ = new WPushButton("Clear",equationsBox_);
@@ -186,6 +187,7 @@ void HomeLeft::setupUI()
     clearButton_->setStyleClass("btn btn-warning");
     clearButton_->setInline(true);
     clearButton_->setMargin(5,Left);
+    clearButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"),XHTMLText);
     equationsBox_->addWidget(clearButton_);
 
     globalLogger__.debug("HomeLeft :: UI set up");
@@ -521,7 +523,6 @@ void HomeLeft::showSettings()
     label->setToolTip(WString::tr("tooltip.calculations"),XHTMLText);
     button = new WRadioButton("Algebraic",settingsBox_);
     button->addStyleClass("radio-button");
-    //button->setMargin(10,Left|Right);
     label->setBuddy(button);
     calculationsBtnGroup_->addButton(button,Algebraic);
     button = new WRadioButton("Numeric",settingsBox_);
@@ -536,7 +537,6 @@ void HomeLeft::showSettings()
     label->setMargin(20,Left);
     button = new WRadioButton("Yes",settingsBox_);
     button->addStyleClass("radio-button");
-    //button->setMargin(10,Left|Right);
     label->setBuddy(button);
     separatricesBtnGroup_->addButton(button,Yes);
     button = new WRadioButton("No",settingsBox_);
@@ -576,6 +576,7 @@ void HomeLeft::showSettings()
     epsilonSpinBox_->setDecimals(2);
     epsilonSpinBox_->setSingleStep(0.01);
     epsilonSpinBox_->setValue(0.01);
+    epsilonSpinBox_->setRange(0.01,0.3);
     label->setBuddy(epsilonSpinBox_);
 
     // level of approximation

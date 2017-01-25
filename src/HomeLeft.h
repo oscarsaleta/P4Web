@@ -67,9 +67,7 @@ private:
     std::string         fileUploadName_;
 
     Wt::WGroupBox       *equationsBox_;
-    Wt::WLabel          *xLabel_;
     Wt::WLineEdit       *xEquationInput_;
-    Wt::WLabel          *yLabel_;
     Wt::WLineEdit       *yEquationInput_;
     Wt::WPushButton     *evalButton_;
     Wt::WPushButton     *plotButton_;

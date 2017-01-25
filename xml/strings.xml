@@ -75,4 +75,38 @@
     <p>Maximum order of Lyapunov constants to be computed for weak foci.</p>
   </message>
 
+  <message id="tooltip.homeleft-eval-button">
+    <p>Evaluate the vector field to find singularities, compute Lyapunov constants
+      and blow-up when needed, and integrate separatrices.</p>
+  </message>
+
+  <message id="tooltip.homeleft-plot-button">
+    <p>Plot the evaluated vector field in the Poincaré sphere.</p>
+  </message>
+
+  <message id="tooltip.homeleft-save-button">
+    <p>Save the current vector field and evaluation parameters to a P4 compatible
+      input file.</p>
+  </message>
+
+  <message id="tooltip.homeleft-clear-button">
+    <p>Clear the x' and y' input fields.</p>
+  </message>
+
+  <message id="tooltip.homeright-full-button">
+    <p>Show the full Maple output for the currently evaluated vector field.</p>
+  </message>
+
+  <message id="tooltip.homeright-finite-button">
+    <p>Show the output regarding finite singularities.</p>
+  </message>
+
+  <message id="tooltip.homeright-infinite-button">
+    <p>Show the output regarding singularities at the infinite.</p>
+  </message>
+
+  <message id="tooltip.homeright-clear-button">
+    <p>Clear output text area.</p>
+  </message>
+
 </messages>

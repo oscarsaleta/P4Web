@@ -91,16 +91,19 @@ void HomeRight::setupUI()
     fullResButton_ = new WPushButton("Full output");
     fullResButton_->setId("fullResButton_");
     fullResButton_->setStyleClass("btn-default btn");
+    fullResButton_->setToolTip(WString::tr("tooltip.homeright-full-button"),XHTMLText);
     outputButtonsToolbar_->addButton(fullResButton_);
 
     finResButton_ = new WPushButton("Finite");
     finResButton_->setId("finResButton_");
     finResButton_->setStyleClass("btn-default btn");
+    finResButton_->setToolTip(WString::tr("tooltip.homeright-finite-button"),XHTMLText);
     outputButtonsToolbar_->addButton(finResButton_);
 
     infResButton_ = new WPushButton("Infinite");
     infResButton_->setId("infResButton_");
     infResButton_->setStyleClass("btn-default btn");
+    infResButton_->setToolTip(WString::tr("tooltip.homeright-infinite-button"),XHTMLText);
     outputButtonsToolbar_->addButton(infResButton_);
 
     outputButtonsToolbar_->addSeparator();
@@ -108,6 +111,7 @@ void HomeRight::setupUI()
     clearOutputButton_ = new WPushButton("Clear");
     clearOutputButton_->setId("clearOutputButton_");
     clearOutputButton_->setStyleClass("btn-warning btn");
+    clearOutputButton_->setToolTip(WString::tr("tooltip.homeright-clear-button"),XHTMLText);
     outputButtonsToolbar_->addButton(clearOutputButton_);
 
 
