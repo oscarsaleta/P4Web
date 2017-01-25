@@ -20,7 +20,7 @@ The aim of this project is to create a web version of <a href="htpps://github.co
 
 ### Logged in extra settings
 
-![loggedin.png](screenshots/loggedinview.png)
+![loggedin.png](screenshots/loggedin.png)
 
 ## Want to try it locally?
 
