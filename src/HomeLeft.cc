@@ -566,11 +566,10 @@ void HomeLeft::showSettings()
     precisionSpinBox_->setValue(0);
     label->setBuddy(precisionSpinBox_);
 
-    new WBreak(settingsBox_);
-
     // epsilon
     label = new WLabel("Epsilon:",settingsBox_);
     label->setToolTip(WString::tr("tooltip.epsilon"),XHTMLText);
+    label->setMargin(20,Left);
     epsilonSpinBox_ = new WDoubleSpinBox(settingsBox_);
     epsilonSpinBox_->setStyleClass("spin-box");
     epsilonSpinBox_->setDecimals(2);
@@ -579,42 +578,42 @@ void HomeLeft::showSettings()
     epsilonSpinBox_->setRange(0.01,0.3);
     label->setBuddy(epsilonSpinBox_);
 
+    new WBreak(settingsBox_);
+
     // level of approximation
     label = new WLabel("Level of approximation:",settingsBox_);
     label->setToolTip(WString::tr("tooltip.level-approximation"),XHTMLText);
-    label->setMargin(20,Left);
     levAppSpinBox_ = new WSpinBox(settingsBox_);
     levAppSpinBox_->setStyleClass("spin-box");
     levAppSpinBox_->setRange(0,10);
     levAppSpinBox_->setValue(6);
     label->setBuddy(levAppSpinBox_);
 
-    new WBreak(settingsBox_);
-
     // numeric level
     label = new WLabel("Numeric level:",settingsBox_);
     label->setToolTip(WString::tr("tooltip.numeric-level"),XHTMLText);
+    label->setMargin(20,Left);
     numericLevelSpinBox_ = new WSpinBox(settingsBox_);
     numericLevelSpinBox_->setStyleClass("spin-box");
     numericLevelSpinBox_->setRange(5,15);
     numericLevelSpinBox_->setValue(8);
     label->setBuddy(numericLevelSpinBox_);
 
+    new WBreak(settingsBox_);
+
     // maximum level
     label = new WLabel("Maximum level:",settingsBox_);
     label->setToolTip(WString::tr("tooltip.maximum-level"),XHTMLText);
-    label->setMargin(20,Left);
     maxLevelSpinBox_ = new WSpinBox(settingsBox_);
     maxLevelSpinBox_->setStyleClass("spin-box");
     maxLevelSpinBox_->setRange(15,25);
     maxLevelSpinBox_->setValue(20);
     label->setBuddy(maxLevelSpinBox_);
     
-    new WBreak(settingsBox_);
-
     // max weakness level
     label = new WLabel("Maximum weakness level:",settingsBox_);
     label->setToolTip(WString::tr("tooltip.maximum-weakness-level"),XHTMLText);
+    label->setMargin(20,Left);
     maxWeakLevelSpinBox_ = new WSpinBox(settingsBox_);
     maxWeakLevelSpinBox_->setStyleClass("spin-box");
     maxWeakLevelSpinBox_->setRange(0,8);
