@@ -4,14 +4,36 @@
 
 The aim of this project is to create a web version of <a href="htpps://github.com/oscarsaleta/P4">P4</a> with very limited functionality and host it in a public server, in order to make the P4 software available to a wider public (e.g. for users that do not have Maple).
 
-## Output view
+## Screenshots
 
-![capture1.png](screenshots/capture1.png)
+### Output view
 
-## Plot view
+![outputview.png](screenshots/outputview.png)
 
-![capture2.png](screenshots/capture2.png)
+### Plot view
 
-## Login widget
+![plotview.png](screenshots/plotview.png)
 
-![capture3.png](screenshots/capture3.png)
+### Login widget
+
+![loginview.png](screenshots/loginview.png)
+
+### Logged in extra settings
+
+![loggedin.png](screenshots/loggedinview.png)
+
+## Want to try it locally?
+
+**Requirements:**
+
+* Compilation: **Wt library** (`sudo apt install witty witty-dev` for Ubuntu) and **CMake** (`sudo apt install cmake`)
+* Execution: **P4** installed as root (see <a href="https://github.com/oscarsaleta/P4">P4 repository</a> for install instructions), **Maple**.
+
+**Step by step:**
+
+* Clone this repository: `git clone https://github.com/oscarsaleta/WP4.git` and enter its directory: `cd WP4`,
+* Create a build directory: `mkdir build && cd build`,
+* Run CMake to generate the Makefiles: `cmake ..`,
+* If no errors appeared, a *Makefile* file should have been created. Run `make` to compile (you can run `make -j4`, for example, if your computer has 4 cores).
+* If no errors appeared, the Wt application is compiled and ready to run. Change dir to the root directory of the repository (`cd ..`) and run the *WP4* script: (`./WP4`).
+* Now open a web browser and go to this address: `[0::0]:8080` to try out WP4.
