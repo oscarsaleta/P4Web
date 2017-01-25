@@ -110,6 +110,19 @@ public:
      */
     void onPlot(std::string basename);
 
+    /**
+     * React to a mouse event to set the caption of the plot
+     *
+     * Sets the caption to the name of the view and the coordinates of the
+     * mouse cursor, if these are correct.
+     *
+     * Actually, the work is not done here. This function simply sets the
+     * text of the caption widget to the caption WString (member of 
+     * the WWinSphere *study_ object).
+     * 
+     * @param e WMouseEvent (needed to connect the function to the event,
+     * although it's not used here)
+     */
     void mouseMovedEvent( Wt::WMouseEvent e );
 
 private:

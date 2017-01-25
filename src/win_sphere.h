@@ -172,8 +172,8 @@ public:
                                 we keep to smallest rectangle enclosing
                                 all painted objects. */
 
-    Wt::WString chartString_;
-    Wt::WString plotCaption_;
+    Wt::WString chartString_;   ///< string that identifies which chart we're in
+    Wt::WString plotCaption_;   ///< string that shows type of view and cursor coordinates
 
 protected:
     /**
@@ -343,6 +343,16 @@ public:
     void SetupPlot( void );
     //void updatePointSelection( void );
 
+    /**
+     * React to a mouse hover event to set a string
+     *
+     * This function takes the coordinates of the mouse cursor,
+     * transforms them to the current view (poincaré sphere, p-l,
+     * plane, or one of the charts) and sets plotCaption_ to reflect
+     * these coordinates.
+     * 
+     * @param e WMouseEvent, contains the coordinates of the mouse cursor
+     */
     void mouseMovementEvent( Wt::WMouseEvent e );
 
 //private:
