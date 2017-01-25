@@ -27,7 +27,7 @@ The aim of this project is to create a web version of <a href="htpps://github.co
 **Requirements:**
 
 * Compilation: **Wt library** (`sudo apt install witty witty-dev` for Ubuntu) and **CMake** (`sudo apt install cmake`)
-* Execution: **P4** installed as root (see <a href="https://github.com/oscarsaleta/P4#installation">P4 repository</a> for install instructions) [<a href="#footnote">1</a>], **Maple**.
+* Execution: **P4** installed as root (see <a href="https://github.com/oscarsaleta/P4#installation">P4 repository</a> for install instructions) [1], **Maple**.
 
 **Step by step:**
 
@@ -38,4 +38,4 @@ The aim of this project is to create a web version of <a href="htpps://github.co
 * If no errors appeared, the Wt application is compiled and ready to run. Change dir to the root directory of the repository (`cd ..`) and run the *WP4* script: (`./WP4`).
 * Now open a web browser and go to this address: `[0::0]:8080` to try out WP4.
 
-<sup>[1](#footnote) Actually, only the separate executables *lyapunov* and *separatrices* are needed from the P4 suite. WP4 does not need or use the P4 Qt application itself for working.</sup>
+<sup>[1] Actually, only the separate executables *lyapunov* and *separatrices* are needed from the P4 suite. WP4 does not need or use the P4 Qt application itself for working.</sup>
