@@ -141,11 +141,6 @@ void HomeRight::setupUI()
     plotContainer_->setId("plotContainer_");
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
-    // sphere (plot region)
-    //sphere_ = new WWinSphere(plotContainer_,550,550);
-    //sphere_->setId("sphere_");
-    //sphere_->setMargin(5,Top);
-    //plotContainer_->addWidget(sphere_);
 
     //TODO: add plot separatrices, orbits, etc buttons?
     /*plotButtonsToolbar_ = new WToolBar(plotContainer_);
@@ -244,7 +239,7 @@ void HomeRight::readResults(std::string fileName)
 }
 
 void HomeRight::printError(std::string error)
-{
+{   
     fullResults_ = error;
     fullResults();
 }
@@ -253,6 +248,7 @@ void HomeRight::fullResults()
 {
     outputTextAreaContent_ = fullResults_;
     outputTextArea_->setText(outputTextAreaContent_);
+    tabWidget_->setCurrentIndex(0);
     globalLogger__.debug("HomeRight :: showing full results");
 }
 
@@ -290,11 +286,16 @@ void HomeRight::onPlot(std::string basename)
 
     plotContainer_->addWidget(new WBreak(plotContainer_));
 
+    if (plotCaption_ != nullptr) {
+        delete plotCaption_;
+        plotCaption_ = nullptr;
+    }
     plotCaption_ = new WText(plotContainer_);
     plotCaption_->setId("plotCaption_");
     plotContainer_->addWidget(plotCaption_);
 
     sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
+    sphere_->errorSignal().connect(this,&HomeRight::printError);
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);

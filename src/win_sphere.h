@@ -175,38 +175,6 @@ public:
     Wt::WString chartString_;   ///< string that identifies which chart we're in
     Wt::WString plotCaption_;   ///< string that shows type of view and cursor coordinates
 
-protected:
-    /**
-     * Paint event for this painted widget
-     * @param p paint device (passed automatically by the generator of the event)
-     *
-     * When an update is called upon the painted widget (this), a paint event is
-     * generated and this function implements the behavior.
-     */
-    void paintEvent( Wt::WPaintDevice * p );
-
-
-private:
-    Wt::WPainter * staticPainter;       /**< pointer to a painter linked to a paint device
-                                            created in a paint event. This makes possible
-                                            to distribute painting to different functions
-                                            and compiling units (even from outside the
-                                            object) */
-    Wt::WContainerWidget * parentWnd;   /**< parent widget (stored from @c parent, argument
-                                            passed to constructor) */
-    //bool iszoom;                ///< indicates if we are zoomed in the plot (not available)
-    bool ReverseYaxis;          /**< when calculating coordinates: this determines
-                                    orientation of horizontal axis.  Normally false,
-                                    only true when printing. */
-    
-    P4POLYLINES * CircleAtInfinity; ///< linked list of lines that form the Poincaré circle
-    P4POLYLINES * PLCircle;         /**< linked list of lines that form the Poincaré-
-                                        Lyapunov circle */
-    //QTimer * refreshTimeout;
-
-    void setChartString(int p, int q, bool isu1v1chart, bool negchart);
-
-public:
     int spherebgcolor;          ///< background color
     WWinSphere * next;          ///< next WWinSphere (linked list)
     //int SelectingX, SelectingY, SelectingPointStep, SelectingPointRadius;
@@ -339,8 +307,11 @@ public:
      * of the study (correct view, sphere, etc). Then, it deletes
      * any remaining circles or lines at infinity and creates a
      * new one depending on the configuration.
+     *
+     * @return @c true if setup was successful, @c false if results could
+     * not be read
      */
-    void SetupPlot( void );
+    bool setupPlot( void );
     //void updatePointSelection( void );
 
     /**
@@ -355,24 +326,45 @@ public:
      */
     void mouseMovementEvent( Wt::WMouseEvent e );
 
-//private:
-    //bool selectingZoom;
-    //bool selectingLCSection;
-    //Wt::WPointF zoomAnchor1;
-    //Wt::WPointF zoomAnchor2;
-    //Wt::WPointF lcAnchor1;
-    //Wt::WPointF lcAnchor2;
-    //QPixmap * AnchorMap;
+    /**
+     * Method that sends a signal to print some message in the output
+     * text area from #HomeRight
+     */
+    Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
 
-    //QStatusBar * msgBar;
-    //int PrintMethod;
+protected:
+    /**
+     * Paint event for this painted widget
+     * @param p paint device (passed automatically by the generator of the event)
+     *
+     * When an update is called upon the painted widget (this), a paint event is
+     * generated and this function implements the behavior.
+     */
+    void paintEvent( Wt::WPaintDevice * p );
 
-//public:
-    //int oldw;                       ///< used while printing
-    //int oldh;
-    //int w;                          // width of window
-    //int h;                          // height of window
-    //int idealh;                     // ideal height of window to get good aspect ratio
+private:
+    /**
+     * Signal emitted when there's an error while reading results from Maple
+     */
+    Wt::Signal<std::string> errorSignal_;
+
+    Wt::WPainter * staticPainter;       /**< pointer to a painter linked to a paint device
+                                            created in a paint event. This makes possible
+                                            to distribute painting to different functions
+                                            and compiling units (even from outside the
+                                            object) */
+    Wt::WContainerWidget * parentWnd;   /**< parent widget (stored from @c parent, argument
+                                            passed to constructor) */
+    bool ReverseYaxis;                  /**< when calculating coordinates: this determines
+                                            orientation of horizontal axis.  Normally false,
+                                            only true when printing. */
+    
+    P4POLYLINES * CircleAtInfinity; ///< linked list of lines that form the Poincaré circle
+    P4POLYLINES * PLCircle;         /**< linked list of lines that form the Poincaré-
+                                        Lyapunov circle */
+
+    void setChartString(int p, int q, bool isu1v1chart, bool negchart);
+
 };
 
 

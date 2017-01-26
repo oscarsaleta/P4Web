@@ -214,15 +214,19 @@ void HomeLeft::setupConnectors()
         if (!yEquationInput_->text().empty()) {
             evalButton_->setEnabled(true);
             plotButton_->setEnabled(true);
-            prepareSaveFile();
+            allowSaveFile();
         }
     }));
     yEquationInput_->textInput().connect(std::bind([=] () {
         if (!xEquationInput_->text().empty()) {
             evalButton_->setEnabled(true);
             plotButton_->setEnabled(true);
-            prepareSaveFile();
+            allowSaveFile();
         }
+    }));
+
+    saveButton_->clicked().connect(std::bind([=] () {
+        prepareSaveFile();
     }));
 
     globalLogger__.debug("HomeLeft :: connectors set up");
@@ -244,6 +248,7 @@ void HomeLeft::fileUploaded()
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
     parseInputFile();
+    allowSaveFile();
     
 }
 
@@ -287,7 +292,7 @@ void HomeLeft::parseInputFile()
 }
 
 
-std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std::ofstream &f)
+std::string HomeLeft::openTempStream(std::string prefix, std::string suffix/*, std::ofstream &f*/)
 {
     std::string fullname;
     prefix += "/XXXXXX" + suffix;
@@ -298,7 +303,7 @@ std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std
     if (fd != -1) {
         prefix.assign(dst_prefix.begin(), dst_prefix.end()-1-4);
         fullname = prefix+suffix;
-        f.open(fullname.c_str(), std::ios_base::trunc | std::ios_base::out);
+        //f.open(fullname.c_str(), std::ios_base::trunc | std::ios_base::out);
         close(fd);
     }
 
@@ -307,24 +312,8 @@ std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std
     return prefix;
 }
 
-void HomeLeft::prepareMapleFile()
+void HomeLeft::setParams()
 {
-    std::ofstream mplFile;
-
-    if (!fileUploadName_.empty()) {
-        mplFile.open((fileUploadName_+".mpl").c_str(),
-            std::ios_base::trunc | std::ios_base::out);
-    } else {
-        fileUploadName_ = openTempStream("/tmp",".mpl",mplFile);
-    }
-
-    str_vectable = fileUploadName_+"_vec.tab";
-    str_fintab = fileUploadName_+"_fin.tab";
-    str_finres = fileUploadName_+"_fin.res";
-    str_inftab = fileUploadName_+"_inf.tab";
-    str_infres = fileUploadName_+"_inf.res";
-    str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
-
     if (!loggedIn_) {
         str_critpoints = "0";
         str_saveall = "false";
@@ -340,6 +329,7 @@ void HomeLeft::prepareMapleFile()
         str_weaklevel = "0";
         str_userp = "1";
         str_userq = "1";
+        time_limit = "30";
     } else {
         str_critpoints = "0";
         str_saveall = "false";
@@ -355,7 +345,27 @@ void HomeLeft::prepareMapleFile()
         str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
         str_userp = "1";
         str_userq = "1";
+        time_limit = "60";
     }
+}
+
+void HomeLeft::prepareMapleFile()
+{
+    std::ofstream mplFile;
+
+    if (fileUploadName_.empty())
+        fileUploadName_ = openTempStream("/tmp",".mpl"/*,mplFile*/);
+
+    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc|std::fstream::out);
+
+    str_vectable = fileUploadName_+"_vec.tab";
+    str_fintab = fileUploadName_+"_fin.tab";
+    str_finres = fileUploadName_+"_fin.res";
+    str_inftab = fileUploadName_+"_inf.tab";
+    str_infres = fileUploadName_+"_inf.res";
+    str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
+
+    setParams();
 
     if (mplFile.is_open())
         fillMapleScript(fileUploadName_,mplFile);
@@ -399,7 +409,7 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
     f << "weakness_level := " << str_weaklevel << ":" << std::endl;
     f << "user_p := " << str_userp << ":" << std::endl;
     f << "user_q := " << str_userq << ":" << std::endl;
-    f << "try p4main() catch:"  << std::endl
+    f << "try timelimit("<<time_limit<<",p4main()) catch:"  << std::endl
         << "printf( \"! Error (\%a) \%a\\n\", lastexception[1], lastexception[2] );\n"
         << "finally: closeallfiles();\n"
         << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
@@ -451,32 +461,45 @@ void HomeLeft::evaluate()
 
 void HomeLeft::prepareSaveFile()
 {
+    std::ofstream saveFile;
+
+    saveFile.open(saveFileName_.c_str(),std::fstream::out|std::fstream::trunc);
+
+    setParams();
+    globalLogger__.debug(std::string("HomeLeft :: loggedIn_ is set to ")+(loggedIn_?std::string("true"):std::string("false")));
+    globalLogger__.debug("HomeLeft :: str_numeric is set to "+str_numeric.toUTF8());
+
+    saveFile << 0                               << std::endl;   // typeofstudy
+    saveFile << (str_numeric == WString("true") ? 1 : 0) << std::endl;   // numeric
+    saveFile << str_precision                   << std::endl;   // precision
+    saveFile << str_epsilon                     << std::endl;   // epsilon
+    saveFile << (str_testsep == WString("true") ? 1 : 0) << std::endl;   // test sep
+    saveFile << str_taylor                      << std::endl;   // taylor level
+    saveFile << str_numericlevel                << std::endl;   // numeric level
+    saveFile << str_maxlevel                    << std::endl;   // max levels
+    saveFile << str_weaklevel                   << std::endl;   // weakness level
+    saveFile << str_userp                       << std::endl;   // p
+    saveFile << str_userq                       << std::endl;   // q
+    saveFile << xEquationInput_->text()         << std::endl;   // x'
+    saveFile << yEquationInput_->text()         << std::endl;   // y'
+    saveFile << str_gcf                         << std::endl;   // gcf
+    saveFile << 0                               << std::endl;   // numparams
+
+    saveFile.close();
+
+    saveFileResource_->dataChanged();
+
+}
+
+void HomeLeft::allowSaveFile()
+{
     if (fileUploadName_.empty()) {
-        std::ofstream saveFile;
         if (saveFileName_.empty()) {
-            saveFileName_ = openTempStream("/tmp",".txt",saveFile);
+            saveFileName_ = openTempStream("/tmp",".txt"/*,saveFile*/);
             saveFileName_ += ".txt";
-        } else
-            saveFile.open(saveFileName_.c_str());
-        saveFile << 0 << std::endl;
-        saveFile << 1 << std::endl;
-        saveFile << 8 << std::endl;
-        saveFile << 0.01 << std::endl;
-        saveFile << 0 << std::endl;
-        saveFile << 6 << std::endl;
-        saveFile << 10 << std::endl;
-        saveFile << 20 << std::endl;
-        saveFile << 4 << std::endl;
-        saveFile << 1 << std::endl;
-        saveFile << 1 << std::endl;
-        saveFile << xEquationInput_->text() << std::endl;
-        saveFile << yEquationInput_->text() << std::endl;
-        saveFile << 0 << std::endl;
-        saveFile << 0 << std::endl;
-        saveFile.close();
-    } else {
+        }
+    } else
         saveFileName_ = fileUploadName_;
-    }
 
     saveFileResource_ = new WFileResource(saveFileName_);
 
@@ -484,8 +507,9 @@ void HomeLeft::prepareSaveFile()
     std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::strftime(date,sizeof(date),"%F_%R",std::localtime(&now));
     
-    saveFileResource_->suggestFileName("P4vf_"+std::string(date)+".inp");
+    saveFileResource_->suggestFileName("WP4_"+std::string(date)+".inp");
     saveButton_->setLink(saveFileResource_);
+
     saveButton_->setDisabled(false);
 
 }
@@ -620,6 +644,7 @@ void HomeLeft::showSettings()
     maxWeakLevelSpinBox_->setValue(4);
     label->setBuddy(maxWeakLevelSpinBox_);
 
+    // enable separatrice test parameters only if separatrice testing is on Yes
     levAppSpinBox_->disable();
     numericLevelSpinBox_->disable();
     maxLevelSpinBox_->disable();
@@ -644,23 +669,4 @@ void HomeLeft::hideSettings()
         delete settingsBox_;
         settingsBox_ = nullptr;
     }
-}
-
-
-
-// signals
-
-Signal<std::string>& HomeLeft::evaluatedSignal()
-{
-    return evaluatedSignal_;
-}
-
-Signal<std::string>& HomeLeft::errorSignal()
-{
-    return errorSignal_;
-}
-
-Signal <std::string>& HomeLeft::onPlotSignal()
-{
-    return onPlotSignal_;
 }

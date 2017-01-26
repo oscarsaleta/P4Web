@@ -71,15 +71,15 @@ public:
     /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
-    Wt::Signal<std::string>& evaluatedSignal();
+    Wt::Signal<std::string>& evaluatedSignal() { return evaluatedSignal_; }
     /**
      * Method that sends a signal to print some message in the output text area from #HomeRight
      */
-    Wt::Signal<std::string>& errorSignal();
+    Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
     /**
      * Method that sends a signal when the plot button is pressed in order to display a plot
      */
-    Wt::Signal<std::string>& onPlotSignal(); 
+    Wt::Signal<std::string>& onPlotSignal(){ return onPlotSignal_; }
 
 private:
     /* PUBLIC UI (no need to log in) */
@@ -134,7 +134,7 @@ private:
     // read uploaded file
     void parseInputFile();
     // open writable file with random name in tmp folder
-    std::string openTempStream(std::string, std::string, std::ofstream&);
+    std::string openTempStream(std::string, std::string/*, std::ofstream&*/);
     // prepare to write the maple script
     void prepareMapleFile();
     // write the options inside the maple script
@@ -143,8 +143,11 @@ private:
     void evaluate();
     // write a tmp save file in server for download
     void prepareSaveFile();
+    void allowSaveFile();
     // what to do when plot button is pressed
     void onPlot();
+    // set default/widget evaluation parameters
+    void setParams();
 
     /* MAPLE FILE PARAMETERS */
     bool loggedIn_;
@@ -179,6 +182,7 @@ private:
     Wt::WString str_weaklevel;
     Wt::WString str_userp;
     Wt::WString str_userq;
+    Wt::WString time_limit;
 
 };
 
