@@ -22,6 +22,17 @@
 #ifndef HOMELEFT_H
 #define HOMELEFT_H
 
+#define ACCURACY_DEFAULT 8
+#define PRECISION_DEFAULT 0
+#define EPSILON_DEFAULT 0.01
+#define APPROX_DEFAULT 6
+#define NUMERIC_DEFAULT 10
+#define MAXIMUM_DEFAULT 20
+#define WEAKNESS_DEFAULT 4
+#define P_DEFAULT 1
+#define Q_DEFAULT 1
+
+
 /*!
  * @brief Left side of UI
  * @file HomeLeft.h
@@ -93,7 +104,7 @@ private:
     Wt::WPushButton     *evalButton_;
     Wt::WPushButton     *plotButton_;
     Wt::WPushButton     *prepSaveButton_;
-    Wt::WPushButton     *clearButton_;
+    Wt::WPushButton     *resetButton_;
 
     Wt::WAnchor         *saveAnchor_;
     std::string         saveFileName_;
@@ -101,13 +112,10 @@ private:
 
     /* PRIVATE UI (log in needed) */
     Wt::WGroupBox       *settingsBox_;
-    
     Wt::WButtonGroup    *calculationsBtnGroup_;
     enum Calculations   { Algebraic = 0, Numeric = 1 };
-
     Wt::WButtonGroup    *separatricesBtnGroup_;
     enum Separatrices   { Yes = 0, No = 1 };
-
     Wt::WSpinBox        *accuracySpinBox_;
     Wt::WSpinBox        *precisionSpinBox_;
     Wt::WDoubleSpinBox  *epsilonSpinBox_;
@@ -128,6 +136,8 @@ private:
     void setupUI();
     // sets up connectors for buttons, forms, etc
     void setupConnectors();
+    // resets all parameters
+    void resetUI();
     // what to do when file is uploaded
     void fileUploaded();
     // what to do when uploaded file is too large

@@ -190,13 +190,13 @@ void HomeLeft::setupUI()
     saveAnchor_->hide();
     equationsBox_->addWidget(saveAnchor_);
 
-    clearButton_ = new WPushButton("Clear",equationsBox_);
-    clearButton_->setId("clearButton_");
-    clearButton_->setStyleClass("btn btn-warning");
-    clearButton_->setInline(true);
-    clearButton_->setMargin(5,Left);
-    clearButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"),XHTMLText);
-    equationsBox_->addWidget(clearButton_);
+    resetButton_ = new WPushButton("Reset",equationsBox_);
+    resetButton_->setId("resetButton_");
+    resetButton_->setStyleClass("btn btn-warning");
+    resetButton_->setInline(true);
+    resetButton_->setMargin(5,Left);
+    resetButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"),XHTMLText);
+    equationsBox_->addWidget(resetButton_);
 
     globalLogger__.debug("HomeLeft :: UI set up");
 
@@ -212,10 +212,7 @@ void HomeLeft::setupConnectors()
     // buttons
     evalButton_->clicked().connect(this,&HomeLeft::evaluate);
     plotButton_->clicked().connect(this,&HomeLeft::onPlot);
-    clearButton_->clicked().connect(std::bind([=] () {
-        xEquationInput_->setText(std::string());
-        yEquationInput_->setText(std::string());
-    }));
+    resetButton_->clicked().connect(this,&HomeLeft::resetUI);
     prepSaveButton_->clicked().connect(this,&HomeLeft::prepareSaveFile);
 
     saveAnchor_->clicked().connect(std::bind([=] () {
@@ -259,15 +256,74 @@ void HomeLeft::parseInputFile()
     std::ifstream f;
     std::string line;
     f.open(fileUploadName_.c_str());
+
     if (f.is_open()) {
         int i=0;
-        while (std::getline(f,line)) {
-            if (i==11)
-                xEquationInput_->setText(WString::fromUTF8(line));
-            else if (i==12)
-                yEquationInput_->setText(WString::fromUTF8(line));
-        i++;    
+        if (loggedIn_) {
+            while (std::getline(f,line)) {
+                switch(i) {
+                case 1:
+                    if (line == "0")
+                        calculationsBtnGroup_->setCheckedButton(calculationsBtnGroup_->button(Algebraic));
+                    else
+                        calculationsBtnGroup_->setCheckedButton(calculationsBtnGroup_->button(Numeric));
+                    break;
+                case 2:
+                    accuracySpinBox_->setValue((stoi(line)>0)?stoi(line):ACCURACY_DEFAULT);
+                    break;
+                case 3:
+                    epsilonSpinBox_->setValue((stoi(line)>0)?stoi(line):EPSILON_DEFAULT);
+                    break;
+                case 4:
+                    if (line == "0") { 
+                        separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(No));
+                        levAppSpinBox_->disable();
+                        numericLevelSpinBox_->disable();
+                        maxLevelSpinBox_->disable();
+                    } else {
+                        separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(Yes));
+                        levAppSpinBox_->enable();
+                        numericLevelSpinBox_->enable();
+                        maxLevelSpinBox_->enable();
+                    }
+                    break;
+                case 5:
+                    levAppSpinBox_->setValue((stoi(line)>0)?stoi(line):APPROX_DEFAULT);
+                    break;
+                case 6:
+                    numericLevelSpinBox_->setValue((stoi(line)>0)?stoi(line):NUMERIC_DEFAULT);
+                    break;
+                case 7:
+                    maxLevelSpinBox_->setValue((stoi(line)>0)?stoi(line):MAXIMUM_DEFAULT);
+                    break;
+                case 8:
+                    maxWeakLevelSpinBox_->setValue((stoi(line)>0)?stoi(line):WEAKNESS_DEFAULT);
+                    break;
+                case 9:
+                    PLWeightPSpinBox_->setValue((stoi(line)>0)?stoi(line):P_DEFAULT);
+                    break;
+                case 10:
+                    PLWeightQSpinBox_->setValue((stoi(line)>0)?stoi(line):Q_DEFAULT);
+                    break;
+                case 11:
+                    xEquationInput_->setText(line);
+                    break;
+                case 12:
+                    yEquationInput_->setText(line);
+                    break;
+                }
+                i++;
+            }
+        } else {
+            while(std::getline(f,line)) {
+                if (i==11)
+                    xEquationInput_->setText(WString::fromUTF8(line));
+                else if (i==12)
+                    yEquationInput_->setText(WString::fromUTF8(line));
+                i++;
+            }
         }
+        globalLogger__.debug("i="+std::to_string(i));
         if (f.eof() && i<12) {
             errorSignal_.emit("Invalid input file.");
             globalLogger__.error("HomeLeft :: EOF while reading input file uploaded with name "+fileUploadName_);
@@ -277,7 +333,7 @@ void HomeLeft::parseInputFile()
             globalLogger__.error("HomeLeft :: I/O error while reading input file uploaded with name "+fileUploadName_);
             fileUploadName_ = "";
         } else {
-            prepareSaveFile();
+            //prepareSaveFile();
             errorSignal_.emit("File uploaded. Press the Evaluate button to start computing.");
             globalLogger__.info("HomeLeft :: Input file uploaded with name "+fileUploadName_);
         }
@@ -337,8 +393,8 @@ void HomeLeft::setParams()
         str_numericlevel = std::to_string(numericLevelSpinBox_->value());
         str_maxlevel = std::to_string(maxLevelSpinBox_->value());
         str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
-        str_userp = "1";
-        str_userq = "1";
+        str_userp = std::to_string(PLWeightPSpinBox_->value());
+        str_userq = std::to_string(PLWeightQSpinBox_->value());
         time_limit = "60";
     }
 }
@@ -428,6 +484,7 @@ void HomeLeft::evaluate()
         // create vector of arguments for execvp
         std::vector<char *> commands;
         commands.push_back("maple");
+        commands.push_back("-T ,1048576"); // 1GB memory limit
         char *aux = new char [fileUploadName_.length()+1];
         std::strcpy(aux,fileUploadName_.c_str());
         std::strcat(aux,".mpl");
@@ -638,6 +695,27 @@ void HomeLeft::showSettings()
     maxWeakLevelSpinBox_->setValue(4);
     label->setBuddy(maxWeakLevelSpinBox_);
 
+    new WBreak(settingsBox_);
+
+    // p q
+    label = new WLabel("p:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"),XHTMLText);
+    PLWeightPSpinBox_ = new WSpinBox(settingsBox_);
+    PLWeightPSpinBox_->setStyleClass("spin-box");
+    PLWeightPSpinBox_->setRange(1,10);
+    PLWeightPSpinBox_->setValue(1);
+    label->setBuddy(PLWeightPSpinBox_);
+    label = new WLabel("q:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"),XHTMLText);
+    label->setMargin(20,Left);
+    PLWeightQSpinBox_ = new WSpinBox(settingsBox_);
+    PLWeightQSpinBox_->setStyleClass("spin-box");
+    PLWeightQSpinBox_->setRange(1,10);
+    PLWeightQSpinBox_->setValue(1);
+    label->setBuddy(PLWeightQSpinBox_);
+
+
+
     // enable separatrice test parameters only if separatrice testing is on Yes
     levAppSpinBox_->disable();
     numericLevelSpinBox_->disable();
@@ -663,4 +741,11 @@ void HomeLeft::hideSettings()
         delete settingsBox_;
         settingsBox_ = nullptr;
     }
+}
+
+void HomeLeft::resetUI()
+{
+    xEquationInput_->setText(std::string());
+    yEquationInput_->setText(std::string());
+    showSettings();
 }

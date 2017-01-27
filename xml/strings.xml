@@ -97,6 +97,10 @@
     <p>Maximum order of Lyapunov constants to be computed for weak foci.</p>
   </message>
 
+  <message id="tooltip.poincare-lyapunov-weights">
+    <p>Poincaré-Lyapunov weights.</p>
+  </message>
+
   <message id="tooltip.homeleft-eval-button">
     <p>Evaluate the vector field to find singularities, compute Lyapunov constants
       and blow-up when needed, and integrate separatrices.</p>
