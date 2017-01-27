@@ -22,6 +22,17 @@
 #ifndef HOMELEFT_H
 #define HOMELEFT_H
 
+#define ACCURACY_DEFAULT 8
+#define PRECISION_DEFAULT 0
+#define EPSILON_DEFAULT 0.01
+#define APPROX_DEFAULT 6
+#define NUMERIC_DEFAULT 10
+#define MAXIMUM_DEFAULT 20
+#define WEAKNESS_DEFAULT 4
+#define P_DEFAULT 1
+#define Q_DEFAULT 1
+
+
 /*!
  * @brief Left side of UI
  * @file HomeLeft.h
@@ -71,15 +82,15 @@ public:
     /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
-    Wt::Signal<std::string>& evaluatedSignal();
+    Wt::Signal<std::string>& evaluatedSignal() { return evaluatedSignal_; }
     /**
      * Method that sends a signal to print some message in the output text area from #HomeRight
      */
-    Wt::Signal<std::string>& errorSignal();
+    Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
     /**
      * Method that sends a signal when the plot button is pressed in order to display a plot
      */
-    Wt::Signal<std::string>& onPlotSignal(); 
+    Wt::Signal<std::string>& onPlotSignal(){ return onPlotSignal_; }
 
 private:
     /* PUBLIC UI (no need to log in) */
@@ -92,21 +103,19 @@ private:
     Wt::WLineEdit       *yEquationInput_;
     Wt::WPushButton     *evalButton_;
     Wt::WPushButton     *plotButton_;
-    Wt::WPushButton     *clearButton_;
+    Wt::WPushButton     *prepSaveButton_;
+    Wt::WPushButton     *resetButton_;
 
-    Wt::WAnchor         *saveButton_;
+    Wt::WAnchor         *saveAnchor_;
     std::string         saveFileName_;
     Wt::WFileResource   *saveFileResource_;
 
     /* PRIVATE UI (log in needed) */
     Wt::WGroupBox       *settingsBox_;
-    
     Wt::WButtonGroup    *calculationsBtnGroup_;
     enum Calculations   { Algebraic = 0, Numeric = 1 };
-
     Wt::WButtonGroup    *separatricesBtnGroup_;
     enum Separatrices   { Yes = 0, No = 1 };
-
     Wt::WSpinBox        *accuracySpinBox_;
     Wt::WSpinBox        *precisionSpinBox_;
     Wt::WDoubleSpinBox  *epsilonSpinBox_;
@@ -127,6 +136,8 @@ private:
     void setupUI();
     // sets up connectors for buttons, forms, etc
     void setupConnectors();
+    // resets all parameters
+    void resetUI();
     // what to do when file is uploaded
     void fileUploaded();
     // what to do when uploaded file is too large
@@ -134,7 +145,7 @@ private:
     // read uploaded file
     void parseInputFile();
     // open writable file with random name in tmp folder
-    std::string openTempStream(std::string, std::string, std::ofstream&);
+    std::string openTempStream(std::string, std::string/*, std::ofstream&*/);
     // prepare to write the maple script
     void prepareMapleFile();
     // write the options inside the maple script
@@ -143,8 +154,11 @@ private:
     void evaluate();
     // write a tmp save file in server for download
     void prepareSaveFile();
+    void allowSaveFile();
     // what to do when plot button is pressed
     void onPlot();
+    // set default/widget evaluation parameters
+    void setParams();
 
     /* MAPLE FILE PARAMETERS */
     bool loggedIn_;
@@ -179,6 +193,7 @@ private:
     Wt::WString str_weaklevel;
     Wt::WString str_userp;
     Wt::WString str_userq;
+    Wt::WString time_limit;
 
 };
 

@@ -99,7 +99,6 @@ HomeLeft::~HomeLeft()
     delete yEquationInput_;
     delete evalButton_;
     delete plotButton_;
-    delete saveButton_;
     delete equationsBox_;
 
     globalLogger__.debug("HomeLeft :: deleted correctly");
@@ -171,24 +170,33 @@ void HomeLeft::setupUI()
     plotButton_->setToolTip(WString::tr("tooltip.homeleft-plot-button"),XHTMLText);
     equationsBox_->addWidget(plotButton_);
 
-    // save file button (actually, it's a WAnchor)
-    saveButton_ = new WAnchor(equationsBox_);
-    saveButton_->setId("saveButton_");
-    saveButton_->setStyleClass("btn btn-default");
-    saveButton_->setText("Save");
-    saveButton_->setInline(true);
-    saveButton_->setMargin(5,Left);
-    saveButton_->setDisabled(true);
-    saveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
-    equationsBox_->addWidget(saveButton_);
+    // prepare save file button
+    prepSaveButton_ = new WPushButton("Prepare save file",equationsBox_);
+    prepSaveButton_->setId("prepSaveButton_");
+    prepSaveButton_->setStyleClass("btn btn-default");
+    prepSaveButton_->setInline(true);
+    prepSaveButton_->setMargin(5,Left);
+    prepSaveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
+    equationsBox_->addWidget(prepSaveButton_);
 
-    clearButton_ = new WPushButton("Clear",equationsBox_);
-    clearButton_->setId("clearButton_");
-    clearButton_->setStyleClass("btn btn-warning");
-    clearButton_->setInline(true);
-    clearButton_->setMargin(5,Left);
-    clearButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"),XHTMLText);
-    equationsBox_->addWidget(clearButton_);
+    // save file anchor
+    saveAnchor_ = new WAnchor(equationsBox_);
+    saveAnchor_->setId("saveAnchor_");
+    saveAnchor_->setStyleClass("btn btn-default");
+    saveAnchor_->setText("Download save file");
+    saveAnchor_->setInline(true);
+    saveAnchor_->setMargin(5,Left);
+    saveAnchor_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
+    saveAnchor_->hide();
+    equationsBox_->addWidget(saveAnchor_);
+
+    resetButton_ = new WPushButton("Reset",equationsBox_);
+    resetButton_->setId("resetButton_");
+    resetButton_->setStyleClass("btn btn-warning");
+    resetButton_->setInline(true);
+    resetButton_->setMargin(5,Left);
+    resetButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"),XHTMLText);
+    equationsBox_->addWidget(resetButton_);
 
     globalLogger__.debug("HomeLeft :: UI set up");
 
@@ -204,25 +212,13 @@ void HomeLeft::setupConnectors()
     // buttons
     evalButton_->clicked().connect(this,&HomeLeft::evaluate);
     plotButton_->clicked().connect(this,&HomeLeft::onPlot);
-    clearButton_->clicked().connect(std::bind([=] () {
-        xEquationInput_->setText(std::string());
-        yEquationInput_->setText(std::string());
-    }));
+    resetButton_->clicked().connect(this,&HomeLeft::resetUI);
+    prepSaveButton_->clicked().connect(this,&HomeLeft::prepareSaveFile);
 
-    // enable buttons if line edits have content
-    xEquationInput_->textInput().connect(std::bind([=] () {
-        if (!yEquationInput_->text().empty()) {
-            evalButton_->setEnabled(true);
-            plotButton_->setEnabled(true);
-            prepareSaveFile();
-        }
-    }));
-    yEquationInput_->textInput().connect(std::bind([=] () {
-        if (!xEquationInput_->text().empty()) {
-            evalButton_->setEnabled(true);
-            plotButton_->setEnabled(true);
-            prepareSaveFile();
-        }
+    saveAnchor_->clicked().connect(std::bind([=] () {
+        saveAnchor_->hide();
+        prepSaveButton_->show();
+        delete saveFileResource_;
     }));
 
     globalLogger__.debug("HomeLeft :: connectors set up");
@@ -260,15 +256,74 @@ void HomeLeft::parseInputFile()
     std::ifstream f;
     std::string line;
     f.open(fileUploadName_.c_str());
+
     if (f.is_open()) {
         int i=0;
-        while (std::getline(f,line)) {
-            if (i==11)
-                xEquationInput_->setText(WString::fromUTF8(line));
-            else if (i==12)
-                yEquationInput_->setText(WString::fromUTF8(line));
-        i++;    
+        if (loggedIn_) {
+            while (std::getline(f,line)) {
+                switch(i) {
+                case 1:
+                    if (line == "0")
+                        calculationsBtnGroup_->setCheckedButton(calculationsBtnGroup_->button(Algebraic));
+                    else
+                        calculationsBtnGroup_->setCheckedButton(calculationsBtnGroup_->button(Numeric));
+                    break;
+                case 2:
+                    accuracySpinBox_->setValue((stoi(line)>0)?stoi(line):ACCURACY_DEFAULT);
+                    break;
+                case 3:
+                    epsilonSpinBox_->setValue((stoi(line)>0)?stoi(line):EPSILON_DEFAULT);
+                    break;
+                case 4:
+                    if (line == "0") { 
+                        separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(No));
+                        levAppSpinBox_->disable();
+                        numericLevelSpinBox_->disable();
+                        maxLevelSpinBox_->disable();
+                    } else {
+                        separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(Yes));
+                        levAppSpinBox_->enable();
+                        numericLevelSpinBox_->enable();
+                        maxLevelSpinBox_->enable();
+                    }
+                    break;
+                case 5:
+                    levAppSpinBox_->setValue((stoi(line)>0)?stoi(line):APPROX_DEFAULT);
+                    break;
+                case 6:
+                    numericLevelSpinBox_->setValue((stoi(line)>0)?stoi(line):NUMERIC_DEFAULT);
+                    break;
+                case 7:
+                    maxLevelSpinBox_->setValue((stoi(line)>0)?stoi(line):MAXIMUM_DEFAULT);
+                    break;
+                case 8:
+                    maxWeakLevelSpinBox_->setValue((stoi(line)>0)?stoi(line):WEAKNESS_DEFAULT);
+                    break;
+                case 9:
+                    PLWeightPSpinBox_->setValue((stoi(line)>0)?stoi(line):P_DEFAULT);
+                    break;
+                case 10:
+                    PLWeightQSpinBox_->setValue((stoi(line)>0)?stoi(line):Q_DEFAULT);
+                    break;
+                case 11:
+                    xEquationInput_->setText(line);
+                    break;
+                case 12:
+                    yEquationInput_->setText(line);
+                    break;
+                }
+                i++;
+            }
+        } else {
+            while(std::getline(f,line)) {
+                if (i==11)
+                    xEquationInput_->setText(WString::fromUTF8(line));
+                else if (i==12)
+                    yEquationInput_->setText(WString::fromUTF8(line));
+                i++;
+            }
         }
+        globalLogger__.debug("i="+std::to_string(i));
         if (f.eof() && i<12) {
             errorSignal_.emit("Invalid input file.");
             globalLogger__.error("HomeLeft :: EOF while reading input file uploaded with name "+fileUploadName_);
@@ -278,7 +333,7 @@ void HomeLeft::parseInputFile()
             globalLogger__.error("HomeLeft :: I/O error while reading input file uploaded with name "+fileUploadName_);
             fileUploadName_ = "";
         } else {
-            prepareSaveFile();
+            //prepareSaveFile();
             errorSignal_.emit("File uploaded. Press the Evaluate button to start computing.");
             globalLogger__.info("HomeLeft :: Input file uploaded with name "+fileUploadName_);
         }
@@ -287,7 +342,7 @@ void HomeLeft::parseInputFile()
 }
 
 
-std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std::ofstream &f)
+std::string HomeLeft::openTempStream(std::string prefix, std::string suffix/*, std::ofstream &f*/)
 {
     std::string fullname;
     prefix += "/XXXXXX" + suffix;
@@ -298,7 +353,7 @@ std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std
     if (fd != -1) {
         prefix.assign(dst_prefix.begin(), dst_prefix.end()-1-4);
         fullname = prefix+suffix;
-        f.open(fullname.c_str(), std::ios_base::trunc | std::ios_base::out);
+        //f.open(fullname.c_str(), std::ios_base::trunc | std::ios_base::out);
         close(fd);
     }
 
@@ -307,24 +362,8 @@ std::string HomeLeft::openTempStream(std::string prefix, std::string suffix, std
     return prefix;
 }
 
-void HomeLeft::prepareMapleFile()
+void HomeLeft::setParams()
 {
-    std::ofstream mplFile;
-
-    if (!fileUploadName_.empty()) {
-        mplFile.open((fileUploadName_+".mpl").c_str(),
-            std::ios_base::trunc | std::ios_base::out);
-    } else {
-        fileUploadName_ = openTempStream("/tmp",".mpl",mplFile);
-    }
-
-    str_vectable = fileUploadName_+"_vec.tab";
-    str_fintab = fileUploadName_+"_fin.tab";
-    str_finres = fileUploadName_+"_fin.res";
-    str_inftab = fileUploadName_+"_inf.tab";
-    str_infres = fileUploadName_+"_inf.res";
-    str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
-
     if (!loggedIn_) {
         str_critpoints = "0";
         str_saveall = "false";
@@ -340,6 +379,7 @@ void HomeLeft::prepareMapleFile()
         str_weaklevel = "0";
         str_userp = "1";
         str_userq = "1";
+        time_limit = "30";
     } else {
         str_critpoints = "0";
         str_saveall = "false";
@@ -353,9 +393,29 @@ void HomeLeft::prepareMapleFile()
         str_numericlevel = std::to_string(numericLevelSpinBox_->value());
         str_maxlevel = std::to_string(maxLevelSpinBox_->value());
         str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
-        str_userp = "1";
-        str_userq = "1";
+        str_userp = std::to_string(PLWeightPSpinBox_->value());
+        str_userq = std::to_string(PLWeightQSpinBox_->value());
+        time_limit = "60";
     }
+}
+
+void HomeLeft::prepareMapleFile()
+{
+    std::ofstream mplFile;
+
+    if (fileUploadName_.empty())
+        fileUploadName_ = openTempStream("/tmp",".mpl"/*,mplFile*/);
+
+    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc|std::fstream::out);
+
+    str_vectable = fileUploadName_+"_vec.tab";
+    str_fintab = fileUploadName_+"_fin.tab";
+    str_finres = fileUploadName_+"_fin.res";
+    str_inftab = fileUploadName_+"_inf.tab";
+    str_infres = fileUploadName_+"_inf.res";
+    str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
+
+    setParams();
 
     if (mplFile.is_open())
         fillMapleScript(fileUploadName_,mplFile);
@@ -399,7 +459,7 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
     f << "weakness_level := " << str_weaklevel << ":" << std::endl;
     f << "user_p := " << str_userp << ":" << std::endl;
     f << "user_q := " << str_userq << ":" << std::endl;
-    f << "try p4main() catch:"  << std::endl
+    f << "try timelimit("<<time_limit<<",p4main()) catch:"  << std::endl
         << "printf( \"! Error (\%a) \%a\\n\", lastexception[1], lastexception[2] );\n"
         << "finally: closeallfiles();\n"
         << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
@@ -424,6 +484,7 @@ void HomeLeft::evaluate()
         // create vector of arguments for execvp
         std::vector<char *> commands;
         commands.push_back("maple");
+        commands.push_back("-T ,1048576"); // 1GB memory limit
         char *aux = new char [fileUploadName_.length()+1];
         std::strcpy(aux,fileUploadName_.c_str());
         std::strcat(aux,".mpl");
@@ -442,8 +503,8 @@ void HomeLeft::evaluate()
             evaluatedSignal_.emit(fileUploadName_);
             globalLogger__.info("HomeLeft :: Maple script successfully executed");
         } else {
-            errorSignal_.emit("Maple error: "+std::to_string(status));
-            globalLogger__.error("HomeLeft :: error during Maple script execution");
+            errorSignal_.emit("Error during Maple script execution");
+            globalLogger__.error("HomeLeft :: Maple error: "+std::to_string(status));
         }
     }
 }
@@ -451,32 +512,43 @@ void HomeLeft::evaluate()
 
 void HomeLeft::prepareSaveFile()
 {
-    if (fileUploadName_.empty()) {
-        std::ofstream saveFile;
-        if (saveFileName_.empty()) {
-            saveFileName_ = openTempStream("/tmp",".txt",saveFile);
-            saveFileName_ += ".txt";
-        } else
-            saveFile.open(saveFileName_.c_str());
-        saveFile << 0 << std::endl;
-        saveFile << 1 << std::endl;
-        saveFile << 8 << std::endl;
-        saveFile << 0.01 << std::endl;
-        saveFile << 0 << std::endl;
-        saveFile << 6 << std::endl;
-        saveFile << 10 << std::endl;
-        saveFile << 20 << std::endl;
-        saveFile << 4 << std::endl;
-        saveFile << 1 << std::endl;
-        saveFile << 1 << std::endl;
-        saveFile << xEquationInput_->text() << std::endl;
-        saveFile << yEquationInput_->text() << std::endl;
-        saveFile << 0 << std::endl;
-        saveFile << 0 << std::endl;
-        saveFile.close();
-    } else {
-        saveFileName_ = fileUploadName_;
+    if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
+        errorSignal_.emit("Cannot prepare a Maple script without introducing a vector field first.");
+        globalLogger__.error("HomeLeft :: tried to save without entering a vector field");
+        return;
     }
+
+    std::ofstream saveFile;
+
+    if (fileUploadName_.empty()) {
+        if (saveFileName_.empty()) {
+            saveFileName_ = openTempStream("/tmp",".txt"/*,saveFile*/);
+            saveFileName_ += ".txt";
+        }
+    } else
+        saveFileName_ = fileUploadName_;
+
+    saveFile.open(saveFileName_.c_str(),std::fstream::out|std::fstream::trunc);
+
+    setParams();
+
+    saveFile << 0                               << std::endl;   // typeofstudy
+    saveFile << (str_numeric == WString("true") ? 1 : 0) << std::endl;   // numeric
+    saveFile << str_precision                   << std::endl;   // precision
+    saveFile << str_epsilon                     << std::endl;   // epsilon
+    saveFile << (str_testsep == WString("true") ? 1 : 0) << std::endl;   // test sep
+    saveFile << str_taylor                      << std::endl;   // taylor level
+    saveFile << str_numericlevel                << std::endl;   // numeric level
+    saveFile << str_maxlevel                    << std::endl;   // max levels
+    saveFile << str_weaklevel                   << std::endl;   // weakness level
+    saveFile << str_userp                       << std::endl;   // p
+    saveFile << str_userq                       << std::endl;   // q
+    saveFile << xEquationInput_->text()         << std::endl;   // x'
+    saveFile << yEquationInput_->text()         << std::endl;   // y'
+    saveFile << str_gcf                         << std::endl;   // gcf
+    saveFile << 0                               << std::endl;   // numparams
+
+    saveFile.close();
 
     saveFileResource_ = new WFileResource(saveFileName_);
 
@@ -484,11 +556,14 @@ void HomeLeft::prepareSaveFile()
     std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     std::strftime(date,sizeof(date),"%F_%R",std::localtime(&now));
     
-    saveFileResource_->suggestFileName("P4vf_"+std::string(date)+".inp");
-    saveButton_->setLink(saveFileResource_);
-    saveButton_->setDisabled(false);
+    saveFileResource_->suggestFileName("WP4_"+std::string(date)+".inp");
+    saveAnchor_->setLink(saveFileResource_);
+
+    prepSaveButton_->hide();
+    saveAnchor_->show();
 
 }
+
 
 void HomeLeft::onPlot()
 {
@@ -620,6 +695,28 @@ void HomeLeft::showSettings()
     maxWeakLevelSpinBox_->setValue(4);
     label->setBuddy(maxWeakLevelSpinBox_);
 
+    new WBreak(settingsBox_);
+
+    // p q
+    label = new WLabel("p:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"),XHTMLText);
+    PLWeightPSpinBox_ = new WSpinBox(settingsBox_);
+    PLWeightPSpinBox_->setStyleClass("spin-box");
+    PLWeightPSpinBox_->setRange(1,10);
+    PLWeightPSpinBox_->setValue(1);
+    label->setBuddy(PLWeightPSpinBox_);
+    label = new WLabel("q:",settingsBox_);
+    label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"),XHTMLText);
+    label->setMargin(20,Left);
+    PLWeightQSpinBox_ = new WSpinBox(settingsBox_);
+    PLWeightQSpinBox_->setStyleClass("spin-box");
+    PLWeightQSpinBox_->setRange(1,10);
+    PLWeightQSpinBox_->setValue(1);
+    label->setBuddy(PLWeightQSpinBox_);
+
+
+
+    // enable separatrice test parameters only if separatrice testing is on Yes
     levAppSpinBox_->disable();
     numericLevelSpinBox_->disable();
     maxLevelSpinBox_->disable();
@@ -646,21 +743,9 @@ void HomeLeft::hideSettings()
     }
 }
 
-
-
-// signals
-
-Signal<std::string>& HomeLeft::evaluatedSignal()
+void HomeLeft::resetUI()
 {
-    return evaluatedSignal_;
-}
-
-Signal<std::string>& HomeLeft::errorSignal()
-{
-    return errorSignal_;
-}
-
-Signal <std::string>& HomeLeft::onPlotSignal()
-{
-    return onPlotSignal_;
+    xEquationInput_->setText(std::string());
+    yEquationInput_->setText(std::string());
+    showSettings();
 }

@@ -102,12 +102,50 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
 }
 
 
-void WWinSphere::SetupPlot( void )
+WWinSphere::~WWinSphere()
+{
+    int i;
+
+    struct P4POLYLINES * t;
+    while( CircleAtInfinity != nullptr )
+    {
+        t = CircleAtInfinity;
+        CircleAtInfinity = t->next;
+        delete t;//free( t );
+        t = nullptr;
+    }
+    while( PLCircle != nullptr )
+    {
+        t = PLCircle;
+        PLCircle = t->next;
+        delete t;//free( t );
+        t = nullptr;
+    }
+
+    for( i = 0; i < numSpheres; i++ )
+    {
+        if( SphereList[i] == this )
+            break;
+    }
+    if( i == numSpheres )
+        return;         // error: sphere not found?
+
+    if( i > 0 )
+        SphereList[i-1]->next = next;
+
+    if( i < numSpheres-1 )
+        memmove( SphereList+i, SphereList+i+1, sizeof(WWinSphere *) * (numSpheres-i-1) );
+
+    numSpheres--;
+}
+
+
+bool WWinSphere::setupPlot( void )
 {
     if (!study_->readTables(basename_)) {
         //parent()->printError("Error while reading results. Evaluate the vector field first");
-        delete this;
-        return;
+        //delete this;
+        return false;
     } else
         study_->setupCoordinateTransformations();
 
@@ -163,49 +201,17 @@ void WWinSphere::SetupPlot( void )
         if( study_->plweights )
             PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
     }
-    
+    return true;
 }
 
-WWinSphere::~WWinSphere()
-{
-    int i;
-
-    struct P4POLYLINES * t;
-    while( CircleAtInfinity != nullptr )
-    {
-        t = CircleAtInfinity;
-        CircleAtInfinity = t->next;
-        delete t;//free( t );
-        t = nullptr;
-    }
-    while( PLCircle != nullptr )
-    {
-        t = PLCircle;
-        PLCircle = t->next;
-        delete t;//free( t );
-        t = nullptr;
-    }
-
-    for( i = 0; i < numSpheres; i++ )
-    {
-        if( SphereList[i] == this )
-            break;
-    }
-    if( i == numSpheres )
-        return;         // error: sphere not found?
-
-    if( i > 0 )
-        SphereList[i-1]->next = next;
-
-    if( i < numSpheres-1 )
-        memmove( SphereList+i, SphereList+i+1, sizeof(WWinSphere *) * (numSpheres-i-1) );
-
-    numSpheres--;
-}
 
 void WWinSphere::paintEvent( WPaintDevice * p )
 {
-    SetupPlot();
+    if (!setupPlot()) {
+        // TODO: enviar senyal des d'aquí per imprimir error a output
+        errorSignal_.emit("Error while reading Maple results, probably time ran out during execution.");
+        return;
+    }
     WPainter paint(p);
     paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
     staticPainter = &paint;
