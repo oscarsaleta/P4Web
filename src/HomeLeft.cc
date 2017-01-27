@@ -99,7 +99,6 @@ HomeLeft::~HomeLeft()
     delete yEquationInput_;
     delete evalButton_;
     delete plotButton_;
-    delete saveButton_;
     delete equationsBox_;
 
     globalLogger__.debug("HomeLeft :: deleted correctly");
@@ -171,16 +170,25 @@ void HomeLeft::setupUI()
     plotButton_->setToolTip(WString::tr("tooltip.homeleft-plot-button"),XHTMLText);
     equationsBox_->addWidget(plotButton_);
 
-    // save file button (actually, it's a WAnchor)
-    saveButton_ = new WAnchor(equationsBox_);
-    saveButton_->setId("saveButton_");
-    saveButton_->setStyleClass("btn btn-default");
-    saveButton_->setText("Save");
-    saveButton_->setInline(true);
-    saveButton_->setMargin(5,Left);
-    saveButton_->setDisabled(true);
-    saveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
-    equationsBox_->addWidget(saveButton_);
+    // prepare save file button
+    prepSaveButton_ = new WPushButton("Prepare save file",equationsBox_);
+    prepSaveButton_->setId("prepSaveButton_");
+    prepSaveButton_->setStyleClass("btn btn-default");
+    prepSaveButton_->setInline(true);
+    prepSaveButton_->setMargin(5,Left);
+    prepSaveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
+    equationsBox_->addWidget(prepSaveButton_);
+
+    // save file anchor
+    saveAnchor_ = new WAnchor(equationsBox_);
+    saveAnchor_->setId("saveAnchor_");
+    saveAnchor_->setStyleClass("btn btn-default");
+    saveAnchor_->setText("Download save file");
+    saveAnchor_->setInline(true);
+    saveAnchor_->setMargin(5,Left);
+    saveAnchor_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
+    saveAnchor_->hide();
+    equationsBox_->addWidget(saveAnchor_);
 
     clearButton_ = new WPushButton("Clear",equationsBox_);
     clearButton_->setId("clearButton_");
@@ -208,25 +216,12 @@ void HomeLeft::setupConnectors()
         xEquationInput_->setText(std::string());
         yEquationInput_->setText(std::string());
     }));
+    prepSaveButton_->clicked().connect(this,&HomeLeft::prepareSaveFile);
 
-    // enable buttons if line edits have content
-    xEquationInput_->textInput().connect(std::bind([=] () {
-        if (!yEquationInput_->text().empty()) {
-            evalButton_->setEnabled(true);
-            plotButton_->setEnabled(true);
-            allowSaveFile();
-        }
-    }));
-    yEquationInput_->textInput().connect(std::bind([=] () {
-        if (!xEquationInput_->text().empty()) {
-            evalButton_->setEnabled(true);
-            plotButton_->setEnabled(true);
-            allowSaveFile();
-        }
-    }));
-
-    saveButton_->clicked().connect(std::bind([=] () {
-        prepareSaveFile();
+    saveAnchor_->clicked().connect(std::bind([=] () {
+        saveAnchor_->hide();
+        prepSaveButton_->show();
+        delete saveFileResource_;
     }));
 
     globalLogger__.debug("HomeLeft :: connectors set up");
@@ -248,7 +243,6 @@ void HomeLeft::fileUploaded()
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
     parseInputFile();
-    allowSaveFile();
     
 }
 
@@ -452,8 +446,8 @@ void HomeLeft::evaluate()
             evaluatedSignal_.emit(fileUploadName_);
             globalLogger__.info("HomeLeft :: Maple script successfully executed");
         } else {
-            errorSignal_.emit("Maple error: "+std::to_string(status));
-            globalLogger__.error("HomeLeft :: error during Maple script execution");
+            errorSignal_.emit("Error during Maple script execution");
+            globalLogger__.error("HomeLeft :: Maple error: "+std::to_string(status));
         }
     }
 }
@@ -461,13 +455,25 @@ void HomeLeft::evaluate()
 
 void HomeLeft::prepareSaveFile()
 {
+    if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
+        errorSignal_.emit("Cannot prepare a Maple script without introducing a vector field first.");
+        globalLogger__.error("HomeLeft :: tried to save without entering a vector field");
+        return;
+    }
+
     std::ofstream saveFile;
+
+    if (fileUploadName_.empty()) {
+        if (saveFileName_.empty()) {
+            saveFileName_ = openTempStream("/tmp",".txt"/*,saveFile*/);
+            saveFileName_ += ".txt";
+        }
+    } else
+        saveFileName_ = fileUploadName_;
 
     saveFile.open(saveFileName_.c_str(),std::fstream::out|std::fstream::trunc);
 
     setParams();
-    globalLogger__.debug(std::string("HomeLeft :: loggedIn_ is set to ")+(loggedIn_?std::string("true"):std::string("false")));
-    globalLogger__.debug("HomeLeft :: str_numeric is set to "+str_numeric.toUTF8());
 
     saveFile << 0                               << std::endl;   // typeofstudy
     saveFile << (str_numeric == WString("true") ? 1 : 0) << std::endl;   // numeric
@@ -487,20 +493,6 @@ void HomeLeft::prepareSaveFile()
 
     saveFile.close();
 
-    saveFileResource_->dataChanged();
-
-}
-
-void HomeLeft::allowSaveFile()
-{
-    if (fileUploadName_.empty()) {
-        if (saveFileName_.empty()) {
-            saveFileName_ = openTempStream("/tmp",".txt"/*,saveFile*/);
-            saveFileName_ += ".txt";
-        }
-    } else
-        saveFileName_ = fileUploadName_;
-
     saveFileResource_ = new WFileResource(saveFileName_);
 
     char date[100];
@@ -508,11 +500,13 @@ void HomeLeft::allowSaveFile()
     std::strftime(date,sizeof(date),"%F_%R",std::localtime(&now));
     
     saveFileResource_->suggestFileName("WP4_"+std::string(date)+".inp");
-    saveButton_->setLink(saveFileResource_);
+    saveAnchor_->setLink(saveFileResource_);
 
-    saveButton_->setDisabled(false);
+    prepSaveButton_->hide();
+    saveAnchor_->show();
 
 }
+
 
 void HomeLeft::onPlot()
 {

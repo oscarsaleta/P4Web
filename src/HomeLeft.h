@@ -92,9 +92,10 @@ private:
     Wt::WLineEdit       *yEquationInput_;
     Wt::WPushButton     *evalButton_;
     Wt::WPushButton     *plotButton_;
+    Wt::WPushButton     *prepSaveButton_;
     Wt::WPushButton     *clearButton_;
 
-    Wt::WAnchor         *saveButton_;
+    Wt::WAnchor         *saveAnchor_;
     std::string         saveFileName_;
     Wt::WFileResource   *saveFileResource_;
 
