@@ -203,5 +203,19 @@ struct P4POLYLINES
 #define RADIUS2         (RADIUS*RADIUS) ///< square of radius
 
 
+/**
+ * Enum for the possible types of views
+ *
+ * This sets which chart are we studying and plotting
+ */
+enum TYPEOFVIEWS {
+    TYPEOFVIEW_PLANE    = 0,       ///< plane R2
+    TYPEOFVIEW_SPHERE   = 1,       ///< sphere
+    TYPEOFVIEW_U1       = 2,       ///< U1 sphere chart
+    TYPEOFVIEW_U2       = 3,       ///< U2 sphere chart
+    TYPEOFVIEW_V1       = 4,       ///< V1 sphere chart
+    TYPEOFVIEW_V2       = 5        ///< V2 sphere chart
+};
+
 
 #endif /* CUSTOM_H */

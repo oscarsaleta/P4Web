@@ -714,8 +714,6 @@ void HomeLeft::showSettings()
     PLWeightQSpinBox_->setValue(1);
     label->setBuddy(PLWeightQSpinBox_);
 
-
-
     // enable separatrice test parameters only if separatrice testing is on Yes
     levAppSpinBox_->disable();
     numericLevelSpinBox_->disable();
@@ -731,6 +729,8 @@ void HomeLeft::showSettings()
             maxLevelSpinBox_->enable();
         }
     }));
+
+    // TODO: select type of view
 
 }
 

@@ -30,6 +30,8 @@
  * The relevant structures for saddles etc are set up here.
  */
 
+#include "custom.h"
+
 #include <Wt/WString>
 #include <Wt/WTextArea>
 
@@ -368,19 +370,7 @@ struct weak_focus
 #define OT_CENT_UNSTABLE    STYPE_CENUNSTABLE   ///< orbit type center unstable
 #define OT_ORBIT            STYPE_ORBIT         ///< orbit type orbit
 
-/**
- * Enum for the possible types of views
- *
- * This sets which chart are we studying and plotting
- */
-enum TYPEOFVIEWS {
-    TYPEOFVIEW_PLANE    = 0,       ///< plane R2
-    TYPEOFVIEW_SPHERE   = 1,       ///< sphere
-    TYPEOFVIEW_U1       = 2,       ///< U1 sphere chart
-    TYPEOFVIEW_U2       = 3,       ///< U2 sphere chart
-    TYPEOFVIEW_V1       = 4,       ///< V1 sphere chart
-    TYPEOFVIEW_V2       = 5        ///< V2 sphere chart
-};
+
 
 // -----------------------------------------------------------------------
 //                          Results class

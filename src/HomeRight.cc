@@ -274,7 +274,7 @@ void HomeRight::clearResults()
 }
 
 void HomeRight::onPlot(std::string basename)
-{ 
+{
     if (sphere_ != nullptr) {
         delete sphere_;
         sphere_ = nullptr;
@@ -283,8 +283,6 @@ void HomeRight::onPlot(std::string basename)
     sphere_->setId("sphere_");
     sphere_->setMargin(5,Top);
     plotContainer_->addWidget(sphere_);
-
-    //plotContainer_->addWidget(new WBreak(plotContainer_));
 
     if (plotCaption_ != nullptr) {
         delete plotCaption_;
