@@ -647,7 +647,7 @@ public:
     /**
      * Constructor method
      */
-    WVFStudy();
+    WVFStudy(double projection=DEFAULT_PROJECTION);
     /**
      * Destructor method
      */

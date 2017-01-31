@@ -105,10 +105,29 @@ public:
      * #WWinSphere. This method only triggers an @c update of the @c sphere_
      * object.
      * 
+     * @param basename      This is a filename for the Maple results file. The
+     * #WWinSphere class needs this file to parse it and paint accordingly.
+     * @param projection    projection for the sphere view
+     */
+    void onSpherePlot(std::string basename, double projection);
+
+    /**
+     * Method that triggers a plot in the plot tab
+     *
+     * This method is connected to the Plot button of HomeLeft by the onPlot
+     * signal. Here there is no "plotting" work, everything is handled by
+     * #WWinSphere. This method only triggers an @c update of the @c sphere_
+     * object.
+     * 
      * @param basename This is a filename for the Maple results file. The
      * #WWinSphere class needs this file to parse it and paint accordingly.
+     * @param type     type of view (R2,U1,U2,V1,V2)
+     * @param minx     min x for plot range
+     * @param maxx     max x for plot range
+     * @param miny     min y for plot range
+     * @param maxy     max y for plot range
      */
-    void onPlot(std::string basename);
+    void onPlanePlot(std::string basename, int type, double minx, double maxx, double miny, double maxy);
 
     /**
      * React to a mouse event to set the caption of the plot
@@ -126,6 +145,12 @@ public:
     void mouseMovedEvent( Wt::WMouseEvent e );
 
 private:
+    int projection_;
+    double viewMinX_;
+    double viewMaxX_;
+    double viewMinY_;
+    double viewMaxY_;
+
     Wt::WTabWidget *tabWidget_;
 
     Wt::WContainerWidget *outputContainer_;

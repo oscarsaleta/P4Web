@@ -98,13 +98,27 @@ class WWinSphere : public Wt::WPaintedWidget
 
 public:
     /**
-     * Constructor method
+     * Constructor method for a spherical plot
+     * @param *parent       container widget which created the sphere
+     * @param width         width of the painting area
+     * @param height        height of the painting area
+     * @param basename      name of the file that contains Maple output for the current vector field
+     * @param projection    projection for the sphere
+     */
+    WWinSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="", double projection=-1.0 );
+    /**
+     * Constructor method for a planar (or chart) plot
      * @param *parent   container widget which created the sphere
      * @param width     width of the painting area
      * @param height    height of the painting area
      * @param basename  name of the file that contains Maple output for the current vector field
+     * @param type      type of view
+     * @param minx      minimum x for plot
+     * @param maxx      maximum x for plot
+     * @param miny      minimum y for plot
+     * @param maxy      maximum y for plot
      */
-    WWinSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="" );
+    WWinSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="", int type=1, double minx=-1, double maxx=1, double miny=-1, double maxy=1);
     /**
      * Destructor method
      */
@@ -114,6 +128,12 @@ public:
     int height_;                ///< height of the plotting area
     WVFStudy *study_;           ///< WVFStudy object which will parse results from Maple
     std::string basename_;      ///< filename where Maple output is stored
+    int typeOfView_;            ///< type of view for *study_
+    int projection_;
+    double viewMinX_;
+    double viewMaxX_;
+    double viewMinY_;
+    double viewMaxY_;
     
     /**
      * X Coordinate change: from world (double) to window (int) coordinates

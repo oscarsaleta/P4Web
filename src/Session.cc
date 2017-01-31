@@ -79,7 +79,7 @@ Session::Session() :
     sqlite3_(WApplication::instance()->appRoot()+"auth.db")
 {
     session_.setConnection(sqlite3_);
-    sqlite3_.setProperty("show-queries","true");
+    sqlite3_.setProperty("show-queries","false");
 
     session_.mapClass<User>("user");
     session_.mapClass<AuthInfo>("auth_info");

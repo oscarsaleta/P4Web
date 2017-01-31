@@ -49,6 +49,7 @@
 //#include "math_limitcycles.h"
 //#include "math_orbits.h"
 #include "math_separatrice.h"
+#include "MyLogger.h"
 //#include "math_gcf.h"
 #include "plot_points.h"
 #include "plot_tools.h"
@@ -77,8 +78,44 @@ WWinSphere * * WWinSphere::SphereList = nullptr;
 
 // parameters _x1,... are irrelevant if isZoom is false
 
-WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::string basename)
-    : width_(width), height_(height), basename_(basename), parentWnd(parent)
+WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::string basename, double projection) :
+    width_(width),
+    height_(height),
+    basename_(basename),
+    parentWnd(parent),
+    typeOfView_(0),
+    projection_(projection)
+{
+    study_ = new WVFStudy(projection);
+
+    ReverseYaxis = false;
+
+    SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
+    SphereList[numSpheres++] = this;
+    if( numSpheres > 1 ) {
+        SphereList[numSpheres-2]->next = this;
+    }
+
+    resize(width_,height_);
+    
+    next = nullptr;
+    CircleAtInfinity = nullptr;
+    PLCircle = nullptr;
+
+    mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
+
+}
+
+WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::string basename, int type, double minx, double maxx, double miny, double maxy) :
+    width_(width),
+    height_(height),
+    basename_(basename),
+    parentWnd(parent),
+    typeOfView_(type),
+    viewMinX_(minx),
+    viewMaxX_(maxx),
+    viewMinY_(miny),
+    viewMaxY_(maxy)
 {
     study_ = new WVFStudy();
 
@@ -86,8 +123,7 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
 
     SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
     SphereList[numSpheres++] = this;
-    if( numSpheres > 1 )
-    {
+    if( numSpheres > 1 ) {
         SphereList[numSpheres-2]->next = this;
     }
 
@@ -107,23 +143,20 @@ WWinSphere::~WWinSphere()
     int i;
 
     struct P4POLYLINES * t;
-    while( CircleAtInfinity != nullptr )
-    {
+    while( CircleAtInfinity != nullptr ) {
         t = CircleAtInfinity;
         CircleAtInfinity = t->next;
         delete t;//free( t );
         t = nullptr;
     }
-    while( PLCircle != nullptr )
-    {
+    while( PLCircle != nullptr ) {
         t = PLCircle;
         PLCircle = t->next;
         delete t;//free( t );
         t = nullptr;
     }
 
-    for( i = 0; i < numSpheres; i++ )
-    {
+    for( i = 0; i < numSpheres; i++ ) {
         if( SphereList[i] == this )
             break;
     }
@@ -146,8 +179,50 @@ bool WWinSphere::setupPlot( void )
         //parent()->printError("Error while reading results. Evaluate the vector field first");
         //delete this;
         return false;
-    } else
+    } else {
+        switch(typeOfView_) {
+        case 0:
+            study_->typeofview = TYPEOFVIEW_SPHERE;
+            study_->config_projection = projection_;
+            break;
+        case 1:
+            study_->typeofview = TYPEOFVIEW_PLANE;
+            study_->xmin = viewMinX_;
+            study_->xmax = viewMaxX_;
+            study_->ymin = viewMinY_;
+            study_->ymax = viewMaxY_;
+            break;
+        case 2:
+            study_->typeofview = TYPEOFVIEW_U1;
+            study_->xmin = viewMinX_;
+            study_->xmax = viewMaxX_;
+            study_->ymin = viewMinY_;
+            study_->ymax = viewMaxY_;
+            break;
+        case 3:
+            study_->typeofview = TYPEOFVIEW_V1;
+            study_->xmin = viewMinX_;
+            study_->xmax = viewMaxX_;
+            study_->ymin = viewMinY_;
+            study_->ymax = viewMaxY_;
+            break;
+        case 4:
+            study_->typeofview = TYPEOFVIEW_U2;
+            study_->xmin = viewMinX_;
+            study_->xmax = viewMaxX_;
+            study_->ymin = viewMinY_;
+            study_->ymax = viewMaxY_;
+            break;
+        case 5:
+            study_->typeofview = TYPEOFVIEW_V2;
+            study_->xmin = viewMinX_;
+            study_->xmax = viewMaxX_;
+            study_->ymin = viewMinY_;
+            study_->ymax = viewMaxY_;
+            break;
+        }
         study_->setupCoordinateTransformations();
+    }
 
     struct P4POLYLINES * t;
     /*QPalette palette;
@@ -156,23 +231,20 @@ bool WWinSphere::setupPlot( void )
     palette.setColor(backgroundRole(), QXFIGCOLOR(spherebgcolor) );
     setPalette(palette);*/
 
-    while( CircleAtInfinity != nullptr )
-    {
+    while( CircleAtInfinity != nullptr ) {
         t = CircleAtInfinity;
         CircleAtInfinity = t->next;
         delete t;//free( t );
         t = nullptr;
     }
-    while( PLCircle != nullptr )
-    {
+    while( PLCircle != nullptr ) {
         t = PLCircle;
         PLCircle = t->next;
         delete t;//free( t );
         t = nullptr;
     }
 
-    switch( study_->typeofview )
-    {
+    switch( study_->typeofview ) {
     case TYPEOFVIEW_PLANE:
     case TYPEOFVIEW_U1:
     case TYPEOFVIEW_U2:
@@ -195,8 +267,7 @@ bool WWinSphere::setupPlot( void )
     dy = y1-y0;
 
     
-    if( study_->typeofview == TYPEOFVIEW_SPHERE )
-    {
+    if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
         CircleAtInfinity = produceEllipse( 0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0) );
         if( study_->plweights )
             PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
@@ -207,6 +278,7 @@ bool WWinSphere::setupPlot( void )
 
 void WWinSphere::paintEvent( WPaintDevice * p )
 {
+    globalLogger__.debug("Projection is "+std::to_string(study_->config_projection));
     if (!setupPlot()) {
         // TODO: enviar senyal des d'aquí per imprimir error a output
         errorSignal_.emit("Error while reading Maple results, probably time ran out during execution.");
@@ -215,18 +287,14 @@ void WWinSphere::paintEvent( WPaintDevice * p )
     WPainter paint(p);
     paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
     staticPainter = &paint;
-    if( study_->typeofview != TYPEOFVIEW_PLANE )
-    {
-        if( study_->typeofview == TYPEOFVIEW_SPHERE )
-        {
+    if( study_->typeofview != TYPEOFVIEW_PLANE ) {
+        if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
             if( study_->plweights ) {
                 plotPoincareLyapunovSphere(); //not used
-            }
-            else {
+            } else {
                 plotPoincareSphere(); // only one used for now
             }
-        }
-        else
+        } else
             plotLineAtInfinity(); //not used
     }
     //plotGcf();
@@ -440,8 +508,7 @@ bool WWinSphere::getChartPos( int chart, double x1, double y1, double * pos )
 {
     double pcoord[3];
 
-    switch( chart )
-    {
+    switch( chart ) {
     case CHART_R2:
         (study_->*(study_->finite_to_viewcoord))( x1, y1, pos );
         break;
@@ -494,8 +561,7 @@ void WWinSphere::plotPoint( struct saddle * p )
     double pos[2];
     int x, y;
 
-    if( p != nullptr )
-    {
+    if( p != nullptr ) {
         getChartPos( p->chart, p->x0, p->y0, pos );
         if( pos[0] < x0 || pos[0] > x1 || pos[1] < y0 || pos[1] > y1 )
             return;
@@ -517,8 +583,7 @@ void WWinSphere::plotPoint( struct node * p )
     double pos[2];
     int x, y;
 
-    if( p != nullptr )
-    {
+    if( p != nullptr ) {
         getChartPos( p->chart, p->x0, p->y0, pos );
 
         if( pos[0] < x0 || pos[0] > x1 || pos[1] < y0 || pos[1] > y1 )
@@ -544,8 +609,7 @@ void WWinSphere::plotPoint( struct weak_focus * p )
     double pos[2];
     int x, y;
 
-    if( p != nullptr )
-    {
+    if( p != nullptr ) {
         getChartPos( p->chart, p->x0, p->y0, pos );
 
         if( pos[0] < x0 || pos[0] > x1 || pos[1] < y0 || pos[1] > y1 )
@@ -559,8 +623,7 @@ void WWinSphere::plotPoint( struct weak_focus * p )
         if( paintedYMin > y - SYMBOLHEIGHT/2 ) paintedYMin = y - SYMBOLHEIGHT/2;
         if( paintedYMax < y + SYMBOLHEIGHT/2 ) paintedYMax = y - SYMBOLHEIGHT/2;
 
-        switch( p->type )
-        {
+        switch( p->type ) {
         case FOCUSTYPE_STABLE:
             win_plot_stableweakfocus( staticPainter, x, y );
             break;
@@ -582,8 +645,7 @@ void WWinSphere::plotPoint( struct strong_focus * p )
     double pos[2];
     int x, y;
 
-    if( p != nullptr )
-    {
+    if( p != nullptr ) {
         getChartPos( p->chart, p->x0, p->y0, pos );
 
         if( pos[0] < x0 || pos[0] > x1 || pos[1] < y0 || pos[1] > y1 )
@@ -609,8 +671,7 @@ void WWinSphere::plotPoint( struct degenerate * p )
     double pos[2];
     int x, y;
 
-    if( p != nullptr )
-    {
+    if( p != nullptr ) {
         getChartPos( p->chart, p->x0, p->y0, pos );
 
         if( pos[0] < x0 || pos[0] > x1 || pos[1] < y0 || pos[1] > y1 )
@@ -633,8 +694,7 @@ void WWinSphere::plotPoint( struct semi_elementary * p )
     double pos[2];
     int x, y;
 
-    if( p != nullptr )
-    {
+    if( p != nullptr ) {
         getChartPos( p->chart, p->x0, p->y0, pos );
 
         if( pos[0] < x0 || pos[0] > x1 || pos[1] < y0 || pos[1] > y1 )
@@ -648,8 +708,7 @@ void WWinSphere::plotPoint( struct semi_elementary * p )
         if( paintedYMin > y - SYMBOLHEIGHT/2 ) paintedYMin = y - SYMBOLHEIGHT/2;
         if( paintedYMax < y + SYMBOLHEIGHT/2 ) paintedYMax = y - SYMBOLHEIGHT/2;
 
-        switch(p->type)
-        {
+        switch(p->type) {
         case 1: win_plot_sesaddlenode( staticPainter, x, y ); break;
         case 2: win_plot_sesaddlenode( staticPainter, x, y ); break;
         case 3: win_plot_sesaddlenode( staticPainter, x, y ); break;
@@ -705,8 +764,7 @@ void WWinSphere::plotPointSeparatrices( struct degenerate * p )
 {
     struct blow_up_points *blow_up;
 
-    for( blow_up = p->blow_up; blow_up != nullptr; blow_up = blow_up->next_blow_up_point )
-    {
+    for( blow_up = p->blow_up; blow_up != nullptr; blow_up = blow_up->next_blow_up_point ) {
         draw_sep( this, blow_up->first_sep_point );
     }
 }
@@ -767,90 +825,70 @@ P4POLYLINES * WWinSphere::produceEllipse( double cx, double cy, double a, double
 //  FILE * fp;
 //  fp = fopen( "C:\\test.txt", "wt" );
 
-    while( theta < TWOPI )
-    {
+    while( theta < TWOPI ) {
 //        fprintf( fp, "%f\n", (float)theta );
 //        fflush(fp);
         c = (x0-cx)/a;
-        if( c > -1.0 && c < 1.0 )
-        {
+        if( c > -1.0 && c < 1.0 ) {
             t1 = acos(c);
             t2 = TWOPI - t1;
-            if( theta >= t1 && theta < t2 )
-            {
+            if( theta >= t1 && theta < t2 ) {
 //                fprintf( fp, "A EXCL [%f %f]\n", (float)t1, (float)t2 );
                 theta = t2+e/4; d = false; continue;
             }
         }
         c = (x1-cx)/a;
-        if( c > -1.0 && c < 1.0 )
-        {
+        if( c > -1.0 && c < 1.0 ) {
             t1 = acos(c);
             t2 = TWOPI - t1;
-            if( theta < t1 )
-            {
+            if( theta < t1 ) {
 //                fprintf( fp, "B EXCL [-infinity %f]\n", (float)t1 );
                 theta = t1+e/4; d = false; continue;
             }
-            if( theta >= t2 )
-            {
+            if( theta >= t2 ) {
 //                fprintf( fp, "C EXCL [%f, infinity]\n",  (float)t2 );
                 theta = TWOPI+e/4; d = false; break;
             }
         }
         c = (y0-cy)/b;
-        if( c > -1.0 && c < 1.0 )
-        {
+        if( c > -1.0 && c < 1.0 ) {
             t1 = asin(c);
             t2 = PI-t1;
-            if( t1 < 0 )
-            {
+            if( t1 < 0 ) {
                 t2 = t1+TWOPI;
                 t1 = PI-t1;
-                if( theta >= t1 && theta < t2 )
-                {
+                if( theta >= t1 && theta < t2 ) {
 //                    fprintf( fp, "D EXCL [%f %f]\n", (float)t1, (float)t2 );
                     theta = t2+e/4; d = false; continue;
                 }
-            }
-            else
-            {
-                if( theta < t1 )
-                {
+            } else {
+                if( theta < t1 ) {
 //                    fprintf( fp, "E EXCL [-infinity %f]\n", (float)t1 );
                     theta = t1+e/4; d = false; continue;
                 }
-                if( theta >= t2 )
-                {
+                if( theta >= t2 ) {
 //                    fprintf( fp, "F EXCL [%f, infinity]\n",  (float)t2 );
                     theta = TWOPI+e/4; d = false; break;
                 }
             }
         }
         c = (y1-cy)/b;
-        if( c > -1.0 && c < 1.0 )
-        {
+        if( c > -1.0 && c < 1.0 ) {
             t1 = asin(c);
             t2 = PI-t1;
-            if( t1 < 0 )
-            {
+            if( t1 < 0 ) {
                 t2 = t1+TWOPI;
                 t1 = PI-t1;
-                if( theta < t1 )
-                {
+                if( theta < t1 ) {
 //                    fprintf( fp, "G EXCL [-infinity %f]\n", (float)t1 );
                     theta = t1+e/4; d = false; continue;
                 }
-                if( theta >= t2 )
-                {
+                if( theta >= t2 ) {
 //                    fprintf( fp, "H EXCL [%f, infinity]\n",  (float)t2 );
                     theta = TWOPI; d = false; break;
                 }
-            }
-            else
-            {
-                if( theta >= t1 && theta < t2 )
-                {
+            } else {
+                if( theta >= t1 && theta < t2 ) {
 //                    fprintf( fp, "I EXCL [%f %f]\n", (float)t1, (float)t2 );
                     theta = t2+e/4; d = false; continue;
                 }
@@ -863,20 +901,15 @@ P4POLYLINES * WWinSphere::produceEllipse( double cx, double cy, double a, double
 
         // (x,y) is inside view
 
-        if( !d )
-        {
-            if( doton )
-            {
+        if( !d ) {
+            if( doton ) {
                 d = true;
                 prevx = x;
                 prevy = y;
                 dotcount = 0;
                 doton = true;
-            }
-            else
-            {
-                if( ++dotcount > 7 && dotted )
-                {
+            } else {
+                if( ++dotcount > 7 && dotted ) {
                     d = false;
                     doton = (doton) ? false:true;
                     dotcount = 0;
@@ -885,15 +918,11 @@ P4POLYLINES * WWinSphere::produceEllipse( double cx, double cy, double a, double
         }
         else
         {
-            if( doton )
-            {
-                if( first == nullptr )
-                {
+            if( doton ) {
+                if( first == nullptr ) {
                     last = first = new P4POLYLINES;
                     last->next = nullptr;
-                }
-                else
-                {
+                } else {
                     last->next = new P4POLYLINES;
                     last = last->next;
                     last->next = nullptr;
@@ -907,8 +936,7 @@ P4POLYLINES * WWinSphere::produceEllipse( double cx, double cy, double a, double
                 prevx = x;
                 prevy = y;
             }
-            if( ++dotcount > 7 && dotted )
-            {
+            if( ++dotcount > 7 && dotted ) {
                 d = false;
                 doton = (doton) ? false:true;
                 dotcount = 0;
@@ -927,8 +955,7 @@ void WWinSphere::plotPoincareSphere( void )
     P4POLYLINES * circlePoint = CircleAtInfinity;
     color = study_->singinf ? CSING : CLINEATINFINITY;
     staticPainter->setPen(QXFIGCOLOR(color));
-    while( circlePoint != nullptr )
-    {
+    while( circlePoint != nullptr ) {
         path.moveTo(coWinX(circlePoint->x1),coWinY(circlePoint->y1));
         path.lineTo(coWinX(circlePoint->x2),coWinY(circlePoint->y2));
         circlePoint = circlePoint->next;
@@ -945,8 +972,7 @@ void WWinSphere::plotPoincareLyapunovSphere( void )
     P4POLYLINES * p = CircleAtInfinity;
     color = study_->singinf ? CSING : CLINEATINFINITY;
     staticPainter->setPen( QXFIGCOLOR(color) );
-    while( p != nullptr )
-    {
+    while( p != nullptr ) {
         path->moveTo(coWinX(p->x1),coWinY(p->y1));
         path->lineTo(coWinX(p->x2),coWinY(p->y2));
         //staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2), coWinY(p->y2) );
@@ -960,8 +986,7 @@ void WWinSphere::plotPoincareLyapunovSphere( void )
     path = new WPainterPath();
 
     staticPainter->setPen( QXFIGCOLOR(color) );
-    while( p != nullptr )
-    {
+    while( p != nullptr ) {
         path->moveTo(coWinX(p->x1),coWinY(p->y1));
         path->lineTo(coWinX(p->x2),coWinY(p->y2));
         //staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2), coWinY(p->y2) );
@@ -974,20 +999,17 @@ void WWinSphere::plotPoincareLyapunovSphere( void )
 
 void WWinSphere::plotLineAtInfinity( void )
 {
-    switch( study_->typeofview )
-    {
+    switch( study_->typeofview ) {
     case TYPEOFVIEW_U1:
     case TYPEOFVIEW_V1:
-        if( x0 < 0.0 && x1 > 0.0 )
-        {
+        if( x0 < 0.0 && x1 > 0.0 ) {
             staticPainter->setPen( QXFIGCOLOR(CLINEATINFINITY) );
             staticPainter->drawLine( coWinX(0.0), 0, coWinX(0.0), height_-1 );
         }
         break;
     case TYPEOFVIEW_U2:
     case TYPEOFVIEW_V2:
-        if( y0 < 0.0 && y1 > 0.0 )
-        {
+        if( y0 < 0.0 && y1 > 0.0 ) {
             staticPainter->setPen( QXFIGCOLOR(CLINEATINFINITY) );
             staticPainter->drawLine( 0, coWinY(0.0), width_-1, coWinY(0.0) );
         }
@@ -1006,15 +1028,12 @@ void WWinSphere::drawLine( double _x1, double _y1, double _x2, double _y2, int c
 {
     int wx1, wy1, wx2, wy2;
 
-    if( staticPainter != nullptr )
-    {
-        if( _x1 >= x0 && _x1 <= x1 && _y1 >= y0 && _y1 <= y1 )
-        {
+    if( staticPainter != nullptr ) {
+        if( _x1 >= x0 && _x1 <= x1 && _y1 >= y0 && _y1 <= y1 ) {
             wx1 = coWinX(_x1);
             wy1 = coWinY(_y1);
 
-            if( _x2 >= x0 && _x2 <= x1 && _y2 >= y0 && _y2 <= y1 )
-            {
+            if( _x2 >= x0 && _x2 <= x1 && _y2 >= y0 && _y2 <= y1 ) {
                 // both points are visible in the window
 
                 wx2 = coWinX(_x2);
@@ -1031,13 +1050,10 @@ void WWinSphere::drawLine( double _x1, double _y1, double _x2, double _y2, int c
 
                 staticPainter->setPen( QXFIGCOLOR(color) );
                 staticPainter->drawLine( wx1, wy1, wx2, wy2 );
-            }
-            else
-            {
+            } else {
                 // only (_x2,_y2) is not visible
 
-                if( lineRectangleIntersect( _x1, _y1, _x2, _y2, x0, x1, y0, y1 ) )
-                {
+                if( lineRectangleIntersect( _x1, _y1, _x2, _y2, x0, x1, y0, y1 ) ) {
                     wx1 = coWinX(_x1);
                     wy1 = coWinY(_y1);
                     wx2 = coWinX(_x2);
@@ -1059,12 +1075,10 @@ void WWinSphere::drawLine( double _x1, double _y1, double _x2, double _y2, int c
         }
         else
         {
-            if( _x2 >= x0 && _x2 <= x1 && _y2 >= y0 && _y2 <= y1 )
-            {
+            if( _x2 >= x0 && _x2 <= x1 && _y2 >= y0 && _y2 <= y1 ) {
                 // only (_x2,_y2) is visible
 
-                if( lineRectangleIntersect( _x1, _y1, _x2, _y2, x0, x1, y0, y1 ) )
-                {
+                if( lineRectangleIntersect( _x1, _y1, _x2, _y2, x0, x1, y0, y1 ) ) {
                     wx1 = coWinX(_x1);
                     wy1 = coWinY(_y1);
                     wx2 = coWinX(_x2);
@@ -1082,13 +1096,10 @@ void WWinSphere::drawLine( double _x1, double _y1, double _x2, double _y2, int c
 
                     staticPainter->drawLine( wx1, wy1, wx2, wy2 );
                 }
-            }
-            else
-            {
+            } else {
                 // both end points are invisible
 
-                if( lineRectangleIntersect( _x1, _y1, _x2, _y2, x0, x1, y0, y1 ) )
-                {
+                if( lineRectangleIntersect( _x1, _y1, _x2, _y2, x0, x1, y0, y1 ) ) {
                     wx1 = coWinX(_x1);
                     wy1 = coWinY(_y1);
                     wx2 = coWinX(_x2);
@@ -1114,8 +1125,7 @@ void WWinSphere::drawLine( double _x1, double _y1, double _x2, double _y2, int c
 void WWinSphere::drawPoint( double x, double y, int color )
 {
     int _x, _y;
-    if( staticPainter != nullptr )
-    {
+    if( staticPainter != nullptr ) {
         if( x < x0 || x > x1 || y < y0 || y > y1 )
             return;
         staticPainter->setPen( QXFIGCOLOR(color) );
@@ -1155,8 +1165,7 @@ void WWinSphere::drawPoint( double x, double y, int color )
     h = w * dy / dx;
     h *= aspectratio;
 
-    if( (int)(h+0.5) <= maxheight || maxheight == -1 )
-    {
+    if( (int)(h+0.5) <= maxheight || maxheight == -1 ) {
         *height = (int)(h+0.5);
     }
     else
@@ -1174,8 +1183,7 @@ void WWinSphere::drawPoint( double x, double y, int color )
 
 /*void WWinSphere::prepareDrawing()
 {
-    if( PainterCache == nullptr )
-    {
+    if( PainterCache == nullptr ) {
         isPainterCacheDirty = true;
         PainterCache = new QPixmap( size() );
     }
@@ -1195,8 +1203,7 @@ void WWinSphere::drawPoint( double x, double y, int color )
     if( next != nullptr )
         next->finishDrawing();
 
-    if( staticPainter != nullptr )
-    {
+    if( staticPainter != nullptr ) {
         staticPainter->end();
         delete staticPainter;
         staticPainter = nullptr;

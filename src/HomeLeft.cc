@@ -42,6 +42,7 @@
 #include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WButtonGroup>
+#include <Wt/WComboBox>
 #include <Wt/WDoubleSpinBox>
 #include <Wt/WDoubleValidator>
 #include <Wt/WFileResource>
@@ -54,6 +55,7 @@
 #include <Wt/WPushButton>
 #include <Wt/WRadioButton>
 #include <Wt/WSpinBox>
+#include <Wt/WTemplate>
 
 using namespace Wt;
 
@@ -61,11 +63,12 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     WContainerWidget(parent),
     evaluatedSignal_(this),
     errorSignal_(this),
-    onPlotSignal_(this),
+    //onPlotSignal_(this),
     loggedIn_(false),
-    settingsBox_(nullptr)
+    settingsBox_(nullptr),
+    viewBox_(nullptr),
+    viewTemplate_(nullptr)
 {
-
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box-left"));
@@ -88,13 +91,12 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
 
     globalLogger__.debug("HomeLeft :: created correctly");
+
 }
 
 HomeLeft::~HomeLeft()
 {
     delete fileUploadWidget_;
-    delete fileUploadBox_;
-
     delete xEquationInput_;
     delete yEquationInput_;
     delete evalButton_;
@@ -108,21 +110,7 @@ HomeLeft::~HomeLeft()
 void HomeLeft::setupUI()
 {
 
-    // File upload box
-    fileUploadBox_ = new WGroupBox(this);
-    fileUploadBox_->setId("fileUploadBox_");
-    fileUploadBox_->setTitle(WString::tr("homeleft.fuploadboxtitle"));
-    addWidget(fileUploadBox_);
-
-    fileUploadWidget_ = new WFileUpload(fileUploadBox_);
-    fileUploadWidget_->setId("fileUploadWidget_");
-    fileUploadWidget_->setFileTextSize(30);
-    fileUploadWidget_->setFilters(".inp");
-    fileUploadWidget_->setInline(true);
-    fileUploadBox_->addWidget(fileUploadWidget_);
-
-    addWidget(new WBreak());
-
+    
     WLabel *label;
 
     // Equation boxes
@@ -130,6 +118,15 @@ void HomeLeft::setupUI()
     equationsBox_->setId("equationsBox_");
     equationsBox_->setTitle(WString::tr("homeleft.equationboxtitle"));
     addWidget(equationsBox_);
+
+    fileUploadWidget_ = new WFileUpload(equationsBox_);
+    fileUploadWidget_->setId("fileUploadWidget_");
+    fileUploadWidget_->setFileTextSize(30);
+    fileUploadWidget_->setFilters(".inp");
+    fileUploadWidget_->setInline(true);
+    equationsBox_->addWidget(fileUploadWidget_);
+
+    new WBreak(equationsBox_);
 
     label = new WLabel(WString::tr("homeleft.xprimelabel"), equationsBox_);
     label->setId("label");
@@ -158,7 +155,7 @@ void HomeLeft::setupUI()
     evalButton_->setId("evalButton_");
     evalButton_->setStyleClass("btn btn-primary");
     evalButton_->setInline(true);
-    evalButton_->setToolTip(WString::tr("tooltip.homeleft-eval-button"),XHTMLText);
+    evalButton_->setToolTip(WString::tr("tooltip.homeleft-eval-button"));
     equationsBox_->addWidget(evalButton_);
 
     // plot button
@@ -167,7 +164,7 @@ void HomeLeft::setupUI()
     plotButton_->setStyleClass("btn btn-default");
     plotButton_->setInline(true);
     plotButton_->setMargin(5,Left);
-    plotButton_->setToolTip(WString::tr("tooltip.homeleft-plot-button"),XHTMLText);
+    plotButton_->setToolTip(WString::tr("tooltip.homeleft-plot-button"));
     equationsBox_->addWidget(plotButton_);
 
     // prepare save file button
@@ -176,7 +173,7 @@ void HomeLeft::setupUI()
     prepSaveButton_->setStyleClass("btn btn-default");
     prepSaveButton_->setInline(true);
     prepSaveButton_->setMargin(5,Left);
-    prepSaveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
+    prepSaveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"));
     equationsBox_->addWidget(prepSaveButton_);
 
     // save file anchor
@@ -186,7 +183,7 @@ void HomeLeft::setupUI()
     saveAnchor_->setText("Download save file");
     saveAnchor_->setInline(true);
     saveAnchor_->setMargin(5,Left);
-    saveAnchor_->setToolTip(WString::tr("tooltip.homeleft-save-button"),XHTMLText);
+    saveAnchor_->setToolTip(WString::tr("tooltip.homeleft-save-button"));
     saveAnchor_->hide();
     equationsBox_->addWidget(saveAnchor_);
 
@@ -195,7 +192,7 @@ void HomeLeft::setupUI()
     resetButton_->setStyleClass("btn btn-warning");
     resetButton_->setInline(true);
     resetButton_->setMargin(5,Left);
-    resetButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"),XHTMLText);
+    resetButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"));
     equationsBox_->addWidget(resetButton_);
 
     globalLogger__.debug("HomeLeft :: UI set up");
@@ -323,7 +320,6 @@ void HomeLeft::parseInputFile()
                 i++;
             }
         }
-        globalLogger__.debug("i="+std::to_string(i));
         if (f.eof() && i<12) {
             errorSignal_.emit("Invalid input file.");
             globalLogger__.error("HomeLeft :: EOF while reading input file uploaded with name "+fileUploadName_);
@@ -474,6 +470,8 @@ void HomeLeft::evaluate()
         return;
     }
 
+    errorSignal_.emit("Evaluating vector field...");
+
     prepareMapleFile();
 
     pid_t pid = fork();
@@ -571,7 +569,19 @@ void HomeLeft::onPlot()
         errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
     } else {
         globalLogger__.debug("HomeLeft :: sending onPlot signal");
-        onPlotSignal_.emit(fileUploadName_);
+        if (!loggedIn_)
+            onPlotSphereSignal_.emit(fileUploadName_,-1);
+        else {
+            if (viewComboBox_->currentIndex() == 0) {
+                onPlotSphereSignal_.emit(fileUploadName_,std::stod(viewProjection_->text()));
+            } else {
+                onPlotPlaneSignal_.emit(fileUploadName_,viewComboBox_->currentIndex(),
+                std::stod(viewMinX_->text()),
+                std::stod(viewMaxX_->text()),
+                std::stod(viewMinY_->text()),
+                std::stod(viewMaxY_->text()));    
+            }
+        }
     }
 }
 
@@ -579,23 +589,116 @@ void HomeLeft::onPlot()
 void HomeLeft::showSettings()
 {
     loggedIn_ = true;
+    if (viewTemplate_ != nullptr) {
+        delete viewTemplate_;
+        viewTemplate_ = nullptr;
+    }
+    if (viewBox_ != nullptr) {
+        delete viewBox_;
+        viewBox_ = nullptr;
+    }
     if (settingsBox_ != nullptr) {
         delete settingsBox_;
         settingsBox_ = nullptr;
     }
+    
+
+    WLabel *label;
+    WRadioButton *button;
+    WDoubleValidator *validator;
+
+    /* view settings */
+    viewBox_ = new WGroupBox(this);
+    viewBox_->setId("viewBox_");
+    viewBox_->setTitle(WString::tr("homeleft.viewboxtitle"));
+    viewBox_->setMargin(35,Top);
+    addWidget(viewBox_);
+
+    // type of view
+    viewTemplate_ = new WTemplate(WString::tr("template.view"),viewBox_);
+    viewTemplate_->addFunction("id",&WTemplate::Functions::id);
+
+    viewComboBox_ = new WComboBox(viewBox_);
+    viewComboBox_->setId("viewComboBox_");
+    viewComboBox_->addItem("Spherical");
+    viewComboBox_->addItem("Planar");
+    viewComboBox_->addItem("U1");
+    viewComboBox_->addItem("V1");
+    viewComboBox_->addItem("U2");
+    viewComboBox_->addItem("V2");
+    viewTemplate_->bindWidget("selectview",viewComboBox_);
+
+    // projection
+    viewProjection_ = new WLineEdit(viewBox_);
+    viewProjection_->setText("-1");
+    viewTemplate_->bindWidget("projection",viewProjection_);
+    validator = new WDoubleValidator(-1e16,-1e-16);
+    validator->setMandatory(true);
+    viewProjection_->setValidator(validator);
+
+    /*viewProjection_->textInput().connect(std::bind([=] () {
+        if (! viewProjection_->validate() == WValidator::Valid)
+            errorSignal_.emit("Projection point for Poincaré sphere must be negative.");
+    }));*/
+
+    //new WBreak(viewBox_);
+
+    //label = new WLabel("Min. x",viewBox_);
+    //label->setToolTip(WString::tr("tooltip.view-minx"));
+    //label->setMargin(20,Left);
+    viewMinX_ = new WLineEdit(viewBox_);
+    //viewMinX_->setStyleClass("small-line-edit");
+    viewMinX_->setText("-1");
+    viewMinX_->disable();
+    viewTemplate_->bindWidget("xmin",viewMinX_);
+    //label->setBuddy(viewMinX_);
+
+    //label = new WLabel("Max. x",viewBox_);
+    //label->setToolTip(WString::tr("tooltip.view-minx"));
+    //label->setMargin(10,Left);
+    viewMaxX_ = new WLineEdit(viewBox_);
+    //viewMaxX_->setStyleClass("small-line-edit");
+    viewMaxX_->setText("1");
+    viewMaxX_->disable();
+    viewTemplate_->bindWidget("xmax",viewMaxX_);
+    //label->setBuddy(viewMaxX_);
+
+    //label = new WLabel("Min. y",viewBox_);
+    //label->setToolTip(WString::tr("tooltip.view-minx"));
+    //label->setMargin(10,Left);
+    viewMinY_ = new WLineEdit(viewBox_);
+    //viewMinY_->setStyleClass("small-line-edit");
+    viewMinY_->setText("-1");
+    viewMinY_->disable();
+    viewTemplate_->bindWidget("ymin",viewMinY_);
+    //label->setBuddy(viewMinY_);
+
+
+    //label = new WLabel("Max. y",viewBox_);
+    //label->setToolTip(WString::tr("tooltip.view-minx"));
+    //label->setMargin(10,Left);
+    viewMaxY_ = new WLineEdit(viewBox_);
+    //viewMaxY_->setStyleClass("small-line-edit");
+    viewMaxY_->setText("1");
+    viewMaxY_->disable();
+    viewTemplate_->bindWidget("ymax",viewMaxY_);
+    //label->setBuddy(viewMaxY_);
+
+
+
+
+
+    /* evaluation parameters */
     settingsBox_ = new WGroupBox(this);
     settingsBox_->setId("settingsBox_");
     settingsBox_->setTitle(WString::tr("homeleft.settingsboxtitle"));
     settingsBox_->setMargin(35,Top);
     addWidget(settingsBox_);
 
-    WRadioButton *button;
-    WLabel *label;
-
     // calculations
     calculationsBtnGroup_ = new WButtonGroup(settingsBox_);
     label = new WLabel("Calculations:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.calculations"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.calculations"));
     button = new WRadioButton("Algebraic",settingsBox_);
     button->addStyleClass("radio-button");
     label->setBuddy(button);
@@ -608,7 +711,7 @@ void HomeLeft::showSettings()
     // separatrices
     separatricesBtnGroup_ = new WButtonGroup(settingsBox_);
     label = new WLabel("Test separatrices:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.separatrices"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.separatrices"));
     label->setMargin(20,Left);
     button = new WRadioButton("Yes",settingsBox_);
     button->addStyleClass("radio-button");
@@ -623,7 +726,7 @@ void HomeLeft::showSettings()
 
     // accuracy
     label = new WLabel("Accuracy:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.accuracy"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.accuracy"));
     accuracySpinBox_ = new WSpinBox(settingsBox_);
     accuracySpinBox_->setStyleClass("spin-box");
     accuracySpinBox_->setRange(1,14);
@@ -633,7 +736,7 @@ void HomeLeft::showSettings()
 
     // precision
     label = new WLabel("Precision:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.precision"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.precision"));
     label->setMargin(20,Left);
     precisionSpinBox_ = new WSpinBox(settingsBox_);
     precisionSpinBox_->setStyleClass("spin-box");
@@ -643,7 +746,7 @@ void HomeLeft::showSettings()
 
     // epsilon
     label = new WLabel("Epsilon:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.epsilon"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.epsilon"));
     label->setMargin(20,Left);
     epsilonSpinBox_ = new WDoubleSpinBox(settingsBox_);
     epsilonSpinBox_->setStyleClass("spin-box");
@@ -657,7 +760,7 @@ void HomeLeft::showSettings()
 
     // level of approximation
     label = new WLabel("Level of approximation:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.level-approximation"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.level-approximation"));
     levAppSpinBox_ = new WSpinBox(settingsBox_);
     levAppSpinBox_->setStyleClass("spin-box");
     levAppSpinBox_->setRange(0,10);
@@ -666,7 +769,7 @@ void HomeLeft::showSettings()
 
     // numeric level
     label = new WLabel("Numeric level:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.numeric-level"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.numeric-level"));
     label->setMargin(20,Left);
     numericLevelSpinBox_ = new WSpinBox(settingsBox_);
     numericLevelSpinBox_->setStyleClass("spin-box");
@@ -678,7 +781,7 @@ void HomeLeft::showSettings()
 
     // maximum level
     label = new WLabel("Maximum level:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.maximum-level"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.maximum-level"));
     maxLevelSpinBox_ = new WSpinBox(settingsBox_);
     maxLevelSpinBox_->setStyleClass("spin-box");
     maxLevelSpinBox_->setRange(15,25);
@@ -687,7 +790,7 @@ void HomeLeft::showSettings()
     
     // max weakness level
     label = new WLabel("Maximum weakness level:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.maximum-weakness-level"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.maximum-weakness-level"));
     label->setMargin(20,Left);
     maxWeakLevelSpinBox_ = new WSpinBox(settingsBox_);
     maxWeakLevelSpinBox_->setStyleClass("spin-box");
@@ -699,14 +802,14 @@ void HomeLeft::showSettings()
 
     // p q
     label = new WLabel("p:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"));
     PLWeightPSpinBox_ = new WSpinBox(settingsBox_);
     PLWeightPSpinBox_->setStyleClass("spin-box");
     PLWeightPSpinBox_->setRange(1,10);
     PLWeightPSpinBox_->setValue(1);
     label->setBuddy(PLWeightPSpinBox_);
     label = new WLabel("q:",settingsBox_);
-    label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"),XHTMLText);
+    label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"));
     label->setMargin(20,Left);
     PLWeightQSpinBox_ = new WSpinBox(settingsBox_);
     PLWeightQSpinBox_->setStyleClass("spin-box");
@@ -730,7 +833,35 @@ void HomeLeft::showSettings()
         }
     }));
 
-    // TODO: select type of view
+    viewComboBox_->changed().connect(std::bind([=] () {
+        switch(viewComboBox_->currentIndex()) {
+        case 0:
+            viewProjection_->enable();
+            viewMinX_->disable();
+            viewMinY_->disable();
+            viewMaxX_->disable();
+            viewMaxY_->disable();
+            PLWeightPSpinBox_->enable();
+            PLWeightQSpinBox_->enable();
+            break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+            viewProjection_->disable();
+            viewMinX_->enable();
+            viewMinY_->enable();
+            viewMaxX_->enable();
+            viewMaxY_->enable();
+            PLWeightPSpinBox_->disable();
+            PLWeightQSpinBox_->disable();
+            break;
+        }
+    }));
+
+
+    //new WBreak(settingsBox_);
 
 }
 

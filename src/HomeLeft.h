@@ -90,15 +90,14 @@ public:
     /**
      * Method that sends a signal when the plot button is pressed in order to display a plot
      */
-    Wt::Signal<std::string>& onPlotSignal(){ return onPlotSignal_; }
+    Wt::Signal<std::string,double>& onPlotSphereSignal(){ return onPlotSphereSignal_; }
+    Wt::Signal<std::string,int,double,double,double,double>& onPlotPlaneSignal(){ return onPlotPlaneSignal_; }
 
 private:
     /* PUBLIC UI (no need to log in) */
-    Wt::WGroupBox       *fileUploadBox_;
+    Wt::WGroupBox       *equationsBox_;
     Wt::WFileUpload     *fileUploadWidget_;
     std::string         fileUploadName_;
-
-    Wt::WGroupBox       *equationsBox_;
     Wt::WLineEdit       *xEquationInput_;
     Wt::WLineEdit       *yEquationInput_;
     Wt::WPushButton     *evalButton_;
@@ -111,6 +110,8 @@ private:
     Wt::WFileResource   *saveFileResource_;
 
     /* PRIVATE UI (log in needed) */
+    Wt::WTemplate       *viewTemplate_;
+
     Wt::WGroupBox       *settingsBox_;
     Wt::WButtonGroup    *calculationsBtnGroup_;
     enum Calculations   { Algebraic = 0, Numeric = 1 };
@@ -126,10 +127,19 @@ private:
     Wt::WSpinBox        *PLWeightPSpinBox_;
     Wt::WSpinBox        *PLWeightQSpinBox_;
 
+    Wt::WGroupBox       *viewBox_;
+    Wt::WComboBox       *viewComboBox_;
+    Wt::WLineEdit       *viewProjection_;
+    Wt::WLineEdit       *viewMinX_;
+    Wt::WLineEdit       *viewMinY_;
+    Wt::WLineEdit       *viewMaxX_;
+    Wt::WLineEdit       *viewMaxY_;
+
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
     Wt::Signal<std::string> errorSignal_;
-    Wt::Signal<std::string> onPlotSignal_;
+    Wt::Signal<std::string,double> onPlotSphereSignal_;
+    Wt::Signal<std::string,int,double,double,double,double> onPlotPlaneSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
