@@ -38,7 +38,7 @@
 #include <vector>
 
 #include <Wt/WAnchor>
-#include <Wt/WAnimation>
+//#include <Wt/WAnimation>
 #include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WButtonGroup>
@@ -48,12 +48,14 @@
 #include <Wt/WFileResource>
 #include <Wt/WFileUpload>
 #include <Wt/WGroupBox>
+#include <Wt/WImage>
 #include <Wt/WLabel>
 #include <Wt/WLength>
 #include <Wt/WLineEdit>
 #include <Wt/WPushButton>
 #include <Wt/WRadioButton>
 #include <Wt/WSpinBox>
+#include <Wt/WTabWidget>
 #include <Wt/WTemplate>
 
 using namespace Wt;
@@ -64,8 +66,8 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     errorSignal_(this),
     //onPlotSignal_(this),
     loggedIn_(false),
-    settingsBox_(nullptr),
-    viewBox_(nullptr)
+    settingsContainer_(nullptr),
+    viewContainer_(nullptr)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
@@ -175,6 +177,28 @@ void HomeLeft::setupUI()
     resetButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"));
     t->bindWidget("reset",resetButton_);
 
+    new WBreak(this);
+
+    /* tab widget for legend et al */
+    tabs_ = new WTabWidget(this);
+    // legend tab ----
+    WContainerWidget *legendContainer = new WContainerWidget();
+    legendContainer->setId("legendContainer");
+    tabs_->addTab(legendContainer,WString::fromUTF8("Legend"),WTabWidget::PreLoading);
+    addWidget(tabs_);
+
+    t = new WTemplate(WString::tr("template.legend"),legendContainer);
+    t->addFunction("id",WTemplate::Functions::id);
+
+    // legend image
+    WImage *legend = new WImage(WLink("resources/p4legend.png"), legendContainer);
+    legend->setAlternateText("Plot legend");
+    legend->setId("legend");
+    //legend->setMargin(5,Top);
+    //legendContainer->addWidget(legend);
+    t->bindWidget("img",legend);
+
+
     globalLogger__.debug("HomeLeft :: UI set up");
 
 }
@@ -217,6 +241,9 @@ void HomeLeft::fileUploaded()
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
     parseInputFile();
+
+    if (loggedIn_)
+        tabs_->setCurrentWidget(settingsContainer_);
     
 }
 
@@ -538,6 +565,7 @@ void HomeLeft::prepareSaveFile()
     saveAnchor_->setLink(saveFileResource_);
 
     prepSaveButton_->hide();
+    //saveAnchor_->clicked().emit(WMouseEvent());
     saveAnchor_->show();
 
 }
@@ -561,6 +589,7 @@ void HomeLeft::onPlot()
                 std::stod(viewMinY_->text()),
                 std::stod(viewMaxY_->text()));    
             }
+            tabs_->setCurrentWidget(viewContainer_);
         }
     }
 }
@@ -569,13 +598,13 @@ void HomeLeft::onPlot()
 void HomeLeft::showSettings()
 {
     loggedIn_ = true;
-    if (viewBox_ != nullptr) {
-        delete viewBox_;
-        viewBox_ = nullptr;
+    if (settingsContainer_ != nullptr) {
+        delete settingsContainer_;
+        settingsContainer_ = nullptr;
     }
-    if (settingsBox_ != nullptr) {
-        delete settingsBox_;
-        settingsBox_ = nullptr;
+    if (viewContainer_ != nullptr) {
+        delete viewContainer_;
+        viewContainer_ = nullptr;
     }
     
 
@@ -583,17 +612,120 @@ void HomeLeft::showSettings()
     WDoubleValidator *validator;
     WTemplate *t;
 
+
+    /* evaluation parameters */
+    settingsContainer_ = new WContainerWidget(this);
+    settingsContainer_->setId("settingsContainer_");
+    tabs_->addTab(settingsContainer_,WString("Evaluation parameters"),WTabWidget::PreLoading);
+
+    t = new WTemplate(WString::tr("template.homeleft-parameters"),settingsContainer_);
+    t->addFunction("id",WTemplate::Functions::id);
+
+    // calculations
+    calculationsBtnGroup_ = new WButtonGroup(settingsContainer_);
+    button = new WRadioButton("Algebraic",settingsContainer_);
+    button->setInline(true);
+    t->bindWidget("calc-algebraic",button);
+    calculationsBtnGroup_->addButton(button,Algebraic);
+    button = new WRadioButton("Numeric",settingsContainer_);
+    button->setInline(true);
+    calculationsBtnGroup_->addButton(button,Numeric);
+    calculationsBtnGroup_->setCheckedButton(calculationsBtnGroup_->button(Numeric));
+    t->bindString("calc-tooltip",WString::tr("tooltip.calculations"));
+    t->bindWidget("calc-numeric",button);
+
+    // separatrices
+    separatricesBtnGroup_ = new WButtonGroup(settingsContainer_);
+    button = new WRadioButton("Yes",settingsContainer_);
+    button->setInline(true);
+    t->bindWidget("sep-yes",button);
+    separatricesBtnGroup_->addButton(button,Yes);
+    button = new WRadioButton("No",settingsContainer_);
+    button->setInline(true);
+    separatricesBtnGroup_->addButton(button,No);
+    separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(No));
+    t->bindString("sep-tooltip",WString::tr("tooltip.separatrices"));
+    t->bindWidget("sep-no",button);
+
+
+    // accuracy
+    accuracySpinBox_ = new WSpinBox(settingsContainer_);
+    accuracySpinBox_->setRange(1,14);
+    accuracySpinBox_->setValue(8);
+    accuracySpinBox_->setInline(true);
+    t->bindWidget("acc",accuracySpinBox_);
+    t->bindString("acc-tooltip",WString::tr("tooltip.accuracy"));
+
+    // precision
+    precisionSpinBox_ = new WSpinBox(settingsContainer_);
+    precisionSpinBox_->setRange(0,8);
+    precisionSpinBox_->setValue(0);
+    t->bindWidget("pre",precisionSpinBox_);
+    t->bindString("pre-tooltip",WString::tr("tooltip.precision"));
+
+    // epsilon
+    epsilonSpinBox_ = new WDoubleSpinBox(settingsContainer_);
+    epsilonSpinBox_->setDecimals(2);
+    epsilonSpinBox_->setSingleStep(0.01);
+    epsilonSpinBox_->setValue(0.01);
+    epsilonSpinBox_->setRange(0.01,0.3);
+    t->bindWidget("eps",epsilonSpinBox_);
+    t->bindString("eps-tooltip",WString::tr("tooltip.epsilon"));
+
+
+    // level of approximation
+    levAppSpinBox_ = new WSpinBox(settingsContainer_);
+    levAppSpinBox_->setRange(0,10);
+    levAppSpinBox_->setValue(6);
+    t->bindWidget("app",levAppSpinBox_);
+    t->bindString("app-tooltip",WString::tr("tooltip.approximation-level"));
+
+    // numeric level
+    numericLevelSpinBox_ = new WSpinBox(settingsContainer_);
+    numericLevelSpinBox_->setRange(5,15);
+    numericLevelSpinBox_->setValue(8);
+    t->bindWidget("num",numericLevelSpinBox_);
+    t->bindString("num-tooltip",WString::tr("tooltip.numeric-level"));
+
+
+    // maximum level
+    maxLevelSpinBox_ = new WSpinBox(settingsContainer_);
+    maxLevelSpinBox_->setRange(15,25);
+    maxLevelSpinBox_->setValue(20);
+    t->bindWidget("max",maxLevelSpinBox_);
+    t->bindString("max-tooltip",WString::tr("tooltip.maximum-level"));
+    
+    // max weakness level
+    maxWeakLevelSpinBox_ = new WSpinBox(settingsContainer_);
+    maxWeakLevelSpinBox_->setRange(0,8);
+    maxWeakLevelSpinBox_->setValue(4);
+    t->bindWidget("weak",maxWeakLevelSpinBox_);
+    t->bindString("weak-tooltip",WString::tr("tooltip.maximum-weakness-level"));
+
+
+    // p q
+    PLWeightPSpinBox_ = new WSpinBox(settingsContainer_);
+    PLWeightPSpinBox_->setRange(1,10);
+    PLWeightPSpinBox_->setValue(1);
+    t->bindWidget("p",PLWeightPSpinBox_);
+    t->bindString("pq-tooltip",WString::tr("tooltip.poincare-lyapunov-weights"));
+    
+    PLWeightQSpinBox_ = new WSpinBox(settingsContainer_);
+    PLWeightQSpinBox_->setRange(1,10);
+    PLWeightQSpinBox_->setValue(1);
+    t->bindWidget("q",PLWeightQSpinBox_);
+
+
     /* view settings */
-    viewBox_ = new WGroupBox(this);
-    viewBox_->setId("viewBox_");
-    viewBox_->setTitle(WString::tr("homeleft.viewboxtitle"));
-    addWidget(viewBox_);
+    viewContainer_ = new WContainerWidget(this);
+    viewContainer_->setId("viewContainer_");
+    tabs_->addTab(viewContainer_,WString::fromUTF8("View settings"),WTabWidget::PreLoading);
 
     // type of view
-    t = new WTemplate(WString::tr("template.homeleft-view"),viewBox_);
+    t = new WTemplate(WString::tr("template.homeleft-view"),viewContainer_);
     t->addFunction("id",&WTemplate::Functions::id);
 
-    viewComboBox_ = new WComboBox(viewBox_);
+    viewComboBox_ = new WComboBox(viewContainer_);
     viewComboBox_->setId("viewComboBox_");
     viewComboBox_->addItem("Spherical");
     viewComboBox_->addItem("Planar");
@@ -605,7 +737,7 @@ void HomeLeft::showSettings()
     t->bindWidget("selectview",viewComboBox_);
 
     // projection
-    viewProjection_ = new WLineEdit(viewBox_);
+    viewProjection_ = new WLineEdit(viewContainer_);
     viewProjection_->setText("-1");
     t->bindString("projection-tooltip",WString::tr("tooltip.view-projection"));
     t->bindWidget("projection",viewProjection_);
@@ -613,134 +745,30 @@ void HomeLeft::showSettings()
     validator->setMandatory(true);
     viewProjection_->setValidator(validator);
 
-    viewMinX_ = new WLineEdit(viewBox_);
+    viewMinX_ = new WLineEdit(viewContainer_);
     viewMinX_->setText("-1");
     viewMinX_->disable();
     t->bindString("minx-tooltip",WString::tr("tooltip.view-minx"));
     t->bindWidget("minx",viewMinX_);
 
-    viewMaxX_ = new WLineEdit(viewBox_);
+    viewMaxX_ = new WLineEdit(viewContainer_);
     viewMaxX_->setText("1");
     viewMaxX_->disable();
     t->bindString("maxx-tooltip",WString::tr("tooltip.view-maxx"));
     t->bindWidget("maxx",viewMaxX_);
 
-    viewMinY_ = new WLineEdit(viewBox_);
+    viewMinY_ = new WLineEdit(viewContainer_);
     viewMinY_->setText("-1");
     viewMinY_->disable();
     t->bindString("miny-tooltip",WString::tr("tooltip.view-miny"));
     t->bindWidget("miny",viewMinY_);
 
-    viewMaxY_ = new WLineEdit(viewBox_);
+    viewMaxY_ = new WLineEdit(viewContainer_);
     viewMaxY_->setText("1");
     viewMaxY_->disable();
     t->bindString("maxy-tooltip",WString::tr("tooltip.view-maxy"));
     t->bindWidget("maxy",viewMaxY_);
 
-
-
-    /* evaluation parameters */
-    settingsBox_ = new WGroupBox(this);
-    settingsBox_->setId("settingsBox_");
-    settingsBox_->setTitle(WString::tr("homeleft.settingsboxtitle"));
-    addWidget(settingsBox_);
-
-    t = new WTemplate(WString::tr("template.homeleft-parameters"),settingsBox_);
-    t->addFunction("id",WTemplate::Functions::id);
-
-    // calculations
-    calculationsBtnGroup_ = new WButtonGroup(settingsBox_);
-    button = new WRadioButton("Algebraic",settingsBox_);
-    button->setInline(true);
-    t->bindWidget("calc-algebraic",button);
-    calculationsBtnGroup_->addButton(button,Algebraic);
-    button = new WRadioButton("Numeric",settingsBox_);
-    button->setInline(true);
-    calculationsBtnGroup_->addButton(button,Numeric);
-    calculationsBtnGroup_->setCheckedButton(calculationsBtnGroup_->button(Numeric));
-    t->bindString("calc-tooltip",WString::tr("tooltip.calculations"));
-    t->bindWidget("calc-numeric",button);
-
-    // separatrices
-    separatricesBtnGroup_ = new WButtonGroup(settingsBox_);
-    button = new WRadioButton("Yes",settingsBox_);
-    button->setInline(true);
-    t->bindWidget("sep-yes",button);
-    separatricesBtnGroup_->addButton(button,Yes);
-    button = new WRadioButton("No",settingsBox_);
-    button->setInline(true);
-    separatricesBtnGroup_->addButton(button,No);
-    separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(No));
-    t->bindString("sep-tooltip",WString::tr("tooltip.separatrices"));
-    t->bindWidget("sep-no",button);
-
-
-    // accuracy
-    accuracySpinBox_ = new WSpinBox(settingsBox_);
-    accuracySpinBox_->setRange(1,14);
-    accuracySpinBox_->setValue(8);
-    accuracySpinBox_->setInline(true);
-    t->bindWidget("acc",accuracySpinBox_);
-    t->bindString("acc-tooltip",WString::tr("tooltip.accuracy"));
-
-    // precision
-    precisionSpinBox_ = new WSpinBox(settingsBox_);
-    precisionSpinBox_->setRange(0,8);
-    precisionSpinBox_->setValue(0);
-    t->bindWidget("pre",precisionSpinBox_);
-    t->bindString("pre-tooltip",WString::tr("tooltip.precision"));
-
-    // epsilon
-    epsilonSpinBox_ = new WDoubleSpinBox(settingsBox_);
-    epsilonSpinBox_->setDecimals(2);
-    epsilonSpinBox_->setSingleStep(0.01);
-    epsilonSpinBox_->setValue(0.01);
-    epsilonSpinBox_->setRange(0.01,0.3);
-    t->bindWidget("eps",epsilonSpinBox_);
-    t->bindString("eps-tooltip",WString::tr("tooltip.epsilon"));
-
-
-    // level of approximation
-    levAppSpinBox_ = new WSpinBox(settingsBox_);
-    levAppSpinBox_->setRange(0,10);
-    levAppSpinBox_->setValue(6);
-    t->bindWidget("app",levAppSpinBox_);
-    t->bindString("app-tooltip",WString::tr("tooltip.approximation-level"));
-
-    // numeric level
-    numericLevelSpinBox_ = new WSpinBox(settingsBox_);
-    numericLevelSpinBox_->setRange(5,15);
-    numericLevelSpinBox_->setValue(8);
-    t->bindWidget("num",numericLevelSpinBox_);
-    t->bindString("num-tooltip",WString::tr("tooltip.numeric-level"));
-
-
-    // maximum level
-    maxLevelSpinBox_ = new WSpinBox(settingsBox_);
-    maxLevelSpinBox_->setRange(15,25);
-    maxLevelSpinBox_->setValue(20);
-    t->bindWidget("max",maxLevelSpinBox_);
-    t->bindString("max-tooltip",WString::tr("tooltip.maximum-level"));
-    
-    // max weakness level
-    maxWeakLevelSpinBox_ = new WSpinBox(settingsBox_);
-    maxWeakLevelSpinBox_->setRange(0,8);
-    maxWeakLevelSpinBox_->setValue(4);
-    t->bindWidget("weak",maxWeakLevelSpinBox_);
-    t->bindString("weak-tooltip",WString::tr("tooltip.maximum-weakness-level"));
-
-
-    // p q
-    PLWeightPSpinBox_ = new WSpinBox(settingsBox_);
-    PLWeightPSpinBox_->setRange(1,10);
-    PLWeightPSpinBox_->setValue(1);
-    t->bindWidget("p",PLWeightPSpinBox_);
-    t->bindString("pq-tooltip",WString::tr("tooltip.poincare-lyapunov-weights"));
-    
-    PLWeightQSpinBox_ = new WSpinBox(settingsBox_);
-    PLWeightQSpinBox_->setRange(1,10);
-    PLWeightQSpinBox_->setValue(1);
-    t->bindWidget("q",PLWeightQSpinBox_);
 
     // enable separatrice test parameters only if separatrice testing is on Yes
     levAppSpinBox_->disable();
@@ -766,8 +794,8 @@ void HomeLeft::showSettings()
             viewMinY_->disable();
             viewMaxX_->disable();
             viewMaxY_->disable();
-            PLWeightPSpinBox_->enable();
-            PLWeightQSpinBox_->enable();
+            //PLWeightPSpinBox_->enable();
+            //PLWeightQSpinBox_->enable();
             break;
         case 1:
         case 2:
@@ -779,20 +807,28 @@ void HomeLeft::showSettings()
             viewMinY_->enable();
             viewMaxX_->enable();
             viewMaxY_->enable();
-            PLWeightPSpinBox_->disable();
-            PLWeightQSpinBox_->disable();
+            //PLWeightPSpinBox_->disable();
+            //PLWeightQSpinBox_->disable();
             break;
         }
     }));
+
+    tabs_->setCurrentWidget(settingsContainer_);
 
 }
 
 void HomeLeft::hideSettings()
 {
     loggedIn_ = false;
-    if (settingsBox_ != nullptr) {        
-        delete settingsBox_;
-        settingsBox_ = nullptr;
+    if (viewContainer_ != nullptr) {
+        tabs_->closeTab(tabs_->indexOf(viewContainer_));
+        delete viewContainer_;
+        viewContainer_ = nullptr;
+    }
+    if (settingsContainer_ != nullptr) {      
+        tabs_->closeTab(tabs_->indexOf(settingsContainer_));  
+        delete settingsContainer_;
+        settingsContainer_ = nullptr;
     }
 }
 
@@ -800,5 +836,8 @@ void HomeLeft::resetUI()
 {
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
-    showSettings();
+    if (loggedIn_) {
+        hideSettings();
+        showSettings();
+    }
 }

@@ -31,10 +31,6 @@
     <h1>WP4: Planar Polynomial Phase Portraits</h1>
   </message>
 
-  <message id="homeleft.fuploadboxtitle">
-    Load configuration file:
-  </message>
-
   <message id="homeleft.equationboxtitle">
     Differential system:
   </message>
@@ -53,14 +49,6 @@
 
   <message id="mainui.logintext-user">
     Logged in as <b>{1}</b>. 
-  </message>
-
-  <message id="homeleft.settingsboxtitle">
-    Evaluation parameters:
-  </message>
-
-  <message id="homeleft.viewboxtitle">
-    View parameters:
   </message>
 
   <message id="tooltip.calculations">

@@ -60,6 +60,7 @@ MainUI::~MainUI()
 {
     delete leftContainer_;
     delete rightContainer_;
+    delete authWidget_;
 }
 
 void MainUI::setupUI()
@@ -110,8 +111,7 @@ void MainUI::setupUI()
     // this holds the main page content
     pageContainer_ = new WContainerWidget(mainStack_);
     pageContainer_->setId("pageContainer_");
-    //addWidget(pageContainer_);
-    //
+
     WTemplate *t = new WTemplate(WString::tr("template.mainui"),pageContainer_);
     t->addFunction("id",WTemplate::Functions::id);
 
@@ -119,14 +119,12 @@ void MainUI::setupUI()
     globalLogger__.debug("MainUI :: creating HomeLeft...");
     leftContainer_ = new HomeLeft(pageContainer_);
     globalLogger__.debug("MainUI :: HomeLeft created");
-    //pageContainer_->addWidget(leftContainer_);
     t->bindWidget("left",leftContainer_);
 
     // right widget (output text area, plots, legend)
     globalLogger__.debug("MainUI :: creating HomeRight...");
     rightContainer_ = new HomeRight(pageContainer_);
     globalLogger__.debug("MainUI :: HomeRight created");
-    //pageContainer_->addWidget(rightContainer_);
     t->bindWidget("right",rightContainer_);
 
     // connect signals sent from left to actions performed by right

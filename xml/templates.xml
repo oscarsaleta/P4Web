@@ -3,7 +3,7 @@
   
   <!-- template for login -->
   <message id="Wt.Auth.template.login">
-    <div class="col-sm-8 col-sm-offset-2 Wt-auth-login">
+    <div class="span8 offset2 Wt-auth-login">
       <!--<legend>${tr:Wt.Auth.login-form-title}</legend>-->
       <p>${tr:Wt.Auth.login-form-info}</p>
 
@@ -78,8 +78,17 @@
     </form>
   </message>
 
+  <!-- HomeLeft legend image tab template -->
+  <message id="template.legend">
+    <p></p>
+    <div class="row">
+      <div class="col-sm-6 col-sm-offset-3">${img}</div>
+    </div>
+  </message>
+
   <!-- HomeLeft view settings template -->
   <message id="template.homeleft-view">
+    <p></p>
     <form class="form-horizontal">
       <div class="form-group">
         <label class="control-label col-sm-2" title="${selectview-tooltip}" for="${id:selectview}">
@@ -116,6 +125,7 @@
 
   <!-- HomeLeft evaluation parameters template -->
   <message id="template.homeleft-parameters">
+    <p></p>
     <form class="form-horizontal">
       <div class="form-group">
         <label class="control-label col-sm-offset-1 col-sm-3" title="${calc-tooltip}" for="calc">
