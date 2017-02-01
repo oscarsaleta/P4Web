@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <messages xmlns:if="Wt.WTemplate.conditions">
   
+  <!-- template for login -->
   <message id="Wt.Auth.template.login">
-    <div class="col-md-8 col-md-offset-2 Wt-auth-login">
+    <div class="col-sm-8 col-sm-offset-2 Wt-auth-login">
       <!--<legend>${tr:Wt.Auth.login-form-title}</legend>-->
       <p>${tr:Wt.Auth.login-form-info}</p>
 
@@ -30,14 +31,17 @@
     </div>
   </message>
 
+  <!-- Remember me message -->
   <message id="Wt.Auth.remember-me">Remember</message>
 
+  <!-- Logged in template -->
   <message id="Wt.Auth.template.logged-in">
     <div class="Wt-auth-logged-in">
       <b>${user-name}</b> ${logout class="btn-warning"}
     </div>
   </message>
 
+  <!-- Main UI dual column template -->
   <message id="template.mainui">
     <div class="row">
       <div class="col-sm-6">${left}</div>
@@ -45,37 +49,133 @@
     </div>
   </message>
 
-  <message id="template.view">
+  <!-- HomeLeft normal settings template -->
+  <message id="template.homeleft-default">
+    <div class="row">
+      <div class="col-sm-offset-2 col-sm-10">${upload}</div>
+    </div>
     <form class="form-horizontal">
       <div class="form-group">
-        <label class="control-label col-sm-3" for="${id:selectview}">
-          Select view:
+        <label class="control-label col-sm-2" title="${vf-tooltip}" for="${id:xeq}">
+          x'=
         </label>
-        <div class="col-sm-3">${selectview}</div>
-        <label class="control-label col-sm-3" for="${id:projection}">
+        <div class="col-sm-10" title="${vf-tooltip}">${xeq}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" title="${vf-tooltip}" for="${id:yeq}">
+          y'=
+        </label>
+        <div class="col-sm-10" title="${vf-tooltip}">${yeq}</div>
+      </div>
+      <div class="form-group">
+        <div class="btn-group-md col-sm-offset-2 col-sm-10">
+          ${eval}
+          ${plot}
+          ${prep-save}${down-save}
+          ${reset}
+        </div>
+      </div>
+    </form>
+  </message>
+
+  <!-- HomeLeft view settings template -->
+  <message id="template.homeleft-view">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-2" title="${selectview-tooltip}" for="${id:selectview}">
+          View:
+        </label>
+        <div class="col-sm-4" title="${selectview-tooltip}">${selectview}</div>
+        <label class="control-label col-sm-2" title="${projection-tooltip}" for="${id:projection}">
           Projection:
         </label>
-        <div class="col-sm-3">${projection}</div>
+        <div class="col-sm-4" title="${projection-tooltip}">${projection}</div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-2 col-sm-offset-2" for="${id:xmin}">
+        <label class="control-label col-sm-2" title="${minx-tooltip}" for="${id:minx}">
           Min. x:
         </label>
-        <div class="col-sm-2">${xmin}</div>
-        <label class="control-label col-sm-2" for="${id:xmax}">
+        <div class="col-sm-4" title="${minx-tooltip}">${minx}</div>
+        <label class="control-label col-sm-2" title="${maxx-tooltip}" for="${id:maxx}">
           Max. x:
         </label>
-        <div class="col-sm-2">${xmax}</div>
+        <div class="col-sm-4" title="${maxx-tooltip}">${maxx}</div>
       </div>
       <div class="form-group">
-        <label class="control-label col-sm-2 col-sm-offset-2" for="${id:ymin}">
+        <label class="control-label col-sm-2" title="${miny-tooltip}" for="${id:miny}">
           Min. y:
         </label>
-        <div class="col-sm-2">${ymin}</div>
-        <label class="control-label col-sm-2" for="${id:ymax}">
+        <div class="col-sm-4" title="${miny-tooltip}">${miny}</div>
+        <label class="control-label col-sm-2" title="${maxy-tooltip}" for="${id:maxy}">
           Max. y:
         </label>
-        <div class="col-sm-2">${ymax}</div>
+        <div class="col-sm-4" title="${maxy-tooltip}">${maxy}</div>
+      </div>
+    </form>
+  </message>
+
+  <!-- HomeLeft evaluation parameters template -->
+  <message id="template.homeleft-parameters">
+    <form class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-offset-1 col-sm-3" title="${calc-tooltip}" for="calc">
+          Calculations:
+        </label>
+        <div id="calc" class="col-sm-2" title="${calc-tooltip}">
+          <div name="radio-calc">${calc-algebraic}</div>
+          <div name="radio-calc">${calc-numeric}</div>
+        </div>
+        <label class="control-label col-sm-3 col-sm-offset-1" title="${sep-tooltip}" for="${id:sep}">
+          Test separatrices:
+        </label>
+        <div class="col-sm-2" title="${sep-tooltip}">
+          <div name="radio-sep">${sep-yes}</div>
+          <div name="radio-sep">${sep-no}</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2 col-sm-offset-2" title="${acc-tooltip}" for="${id:acc}">
+          Accuracy:
+        </label>
+        <div class="col-sm-2" title="${acc-tooltip}">${acc}</div>
+        <label class="control-label col-sm-2 col-sm-offset-2" title="${prec-tooltip}" for="${id:pre}">
+          Precision:
+        </label>
+        <div class="col-sm-2" title="${pre-tooltip}">${pre}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2 col-sm-offset-2" title="${eps-tooltip}" for="${id:eps}">
+          Epsilon:
+        </label>
+        <div class="col-sm-2" title="${eps-tooltip}">${eps}</div>
+        <label class="control-label col-sm-4" title="${app-tooltip}" for="${id:app}">
+          Level of approximation:
+        </label>
+        <div class="col-sm-2" title="${app-tooltip}">${app}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-4" title="${num-tooltip}" for="${id:num}">
+          Numeric level:
+        </label>
+        <div class="col-sm-2" title="${num-tooltip}">${num}</div>
+        <label class="control-label col-sm-4" title="${max-tooltip}" for="${id:max}">
+          Maximum level:
+        </label>
+        <div class="col-sm-2" title="${max-tooltip}">${max}</div>
+      </div>
+      <label class="control-label col-sm-4" title="${weak-tooltip}" for="${id:weak}">
+          Max weakness level:
+        </label>
+        <div class="col-sm-2" title="${weak-tooltip}">${weak}</div>
+      <div class="form-group">
+        <label class="control-label col-sm-1" title="${pq-tooltip}" for="${id:p}">
+          p:
+        </label>
+        <div class="col-sm-2" title="${pq-tooltip}">${p}</div>
+        <label class="control-label col-sm-1" title="${pq-tooltip}" for="${id:q}">
+          q:
+        </label>
+        <div class="col-sm-2" title="${pq-tooltip}">${q}</div>
       </div>
     </form>
   </message>

@@ -110,8 +110,6 @@ private:
     Wt::WFileResource   *saveFileResource_;
 
     /* PRIVATE UI (log in needed) */
-    Wt::WTemplate       *viewTemplate_;
-
     Wt::WGroupBox       *settingsBox_;
     Wt::WButtonGroup    *calculationsBtnGroup_;
     enum Calculations   { Algebraic = 0, Numeric = 1 };

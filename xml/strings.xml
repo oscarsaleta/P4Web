@@ -84,7 +84,7 @@
     Default epsilon for separatrices. Can take values from 0.01 to 0.3.
   </message>
 
-  <message id="tooltip.level-approximation">
+  <message id="tooltip.approximation-level">
     Order of Taylor approximation. This order is increased as long as the separatrice test fails.
   </message>
 
@@ -138,7 +138,7 @@
     Clear output text area.
   </message>
 
-  <message id="tooltip.select-view">
+  <message id="tooltip.view-select">
     Select view of study:
       - Spherical: spherical projection of the plane (Poincare or Poincare-Lyapunov)
       - Planar: planar view of a compact, rectangular region of the plane
@@ -149,23 +149,27 @@
   </message>
 
   <message id="tooltip.view-projection">
-    Choose projection point of the Poincare sphere. Point must be <![CDATA[<]]> 0.
+    Choose projection point of the Poincare sphere. Point must be <![CDATA[<]]> 0. Only relevant for sphere view.
   </message>
 
   <message id="tooltip.view-minx">
-    Minimum coordinate on the horizontal axis.
+    Minimum coordinate on the horizontal axis. Only relevant for plane or chart view.
   </message>
 
   <message id="tooltip.view-maxx">
-    Maximum coordinate on the horizontal axis.
+    Maximum coordinate on the horizontal axis. Only relevant for plane or chart view.
   </message>
 
-  <message id="tooltip.view-minx">
-    Minimum coordinate on the vertical axis.
+  <message id="tooltip.view-miny">
+    Minimum coordinate on the vertical axis. Only relevant for plane or chart view.
   </message>
 
-  <message id="tooltip.view-minx">
-    Maximum coordinate on the vertical axis.
+  <message id="tooltip.view-maxy">
+    Maximum coordinate on the vertical axis. Only relevant for plane or chart view.
+  </message>
+
+  <message id="tooltip.vectorfield">
+    Enter your differential equations here. Use Maple syntax.
   </message>
 
 </messages>
