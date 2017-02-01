@@ -579,7 +579,6 @@ void HomeLeft::showSettings()
     }
     
 
-    WLabel *label;
     WRadioButton *button;
     WDoubleValidator *validator;
     WTemplate *t;
@@ -588,7 +587,6 @@ void HomeLeft::showSettings()
     viewBox_ = new WGroupBox(this);
     viewBox_->setId("viewBox_");
     viewBox_->setTitle(WString::tr("homeleft.viewboxtitle"));
-    //viewBox_->setMargin(35,Top);
     addWidget(viewBox_);
 
     // type of view
@@ -641,13 +639,10 @@ void HomeLeft::showSettings()
 
 
 
-
-
     /* evaluation parameters */
     settingsBox_ = new WGroupBox(this);
     settingsBox_->setId("settingsBox_");
     settingsBox_->setTitle(WString::tr("homeleft.settingsboxtitle"));
-    //settingsBox_->setMargin(35,Top);
     addWidget(settingsBox_);
 
     t = new WTemplate(WString::tr("template.homeleft-parameters"),settingsBox_);
@@ -655,17 +650,12 @@ void HomeLeft::showSettings()
 
     // calculations
     calculationsBtnGroup_ = new WButtonGroup(settingsBox_);
-    //label = new WLabel("Calculations:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.calculations"));
     button = new WRadioButton("Algebraic",settingsBox_);
     button->setInline(true);
-    //button->addStyleClass("radio-button");
     t->bindWidget("calc-algebraic",button);
-    //label->setBuddy(button);
     calculationsBtnGroup_->addButton(button,Algebraic);
     button = new WRadioButton("Numeric",settingsBox_);
     button->setInline(true);
-    //button->addStyleClass("radio-button");
     calculationsBtnGroup_->addButton(button,Numeric);
     calculationsBtnGroup_->setCheckedButton(calculationsBtnGroup_->button(Numeric));
     t->bindString("calc-tooltip",WString::tr("tooltip.calculations"));
@@ -673,134 +663,83 @@ void HomeLeft::showSettings()
 
     // separatrices
     separatricesBtnGroup_ = new WButtonGroup(settingsBox_);
-    //label = new WLabel("Test separatrices:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.separatrices"));
-    //label->setMargin(20,Left);
     button = new WRadioButton("Yes",settingsBox_);
-    //button->addStyleClass("radio-button");
     button->setInline(true);
     t->bindWidget("sep-yes",button);
-    //label->setBuddy(button);
     separatricesBtnGroup_->addButton(button,Yes);
     button = new WRadioButton("No",settingsBox_);
     button->setInline(true);
-    //button->addStyleClass("radio-button");
     separatricesBtnGroup_->addButton(button,No);
     separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(No));
     t->bindString("sep-tooltip",WString::tr("tooltip.separatrices"));
     t->bindWidget("sep-no",button);
 
-    //new WBreak(settingsBox_);
 
     // accuracy
-    //label = new WLabel("Accuracy:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.accuracy"));
     accuracySpinBox_ = new WSpinBox(settingsBox_);
-    //accuracySpinBox_->setStyleClass("spin-box");
     accuracySpinBox_->setRange(1,14);
     accuracySpinBox_->setValue(8);
     accuracySpinBox_->setInline(true);
     t->bindWidget("acc",accuracySpinBox_);
     t->bindString("acc-tooltip",WString::tr("tooltip.accuracy"));
-    //label->setBuddy(accuracySpinBox_);
 
     // precision
-    //label = new WLabel("Precision:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.precision"));
-    //label->setMargin(20,Left);
     precisionSpinBox_ = new WSpinBox(settingsBox_);
-    //precisionSpinBox_->setStyleClass("spin-box");
     precisionSpinBox_->setRange(0,8);
     precisionSpinBox_->setValue(0);
     t->bindWidget("pre",precisionSpinBox_);
     t->bindString("pre-tooltip",WString::tr("tooltip.precision"));
-    //label->setBuddy(precisionSpinBox_);
 
     // epsilon
-    //label = new WLabel("Epsilon:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.epsilon"));
-    //label->setMargin(20,Left);
     epsilonSpinBox_ = new WDoubleSpinBox(settingsBox_);
-    //epsilonSpinBox_->setStyleClass("spin-box");
     epsilonSpinBox_->setDecimals(2);
     epsilonSpinBox_->setSingleStep(0.01);
     epsilonSpinBox_->setValue(0.01);
     epsilonSpinBox_->setRange(0.01,0.3);
     t->bindWidget("eps",epsilonSpinBox_);
     t->bindString("eps-tooltip",WString::tr("tooltip.epsilon"));
-    //label->setBuddy(epsilonSpinBox_);
 
-    //new WBreak(settingsBox_);
 
     // level of approximation
-    //label = new WLabel("Level of approximation:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.level-approximation"));
     levAppSpinBox_ = new WSpinBox(settingsBox_);
-    //levAppSpinBox_->setStyleClass("spin-box");
     levAppSpinBox_->setRange(0,10);
     levAppSpinBox_->setValue(6);
     t->bindWidget("app",levAppSpinBox_);
     t->bindString("app-tooltip",WString::tr("tooltip.approximation-level"));
-    //label->setBuddy(levAppSpinBox_);
 
     // numeric level
-    //label = new WLabel("Numeric level:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.numeric-level"));
-    //label->setMargin(20,Left);
     numericLevelSpinBox_ = new WSpinBox(settingsBox_);
-    //numericLevelSpinBox_->setStyleClass("spin-box");
     numericLevelSpinBox_->setRange(5,15);
     numericLevelSpinBox_->setValue(8);
     t->bindWidget("num",numericLevelSpinBox_);
     t->bindString("num-tooltip",WString::tr("tooltip.numeric-level"));
-    //label->setBuddy(numericLevelSpinBox_);
 
-    //new WBreak(settingsBox_);
 
     // maximum level
-    //label = new WLabel("Maximum level:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.maximum-level"));
     maxLevelSpinBox_ = new WSpinBox(settingsBox_);
-    //maxLevelSpinBox_->setStyleClass("spin-box");
     maxLevelSpinBox_->setRange(15,25);
     maxLevelSpinBox_->setValue(20);
     t->bindWidget("max",maxLevelSpinBox_);
     t->bindString("max-tooltip",WString::tr("tooltip.maximum-level"));
-    //label->setBuddy(maxLevelSpinBox_);
     
     // max weakness level
-    //label = new WLabel("Maximum weakness level:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.maximum-weakness-level"));
-    //label->setMargin(20,Left);
     maxWeakLevelSpinBox_ = new WSpinBox(settingsBox_);
-    //maxWeakLevelSpinBox_->setStyleClass("spin-box");
     maxWeakLevelSpinBox_->setRange(0,8);
     maxWeakLevelSpinBox_->setValue(4);
-    //label->setBuddy(maxWeakLevelSpinBox_);
     t->bindWidget("weak",maxWeakLevelSpinBox_);
     t->bindString("weak-tooltip",WString::tr("tooltip.maximum-weakness-level"));
 
-    //new WBreak(settingsBox_);
 
     // p q
-    //label = new WLabel("p:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"));
     PLWeightPSpinBox_ = new WSpinBox(settingsBox_);
-    //PLWeightPSpinBox_->setStyleClass("spin-box");
     PLWeightPSpinBox_->setRange(1,10);
     PLWeightPSpinBox_->setValue(1);
-    //label->setBuddy(PLWeightPSpinBox_);
     t->bindWidget("p",PLWeightPSpinBox_);
     t->bindString("pq-tooltip",WString::tr("tooltip.poincare-lyapunov-weights"));
     
-    //label = new WLabel("q:",settingsBox_);
-    //label->setToolTip(WString::tr("tooltip.poincare-lyapunov-weights"));
-    //label->setMargin(20,Left);
     PLWeightQSpinBox_ = new WSpinBox(settingsBox_);
-    //PLWeightQSpinBox_->setStyleClass("spin-box");
     PLWeightQSpinBox_->setRange(1,10);
     PLWeightQSpinBox_->setValue(1);
-    //label->setBuddy(PLWeightQSpinBox_);
     t->bindWidget("q",PLWeightQSpinBox_);
 
     // enable separatrice test parameters only if separatrice testing is on Yes
@@ -845,9 +784,6 @@ void HomeLeft::showSettings()
             break;
         }
     }));
-
-
-    //new WBreak(settingsBox_);
 
 }
 
