@@ -109,29 +109,31 @@ private:
     std::string         saveFileName_;
     Wt::WFileResource   *saveFileResource_;
 
-    /* PRIVATE UI (log in needed) */
-    Wt::WGroupBox       *settingsBox_;
-    Wt::WButtonGroup    *calculationsBtnGroup_;
-    enum Calculations   { Algebraic = 0, Numeric = 1 };
-    Wt::WButtonGroup    *separatricesBtnGroup_;
-    enum Separatrices   { Yes = 0, No = 1 };
-    Wt::WSpinBox        *accuracySpinBox_;
-    Wt::WSpinBox        *precisionSpinBox_;
-    Wt::WDoubleSpinBox  *epsilonSpinBox_;
-    Wt::WSpinBox        *levAppSpinBox_;
-    Wt::WSpinBox        *numericLevelSpinBox_;
-    Wt::WSpinBox        *maxLevelSpinBox_;
-    Wt::WSpinBox        *maxWeakLevelSpinBox_;
-    Wt::WSpinBox        *PLWeightPSpinBox_;
-    Wt::WSpinBox        *PLWeightQSpinBox_;
+    Wt::WTabWidget      *tabs_;
 
-    Wt::WGroupBox       *viewBox_;
-    Wt::WComboBox       *viewComboBox_;
-    Wt::WLineEdit       *viewProjection_;
-    Wt::WLineEdit       *viewMinX_;
-    Wt::WLineEdit       *viewMinY_;
-    Wt::WLineEdit       *viewMaxX_;
-    Wt::WLineEdit       *viewMaxY_;
+    /* PRIVATE UI (log in needed) */
+    Wt::WContainerWidget    *settingsContainer_;
+    Wt::WButtonGroup        *calculationsBtnGroup_;
+    enum Calculations       { Algebraic = 0, Numeric = 1 };
+    Wt::WButtonGroup        *separatricesBtnGroup_;
+    enum Separatrices       { Yes = 0, No = 1 };
+    Wt::WSpinBox            *accuracySpinBox_;
+    Wt::WSpinBox            *precisionSpinBox_;
+    Wt::WDoubleSpinBox      *epsilonSpinBox_;
+    Wt::WSpinBox            *levAppSpinBox_;
+    Wt::WSpinBox            *numericLevelSpinBox_;
+    Wt::WSpinBox            *maxLevelSpinBox_;
+    Wt::WSpinBox            *maxWeakLevelSpinBox_;
+    Wt::WSpinBox            *PLWeightPSpinBox_;
+    Wt::WSpinBox            *PLWeightQSpinBox_;
+
+    Wt::WContainerWidget    *viewContainer_;
+    Wt::WComboBox           *viewComboBox_;
+    Wt::WLineEdit           *viewProjection_;
+    Wt::WLineEdit           *viewMinX_;
+    Wt::WLineEdit           *viewMinY_;
+    Wt::WLineEdit           *viewMaxX_;
+    Wt::WLineEdit           *viewMaxY_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;

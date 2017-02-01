@@ -48,7 +48,6 @@ HomeRight::HomeRight(WContainerWidget *parent) :
     setId("HomeRight");
     setStyleClass("half-box-right");
 
-
     globalLogger__.debug("HomeRight :: setting up UI...");
     setupUI();
     globalLogger__.debug("HomeRight :: setting up connectors...");
@@ -61,8 +60,6 @@ HomeRight::HomeRight(WContainerWidget *parent) :
 
 HomeRight::~HomeRight()
 {
-    // sphere
-    //delete sphere_;
     // output tab
     delete fullResButton_;
     delete finResButton_;
@@ -71,12 +68,6 @@ HomeRight::~HomeRight()
     delete outputButtonsToolbar_;
     delete outputTextArea_;
     delete outputContainer_;
-    // plot tab
-    /*delete clearPlotButton_;
-    delete plotPointsButton_;
-    delete plotSeparatricesButton_;
-    delete plotButtonsToolbar_;*/
-    delete plotContainer_;
     // legend tab
     delete legend_;
     delete legendContainer_;
@@ -169,17 +160,7 @@ void HomeRight::setupUI()
 
 */
     
-    // legend tab ----
-    legendContainer_ = new WContainerWidget();
-    legendContainer_->setId("legendContainer_");
-    tabWidget_->addTab(legendContainer_,WString::fromUTF8("Legend"),WTabWidget::PreLoading);
-
-    // legend image
-    legend_ = new WImage(WLink("resources/p4legend.png"), legendContainer_);
-    legend_->setAlternateText("Plot legend");
-    legend_->setId("legend_");
-    legend_->setMargin(5,Top);
-    legendContainer_->addWidget(legend_);
+    
 
     globalLogger__.debug("HomeRight :: UI set up");
 

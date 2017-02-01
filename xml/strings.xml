@@ -55,14 +55,6 @@
     Logged in as <b>{1}</b>. 
   </message>
 
-  <message id="homeleft.settingsboxtitle">
-    Evaluation parameters:
-  </message>
-
-  <message id="homeleft.viewboxtitle">
-    View parameters:
-  </message>
-
   <message id="tooltip.calculations">
     Let the symbolic manipulator work in algebraic or numeric mode.
     The symbolic package will automatically switch over to numeric calculations whenever a symbolic study is impossible.
