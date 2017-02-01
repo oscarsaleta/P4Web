@@ -209,11 +209,7 @@ public:
      * @return       Always @c true
      */
     bool getChartPos( int chart, double x1, double y1, double * pos );
-    //void adjustToNewSize( void );
 
-    //void Signal_Evaluating( void );
-    //void Signal_Changed( void );
-    
     /**
      * Plot a saddle
      * @param p saddle struct
@@ -297,7 +293,6 @@ public:
      */
     P4POLYLINES *produceEllipse( double cx, double cy, double a, double b, bool dotted, double resa, double resb );
 
-    //void prepareDrawing( void );
     /**
      * Draw a point with a given color
      * @param x     point is (x,y)
@@ -314,7 +309,6 @@ public:
      * @param color color (defined in color.h)
      */
     void drawLine( double x1, double y1, double x2, double y2, int color );
-    //void finishDrawing( void );
 
 
     /**
