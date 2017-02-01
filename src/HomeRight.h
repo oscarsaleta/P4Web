@@ -184,6 +184,8 @@ private:
     void showInfResults();
     void clearResults();
 
+    void setupSphereAndPlot();
+
     /*void plotSingularPoints();
     void plotSeparatrices();
     void clearPlot();*/

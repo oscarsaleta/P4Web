@@ -256,30 +256,12 @@ void HomeRight::clearResults()
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
 {
-    globalLogger__.debug("received projection value " + std::to_string(projection));
     if (sphere_ != nullptr) {
         delete sphere_;
         sphere_ = nullptr;
     }
     sphere_ = new WWinSphere(plotContainer_,550,550,basename,projection);
-    sphere_->setId("sphere_");
-    sphere_->setMargin(5,Top);
-    plotContainer_->addWidget(sphere_);
-
-    if (plotCaption_ != nullptr) {
-        delete plotCaption_;
-        plotCaption_ = nullptr;
-    }
-    plotCaption_ = new WText(plotContainer_);
-    plotCaption_->setId("plotCaption_");
-    plotContainer_->addWidget(plotCaption_);
-
-    sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
-    sphere_->errorSignal().connect(this,&HomeRight::printError);
-
-    sphere_->update();
-    tabWidget_->setCurrentIndex(1);
-    globalLogger__.debug("HomeRight :: reacted to onPlot signal");
+    setupSphereAndPlot();
 }
 
 void HomeRight::onPlanePlot(std::string basename, int type, double minx, double maxx, double miny, double maxy)
@@ -289,6 +271,12 @@ void HomeRight::onPlanePlot(std::string basename, int type, double minx, double 
         sphere_ = nullptr;
     }
     sphere_ = new WWinSphere(plotContainer_,550,550,basename,type,minx,maxx,miny,maxy);
+    
+    setupSphereAndPlot();
+}
+
+void HomeRight::setupSphereAndPlot()
+{
     sphere_->setId("sphere_");
     sphere_->setMargin(5,Top);
     plotContainer_->addWidget(sphere_);
@@ -303,6 +291,7 @@ void HomeRight::onPlanePlot(std::string basename, int type, double minx, double 
 
     sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
     sphere_->errorSignal().connect(this,&HomeRight::printError);
+    //shpere_->clicked().connect(this,&HomeRight::plotClicked)
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
