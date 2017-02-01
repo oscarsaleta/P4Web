@@ -176,9 +176,6 @@ private:
     Wt::WPushButton *plotPointsButton_;
     Wt::WPushButton *plotSeparatricesButton_;*/
 
-    Wt::WContainerWidget *legendContainer_;
-    Wt::WImage *legend_;
-
     void setupUI();
     void setupConnectors();
 

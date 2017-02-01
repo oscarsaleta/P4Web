@@ -35,9 +35,11 @@ body {
 	overflow-y      : auto ;
 }
 
-.btn.disabled {
-  cursor: auto;
+#title_ {
+  text-align: center;
 }
+
+
 
 
 /* settings for double panel pages */
@@ -67,14 +69,6 @@ body {
   margin-top: -10px;
 }
 
-/* inline equation editors */
-.equation-editor {
-  display: inline;
-  width: 90%;
-  font-size: 14px;
-  margin-bottom: 10px;
-  margin-left: 10px;
-}
 
 /* right home panel stuff */
 #outputTextArea_ {
@@ -88,9 +82,7 @@ body {
   margin-top: 0px;
 }
 
-#title_ {
-  text-align: center;
-}
+
 
 /* login page and login status message */
 .Wt-auth-login {

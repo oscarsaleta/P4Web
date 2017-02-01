@@ -241,6 +241,9 @@ void HomeLeft::fileUploaded()
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
     parseInputFile();
+
+    if (loggedIn_)
+        tabs_->setCurrentWidget(settingsContainer_);
     
 }
 
@@ -562,6 +565,7 @@ void HomeLeft::prepareSaveFile()
     saveAnchor_->setLink(saveFileResource_);
 
     prepSaveButton_->hide();
+    //saveAnchor_->clicked().emit(WMouseEvent());
     saveAnchor_->show();
 
 }
@@ -713,7 +717,7 @@ void HomeLeft::showSettings()
 
 
     /* view settings */
-    viewContainer_ = new WGroupBox(this);
+    viewContainer_ = new WContainerWidget(this);
     viewContainer_->setId("viewContainer_");
     tabs_->addTab(viewContainer_,WString::fromUTF8("View settings"),WTabWidget::PreLoading);
 

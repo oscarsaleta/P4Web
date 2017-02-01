@@ -78,7 +78,7 @@
     </form>
   </message>
 
-  <!-- legend image -->
+  <!-- HomeLeft legend image tab template -->
   <message id="template.legend">
     <p></p>
     <div class="row">
@@ -88,6 +88,7 @@
 
   <!-- HomeLeft view settings template -->
   <message id="template.homeleft-view">
+    <p></p>
     <form class="form-horizontal">
       <div class="form-group">
         <label class="control-label col-sm-2" title="${selectview-tooltip}" for="${id:selectview}">

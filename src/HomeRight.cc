@@ -68,9 +68,7 @@ HomeRight::~HomeRight()
     delete outputButtonsToolbar_;
     delete outputTextArea_;
     delete outputContainer_;
-    // legend tab
-    delete legend_;
-    delete legendContainer_;
+    
     // tab widget
     delete tabWidget_;
 
