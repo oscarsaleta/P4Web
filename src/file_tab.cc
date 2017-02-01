@@ -67,7 +67,8 @@ using namespace Wt;
 //                              WVFStudy CONSTRUCTOR
 // -----------------------------------------------------------------------
 
-WVFStudy::WVFStudy()
+WVFStudy::WVFStudy(double projection) :
+    config_projection(projection)
 {
     // initialize vector field structures:
 
@@ -124,7 +125,7 @@ WVFStudy::WVFStudy()
     config_step = DEFAULT_STEPSIZE;             // step size
     config_currentstep = DEFAULT_STEPSIZE;      // current step size (during integration)
     config_tolerance = DEFAULT_TOLERANCE;       // tolerance
-    config_projection = DEFAULT_PROJECTION;     // projection in the case of Poincare sphere
+    //config_projection = DEFAULT_PROJECTION;     // projection in the case of Poincare sphere
     config_intpoints = DEFAULT_INTPOINTS;       // number of points to integrate
     config_dashes = DEFAULT_LINESTYLE;          // line style (dashes or points)
     config_kindvf = DEFAULT_INTCONFIG;

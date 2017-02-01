@@ -40,7 +40,10 @@
 using namespace Wt;
 
 
-HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent)
+HomeRight::HomeRight(WContainerWidget *parent) :
+    WContainerWidget(parent),
+    plotCaption_(nullptr),
+    sphere_(nullptr)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
@@ -58,9 +61,8 @@ HomeRight::HomeRight(WContainerWidget *parent) : WContainerWidget(parent)
 
 HomeRight::~HomeRight()
 {
-    /*
     // sphere
-    delete sphere_;
+    //delete sphere_;
     // output tab
     delete fullResButton_;
     delete finResButton_;
@@ -68,18 +70,18 @@ HomeRight::~HomeRight()
     delete clearOutputButton_;
     delete outputButtonsToolbar_;
     delete outputTextArea_;
-    delete outputContainer_;*/
+    delete outputContainer_;
     // plot tab
     /*delete clearPlotButton_;
     delete plotPointsButton_;
     delete plotSeparatricesButton_;
     delete plotButtonsToolbar_;*/
-    /*delete plotContainer_;
+    delete plotContainer_;
     // legend tab
     delete legend_;
     delete legendContainer_;
     // tab widget
-    delete tabWidget_;*/
+    delete tabWidget_;
 
     globalLogger__.debug("HomeRight :: deleted correctly");
 }
@@ -141,11 +143,6 @@ void HomeRight::setupUI()
     plotContainer_->setId("plotContainer_");
     tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
 
-    // sphere (plot region)
-    //sphere_ = new WWinSphere(plotContainer_,550,550);
-    //sphere_->setId("sphere_");
-    //sphere_->setMargin(5,Top);
-    //plotContainer_->addWidget(sphere_);
 
     //TODO: add plot separatrices, orbits, etc buttons?
     /*plotButtonsToolbar_ = new WToolBar(plotContainer_);
@@ -244,7 +241,7 @@ void HomeRight::readResults(std::string fileName)
 }
 
 void HomeRight::printError(std::string error)
-{
+{   
     fullResults_ = error;
     fullResults();
 }
@@ -253,6 +250,7 @@ void HomeRight::fullResults()
 {
     outputTextAreaContent_ = fullResults_;
     outputTextArea_->setText(outputTextAreaContent_);
+    tabWidget_->setCurrentIndex(0);
     globalLogger__.debug("HomeRight :: showing full results");
 }
 
@@ -277,24 +275,55 @@ void HomeRight::clearResults()
     globalLogger__.debug("HomeRight :: cleared results");
 }
 
-void HomeRight::onPlot(std::string basename)
-{ 
+void HomeRight::onSpherePlot(std::string basename, double projection)
+{
+    globalLogger__.debug("received projection value " + std::to_string(projection));
     if (sphere_ != nullptr) {
         delete sphere_;
         sphere_ = nullptr;
     }
-    sphere_ = new WWinSphere(plotContainer_,550,550,basename);
+    sphere_ = new WWinSphere(plotContainer_,550,550,basename,projection);
     sphere_->setId("sphere_");
     sphere_->setMargin(5,Top);
     plotContainer_->addWidget(sphere_);
 
-    plotContainer_->addWidget(new WBreak(plotContainer_));
-
+    if (plotCaption_ != nullptr) {
+        delete plotCaption_;
+        plotCaption_ = nullptr;
+    }
     plotCaption_ = new WText(plotContainer_);
     plotCaption_->setId("plotCaption_");
     plotContainer_->addWidget(plotCaption_);
 
     sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
+    sphere_->errorSignal().connect(this,&HomeRight::printError);
+
+    sphere_->update();
+    tabWidget_->setCurrentIndex(1);
+    globalLogger__.debug("HomeRight :: reacted to onPlot signal");
+}
+
+void HomeRight::onPlanePlot(std::string basename, int type, double minx, double maxx, double miny, double maxy)
+{
+    if (sphere_ != nullptr) {
+        delete sphere_;
+        sphere_ = nullptr;
+    }
+    sphere_ = new WWinSphere(plotContainer_,550,550,basename,type,minx,maxx,miny,maxy);
+    sphere_->setId("sphere_");
+    sphere_->setMargin(5,Top);
+    plotContainer_->addWidget(sphere_);
+
+    if (plotCaption_ != nullptr) {
+        delete plotCaption_;
+        plotCaption_ = nullptr;
+    }
+    plotCaption_ = new WText(plotContainer_);
+    plotCaption_->setId("plotCaption_");
+    plotContainer_->addWidget(plotCaption_);
+
+    sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
+    sphere_->errorSignal().connect(this,&HomeRight::printError);
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);

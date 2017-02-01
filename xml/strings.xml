@@ -59,76 +59,113 @@
     Evaluation parameters:
   </message>
 
+  <message id="homeleft.viewboxtitle">
+    View parameters:
+  </message>
+
   <message id="tooltip.calculations">
-    <p>Let the symbolic manipulator work in algebraic or numeric mode.</p>
-    <p>The symbolic package will automatically switch over to numeric
-      calculations whenever a symbolic study is impossible.</p>
+    Let the symbolic manipulator work in algebraic or numeric mode.
+    The symbolic package will automatically switch over to numeric calculations whenever a symbolic study is impossible.
   </message>
 
   <message id="tooltip.separatrices">
-    <p>Enable/disable numeric testing of the Taylor developments for separatrices.</p>
+    Enable/disable numeric testing of the Taylor developments for separatrices.
   </message>
 
   <message id="tooltip.accuracy">
-    <p>Number of digits required when checking for zero equality.</p>
+    Number of digits required when checking for zero equality.
   </message>
 
   <message id="tooltip.precision">
-    <p>Number of digits of numeric precision for all calculations. Use 0 for default double-precision</p>
+    Number of digits of numeric precision for all calculations. Use 0 for default double-precision
   </message>
 
   <message id="tooltip.epsilon">
-    <p>Default epsilon for separatrices. Can take values from 0.01 to 0.3.</p>
+    Default epsilon for separatrices. Can take values from 0.01 to 0.3.
   </message>
 
   <message id="tooltip.level-approximation">
-    <p>Order of Taylor approximation. This order is increased as long as the separatrice test fails.</p>
+    Order of Taylor approximation. This order is increased as long as the separatrice test fails.
   </message>
 
   <message id="tooltip.numeric-level">
-    <p>Start working numerically when order of Taylor approximation reaches this level.</p>
+    Start working numerically when order of Taylor approximation reaches this level.
   </message>
 
   <message id="tooltip.maximum-level">
-    <p>Maximum order of Taylor approximation. Stop testing separatrices at this order.</p>
+    Maximum order of Taylor approximation. Stop testing separatrices at this order.
   </message>
 
   <message id="tooltip.maximum-weakness-level">
-    <p>Maximum order of Lyapunov constants to be computed for weak foci.</p>
+    Maximum order of Lyapunov constants to be computed for weak foci.
+  </message>
+
+  <message id="tooltip.poincare-lyapunov-weights">
+    Poincaré-Lyapunov weights.
   </message>
 
   <message id="tooltip.homeleft-eval-button">
-    <p>Evaluate the vector field to find singularities, compute Lyapunov constants
-      and blow-up when needed, and integrate separatrices.</p>
+    Evaluate the vector field to find singularities, compute Lyapunov constants
+      and blow-up when needed, and integrate separatrices.
   </message>
 
   <message id="tooltip.homeleft-plot-button">
-    <p>Plot the evaluated vector field in the Poincaré sphere.</p>
+    Plot the evaluated vector field in the Poincaré sphere.
   </message>
 
   <message id="tooltip.homeleft-save-button">
-    <p>Save the current vector field and evaluation parameters to a P4 compatible
-      input file.</p>
+    Save the current vector field and evaluation parameters to a P4 compatible
+      input file.
   </message>
 
   <message id="tooltip.homeleft-clear-button">
-    <p>Clear the x' and y' input fields.</p>
+    Clear the x' and y' input fields.
   </message>
 
   <message id="tooltip.homeright-full-button">
-    <p>Show the full Maple output for the currently evaluated vector field.</p>
+    Show the full Maple output for the currently evaluated vector field.
   </message>
 
   <message id="tooltip.homeright-finite-button">
-    <p>Show the output regarding finite singularities.</p>
+    Show the output regarding finite singularities.
   </message>
 
   <message id="tooltip.homeright-infinite-button">
-    <p>Show the output regarding singularities at the infinite.</p>
+    Show the output regarding singularities at the infinite.
   </message>
 
   <message id="tooltip.homeright-clear-button">
-    <p>Clear output text area.</p>
+    Clear output text area.
+  </message>
+
+  <message id="tooltip.select-view">
+    Select view of study:
+      - Spherical: spherical projection of the plane (Poincare or Poincare-Lyapunov)
+      - Planar: planar view of a compact, rectangular region of the plane
+      - U1: View of the U1 chart. Infinity is shown as a line
+      - V1: View of the V1 chart. Infinity is shown as a line
+      - U2: View of the U2 chart. Infinity is shown as a line
+      - V2: View of the V2 chart. Infinity is shown as a line
+  </message>
+
+  <message id="tooltip.view-projection">
+    Choose projection point of the Poincare sphere. Point must be <![CDATA[<]]> 0.
+  </message>
+
+  <message id="tooltip.view-minx">
+    Minimum coordinate on the horizontal axis.
+  </message>
+
+  <message id="tooltip.view-maxx">
+    Maximum coordinate on the horizontal axis.
+  </message>
+
+  <message id="tooltip.view-minx">
+    Minimum coordinate on the vertical axis.
+  </message>
+
+  <message id="tooltip.view-minx">
+    Maximum coordinate on the vertical axis.
   </message>
 
 </messages>

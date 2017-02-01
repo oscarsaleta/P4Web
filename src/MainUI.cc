@@ -111,23 +111,29 @@ void MainUI::setupUI()
     pageContainer_ = new WContainerWidget(mainStack_);
     pageContainer_->setId("pageContainer_");
     //addWidget(pageContainer_);
+    //
+    WTemplate *t = new WTemplate(WString::tr("template.mainui"),pageContainer_);
+    t->addFunction("id",WTemplate::Functions::id);
 
     // left widget (file upload, input, buttons)
     globalLogger__.debug("MainUI :: creating HomeLeft...");
     leftContainer_ = new HomeLeft(pageContainer_);
     globalLogger__.debug("MainUI :: HomeLeft created");
-    pageContainer_->addWidget(leftContainer_);
+    //pageContainer_->addWidget(leftContainer_);
+    t->bindWidget("left",leftContainer_);
 
     // right widget (output text area, plots, legend)
     globalLogger__.debug("MainUI :: creating HomeRight...");
     rightContainer_ = new HomeRight(pageContainer_);
     globalLogger__.debug("MainUI :: HomeRight created");
-    pageContainer_->addWidget(rightContainer_);
+    //pageContainer_->addWidget(rightContainer_);
+    t->bindWidget("right",rightContainer_);
 
     // connect signals sent from left to actions performed by right
     leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
-    leftContainer_->onPlotSignal().connect(rightContainer_,&HomeRight::onPlot);
+    leftContainer_->onPlotSphereSignal().connect(rightContainer_,&HomeRight::onSpherePlot);
+    leftContainer_->onPlotPlaneSignal().connect(rightContainer_,&HomeRight::onPlanePlot);
     globalLogger__.debug("MainUI :: signals connected");
 
     globalLogger__.debug("MainUI :: MainUI set up");
