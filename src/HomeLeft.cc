@@ -64,10 +64,10 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     WContainerWidget(parent),
     evaluatedSignal_(this),
     errorSignal_(this),
-    //onPlotSignal_(this),
     loggedIn_(false),
     settingsContainer_(nullptr),
-    viewContainer_(nullptr)
+    viewContainer_(nullptr),
+    orbitsContainer_(nullptr)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
@@ -843,15 +843,19 @@ void HomeLeft::showSettings()
 void HomeLeft::hideSettings()
 {
     loggedIn_ = false;
+    for (int i=1; i<tabs_->count(); i++)
+        tabs_->closeTab(i);
+    if (settingsContainer_ != nullptr) {      
+        delete settingsContainer_;
+        settingsContainer_ = nullptr;
+    }
     if (viewContainer_ != nullptr) {
-        tabs_->closeTab(tabs_->indexOf(viewContainer_));
         delete viewContainer_;
         viewContainer_ = nullptr;
     }
-    if (settingsContainer_ != nullptr) {      
-        tabs_->closeTab(tabs_->indexOf(settingsContainer_));  
-        delete settingsContainer_;
-        settingsContainer_ = nullptr;
+    if (orbitsContainer_ != nullptr) {
+        delete orbitsContainer_;
+        orbitsContainer_ = nullptr;
     }
 }
 
@@ -860,7 +864,8 @@ void HomeLeft::resetUI()
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
     if (loggedIn_) {
-        hideSettings();
+        for (int i=1; i<tabs_->count(); i++)
+            tabs_->closeTab(i);
         showSettings();
     }
 }
