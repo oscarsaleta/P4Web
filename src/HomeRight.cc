@@ -291,7 +291,7 @@ void HomeRight::setupSphereAndPlot()
 
     sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
     sphere_->errorSignal().connect(this,&HomeRight::printError);
-    //shpere_->clicked().connect(this,&HomeRight::plotClicked)
+    //shpere_->clicked().connect(this,&HomeRight::sphereClicked)
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
@@ -302,6 +302,11 @@ void HomeRight::mouseMovedEvent( WMouseEvent e )
 {
     plotCaption_->setText(sphere_->plotCaption_);
 }
+
+/*void HomeRight::sphereClicked( WMouseEvent e )
+{
+    sphereClickedSignal_.emit(e);
+}*/
 
 /*void HomeRight::clearPlot()
 {

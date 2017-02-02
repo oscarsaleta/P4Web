@@ -144,6 +144,8 @@ public:
      */
     void mouseMovedEvent( Wt::WMouseEvent e );
 
+    //Wt::Signal<Wt::WMouseEvent>& sphereClickedSignal() { return sphereClickedSignal_; }
+
 private:
     int projection_;
     double viewMinX_;
@@ -186,9 +188,13 @@ private:
 
     void setupSphereAndPlot();
 
+    void sphereClicked(double x, double y);
+
     /*void plotSingularPoints();
     void plotSeparatrices();
     void clearPlot();*/
+
+    //Wt::Signal<Wt::WMouseEvent> sphereClickedSignal_;
     
 };
 

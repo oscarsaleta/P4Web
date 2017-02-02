@@ -35,7 +35,7 @@ RegistrationView::RegistrationView(Session& session, Auth::AuthWidget *authWidge
 
 WFormWidget *RegistrationView::createFormWidget(WFormModel::Field field)
 {
-    return Auth::RegistrationWidget::createFormWidget(field);
+    return (WFormWidget*) Auth::RegistrationWidget::createFormWidget(field);
 }
 
 bool RegistrationView::validate()
