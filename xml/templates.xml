@@ -173,11 +173,11 @@
         </label>
         <div class="col-sm-2" title="${max-tooltip}">${max}</div>
       </div>
-      <label class="control-label col-sm-4" title="${weak-tooltip}" for="${id:weak}">
+      <div class="form-group">
+        <label class="control-label col-sm-4" title="${weak-tooltip}" for="${id:weak}">
           Max weakness level:
         </label>
         <div class="col-sm-2" title="${weak-tooltip}">${weak}</div>
-      <div class="form-group">
         <label class="control-label col-sm-1" title="${pq-tooltip}" for="${id:p}">
           p:
         </label>
