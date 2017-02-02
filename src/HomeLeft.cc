@@ -843,17 +843,18 @@ void HomeLeft::showSettings()
 void HomeLeft::hideSettings()
 {
     loggedIn_ = false;
-    for (int i=1; i<tabs_->count(); i++)
-        tabs_->closeTab(i);
-    if (settingsContainer_ != nullptr) {      
+    if (settingsContainer_ != nullptr) {
+        tabs_->removeTab(settingsContainer_);
         delete settingsContainer_;
         settingsContainer_ = nullptr;
     }
     if (viewContainer_ != nullptr) {
+        tabs_->removeTab(viewContainer_);
         delete viewContainer_;
         viewContainer_ = nullptr;
     }
     if (orbitsContainer_ != nullptr) {
+        tabs_->removeTab(orbitsContainer_);
         delete orbitsContainer_;
         orbitsContainer_ = nullptr;
     }
@@ -864,8 +865,7 @@ void HomeLeft::resetUI()
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
     if (loggedIn_) {
-        for (int i=1; i<tabs_->count(); i++)
-            tabs_->closeTab(i);
+        hideSettings();
         showSettings();
     }
 }
