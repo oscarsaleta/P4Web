@@ -103,7 +103,7 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     PLCircle = nullptr;
 
     mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
-    //clicked().connect(this,&WWinSphere::)
+    clicked().connect(this,&WWinSphere::mouseClickEvent);
 
 }
 
@@ -135,6 +135,7 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     PLCircle = nullptr;
 
     mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
+    clicked().connect(this,&WWinSphere::mouseClickEvent);
 
 }
 
@@ -267,6 +268,25 @@ bool WWinSphere::setupPlot( void )
     dx = x1-x0;
     dy = y1-y0;
 
+
+    switch(study_->typeofview) {
+    case TYPEOFVIEW_PLANE:
+    case TYPEOFVIEW_SPHERE:
+        chartString_ = "";
+        break;
+    case TYPEOFVIEW_U1:
+        setChartString(study_->p,study_->q,true,false);
+        break;
+    case TYPEOFVIEW_U2:
+        setChartString(study_->p,study_->q,false,false);
+        break;
+    case TYPEOFVIEW_V1:
+        setChartString(study_->p,study_->q,true,true);
+        break;
+    case TYPEOFVIEW_V2:
+        setChartString(study_->p,study_->q,false,true);
+        break;
+    }
     
     if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
         CircleAtInfinity = produceEllipse( 0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0) );
@@ -449,8 +469,24 @@ void WWinSphere::mouseMovementEvent( WMouseEvent e )
         }
     }
     
-    plotCaption_ = buf;
+    hoverSignal_.emit(buf);
 }
+
+void WWinSphere::mouseClickEvent( WMouseEvent e )
+{
+    double wx = coWorldX(e.widget().x);
+    double wy = coWorldY(e.widget().y);
+    double pcoord[3];
+    double ucoord[2];
+    if ((study_->*(study_->is_valid_viewcoord))(wx,wy,pcoord)) {
+        (study_->*(study_->sphere_to_R2))(pcoord[0],pcoord[1],pcoord[2],ucoord);
+        clickedSignal_.emit(true,ucoord[0],ucoord[1]);
+    } else {
+        clickedSignal_.emit(false,0,0);
+    }
+}
+
+
 
 double WWinSphere::coWorldX( int x )
 {

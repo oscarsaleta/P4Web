@@ -289,24 +289,24 @@ void HomeRight::setupSphereAndPlot()
     plotCaption_->setId("plotCaption_");
     plotContainer_->addWidget(plotCaption_);
 
-    sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
+    sphere_->hoverSignal().connect(this,&HomeRight::mouseMovedEvent);
     sphere_->errorSignal().connect(this,&HomeRight::printError);
-    //shpere_->clicked().connect(this,&HomeRight::sphereClicked)
+    sphere_->clickedSignal().connect(this,&HomeRight::sphereClicked);
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
     globalLogger__.debug("HomeRight :: reacted to onPlot signal");
 }
 
-void HomeRight::mouseMovedEvent( WMouseEvent e )
+void HomeRight::mouseMovedEvent( WString caption )
 {
-    plotCaption_->setText(sphere_->plotCaption_);
+    plotCaption_->setText(caption);
 }
 
-/*void HomeRight::sphereClicked( WMouseEvent e )
+void HomeRight::sphereClicked( bool clickValid, double x, double y )
 {
-    sphereClickedSignal_.emit(e);
-}*/
+    sphereClickedSignal_.emit(clickValid,x,y);
+}
 
 /*void HomeRight::clearPlot()
 {

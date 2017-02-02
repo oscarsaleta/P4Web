@@ -190,4 +190,31 @@
     </form>
   </message>
 
+  <message id="template.orbits-dialog">
+    <p></p>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-2" title="${point-label}" for="${id:x}">
+          x0=
+        </label>
+        <div class="col-sm-3">${x}</div>
+        <div class="btn-group-md col-sm-offset-1 col-sm-2">
+          ${fw}
+        </div>
+        <div class="btn-group-md col-sm-2">
+          ${bw}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" title="${point-label}" for="${id:y}">
+          y0=
+        </label>
+        <div class="col-sm-3">${y}</div>
+        <div class="btn-group-md col-sm-offset-1 col-sm-6">
+          ${cnt}
+        </div>
+      </div>
+    </div>
+  </message>
+
 </messages>

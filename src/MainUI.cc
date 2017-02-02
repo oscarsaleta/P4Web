@@ -132,6 +132,7 @@ void MainUI::setupUI()
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
     leftContainer_->onPlotSphereSignal().connect(rightContainer_,&HomeRight::onSpherePlot);
     leftContainer_->onPlotPlaneSignal().connect(rightContainer_,&HomeRight::onPlanePlot);
+    rightContainer_->sphereClickedSignal().connect(leftContainer_,&HomeLeft::showOrbitsDialog);
     globalLogger__.debug("MainUI :: signals connected");
 
     globalLogger__.debug("MainUI :: MainUI set up");

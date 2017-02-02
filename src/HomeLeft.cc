@@ -770,6 +770,29 @@ void HomeLeft::showSettings()
     t->bindWidget("maxy",viewMaxY_);
 
 
+    // orbits integration
+    orbitsContainer_ = new WContainerWidget(this);
+    orbitsContainer_->setId("orbitsContainer_");
+    tabs_->addTab(orbitsContainer_,"Orbit integration");
+
+    t = new WTemplate(WString::tr("template.orbits-dialog"),orbitsContainer_);
+    t->addFunction("id",WTemplate::Functions::id);
+
+    orbitsXLineEdit_ = new WLineEdit(orbitsContainer_);
+    t->bindWidget("x",orbitsXLineEdit_);
+    t->bindString("point-label",WString::tr("tooltip.orbits-selected-point"));
+    orbitsYLineEdit_ = new WLineEdit(orbitsContainer_);
+    t->bindWidget("y",orbitsYLineEdit_);
+
+    orbitsForwardsBtn_ = new WPushButton("Forwards",orbitsContainer_);
+    orbitsContinueBtn_ = new WPushButton("Continue",orbitsContainer_);
+    orbitsBackwardsBtn_ = new WPushButton("Backwards",orbitsContainer_);
+    t->bindWidget("fw",orbitsForwardsBtn_);
+    t->bindWidget("cnt",orbitsContinueBtn_);
+    t->bindWidget("bw",orbitsBackwardsBtn_);
+
+
+
     // enable separatrice test parameters only if separatrice testing is on Yes
     levAppSpinBox_->disable();
     numericLevelSpinBox_->disable();
@@ -840,4 +863,18 @@ void HomeLeft::resetUI()
         hideSettings();
         showSettings();
     }
+}
+
+void HomeLeft::showOrbitsDialog( bool clickValid, double x, double y )
+{
+    if (!loggedIn_)
+        return;
+
+    tabs_->setCurrentWidget(orbitsContainer_);
+
+    if (clickValid) {
+        orbitsXLineEdit_->setText(std::to_string(x));
+        orbitsYLineEdit_->setText(std::to_string(y));
+    }
+
 }

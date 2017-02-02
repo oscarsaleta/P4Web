@@ -31,6 +31,7 @@
 #include <Wt/WContainerWidget>
 
 #include <Wt/WString>
+//#include <Wt/WMouseEvent>
 
 class WWinSphere;
 
@@ -142,9 +143,11 @@ public:
      * @param e WMouseEvent (needed to connect the function to the event,
      * although it's not used here)
      */
-    void mouseMovedEvent( Wt::WMouseEvent e );
+    void mouseMovedEvent( Wt::WString caption );
 
-    //Wt::Signal<Wt::WMouseEvent>& sphereClickedSignal() { return sphereClickedSignal_; }
+    void sphereClicked( bool clickValid, double x, double y );
+
+    Wt::Signal<bool,double,double>& sphereClickedSignal() { return sphereClickedSignal_; }
 
 private:
     int projection_;
@@ -188,13 +191,13 @@ private:
 
     void setupSphereAndPlot();
 
-    void sphereClicked(double x, double y);
+    void sphereClicked(Wt::WMouseEvent e);
 
     /*void plotSingularPoints();
     void plotSeparatrices();
     void clearPlot();*/
 
-    //Wt::Signal<Wt::WMouseEvent> sphereClickedSignal_;
+    Wt::Signal<bool,double,double> sphereClickedSignal_;
     
 };
 

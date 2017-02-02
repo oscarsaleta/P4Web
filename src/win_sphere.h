@@ -341,6 +341,20 @@ public:
     void mouseMovementEvent( Wt::WMouseEvent e );
 
     /**
+     * React to a mouse click event to emit the coordinates
+     *
+     * This function takes the coordinates of the mouse cursor
+     * where the click has been performed, and sends them to the
+     * parent widget (HomeRight)
+     * 
+     * @param e WMouseEvent, contains the coordinates of the mouse cursor
+     */
+    void mouseClickEvent( Wt::WMouseEvent e );
+
+    Wt::Signal<Wt::WString>& hoverSignal() { return hoverSignal_; }
+    Wt::Signal<bool,double,double>& clickedSignal() { return clickedSignal_; }
+
+    /**
      * Method that sends a signal to print some message in the output
      * text area from #HomeRight
      */
@@ -357,6 +371,9 @@ protected:
     void paintEvent( Wt::WPaintDevice * p );
 
 private:
+
+    Wt::Signal<Wt::WString> hoverSignal_;
+    Wt::Signal<bool,double,double> clickedSignal_;
     /**
      * Signal emitted when there's an error while reading results from Maple
      */
@@ -378,6 +395,8 @@ private:
                                         Lyapunov circle */
 
     void setChartString(int p, int q, bool isu1v1chart, bool negchart);
+
+
 
 };
 
