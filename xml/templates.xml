@@ -82,45 +82,13 @@
   <message id="template.legend">
     <p></p>
     <div class="row">
+        <div class="help-block col-sm-11 col-sm-offset-1">
+          This legend shows the type of singularities, separatrices and orbits that the plot can have.
+        </div>
+    </div>
+    <div class="row">
       <div class="col-sm-6 col-sm-offset-3">${img}</div>
     </div>
-  </message>
-
-  <!-- HomeLeft view settings template -->
-  <message id="template.homeleft-view">
-    <p></p>
-    <form class="form-horizontal">
-      <div class="form-group">
-        <label class="control-label col-sm-2" title="${selectview-tooltip}" for="${id:selectview}">
-          View:
-        </label>
-        <div class="col-sm-4" title="${selectview-tooltip}">${selectview}</div>
-        <label class="control-label col-sm-2" title="${projection-tooltip}" for="${id:projection}">
-          Projection:
-        </label>
-        <div class="col-sm-4" title="${projection-tooltip}">${projection}</div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2" title="${minx-tooltip}" for="${id:minx}">
-          Min. x:
-        </label>
-        <div class="col-sm-4" title="${minx-tooltip}">${minx}</div>
-        <label class="control-label col-sm-2" title="${maxx-tooltip}" for="${id:maxx}">
-          Max. x:
-        </label>
-        <div class="col-sm-4" title="${maxx-tooltip}">${maxx}</div>
-      </div>
-      <div class="form-group">
-        <label class="control-label col-sm-2" title="${miny-tooltip}" for="${id:miny}">
-          Min. y:
-        </label>
-        <div class="col-sm-4" title="${miny-tooltip}">${miny}</div>
-        <label class="control-label col-sm-2" title="${maxy-tooltip}" for="${id:maxy}">
-          Max. y:
-        </label>
-        <div class="col-sm-4" title="${maxy-tooltip}">${maxy}</div>
-      </div>
-    </form>
   </message>
 
   <!-- HomeLeft evaluation parameters template -->
@@ -190,28 +158,86 @@
     </form>
   </message>
 
+
+  <!-- HomeLeft view settings template -->
+  <message id="template.homeleft-view">
+    <p></p>
+    <form class="form-horizontal">
+      <div class="form-group">
+        <div class="help-block col-sm-11 col-sm-offset-1">
+          Select a type of view for the plot: spherical, planar, or a chart (U1, U2, V1, V2).
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" title="${selectview-tooltip}" for="${id:selectview}">
+          View:
+        </label>
+        <div class="col-sm-4" title="${selectview-tooltip}">${selectview}</div>
+        <label class="control-label col-sm-2" title="${projection-tooltip}" for="${id:projection}">
+          Projection:
+        </label>
+        <div class="col-sm-4" title="${projection-tooltip}">${projection}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" title="${minx-tooltip}" for="${id:minx}">
+          Min. x:
+        </label>
+        <div class="col-sm-4" title="${minx-tooltip}">${minx}</div>
+        <label class="control-label col-sm-2" title="${maxx-tooltip}" for="${id:maxx}">
+          Max. x:
+        </label>
+        <div class="col-sm-4" title="${maxx-tooltip}">${maxx}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2" title="${miny-tooltip}" for="${id:miny}">
+          Min. y:
+        </label>
+        <div class="col-sm-4" title="${miny-tooltip}">${miny}</div>
+        <label class="control-label col-sm-2" title="${maxy-tooltip}" for="${id:maxy}">
+          Max. y:
+        </label>
+        <div class="col-sm-4" title="${maxy-tooltip}">${maxy}</div>
+      </div>
+    </form>
+  </message>
+
+
+  <!-- HomeLeft orbit integration tab template -->
   <message id="template.orbits-dialog">
     <p></p>
     <div class="form-horizontal">
       <div class="form-group">
+        <div class="help-block col-sm-11 col-sm-offset-1">
+          Select a point from the plot or enter one in the input area.
+        </div>
+      </div>
+      <div class="form-group">
         <label class="control-label col-sm-2" title="${point-label}" for="${id:x}">
           x0=
         </label>
-        <div class="col-sm-3">${x}</div>
-        <div class="btn-group-md col-sm-offset-1 col-sm-2">
-          ${fw}
-        </div>
-        <div class="btn-group-md col-sm-2">
-          ${bw}
+        <div class="col-sm-6" title="${point-label}">${x}</div>
+        <div class="btn-group-md col-sm-offset-1 col-sm-3">
+          ${dl}
         </div>
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2" title="${point-label}" for="${id:y}">
           y0=
         </label>
-        <div class="col-sm-3">${y}</div>
-        <div class="btn-group-md col-sm-offset-1 col-sm-6">
+        <div class="col-sm-6" title="${point-label}">${y}</div>
+        <div class="btn-group-md col-sm-offset-1 col-sm-3">
+          ${da}
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="btn-group-md col-sm-offset-2 col-sm-2">
+          ${fw}
+        </div>
+        <div class="btn-group-md col-sm-2">
           ${cnt}
+        </div>
+        <div class="btn-group-md col-sm-2">
+          ${bw}
         </div>
       </div>
     </div>

@@ -328,6 +328,24 @@ public:
     bool setupPlot( void );
     //void updatePointSelection( void );
 
+
+    void integrateOrbit( int dir );
+
+    orbits_points * integrate_orbit( double pcoord[3],double step,int dir,int color, int points_to_int,struct orbits_points **orbit );
+
+    void drawOrbit( double * pcoord, struct orbits_points * points, int color );
+
+    bool startOrbit( double x, double y, bool R );
+
+    void drawOrbits();
+
+    void deleteLastOrbit();
+
+
+
+
+
+
     /**
      * React to a mouse hover event to set a string
      *
@@ -360,6 +378,12 @@ public:
      */
     Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
 
+    Wt::WPainter *staticPainter;       /**< pointer to a painter linked to a paint device
+                                            created in a paint event. This makes possible
+                                            to distribute painting to different functions
+                                            and compiling units (even from outside the
+                                            object) */
+
 protected:
     /**
      * Paint event for this painted widget
@@ -379,11 +403,7 @@ private:
      */
     Wt::Signal<std::string> errorSignal_;
 
-    Wt::WPainter * staticPainter;       /**< pointer to a painter linked to a paint device
-                                            created in a paint event. This makes possible
-                                            to distribute painting to different functions
-                                            and compiling units (even from outside the
-                                            object) */
+    
     Wt::WContainerWidget * parentWnd;   /**< parent widget (stored from @c parent, argument
                                             passed to constructor) */
     bool ReverseYaxis;                  /**< when calculating coordinates: this determines

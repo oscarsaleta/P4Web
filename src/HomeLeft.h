@@ -123,8 +123,30 @@ public:
     {
         return onPlotPlaneSignal_;
     }
+    /**
+     * Orbit integration signal
+     *
+     * The int can be -1 (backwards), 0 (continue) or 1 (forwards). The doubles are the
+     * coordinates
+     */
+    Wt::Signal<int,double,double>& orbitIntegrateSignal()
+    {
+        return orbitIntegrateSignal_;
+    }
+    /**
+     * Signal to delete orbits
+     *
+     * The int can be 1 (delete last) or 0 (delete all)
+     */
+    Wt::Signal<int>& orbitDeleteSignal()
+    {
+        return orbitDeleteSignal_;
+    }
+
 
 private:
+    bool evaluated_;
+
     /* PUBLIC UI (no need to log in) */
     Wt::WGroupBox       *equationsBox_;
     Wt::WFileUpload     *fileUploadWidget_;
@@ -173,12 +195,17 @@ private:
     Wt::WPushButton         *orbitsForwardsBtn_;
     Wt::WPushButton         *orbitsContinueBtn_;
     Wt::WPushButton         *orbitsBackwardsBtn_;
+    Wt::WPushButton         *orbitsDeleteOneBtn_;
+    Wt::WPushButton         *orbitsDeleteAllBtn_;
+    bool                    orbitsStartSelected_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
     Wt::Signal<std::string> errorSignal_;
     Wt::Signal<std::string,double> onPlotSphereSignal_;
     Wt::Signal<std::string,int,double,double,double,double> onPlotPlaneSignal_;
+    Wt::Signal<int,double,double> orbitIntegrateSignal_;
+    Wt::Signal<int> orbitDeleteSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -208,6 +235,13 @@ private:
     void onPlot();
     // set default/widget evaluation parameters
     void setParams();
+    // react to button presses in orbits tab
+    void onOrbitsForwardsBtn();
+    void onOrbitsBackwardsBtn();
+    void onOrbitsContinueBtn();
+    void onOrbitsDeleteOneBtn();
+    void onOrbitsDeleteAllBtn();
+
 
     /* MAPLE FILE PARAMETERS */
     bool loggedIn_;

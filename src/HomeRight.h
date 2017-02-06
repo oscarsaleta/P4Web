@@ -147,9 +147,15 @@ public:
 
     void sphereClicked( bool clickValid, double x, double y );
 
-    Wt::Signal<bool,double,double>& sphereClickedSignal() { return sphereClickedSignal_; }
+    void onOrbitsIntegrateSignal( int dir, double x0, double y0 );
+
+    Wt::Signal<bool,double,double>& sphereClickedSignal()
+    {
+        return sphereClickedSignal_;
+    }
 
 private:
+    bool orbitStarted_;
     int projection_;
     double viewMinX_;
     double viewMaxX_;

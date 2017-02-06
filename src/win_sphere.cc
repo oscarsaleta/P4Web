@@ -299,9 +299,7 @@ bool WWinSphere::setupPlot( void )
 
 void WWinSphere::paintEvent( WPaintDevice * p )
 {
-    globalLogger__.debug("Projection is "+std::to_string(study_->config_projection));
     if (!setupPlot()) {
-        // TODO: enviar senyal des d'aquí per imprimir error a output
         errorSignal_.emit("Error while reading Maple results, evaluate the vector field first. If you did, probably the execution ran out of time.");
         return;
     }
@@ -319,11 +317,11 @@ void WWinSphere::paintEvent( WPaintDevice * p )
             plotLineAtInfinity(); //not used
     }
     //plotGcf();
-    //drawOrbits(this);
+    drawOrbits();
     //drawLimitCycles(this);
-    //plotSeparatrices();
-    for (int cnt=0;cnt<10;cnt++)
-        plot_all_sep(this);
+    plotSeparatrices();
+    /*for (int cnt=0;cnt<10;cnt++)
+        plot_all_sep(this);*/
     plotPoints();
     
 }
@@ -1184,12 +1182,16 @@ void WWinSphere::drawPoint( double x, double y, int color )
         _x=coWinX(x);
         _y=coWinY(y);
 
-        if( paintedXMin > _x ) paintedXMin = _x;
-        if( paintedXMax < _x ) paintedXMax = _x;
-        if( paintedYMin > _y ) paintedYMin = _y;
-        if( paintedYMax < _y ) paintedYMax = _y;
+        if( paintedXMin > _x )
+            paintedXMin = _x;
+        if( paintedXMax < _x )
+            paintedXMax = _x;
+        if( paintedYMin > _y )
+            paintedYMin = _y;
+        if( paintedYMax < _y )
+            paintedYMax = _y;
 
-        staticPainter->drawPoint( _x, _y );
+        staticPainter->drawPoint( (double)_x, (double)_y );
     }
 }
 

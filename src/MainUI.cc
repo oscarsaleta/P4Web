@@ -127,11 +127,12 @@ void MainUI::setupUI()
     globalLogger__.debug("MainUI :: HomeRight created");
     t->bindWidget("right",rightContainer_);
 
-    // connect signals sent from left to actions performed by right
+    // connect signals sent from left to actions performed by right (and vice versa)
     leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
     leftContainer_->onPlotSphereSignal().connect(rightContainer_,&HomeRight::onSpherePlot);
     leftContainer_->onPlotPlaneSignal().connect(rightContainer_,&HomeRight::onPlanePlot);
+    leftContainer_->orbitIntegrateSignal().connect(rightContainer_,&HomeRight::onOrbitsIntegrateSignal);
     rightContainer_->sphereClickedSignal().connect(leftContainer_,&HomeLeft::showOrbitsDialog);
     globalLogger__.debug("MainUI :: signals connected");
 
