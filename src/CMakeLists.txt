@@ -7,7 +7,7 @@ file (GLOB files_src
 set (WT_PROJECT_SOURCE
   ${files_src}
   )
-link_directories(/usr/local/lib)
+link_directories(${WT_LIB_DIR})
 
 set (WT_PROJECT_TARGET WP4.wt)
 
@@ -23,4 +23,4 @@ endif()
 
 target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wtdbo wtdbosqlite3 wt)
 
-include_directories(/usr/local/include/Wt ${Boost_INCLUDE_DIR})
+include_directories(${WT_INCLUDE_DIR} ${Boost_INCLUDE_DIR})

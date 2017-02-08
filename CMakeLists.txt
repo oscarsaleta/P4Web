@@ -9,6 +9,14 @@ set (WT_CONNECTOR
     wthttp wtfcgi
     CACHE STRING "Connector used (wthttp or wtfcgi)")
 
+set (WT_LIB_DIR
+    /usr/local/lib
+    CACHE STRING "Location of Wt libs")
+
+set (WT_INCLUDE_DIR
+    /usr/local/include/Wt
+    CACHE STRING "Location of Wt headers")
+
 find_library (CONNECTOR_LIBRARY ${WT_CONNECTOR})
 
 if (NOT CONNECTOR_LIBRARY)
