@@ -62,8 +62,8 @@ using namespace Wt;
 
 HomeLeft::HomeLeft(WContainerWidget *parent) :
     WContainerWidget(parent),
-    evaluatedSignal_(this),
-    errorSignal_(this),
+    //evaluatedSignal_(this),
+    //errorSignal_(this),
     //onPlotSignal_(this),
     loggedIn_(false),
     settingsContainer_(nullptr),
@@ -228,6 +228,8 @@ void HomeLeft::setupConnectors()
 
 void HomeLeft::fileUploaded()
 {
+    globalLogger__.debug("HomeLeft :: file uploaded, proceeding to read...");
+
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
     // input validation
@@ -244,6 +246,8 @@ void HomeLeft::fileUploaded()
 
     if (loggedIn_)
         tabs_->setCurrentWidget(settingsContainer_);
+
+    globalLogger__.debug("HomeLeft :: file read correctly.");
     
 }
 
@@ -481,14 +485,24 @@ void HomeLeft::evaluate()
 
     prepareMapleFile();
 
+    /*std::string command = "batch <<< '"+std::string(MAPLE_PATH)+" -T ,1048576 "+fileUploadName_+".mpl > "+fileUploadName_+".res'";
+    int status = system(command.c_str());
+    if (status == 0) {
+        evaluatedSignal_.emit(fileUploadName_);
+        globalLogger__.info("HomeLeft :: Maple script successfully executed");
+    } else {
+        errorSignal_.emit("Error during Maple script execution");
+        globalLogger__.error("HomeLeft :: Maple error: "+std::to_string(status));
+    }*/
+
     pid_t pid = fork();
     if (pid < 0) {
-        errorSignal_.emit("Fork error");
+        errorSignal_.emit("Error creating Maple thread");
         globalLogger__.error("HomeLeft :: error during Maple script execution");
     } else if (pid == 0) {
         // create vector of arguments for execvp
         std::vector<char *> commands;
-        commands.push_back("maple");
+        commands.push_back(MAPLE_PATH);
         commands.push_back("-T ,1048576"); // 1GB memory limit
         char *aux = new char [fileUploadName_.length()+1];
         std::strcpy(aux,fileUploadName_.c_str());
@@ -513,6 +527,7 @@ void HomeLeft::evaluate()
         }
     }
 }
+
 
 
 void HomeLeft::prepareSaveFile()

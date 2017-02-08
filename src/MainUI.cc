@@ -34,7 +34,7 @@
 #include <Wt/WMenu>
 #include <Wt/WMenuItem>
 #include <Wt/WMessageBox>
-#include <Wt/WNavigationBar>
+//#include <Wt/WNavigationBar>
 #include <Wt/WPopupMenu>
 #include <Wt/WStackedWidget>
 #include <Wt/WString>
@@ -158,12 +158,13 @@ void MainUI::handlePathChange()
 {
     WApplication *app = WApplication::instance();
 
-    if (app->internalPath() == "/login")
+    if (app->internalPath() == "/login") {
+        globalLogger__.debug("MainUI :: handle internal path change /login");
         if (session_.login().loggedIn()) {
             session_.login().logout();
         } else
             mainStack_->setCurrentWidget(authWidget_);
-    else {
+    } else {
         mainStack_->setCurrentWidget(pageContainer_);
         globalLogger__.debug("MainUI :: setting main page as current view");
     }

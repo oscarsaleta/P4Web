@@ -13,6 +13,8 @@ set (WT_PROJECT_TARGET WP4.wt)
 
 add_executable(${WT_PROJECT_TARGET} ${WT_PROJECT_SOURCE})
 
+#target_compile_features (${WT_PROJECT_TARGET} PRIVATE cxx_nullptr)
+
 target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wtdbo wtdbosqlite3 wt)
 
 include_directories(/usr/local/include/Wt ${Boost_INCLUDE_DIR})
