@@ -1,4 +1,4 @@
-find_package ( Boost 1.40 COMPONENTS system REQUIRED )
+find_package ( Boost 1.40 COMPONENTS system signals REQUIRED )
 
 file (GLOB files_src
   "*.h"
@@ -7,12 +7,20 @@ file (GLOB files_src
 set (WT_PROJECT_SOURCE
   ${files_src}
   )
-link_directories(/usr/local/lib)
+link_directories(${WT_LIB_DIR})
 
 set (WT_PROJECT_TARGET WP4.wt)
 
 add_executable(${WT_PROJECT_TARGET} ${WT_PROJECT_SOURCE})
 
-target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wtdbo wtdbosqlite3 wt)
+if (${CMAKE_MAJOR_VERSION} EQUAL 3)
+    message (STATUS "CMake version >= 3.0 detected")
+    target_compile_features (${WT_PROJECT_TARGET} PRIVATE cxx_nullptr)
+else()
+    message (STATUS "CMake version < 3.0 detected")
+    set (CMAKE_CXX_FLAGS "-std=c++11")
+endif()
 
-include_directories(/usr/local/include/Wt ${Boost_INCLUDE_DIR})
+target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wtdbo wtdbosqlite3 wt ${Boost_LIBRARIES})
+
+include_directories(${WT_INCLUDE_DIR} ${Boost_INCLUDE_DIR})

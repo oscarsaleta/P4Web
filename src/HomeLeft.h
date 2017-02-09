@@ -22,6 +22,8 @@
 #ifndef HOMELEFT_H
 #define HOMELEFT_H
 
+#define MAPLE_PATH "/home/osr/maple2015/bin/maple"
+
 #define ACCURACY_DEFAULT 8
 #define PRECISION_DEFAULT 0
 #define EPSILON_DEFAULT 0.01
