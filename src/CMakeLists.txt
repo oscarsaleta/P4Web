@@ -12,6 +12,7 @@ set (WT_PROJECT_TARGET WP4.wt)
 add_executable(${WT_PROJECT_TARGET} ${WT_PROJECT_SOURCE})
 
 if (${COMPILED_ANTZ})
+    message (STATUS "Compiling for antz: adding ssh call to Maple execution")
     add_definitions(-DANTZ)
 endif()
 

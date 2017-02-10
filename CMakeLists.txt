@@ -25,7 +25,7 @@ find_library (CONNECTOR_LIBRARY ${WT_CONNECTOR})
 if (NOT CONNECTOR_LIBRARY)
     message (FATAL_ERROR "-- ${WT_CONNECTOR} library not found")
 else ()
-    message ("-- Found library ${WT_CONNECTOR}")
+    message (STATUS "Found library ${WT_CONNECTOR}")
 endif ()
 
 add_subdirectory (src)
