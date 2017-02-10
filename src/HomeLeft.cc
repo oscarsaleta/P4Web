@@ -515,8 +515,10 @@ void HomeLeft::evaluate()
     } else if (pid == 0) {
         // create vector of arguments for execvp
         std::vector<char *> commands;
+#ifdef ANTZ
         commands.push_back("ssh");
         commands.push_back("a01");
+#endif
         commands.push_back(MAPLE_PATH);
         commands.push_back("-T ,1048576"); // 1GB memory limit
         char *aux = new char [fileUploadName_.length()+1];
