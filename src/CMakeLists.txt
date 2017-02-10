@@ -1,4 +1,4 @@
-find_package ( Boost 1.40 COMPONENTS system signals REQUIRED )
+find_package ( Boost 1.40 COMPONENTS system signals filesystem REQUIRED )
 
 file (GLOB files_src
   "*.h"

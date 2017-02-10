@@ -25,6 +25,7 @@
 #include "custom.h"
 #include "MyLogger.h"
 
+#include <boost/filesystem.hpp>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -80,7 +81,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     // set up maple parameters that will not change
     str_bindir = "/usr/local/p4/bin/";
     str_p4m = str_bindir+"p4.m";
-    str_tmpdir = "/tmp/";
+    str_tmpdir = "/home/osr/tmp/wp4/";
     str_lypexe = "lyapunov";
     str_sepexe = "separatrice";
     str_exeprefix = "";
@@ -241,6 +242,14 @@ void HomeLeft::fileUploaded()
     }
 
     fileUploadName_ = fileUploadWidget_->spoolFileName();
+    // copy file to home tmp dir
+    try {
+        boost::filesystem::copy_file( fileUploadName_, "/home/osr/tmp/wp4/"+fileUploadName_.substr(5));
+        fileUploadName_ = "/home/osr/tmp/wp4/"+fileUploadName_.substr(5);
+    } catch (const boost::filesystem::filesystem_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return;
+    }
 
     evaluated_ = false;
 
@@ -413,7 +422,7 @@ void HomeLeft::prepareMapleFile()
     std::ofstream mplFile;
 
     if (fileUploadName_.empty())
-        fileUploadName_ = openTempStream("/tmp",".mpl"/*,mplFile*/);
+        fileUploadName_ = openTempStream("/home/osr/tmp/wp4/",".mpl"/*,mplFile*/);
 
     mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc|std::fstream::out);
 
@@ -506,6 +515,8 @@ void HomeLeft::evaluate()
     } else if (pid == 0) {
         // create vector of arguments for execvp
         std::vector<char *> commands;
+        //commands.push_back("ssh");
+        //commands.push_back("a01");
         commands.push_back(MAPLE_PATH);
         commands.push_back("-T ,1048576"); // 1GB memory limit
         char *aux = new char [fileUploadName_.length()+1];
@@ -546,7 +557,7 @@ void HomeLeft::prepareSaveFile()
 
     if (fileUploadName_.empty()) {
         if (saveFileName_.empty()) {
-            saveFileName_ = openTempStream("/tmp",".txt"/*,saveFile*/);
+            saveFileName_ = openTempStream("/home/osr/tmp/wp4/",".txt"/*,saveFile*/);
             saveFileName_ += ".txt";
         }
     } else
@@ -935,7 +946,7 @@ void HomeLeft::onOrbitsForwardsBtn()
     orbitsForwardsBtn_->disable();
 
     globalLogger__.debug("x0="+orbitsXLineEdit_->text().toUTF8());
-    orbitIntegrateSignal_.emit(1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
+    //orbitIntegrateSignal_.emit(1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
 }
 
 void HomeLeft::onOrbitsBackwardsBtn()
@@ -951,22 +962,22 @@ void HomeLeft::onOrbitsBackwardsBtn()
     orbitsDeleteAllBtn_->enable();
     orbitsBackwardsBtn_->disable();
 
-    orbitIntegrateSignal_.emit(-1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
+    //orbitIntegrateSignal_.emit(-1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
 }
 
 void HomeLeft::onOrbitsContinueBtn()
 {
     if (orbitsStartSelected_ /*&& orbitIntegrationStarted_*/) {
-        orbitIntegrateSignal_.emit(0,0.0,0.0);
+        //orbitIntegrateSignal_.emit(0,0.0,0.0);
     }
 }
 
 void HomeLeft::onOrbitsDeleteOneBtn()
 {
-    orbitDeleteSignal_.emit(1);
+    //orbitDeleteSignal_.emit(1);
 }
 
 void HomeLeft::onOrbitsDeleteAllBtn()
 {
-    orbitDeleteSignal_.emit(0);
+    //orbitDeleteSignal_.emit(0);
 }
