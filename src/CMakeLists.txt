@@ -1,4 +1,4 @@
-find_package ( Boost 1.40 COMPONENTS system signals filesystem REQUIRED )
+#find_package ( Boost 1.40 COMPONENTS system signals filesystem REQUIRED )
 
 file (GLOB files_src
   "*.h"
@@ -26,4 +26,4 @@ endif()
 
 target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wtdbo wtdbosqlite3 wt ${Boost_LIBRARIES})
 
-include_directories(${WT_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+include_directories(${WT_INCLUDE_DIR})
