@@ -20,6 +20,9 @@ else()
     message (STATUS "CMake version < 3.0 detected")
     set (CMAKE_CXX_FLAGS "-std=c++11")
 endif()
+if (NOT BOOST_USE_CXX11)
+    add_definitions("-DBOOST_NO_CXX11_SCOPED_ENUMS")
+endif()
 
 target_link_libraries(${WT_PROJECT_TARGET} ${Boost_LIBRARIES} ${WT_CONNECTOR} wtdbo wtdbosqlite3 wt ${Boost_LIBRARIES})
 
