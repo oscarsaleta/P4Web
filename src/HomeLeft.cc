@@ -62,12 +62,12 @@ using namespace Wt;
 
 HomeLeft::HomeLeft(WContainerWidget *parent) :
     WContainerWidget(parent),
-    //evaluatedSignal_(this),
-    //errorSignal_(this),
-    //onPlotSignal_(this),
     loggedIn_(false),
     settingsContainer_(nullptr),
-    viewContainer_(nullptr)
+    viewContainer_(nullptr),
+    orbitsContainer_(nullptr),
+    orbitsStartSelected_(false),
+    evaluated_(false)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
@@ -241,6 +241,8 @@ void HomeLeft::fileUploaded()
     }
 
     fileUploadName_ = fileUploadWidget_->spoolFileName();
+
+    evaluated_ = false;
 
     parseInputFile();
 
@@ -481,7 +483,9 @@ void HomeLeft::evaluate()
         return;
     }
 
-    errorSignal_.emit("Evaluating vector field...");
+    //errorSignal_.emit("Evaluating vector field...");
+
+    evaluated_ = true;
 
     prepareMapleFile();
 
@@ -588,7 +592,7 @@ void HomeLeft::prepareSaveFile()
 
 void HomeLeft::onPlot()
 {
-    if ( fileUploadName_.empty() ) {
+    if ( !evaluated_ ) {
         errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
     } else {
         globalLogger__.debug("HomeLeft :: sending onPlot signal");
@@ -730,6 +734,23 @@ void HomeLeft::showSettings()
     PLWeightQSpinBox_->setValue(1);
     t->bindWidget("q",PLWeightQSpinBox_);
 
+    // enable separatrice test parameters only if separatrice testing is on Yes
+    levAppSpinBox_->disable();
+    numericLevelSpinBox_->disable();
+    maxLevelSpinBox_->disable();
+    separatricesBtnGroup_->checkedChanged().connect(std::bind([=] () {
+        if (separatricesBtnGroup_->checkedId()==No) {
+            levAppSpinBox_->disable();
+            numericLevelSpinBox_->disable();
+            maxLevelSpinBox_->disable();
+        } else {
+            levAppSpinBox_->enable();
+            numericLevelSpinBox_->enable();
+            maxLevelSpinBox_->enable();
+        }
+    }));
+
+
 
     /* view settings */
     viewContainer_ = new WContainerWidget(this);
@@ -784,23 +805,7 @@ void HomeLeft::showSettings()
     t->bindString("maxy-tooltip",WString::tr("tooltip.view-maxy"));
     t->bindWidget("maxy",viewMaxY_);
 
-
-    // enable separatrice test parameters only if separatrice testing is on Yes
-    levAppSpinBox_->disable();
-    numericLevelSpinBox_->disable();
-    maxLevelSpinBox_->disable();
-    separatricesBtnGroup_->checkedChanged().connect(std::bind([=] () {
-        if (separatricesBtnGroup_->checkedId()==No) {
-            levAppSpinBox_->disable();
-            numericLevelSpinBox_->disable();
-            maxLevelSpinBox_->disable();
-        } else {
-            levAppSpinBox_->enable();
-            numericLevelSpinBox_->enable();
-            maxLevelSpinBox_->enable();
-        }
-    }));
-
+    // enable view range boxes only if sphere is not selected
     viewComboBox_->changed().connect(std::bind([=] () {
         switch(viewComboBox_->currentIndex()) {
         case 0:
@@ -809,8 +814,6 @@ void HomeLeft::showSettings()
             viewMinY_->disable();
             viewMaxX_->disable();
             viewMaxY_->disable();
-            //PLWeightPSpinBox_->enable();
-            //PLWeightQSpinBox_->enable();
             break;
         case 1:
         case 2:
@@ -822,11 +825,50 @@ void HomeLeft::showSettings()
             viewMinY_->enable();
             viewMaxX_->enable();
             viewMaxY_->enable();
-            //PLWeightPSpinBox_->disable();
-            //PLWeightQSpinBox_->disable();
             break;
         }
     }));
+
+
+
+    // orbits integration
+    orbitsContainer_ = new WContainerWidget(this);
+    orbitsContainer_->setId("orbitsContainer_");
+    tabs_->addTab(orbitsContainer_,"Orbit integration");
+
+    t = new WTemplate(WString::tr("template.orbits-dialog"),orbitsContainer_);
+    t->addFunction("id",WTemplate::Functions::id);
+
+    orbitsXLineEdit_ = new WLineEdit(orbitsContainer_);
+    t->bindWidget("x",orbitsXLineEdit_);
+    t->bindString("point-label",WString::tr("tooltip.orbits-selected-point"));
+    orbitsYLineEdit_ = new WLineEdit(orbitsContainer_);
+    t->bindWidget("y",orbitsYLineEdit_);
+
+    orbitsForwardsBtn_ = new WPushButton("Forwards",orbitsContainer_);
+    orbitsContinueBtn_ = new WPushButton("Continue",orbitsContainer_);
+    orbitsContinueBtn_->disable();
+    orbitsBackwardsBtn_ = new WPushButton("Backwards",orbitsContainer_);
+    t->bindWidget("fw",orbitsForwardsBtn_);
+    t->bindWidget("cnt",orbitsContinueBtn_);
+    t->bindWidget("bw",orbitsBackwardsBtn_);
+
+    orbitsDeleteOneBtn_ = new WPushButton("Delete last orbit",orbitsContainer_);
+    orbitsDeleteOneBtn_->setStyleClass("btn btn-warning");
+    orbitsDeleteOneBtn_->disable();
+    orbitsDeleteAllBtn_ = new WPushButton("Delete all orbits",orbitsContainer_);
+    orbitsDeleteAllBtn_->setStyleClass("btn btn-danger");
+    orbitsDeleteAllBtn_->disable();
+    t->bindWidget("dl",orbitsDeleteOneBtn_);
+    t->bindWidget("da",orbitsDeleteAllBtn_);
+
+    // enable delete orbits and continue if integrate button has been pressed
+    orbitsForwardsBtn_->clicked().connect(this,&HomeLeft::onOrbitsForwardsBtn);
+    orbitsBackwardsBtn_->clicked().connect(this,&HomeLeft::onOrbitsBackwardsBtn);
+    orbitsContinueBtn_->clicked().connect(this,&HomeLeft::onOrbitsContinueBtn);
+    orbitsDeleteOneBtn_->clicked().connect(this,&HomeLeft::onOrbitsDeleteOneBtn);
+    orbitsDeleteAllBtn_->clicked().connect(this,&HomeLeft::onOrbitsDeleteAllBtn);
+
 
     tabs_->setCurrentWidget(settingsContainer_);
 
@@ -835,15 +877,20 @@ void HomeLeft::showSettings()
 void HomeLeft::hideSettings()
 {
     loggedIn_ = false;
+    if (settingsContainer_ != nullptr) {
+        tabs_->removeTab(settingsContainer_);
+        delete settingsContainer_;
+        settingsContainer_ = nullptr;
+    }
     if (viewContainer_ != nullptr) {
-        tabs_->closeTab(tabs_->indexOf(viewContainer_));
+        tabs_->removeTab(viewContainer_);
         delete viewContainer_;
         viewContainer_ = nullptr;
     }
-    if (settingsContainer_ != nullptr) {      
-        tabs_->closeTab(tabs_->indexOf(settingsContainer_));  
-        delete settingsContainer_;
-        settingsContainer_ = nullptr;
+    if (orbitsContainer_ != nullptr) {
+        tabs_->removeTab(orbitsContainer_);
+        delete orbitsContainer_;
+        orbitsContainer_ = nullptr;
     }
 }
 
@@ -855,4 +902,71 @@ void HomeLeft::resetUI()
         hideSettings();
         showSettings();
     }
+}
+
+void HomeLeft::showOrbitsDialog( bool clickValid, double x, double y )
+{
+    if (!loggedIn_)
+        return;
+
+    tabs_->setCurrentWidget(orbitsContainer_);
+
+    if (clickValid) {
+        orbitsXLineEdit_->setText(std::to_string(x));
+        orbitsYLineEdit_->setText(std::to_string(y));
+        orbitsForwardsBtn_->enable();
+        orbitsBackwardsBtn_->enable();
+        orbitsContinueBtn_->disable();
+    }
+
+}
+
+void HomeLeft::onOrbitsForwardsBtn()
+{
+    if (!evaluated_ || orbitsXLineEdit_->text().empty() || orbitsYLineEdit_->text().empty())
+        return;
+    
+    orbitsStartSelected_ = true;
+    //if (orbitIntegrationStarted_)
+
+    orbitsContinueBtn_->enable();
+    orbitsDeleteOneBtn_->enable();
+    orbitsDeleteAllBtn_->enable();
+    orbitsForwardsBtn_->disable();
+
+    globalLogger__.debug("x0="+orbitsXLineEdit_->text().toUTF8());
+    orbitIntegrateSignal_.emit(1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
+}
+
+void HomeLeft::onOrbitsBackwardsBtn()
+{
+    if (!evaluated_ || orbitsXLineEdit_->text().empty() || orbitsYLineEdit_->text().empty())
+        return;
+    
+    orbitsStartSelected_ = true;
+    //if (orbitIntegrationStarted_)
+
+    orbitsContinueBtn_->enable();
+    orbitsDeleteOneBtn_->enable();
+    orbitsDeleteAllBtn_->enable();
+    orbitsBackwardsBtn_->disable();
+
+    orbitIntegrateSignal_.emit(-1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
+}
+
+void HomeLeft::onOrbitsContinueBtn()
+{
+    if (orbitsStartSelected_ /*&& orbitIntegrationStarted_*/) {
+        orbitIntegrateSignal_.emit(0,0.0,0.0);
+    }
+}
+
+void HomeLeft::onOrbitsDeleteOneBtn()
+{
+    orbitDeleteSignal_.emit(1);
+}
+
+void HomeLeft::onOrbitsDeleteAllBtn()
+{
+    orbitDeleteSignal_.emit(0);
 }

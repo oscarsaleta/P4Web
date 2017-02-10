@@ -40,7 +40,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "math_orbits.h"
+#include "win_sphere.h"
+#include "file_tab.h"
+//#include "math_orbits.h"
 
 #include "custom.h"
 #include "math_p4.h"
@@ -48,7 +50,6 @@
 //#include "math_numerics.h"
 #include "math_polynom.h"
 #include "plot_tools.h"
-#include "win_sphere.h"
 
 #include <cmath>
 
@@ -59,7 +60,7 @@
 //
 // dir = -1: backwards, dir=0: continue, dir=+1: forwards
 
-void integrateOrbit( WWinSphere * sphere, int dir )
+void WWinSphere::integrateOrbit( int dir )
 {
     struct orbits_points *sep;
     double pcoord[3],ucoord[2];
@@ -67,37 +68,36 @@ void integrateOrbit( WWinSphere * sphere, int dir )
     if ( dir == 0 ) {
         // continue orbit button has been pressed
      
-        dir = sphere->study_->current_orbit->current_f_orbits->dir;
+        dir = study_->current_orbit->current_f_orbits->dir;
 
-        copy_x_into_y( sphere->study_->current_orbit->current_f_orbits->pcoord, pcoord );
-        sphere->study_->current_orbit->current_f_orbits->next_point =
-                    integrate_orbit( sphere, pcoord,sphere->study_->config_currentstep,dir,CORBIT, sphere->study_->config_intpoints,&sep);
+        copy_x_into_y( study_->current_orbit->current_f_orbits->pcoord, pcoord );
+        study_->current_orbit->current_f_orbits->next_point =
+                    integrate_orbit(  pcoord,study_->config_currentstep,dir,CORBIT, study_->config_intpoints,&sep);
         
-        sphere->study_->current_orbit->current_f_orbits = sep;
+        study_->current_orbit->current_f_orbits = sep;
         return;
     }
 
-    copy_x_into_y(sphere->study_->current_orbit->pcoord,pcoord);
-    ((sphere->study_)->*(sphere->study_->sphere_to_R2))(pcoord[0],pcoord[1],pcoord[2],ucoord);
-    if ( sphere->study_->config_kindvf == INTCONFIG_ORIGINAL )
-        if (eval_term2(sphere->study_->gcf,ucoord) < 0)
+    copy_x_into_y(study_->current_orbit->pcoord,pcoord);
+    ((study_)->*(study_->sphere_to_R2))(pcoord[0],pcoord[1],pcoord[2],ucoord);
+    if ( study_->config_kindvf == INTCONFIG_ORIGINAL )
+        if (eval_term2(study_->gcf,ucoord) < 0)
             dir = -dir;
 
-    if ( sphere->study_->current_orbit->f_orbits == nullptr ) {
-        sphere->study_->current_orbit->f_orbits =
-                    integrate_orbit(sphere,pcoord,sphere->study_->config_step,dir,CORBIT,sphere->study_->config_intpoints,&sep);
+    if ( study_->current_orbit->f_orbits == nullptr ) {
+        study_->current_orbit->f_orbits =
+                    integrate_orbit(pcoord,study_->config_step,dir,CORBIT,study_->config_intpoints,&sep);
     } else {
-        sphere->study_->current_orbit->current_f_orbits->next_point = new orbits_points;
-        //(struct orbits_points *) malloc(sizeof(struct orbits_points));
-        sphere->study_->current_orbit->current_f_orbits = sphere->study_->current_orbit->current_f_orbits->next_point;
-        copy_x_into_y(pcoord,sphere->study_->current_orbit->current_f_orbits->pcoord);
-        sphere->study_->current_orbit->current_f_orbits->dashes = 0;
-        sphere->study_->current_orbit->current_f_orbits->color = CORBIT;
-        sphere->study_->current_orbit->current_f_orbits->dir = dir;
-        sphere->study_->current_orbit->current_f_orbits->next_point = 
-                    integrate_orbit(sphere,pcoord,sphere->study_->config_step,dir,CORBIT,sphere->study_->config_intpoints,&sep);  
+        study_->current_orbit->current_f_orbits->next_point = new orbits_points;
+        study_->current_orbit->current_f_orbits = study_->current_orbit->current_f_orbits->next_point;
+        copy_x_into_y(pcoord,study_->current_orbit->current_f_orbits->pcoord);
+        study_->current_orbit->current_f_orbits->dashes = 0;
+        study_->current_orbit->current_f_orbits->color = CORBIT;
+        study_->current_orbit->current_f_orbits->dir = dir;
+        study_->current_orbit->current_f_orbits->next_point = 
+                    integrate_orbit(pcoord,study_->config_step,dir,CORBIT,study_->config_intpoints,&sep);  
     }
-    sphere->study_->current_orbit->current_f_orbits=sep;
+    study_->current_orbit->current_f_orbits=sep;
 }
 
 //// -----------------------------------------------------------------------
@@ -105,30 +105,30 @@ void integrateOrbit( WWinSphere * sphere, int dir )
 //// -----------------------------------------------------------------------
 ///* R=0 then point selected in the drawing canvas else in the orbit window */
 
-bool startOrbit( WWinSphere * sphere, double x, double y, bool R )
+bool WWinSphere::startOrbit( double x, double y, bool R )
 {
     double pcoord[3];
     double ucoord[2];
 
-    if ( sphere->study_->first_orbit == nullptr ) {
-        sphere->study_->first_orbit = new orbits;//(struct orbits *)malloc( sizeof(struct orbits) );
-        sphere->study_->current_orbit = sphere->study_->first_orbit;
+    if ( study_->first_orbit == nullptr ) {
+        study_->first_orbit = new orbits;//(struct orbits *)malloc( sizeof(struct orbits) );
+        study_->current_orbit = study_->first_orbit;
     } else {
-        sphere->study_->current_orbit->next_orbit = new orbits;//(struct orbits *)malloc( sizeof(struct orbits) );
-        sphere->study_->current_orbit = sphere->study_->current_orbit->next_orbit;
+        study_->current_orbit->next_orbit = new orbits;//(struct orbits *)malloc( sizeof(struct orbits) );
+        study_->current_orbit = study_->current_orbit->next_orbit;
     }
     if ( R )
-        ((sphere->study_)->*(sphere->study_->R2_to_sphere))(x,y,pcoord);
+        (study_->*(study_->R2_to_sphere))(x,y,pcoord);
     else
-        ((sphere->study_)->*(sphere->study_->viewcoord_to_sphere))(x,y,pcoord); 
+        (study_->*(study_->viewcoord_to_sphere))(x,y,pcoord); 
 
-    copy_x_into_y( pcoord, sphere->study_->current_orbit->pcoord );
-    sphere->study_->current_orbit->color = CORBIT;
-    sphere->study_->current_orbit->f_orbits = nullptr;
-    sphere->study_->current_orbit->next_orbit = nullptr;
+    copy_x_into_y( pcoord, study_->current_orbit->pcoord );
+    study_->current_orbit->color = CORBIT;
+    study_->current_orbit->f_orbits = nullptr;
+    study_->current_orbit->next_orbit = nullptr;
 
-    ((sphere->study_)->*(sphere->study_->sphere_to_viewcoord))( pcoord[0], pcoord[1], pcoord[2], ucoord );
-    sphere->drawPoint( ucoord[0], ucoord[1], CORBIT );
+    (study_->*(study_->sphere_to_viewcoord))( pcoord[0], pcoord[1], pcoord[2], ucoord );
+    drawPoint( ucoord[0], ucoord[1], CORBIT );
 
     return true;
 }
@@ -137,18 +137,18 @@ bool startOrbit( WWinSphere * sphere, double x, double y, bool R )
 ////                      DRAWORBIT
 //// -----------------------------------------------------------------------
 
-void drawOrbit( WWinSphere * sphere, double * pcoord, struct orbits_points * points, int color )
+void WWinSphere::drawOrbit( double * pcoord, struct orbits_points * points, int color )
 {
     double pcoord1[3];
 
     copy_x_into_y( pcoord, pcoord1 );
-    (*plot_p)( sphere, pcoord, color );
+    (*plot_p)( this, pcoord, color );
     
     while ( points!=nullptr ) {
         if (points->dashes) {
-            (*plot_l)(sphere, pcoord1,points->pcoord,color);
+            (*plot_l)(this, pcoord1,points->pcoord,color);
         } else {
-            (*plot_p)(sphere, points->pcoord,color);
+            (*plot_p)(this, points->pcoord,color);
         }
 
         copy_x_into_y(points->pcoord,pcoord1);
@@ -161,12 +161,12 @@ void drawOrbit( WWinSphere * sphere, double * pcoord, struct orbits_points * poi
 ////                      DRAWORBITS
 //// -----------------------------------------------------------------------
 
-void drawOrbits( WWinSphere * sphere )
+void WWinSphere::drawOrbits()
 {
     struct orbits * orbit;
 
-    for ( orbit = sphere->study_->first_orbit; orbit != nullptr; orbit = orbit->next_orbit ) {
-        drawOrbit( sphere, orbit->pcoord, orbit->f_orbits, orbit->color );
+    for ( orbit = study_->first_orbit; orbit != nullptr; orbit = orbit->next_orbit ) {
+        drawOrbit( orbit->pcoord, orbit->f_orbits, orbit->color );
     }
 }
 
@@ -174,30 +174,30 @@ void drawOrbits( WWinSphere * sphere )
 ////                      DELETELASTORBIT
 //// -----------------------------------------------------------------------
 
-void deleteLastOrbit( WWinSphere * sphere )
+void WWinSphere::deleteLastOrbit()
 {
     struct orbits *orbit1,*orbit2;
 
-    if ( sphere->study_->current_orbit == nullptr )
+    if ( study_->current_orbit == nullptr )
         return;
 
-    orbit2 = sphere->study_->current_orbit;
-    drawOrbit( sphere, orbit2->pcoord, orbit2->f_orbits, sphere->spherebgcolor );
+    orbit2 = study_->current_orbit;
+    drawOrbit( orbit2->pcoord, orbit2->f_orbits, spherebgcolor );
 
-    if ( sphere->study_->first_orbit == sphere->study_->current_orbit ) {
-        sphere->study_->first_orbit = nullptr;
-        sphere->study_->current_orbit = nullptr;
+    if ( study_->first_orbit == study_->current_orbit ) {
+        study_->first_orbit = nullptr;
+        study_->current_orbit = nullptr;
     } else {
-        orbit1 = sphere->study_->first_orbit;
+        orbit1 = study_->first_orbit;
     
         do {
-            sphere->study_->current_orbit = orbit1;
+            study_->current_orbit = orbit1;
             orbit1 = orbit1->next_orbit;
         } while( orbit1 != orbit2 );
         
-        sphere->study_->current_orbit->next_orbit = nullptr;
+        study_->current_orbit->next_orbit = nullptr;
     }
-    sphere->study_->deleteOrbitPoint( orbit2->f_orbits );
+    study_->deleteOrbitPoint( orbit2->f_orbits );
     delete orbit2;
     orbit2 = nullptr;
 }
@@ -296,7 +296,7 @@ void WVFStudy::integrate_lyapunov_orbit( double p0, double p1, double p2, double
     } 
 }
 
-struct orbits_points * integrate_orbit(WWinSphere * sphere, double pcoord[3],double step,int dir,int color,
+orbits_points * WWinSphere::integrate_orbit( double pcoord[3],double step,int dir,int color,
     int points_to_int,struct orbits_points **orbit)
 {
     int i,d,h;
@@ -306,15 +306,15 @@ struct orbits_points * integrate_orbit(WWinSphere * sphere, double pcoord[3],dou
     struct orbits_points *first_orbit=nullptr,*last_orbit=nullptr;
 
     hhi=(double)dir*step;
-    h_min=sphere->study_->config_hmi;
-    h_max=sphere->study_->config_hma;
+    h_min=study_->config_hmi;
+    h_max=study_->config_hma;
     copy_x_into_y(pcoord,pcoord2);
     for (i=1;i<=points_to_int;++i) {
-        ((sphere->study_)->*(sphere->study_->integrate_sphere_orbit))
+        ((study_)->*(study_->integrate_sphere_orbit))
             (pcoord[0],pcoord[1],pcoord[2],pcoord,&hhi,&dashes,&d,h_min,h_max);     
          
         if ( (i % UPDATEFREQ_STEPSIZE) == 0 )
-            sphere->study_->set_current_step(fabs(hhi));
+            study_->set_current_step(fabs(hhi));
 
         if (last_orbit==nullptr) {
             first_orbit = new orbits_points;
@@ -328,16 +328,16 @@ struct orbits_points * integrate_orbit(WWinSphere * sphere, double pcoord[3],dou
   
         copy_x_into_y(pcoord,last_orbit->pcoord);
         last_orbit->color=color;
-        last_orbit->dashes=dashes * sphere->study_->config_dashes;
+        last_orbit->dashes=dashes * study_->config_dashes;
         last_orbit->dir=d*h;
         last_orbit->next_point=nullptr;
-        if (dashes * sphere->study_->config_dashes)
-            (*plot_l)(sphere,pcoord,pcoord2,color);
+        if (dashes * study_->config_dashes)
+            (*plot_l)(this,pcoord,pcoord2,color);
         else
-            (*plot_p)(sphere,pcoord,color);
+            (*plot_p)(this,pcoord,color);
         copy_x_into_y(pcoord,pcoord2); 
     }
-    sphere->study_->set_current_step(fabs(hhi));
+    study_->set_current_step(fabs(hhi));
     *orbit=last_orbit;
-    return(first_orbit);   
+    return(first_orbit);
 }

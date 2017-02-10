@@ -23,6 +23,7 @@
 #include "file_tab.h"
 #include "MyLogger.h"
 #include "win_sphere.h"
+//#include "math_orbits.h"
 
 #include <iostream>
 #include <fstream>
@@ -43,7 +44,8 @@ using namespace Wt;
 HomeRight::HomeRight(WContainerWidget *parent) :
     WContainerWidget(parent),
     plotCaption_(nullptr),
-    sphere_(nullptr)
+    sphere_(nullptr),
+    orbitStarted_(false)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
@@ -289,24 +291,37 @@ void HomeRight::setupSphereAndPlot()
     plotCaption_->setId("plotCaption_");
     plotContainer_->addWidget(plotCaption_);
 
-    sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
+    sphere_->hoverSignal().connect(this,&HomeRight::mouseMovedEvent);
     sphere_->errorSignal().connect(this,&HomeRight::printError);
-    //shpere_->clicked().connect(this,&HomeRight::sphereClicked)
+    sphere_->clickedSignal().connect(this,&HomeRight::sphereClicked);
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
     globalLogger__.debug("HomeRight :: reacted to onPlot signal");
 }
 
-void HomeRight::mouseMovedEvent( WMouseEvent e )
+void HomeRight::mouseMovedEvent( WString caption )
 {
-    plotCaption_->setText(sphere_->plotCaption_);
+    plotCaption_->setText(caption);
 }
 
-/*void HomeRight::sphereClicked( WMouseEvent e )
+void HomeRight::sphereClicked( bool clickValid, double x, double y )
 {
-    sphereClickedSignal_.emit(e);
-}*/
+    sphereClickedSignal_.emit(clickValid,x,y);
+}
+
+void HomeRight::onOrbitsIntegrateSignal( int dir, double x0, double y0 )
+{
+    switch (dir) {
+    case 1:
+    case -1:
+        orbitStarted_ = sphere_->startOrbit(x0,y0,true);
+    case 0:
+        if (orbitStarted_)
+            sphere_->integrateOrbit(dir);
+        break;
+    }
+}
 
 /*void HomeRight::clearPlot()
 {
