@@ -518,13 +518,17 @@ void HomeLeft::evaluate()
 #ifdef ANTZ
         commands.push_back("ssh");
         commands.push_back("a01");
+        commands.push_back("-i")
+        commands.push_back("/var/www/claus_ssh/idrsa-1");
 #endif
+        commands.push_back("'");
         commands.push_back(MAPLE_PATH);
         commands.push_back("-T ,1048576"); // 1GB memory limit
         char *aux = new char [fileUploadName_.length()+1];
         std::strcpy(aux,fileUploadName_.c_str());
         std::strcat(aux,".mpl");
         commands.push_back(aux);
+        commands.push_back("'");
         commands.push_back(nullptr);
         // output from this thread goes to "fileUploadName_.res"
         int fd = open((fileUploadName_+".res").c_str(),O_WRONLY|O_CREAT|O_TRUNC,0666);
