@@ -50,11 +50,17 @@ using namespace Wt;
 
 WApplication *createApplication(const WEnvironment &env)
 {
+    #ifdef ANTZ
+    std::cerr << "ANTZ DEFINED" << std::endl;
+    #else
+    std::cerr << "ANTZ NOT DEFINED" << std::endl;
+    #endif
     return new MyApplication(env);
 }
 
 int main (int argc, char **argv)
 {
+
     try {
         WServer server(argc, argv, WTHTTP_CONFIGURATION);
         server.addEntryPoint(Wt::Application,createApplication,std::string(),"favicon.ico");
