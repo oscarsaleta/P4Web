@@ -84,7 +84,8 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     basename_(basename),
     parentWnd(parent),
     typeOfView_(0),
-    projection_(projection)
+    projection_(projection),
+    plotPrepared_(false)
 {
     study_ = new WVFStudy(projection);
 
@@ -116,7 +117,8 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     viewMinX_(minx),
     viewMaxX_(maxx),
     viewMinY_(miny),
-    viewMaxY_(maxy)
+    viewMaxY_(maxy),
+    plotPrepared_(false)
 {
     study_ = new WVFStudy();
 
@@ -177,7 +179,9 @@ WWinSphere::~WWinSphere()
 
 bool WWinSphere::setupPlot( void )
 {
-    //if (!plotPrepared_) //TODO: we need to NOT reset study_ each time we plot
+    if (plotPrepared_)
+        return true;
+
     if (!study_->readTables(basename_)) {
         //parent()->printError("Error while reading results. Evaluate the vector field first");
         //delete this;
@@ -300,7 +304,7 @@ bool WWinSphere::setupPlot( void )
 
 void WWinSphere::paintEvent( WPaintDevice * p )
 {
-    if (!setupPlot()) {
+    if (!(plotPrepared_=setupPlot())) {
         errorSignal_.emit("Error while reading Maple results, evaluate the vector field first. If you did, probably the execution ran out of time.");
         return;
     }
@@ -320,7 +324,7 @@ void WWinSphere::paintEvent( WPaintDevice * p )
     //plotGcf();
     drawOrbits();
     //drawLimitCycles(this);
-    //plotSeparatrices();
+    plotSeparatrices();
     for (int cnt=0;cnt<10;cnt++)
         plot_all_sep(this);
     plotPoints();

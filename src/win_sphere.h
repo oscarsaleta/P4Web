@@ -416,6 +416,7 @@ private:
 
     void setChartString(int p, int q, bool isu1v1chart, bool negchart);
 
+    bool plotPrepared_;
 
 
 };
