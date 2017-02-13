@@ -247,16 +247,16 @@ void HomeLeft::fileUploaded()
     globalLogger__.debug("(ANTZ) :: copying uploaded file to "+std::string(TMP_DIR));
     // copy file to home tmp dir
     
-    std::string command = "cp "+fileUploadName_+" "+TMP_DIR+fileUploadName_.substr(5);
+    /*std::string command = "cp "+fileUploadName_+" "+TMP_DIR+fileUploadName_.substr(5);
     system(command.c_str());
-    fileUploadName_ = TMP_DIR+fileUploadName_.substr(5);
-    /*try {
+    fileUploadName_ = TMP_DIR+fileUploadName_.substr(5);*/
+    try {
         boost::filesystem::copy_file(fileUploadName_, TMP_DIR+fileUploadName_.substr(5));
         fileUploadName_ = TMP_DIR+fileUploadName_.substr(5);
     } catch (const boost::filesystem::filesystem_error& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return;
-    }*/
+    }
 #endif
 
     evaluated_ = false;
