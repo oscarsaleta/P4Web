@@ -244,7 +244,7 @@ void HomeLeft::fileUploaded()
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
 #ifdef ANTZ
-    globalLogger__.debug("HomeLeft :: (ANTZ) copying uploaded file to "+TMP_DIR);
+    globalLogger__.debug("HomeLeft :: (ANTZ) copying uploaded file to "+std::string(TMP_DIR));
     // copy file to home tmp dir
     try {
         boost::filesystem::copy_file(fileUploadName_, TMP_DIR+fileUploadName_.substr(5));
