@@ -312,15 +312,17 @@ void HomeRight::sphereClicked( bool clickValid, double x, double y )
 
 void HomeRight::onOrbitsIntegrateSignal( int dir, double x0, double y0 )
 {
-    switch (dir) {
-    case 1:
-    case -1:
+    if (dir==1 || dir==-1)
         orbitStarted_ = sphere_->startOrbit(x0,y0,true);
-    case 0:
-        if (orbitStarted_)
-            sphere_->integrateOrbit(dir);
-        break;
+    
+    globalLogger__.debug("HomeRight :: orbit started = "+std::to_string(orbitStarted_));
+
+    if (orbitStarted_) {
+        sphere_->integrateOrbit(dir);
+        globalLogger__.debug("HomeRight :: orbit integrated...");
+        sphere_->update();
     }
+
 }
 
 /*void HomeRight::clearPlot()

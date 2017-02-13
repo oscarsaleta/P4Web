@@ -353,7 +353,7 @@ void HomeLeft::parseInputFile()
         } else {
             //prepareSaveFile();
             errorSignal_.emit("File uploaded. Press the Evaluate button to start computing.");
-            globalLogger__.info("HomeLeft :: Input file uploaded with name "+fileUploadName_);
+            globalLogger__.debug("HomeLeft :: Input file uploaded with name "+fileUploadName_);
         }
         f.close();
     }
@@ -482,7 +482,7 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
         << "finally: closeallfiles();\n"
         << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
 
-    globalLogger__.info("HomeLeft :: filled Maple script "+fname);
+    globalLogger__.debug("HomeLeft :: filled Maple script "+fname);
 }
 
 void HomeLeft::evaluate()
@@ -947,8 +947,9 @@ void HomeLeft::onOrbitsForwardsBtn()
     orbitsDeleteAllBtn_->enable();
     orbitsForwardsBtn_->disable();
 
-    globalLogger__.debug("x0="+orbitsXLineEdit_->text().toUTF8());
-    //orbitIntegrateSignal_.emit(1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
+    globalLogger__.debug("HomeLeft :: orbit start ("+orbitsXLineEdit_->text().toUTF8()+","+
+        orbitsYLineEdit_->text().toUTF8()+")");
+    orbitIntegrateSignal_.emit(1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
 }
 
 void HomeLeft::onOrbitsBackwardsBtn()
@@ -964,13 +965,13 @@ void HomeLeft::onOrbitsBackwardsBtn()
     orbitsDeleteAllBtn_->enable();
     orbitsBackwardsBtn_->disable();
 
-    //orbitIntegrateSignal_.emit(-1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
+    orbitIntegrateSignal_.emit(-1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
 }
 
 void HomeLeft::onOrbitsContinueBtn()
 {
     if (orbitsStartSelected_ /*&& orbitIntegrationStarted_*/) {
-        //orbitIntegrateSignal_.emit(0,0.0,0.0);
+        orbitIntegrateSignal_.emit(0,0.0,0.0);
     }
 }
 

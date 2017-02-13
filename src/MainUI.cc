@@ -34,7 +34,6 @@
 #include <Wt/WMenu>
 #include <Wt/WMenuItem>
 #include <Wt/WMessageBox>
-//#include <Wt/WNavigationBar>
 #include <Wt/WPopupMenu>
 #include <Wt/WStackedWidget>
 #include <Wt/WString>

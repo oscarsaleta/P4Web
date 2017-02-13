@@ -62,7 +62,7 @@
 
 void WWinSphere::integrateOrbit( int dir )
 {
-    struct orbits_points *sep;
+    orbits_points *sep;
     double pcoord[3],ucoord[2];
 
     if ( dir == 0 ) {
@@ -72,7 +72,8 @@ void WWinSphere::integrateOrbit( int dir )
 
         copy_x_into_y( study_->current_orbit->current_f_orbits->pcoord, pcoord );
         study_->current_orbit->current_f_orbits->next_point =
-                    integrate_orbit(  pcoord,study_->config_currentstep,dir,CORBIT, study_->config_intpoints,&sep);
+            integrate_orbit(pcoord,study_->config_currentstep,
+                dir,CORBIT, study_->config_intpoints,&sep);
         
         study_->current_orbit->current_f_orbits = sep;
         return;
@@ -111,10 +112,10 @@ bool WWinSphere::startOrbit( double x, double y, bool R )
     double ucoord[2];
 
     if ( study_->first_orbit == nullptr ) {
-        study_->first_orbit = new orbits;//(struct orbits *)malloc( sizeof(struct orbits) );
+        study_->first_orbit = new orbits;
         study_->current_orbit = study_->first_orbit;
     } else {
-        study_->current_orbit->next_orbit = new orbits;//(struct orbits *)malloc( sizeof(struct orbits) );
+        study_->current_orbit->next_orbit = new orbits;
         study_->current_orbit = study_->current_orbit->next_orbit;
     }
     if ( R )
@@ -124,11 +125,16 @@ bool WWinSphere::startOrbit( double x, double y, bool R )
 
     copy_x_into_y( pcoord, study_->current_orbit->pcoord );
     study_->current_orbit->color = CORBIT;
+    /*study_->current_orbit->f_orbits->color = CORBIT;
+    study_->current_orbit->f_orbits->pcoord[0] = pcoord[0];
+    study_->current_orbit->f_orbits->pcoord[1] = pcoord[1];
+    study_->current_orbit->f_orbits->pcoord[2] = pcoord[2];
+    study_->current_orbit->f_orbits->next_point = nullptr;*/
     study_->current_orbit->f_orbits = nullptr;
     study_->current_orbit->next_orbit = nullptr;
 
     (study_->*(study_->sphere_to_viewcoord))( pcoord[0], pcoord[1], pcoord[2], ucoord );
-    drawPoint( ucoord[0], ucoord[1], CORBIT );
+    //drawPoint( ucoord[0], ucoord[1], CORBIT );
 
     return true;
 }
@@ -137,7 +143,7 @@ bool WWinSphere::startOrbit( double x, double y, bool R )
 ////                      DRAWORBIT
 //// -----------------------------------------------------------------------
 
-void WWinSphere::drawOrbit( double * pcoord, struct orbits_points * points, int color )
+void WWinSphere::drawOrbit( double * pcoord, orbits_points * points, int color )
 {
     double pcoord1[3];
 
@@ -160,10 +166,10 @@ void WWinSphere::drawOrbit( double * pcoord, struct orbits_points * points, int 
 //// -----------------------------------------------------------------------
 ////                      DRAWORBITS
 //// -----------------------------------------------------------------------
-
+// called from paintEvent()
 void WWinSphere::drawOrbits()
 {
-    struct orbits * orbit;
+    orbits * orbit;
 
     for ( orbit = study_->first_orbit; orbit != nullptr; orbit = orbit->next_orbit ) {
         drawOrbit( orbit->pcoord, orbit->f_orbits, orbit->color );
@@ -176,13 +182,13 @@ void WWinSphere::drawOrbits()
 
 void WWinSphere::deleteLastOrbit()
 {
-    struct orbits *orbit1,*orbit2;
+    orbits *orbit1,*orbit2;
 
     if ( study_->current_orbit == nullptr )
         return;
 
     orbit2 = study_->current_orbit;
-    drawOrbit( orbit2->pcoord, orbit2->f_orbits, spherebgcolor );
+    //drawOrbit( orbit2->pcoord, orbit2->f_orbits, spherebgcolor );
 
     if ( study_->first_orbit == study_->current_orbit ) {
         study_->first_orbit = nullptr;
@@ -200,6 +206,7 @@ void WWinSphere::deleteLastOrbit()
     study_->deleteOrbitPoint( orbit2->f_orbits );
     delete orbit2;
     orbit2 = nullptr;
+    update();
 }
 
 
@@ -297,13 +304,13 @@ void WVFStudy::integrate_lyapunov_orbit( double p0, double p1, double p2, double
 }
 
 orbits_points * WWinSphere::integrate_orbit( double pcoord[3],double step,int dir,int color,
-    int points_to_int,struct orbits_points **orbit)
+    int points_to_int,orbits_points **orbit)
 {
     int i,d,h;
     int dashes;
     double hhi;
     double pcoord2[3],h_min,h_max;
-    struct orbits_points *first_orbit=nullptr,*last_orbit=nullptr;
+    orbits_points *first_orbit=nullptr,*last_orbit=nullptr;
 
     hhi=(double)dir*step;
     h_min=study_->config_hmi;
@@ -331,13 +338,15 @@ orbits_points * WWinSphere::integrate_orbit( double pcoord[3],double step,int di
         last_orbit->dashes=dashes * study_->config_dashes;
         last_orbit->dir=d*h;
         last_orbit->next_point=nullptr;
-        if (dashes * study_->config_dashes)
+        /*if (dashes * study_->config_dashes)
             (*plot_l)(this,pcoord,pcoord2,color);
         else
-            (*plot_p)(this,pcoord,color);
+            (*plot_p)(this,pcoord,color);*/
+        //update();
         copy_x_into_y(pcoord,pcoord2); 
     }
     study_->set_current_step(fabs(hhi));
     *orbit=last_orbit;
+
     return(first_orbit);
 }

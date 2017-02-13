@@ -62,8 +62,8 @@
 using namespace Wt;
 
 
-int WWinSphere::numSpheres = 0;
-WWinSphere * * WWinSphere::SphereList = nullptr;
+//int WWinSphere::numSpheres = 0;
+//WWinSphere * * WWinSphere::SphereList = nullptr;
 
 
 /*
@@ -90,11 +90,11 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
 
     ReverseYaxis = false;
 
-    SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
+    /*SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
     SphereList[numSpheres++] = this;
     if( numSpheres > 1 ) {
         SphereList[numSpheres-2]->next = this;
-    }
+    }*/
 
     resize(width_,height_);
     
@@ -122,11 +122,11 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
 
     ReverseYaxis = false;
 
-    SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
+    /*SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
     SphereList[numSpheres++] = this;
     if( numSpheres > 1 ) {
         SphereList[numSpheres-2]->next = this;
-    }
+    }*/
 
     resize(width_,height_);
     
@@ -158,7 +158,7 @@ WWinSphere::~WWinSphere()
         t = nullptr;
     }
 
-    for( i = 0; i < numSpheres; i++ ) {
+    /*for( i = 0; i < numSpheres; i++ ) {
         if( SphereList[i] == this )
             break;
     }
@@ -171,12 +171,13 @@ WWinSphere::~WWinSphere()
     if( i < numSpheres-1 )
         memmove( SphereList+i, SphereList+i+1, sizeof(WWinSphere *) * (numSpheres-i-1) );
 
-    numSpheres--;
+    numSpheres--;*/
 }
 
 
 bool WWinSphere::setupPlot( void )
 {
+    //if (!plotPrepared_) //TODO: we need to NOT reset study_ each time we plot
     if (!study_->readTables(basename_)) {
         //parent()->printError("Error while reading results. Evaluate the vector field first");
         //delete this;

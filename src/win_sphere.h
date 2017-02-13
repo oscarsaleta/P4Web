@@ -91,10 +91,10 @@
  */
 class WWinSphere : public Wt::WPaintedWidget
 {
-    static int numSpheres;          /**< spheres are constructed as a linked list
+    /*static int numSpheres;          /**< spheres are constructed as a linked list
                                         and when a new sphere is created, this counter
                                         increases */
-    static WWinSphere **SphereList; ///< linked list of spheres
+    //static WWinSphere **SphereList; ///< linked list of spheres
 
 public:
     /**

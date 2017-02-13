@@ -637,7 +637,7 @@ bool WVFStudy::readTables( std::string basename )
         }
     }
 
-    globalLogger__.info("Files "+basename+"_{vec,fin,inf}.tab read correctly.");
+    globalLogger__.debug("WFStudy :: Files "+basename+"_{vec,fin,inf}.tab read correctly.");
     return true;
 } 
 
