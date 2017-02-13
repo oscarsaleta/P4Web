@@ -81,7 +81,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     // set up maple parameters that will not change
     str_bindir = "/usr/local/p4/bin/";
     str_p4m = str_bindir+"p4.m";
-    str_tmpdir = "/home/osr/tmp/wp4/";
+    str_tmpdir = TMP_DIR;
     str_lypexe = "lyapunov";
     str_sepexe = "separatrice";
     str_exeprefix = "";
@@ -243,13 +243,15 @@ void HomeLeft::fileUploaded()
 
     fileUploadName_ = fileUploadWidget_->spoolFileName();
     // copy file to home tmp dir
+#ifdef ANTZ
     try {
-        boost::filesystem::copy_file( fileUploadName_, "/home/osr/tmp/wp4/"+fileUploadName_.substr(5));
-        fileUploadName_ = "/home/osr/tmp/wp4/"+fileUploadName_.substr(5);
+        boost::filesystem::copy_file( fileUploadName_, TMP_DIR+fileUploadName_.substr(5));
+        fileUploadName_ = TMP_DIR+fileUploadName_.substr(5);
     } catch (const boost::filesystem::filesystem_error& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return;
     }
+#endif
 
     evaluated_ = false;
 
@@ -422,7 +424,7 @@ void HomeLeft::prepareMapleFile()
     std::ofstream mplFile;
 
     if (fileUploadName_.empty())
-        fileUploadName_ = openTempStream("/home/osr/tmp/wp4/",".mpl"/*,mplFile*/);
+        fileUploadName_ = openTempStream(TMP_DIR,".mpl"/*,mplFile*/);
 
     mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc|std::fstream::out);
 
@@ -520,15 +522,17 @@ void HomeLeft::evaluate()
         commands.push_back("a01");
         commands.push_back("-i");
         commands.push_back("/var/www/claus_ssh/idrsa-1");
+        //commands.push_back("'");
 #endif
-        commands.push_back("'");
         commands.push_back(MAPLE_PATH);
         commands.push_back("-T ,1048576"); // 1GB memory limit
         char *aux = new char [fileUploadName_.length()+1];
         std::strcpy(aux,fileUploadName_.c_str());
         std::strcat(aux,".mpl");
         commands.push_back(aux);
+/*#ifdef ANTZ
         commands.push_back("'");
+#endif*/
         commands.push_back(nullptr);
         // output from this thread goes to "fileUploadName_.res"
         int fd = open((fileUploadName_+".res").c_str(),O_WRONLY|O_CREAT|O_TRUNC,0666);
@@ -563,7 +567,7 @@ void HomeLeft::prepareSaveFile()
 
     if (fileUploadName_.empty()) {
         if (saveFileName_.empty()) {
-            saveFileName_ = openTempStream("/home/osr/tmp/wp4/",".txt"/*,saveFile*/);
+            saveFileName_ = openTempStream(TMP_DIR,".txt"/*,saveFile*/);
             saveFileName_ += ".txt";
         }
     } else
