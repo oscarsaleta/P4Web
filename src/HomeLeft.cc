@@ -518,7 +518,7 @@ void HomeLeft::evaluate()
 #ifdef ANTZ
         commands.push_back("ssh");
         commands.push_back("a01");
-        commands.push_back("-i")
+        commands.push_back("-i");
         commands.push_back("/var/www/claus_ssh/idrsa-1");
 #endif
         commands.push_back("'");
