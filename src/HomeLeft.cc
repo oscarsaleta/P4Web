@@ -229,7 +229,7 @@ void HomeLeft::setupConnectors()
 
 void HomeLeft::fileUploaded()
 {
-    globalLogger__.debug("HomeLeft :: file uploaded, proceeding to read...");
+    globalLogger__.debug("HomeLeft :: input file uploaded");
 
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
@@ -244,15 +244,19 @@ void HomeLeft::fileUploaded()
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
 #ifdef ANTZ
-    globalLogger__.debug("HomeLeft :: (ANTZ) copying uploaded file to "+std::string(TMP_DIR));
+    globalLogger__.debug("(ANTZ) :: copying uploaded file to "+std::string(TMP_DIR));
     // copy file to home tmp dir
-    try {
+    
+    std::string command = "cp "+fileUploadName_+" "+TMP_DIR+fileUploadName_.substr(5);
+    system(command.c_str());
+    fileUploadName_ = TMP_DIR+fileUploadName_.substr(5);
+    /*try {
         boost::filesystem::copy_file(fileUploadName_, TMP_DIR+fileUploadName_.substr(5));
         fileUploadName_ = TMP_DIR+fileUploadName_.substr(5);
     } catch (const boost::filesystem::filesystem_error& e) {
         std::cerr << "Error: " << e.what() << std::endl;
         return;
-    }
+    }*/
 #endif
 
     evaluated_ = false;

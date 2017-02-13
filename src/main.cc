@@ -50,11 +50,6 @@ using namespace Wt;
 
 WApplication *createApplication(const WEnvironment &env)
 {
-    #ifdef ANTZ
-    std::cerr << "ANTZ DEFINED" << std::endl;
-    #else
-    std::cerr << "ANTZ NOT DEFINED" << std::endl;
-    #endif
     return new MyApplication(env);
 }
 
