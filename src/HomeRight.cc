@@ -310,7 +310,7 @@ void HomeRight::sphereClicked( bool clickValid, double x, double y )
     sphereClickedSignal_.emit(clickValid,x,y);
 }
 
-void HomeRight::onOrbitsIntegrateSignal( int dir, double x0, double y0 )
+void HomeRight::onOrbitsIntegrate( int dir, double x0, double y0 )
 {
     if (dir==1 || dir==-1)
         orbitStarted_ = sphere_->startOrbit(x0,y0,true);
@@ -320,9 +320,23 @@ void HomeRight::onOrbitsIntegrateSignal( int dir, double x0, double y0 )
     if (orbitStarted_) {
         sphere_->integrateOrbit(dir);
         globalLogger__.debug("HomeRight :: orbit integrated...");
+        // update with flag PaintUpdate so widget is not cleared before painting orbit
         sphere_->update(PaintUpdate);
     }
 
+}
+
+void HomeRight::onOrbitsDelete(int flag)
+{
+    if (sphere_ == nullptr || sphere_->study_ == nullptr)
+        return;
+
+    if (flag == 0)
+        sphere_->study_->deleteOrbit(sphere_->study_->first_orbit);
+    else if (flag == 1)
+        sphere_->study_->deleteOrbit(sphere_->study_->current_orbit);
+
+    sphere_->update();    
 }
 
 /*void HomeRight::clearPlot()

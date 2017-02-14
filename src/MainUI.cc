@@ -131,7 +131,8 @@ void MainUI::setupUI()
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
     leftContainer_->onPlotSphereSignal().connect(rightContainer_,&HomeRight::onSpherePlot);
     leftContainer_->onPlotPlaneSignal().connect(rightContainer_,&HomeRight::onPlanePlot);
-    leftContainer_->orbitIntegrateSignal().connect(rightContainer_,&HomeRight::onOrbitsIntegrateSignal);
+    leftContainer_->orbitIntegrateSignal().connect(rightContainer_,&HomeRight::onOrbitsIntegrate);
+    leftContainer_->orbitDeleteSignal().connect(rightContainer_,&HomeRight::onOrbitsDelete);
     rightContainer_->sphereClickedSignal().connect(leftContainer_,&HomeLeft::showOrbitsDialog);
     globalLogger__.debug("MainUI :: signals connected");
 

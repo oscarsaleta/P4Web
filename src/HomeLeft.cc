@@ -367,7 +367,7 @@ void HomeLeft::parseInputFile()
 std::string HomeLeft::openTempStream(std::string prefix, std::string suffix/*, std::ofstream &f*/)
 {
     std::string fullname;
-    prefix += "/XXXXXX" + suffix;
+    prefix += "XXXXXX" + suffix;
     std::vector<char> dst_prefix(prefix.begin(), prefix.end());
     dst_prefix.push_back('\0');
 
@@ -441,6 +441,7 @@ void HomeLeft::prepareMapleFile()
 
     if (mplFile.is_open())
         fillMapleScript(fileUploadName_,mplFile);
+    mplFile.close();
 }
 
 void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
@@ -502,16 +503,6 @@ void HomeLeft::evaluate()
 
     prepareMapleFile();
 
-    /*std::string command = "batch <<< '"+std::string(MAPLE_PATH)+" -T ,1048576 "+fileUploadName_+".mpl > "+fileUploadName_+".res'";
-    int status = system(command.c_str());
-    if (status == 0) {
-        evaluatedSignal_.emit(fileUploadName_);
-        globalLogger__.info("HomeLeft :: Maple script successfully executed");
-    } else {
-        errorSignal_.emit("Error during Maple script execution");
-        globalLogger__.error("HomeLeft :: Maple error: "+std::to_string(status));
-    }*/
-
     pid_t pid = fork();
     if (pid < 0) {
         errorSignal_.emit("Error creating Maple thread");
@@ -524,7 +515,6 @@ void HomeLeft::evaluate()
         commands.push_back("p4@a01");
         commands.push_back("-i");
         commands.push_back("/var/www/claus_ssh/idrsa-1");
-        //commands.push_back("'");
 #endif
         commands.push_back(MAPLE_PATH);
         commands.push_back("-T ,1048576"); // 1GB memory limit
@@ -532,9 +522,6 @@ void HomeLeft::evaluate()
         std::strcpy(aux,fileUploadName_.c_str());
         std::strcat(aux,".mpl");
         commands.push_back(aux);
-/*#ifdef ANTZ
-        commands.push_back("'");
-#endif*/
         commands.push_back(nullptr);
         // output from this thread goes to "fileUploadName_.res"
         int fd = open((fileUploadName_+".res").c_str(),O_WRONLY|O_CREAT|O_TRUNC,0666);
@@ -987,10 +974,24 @@ void HomeLeft::onOrbitsContinueBtn()
 
 void HomeLeft::onOrbitsDeleteOneBtn()
 {
-    //orbitDeleteSignal_.emit(1);
+    orbitsStartSelected_ = false;
+    
+    orbitsContinueBtn_->disable();
+    orbitsForwardsBtn_->enable();
+    orbitsBackwardsBtn_->enable();
+    orbitsDeleteAllBtn_->disable();
+    orbitsDeleteOneBtn_->disable();
+
+    orbitDeleteSignal_.emit(1);
 }
 
 void HomeLeft::onOrbitsDeleteAllBtn()
 {
-    //orbitDeleteSignal_.emit(0);
+    orbitsStartSelected_ = false;
+
+    orbitsContinueBtn_->disable();
+    orbitsForwardsBtn_->enable();
+    orbitsBackwardsBtn_->enable();
+
+    orbitDeleteSignal_.emit(0);
 }

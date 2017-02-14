@@ -147,13 +147,14 @@ public:
 
     void sphereClicked( bool clickValid, double x, double y );
 
-    void onOrbitsIntegrateSignal( int dir, double x0, double y0 );
-
     Wt::Signal<bool,double,double>& sphereClickedSignal()
     {
         return sphereClickedSignal_;
     }
 
+    void onOrbitsIntegrate( int dir, double x0, double y0 );
+    void onOrbitsDelete(int flag);
+    
 private:
     bool orbitStarted_;
     int projection_;
