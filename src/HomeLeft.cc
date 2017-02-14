@@ -417,7 +417,7 @@ void HomeLeft::setParams()
         str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
         str_userp = std::to_string(PLWeightPSpinBox_->value());
         str_userq = std::to_string(PLWeightQSpinBox_->value());
-        time_limit = "60";
+        time_limit = "120";
     }
 }
 
@@ -428,7 +428,11 @@ void HomeLeft::prepareMapleFile()
     if (fileUploadName_.empty())
         fileUploadName_ = openTempStream(TMP_DIR,".mpl"/*,mplFile*/);
 
-    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc|std::fstream::out|std::fstream::in);
+    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc);
+    
+    // repair file permissions
+    std::string command = "chmod 644 "+fileUploadName_+".mpl";
+    system(command.c_str());
 
     str_vectable = fileUploadName_+"_vec.tab";
     str_fintab = fileUploadName_+"_fin.tab";
