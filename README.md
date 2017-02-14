@@ -18,9 +18,17 @@ The aim of this project is to create a web version of <a href="htpps://github.co
 
 ![loginview.png](screenshots/loginview.png)
 
-### Logged in extra settings
+### Extra evaluation parameters (registered users only)
 
 ![loggedin.png](screenshots/loggedin.png)
+
+### View configuration (registered users only)
+
+![planarview.png](screenshots/planarview.png)
+
+### Orbit integration (registered users only)
+
+![orbits.png](screenshots/orbits.png)
 
 ## Want to try it locally?
 
