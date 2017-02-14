@@ -464,14 +464,14 @@ bool WVFStudy::readTables( std::string basename )
     fp = fopen( (basename + "_vec.tab").c_str() , "rt" );
     if( fp == nullptr )
     {
-        globalLogger__.error("Cannot open file "+basename+"_vec.tab.");
+        globalLogger__.error("WVFStudy :: Cannot open file "+basename+"_vec.tab.");
         deleteVF();
         return false;
     }
 
     if( fscanf( fp, "%d %d %d ", &typeofstudy, &p, &q ) != 3 )
     {
-        globalLogger__.error("Cannot read typeofstudy in "+basename+"_vec.tab.");
+        globalLogger__.error("WVFStudy :: Cannot read typeofstudy in "+basename+"_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
@@ -481,7 +481,7 @@ bool WVFStudy::readTables( std::string basename )
     {
         if( fscanf( fp, "%lf %lf %lf %lf", &xmin, &xmax, &ymin, &ymax ) != 4 )
         {
-            globalLogger__.error("Cannot read min-max coords in "+basename+"_vec.tab.");
+            globalLogger__.error("WVFStudy :: Cannot read min-max coords in "+basename+"_vec.tab.");
             deleteVF();
             fclose(fp);
             return false;
@@ -503,7 +503,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readGCF( fp ) )
     {
-        globalLogger__.error("Cannot read gcf "+basename+"_vec.tab.");
+        globalLogger__.error("WVFStudy :: Cannot read gcf "+basename+"_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
@@ -511,7 +511,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, f_vec_field ) )
     {
-        globalLogger__.error("Cannot read vector field in "+basename+"_vec.tab.");
+        globalLogger__.error("WVFStudy :: Cannot read vector field in "+basename+"_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
@@ -519,7 +519,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, vec_field_U1 ) )
     {
-        globalLogger__.error("Cannot read vector field in U1-chart in "+basename+"_vec.tab.");
+        globalLogger__.error("WVFStudy :: Cannot read vector field in U1-chart in "+basename+"_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
@@ -527,7 +527,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, vec_field_V1 ) )
     {
-        globalLogger__.error("Cannot read vector field in V1-chart in "+basename+"_vec.tab.");
+        globalLogger__.error("WVFStudy :: Cannot read vector field in V1-chart in "+basename+"_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
@@ -535,7 +535,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, vec_field_U2 ) )
     {
-        globalLogger__.error("Cannot read vector field in U2-chart in "+basename+"_vec.tab.");
+        globalLogger__.error("WVFStudy :: Cannot read vector field in U2-chart in "+basename+"_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
@@ -543,7 +543,7 @@ bool WVFStudy::readTables( std::string basename )
 
     if( !readVectorField( fp, vec_field_V2 ) )
     {
-        globalLogger__.error("Cannot read vector field in V2-chart in "+basename+"_vec.tab.");
+        globalLogger__.error("WVFStudy :: Cannot read vector field in V2-chart in "+basename+"_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
@@ -553,7 +553,7 @@ bool WVFStudy::readTables( std::string basename )
     {
         if( !readVectorFieldCylinder( fp, vec_field_C ) )
         {
-            globalLogger__.error("Cannot read vector field in Cylinder-chart in "+basename+"_vec.tab.");
+            globalLogger__.error("WVFStudy :: Cannot read vector field in Cylinder-chart in "+basename+"_vec.tab.");
             deleteVF();
             fclose(fp);
             return false;
@@ -564,7 +564,7 @@ bool WVFStudy::readTables( std::string basename )
     {
         if( fscanf( fp, "%d %d", &flag, &dir_vec_field ) != 2 )
         {
-            globalLogger__.error("Cannot read sing-at-infinity flag and directions flag in "+basename+"_vec.tab.");
+            globalLogger__.error("WVFStudy :: Cannot read sing-at-infinity flag and directions flag in "+basename+"_vec.tab.");
             deleteVF();
             fclose(fp);
             return false;
@@ -581,7 +581,7 @@ bool WVFStudy::readTables( std::string basename )
         {
             if( !readPoints( fp ) )
             {
-                globalLogger__.error("Problem reading singularity info from "+basename+"_fin.tab: "+lasterror.toUTF8()+".");
+                globalLogger__.error("WVFStudy :: Problem reading singularity info from "+basename+"_fin.tab: "+lasterror.toUTF8()+".");
                 deleteVF();
                 fclose( fp );
                 return false;
@@ -590,7 +590,7 @@ bool WVFStudy::readTables( std::string basename )
         }
         else
         {
-            globalLogger__.error("Cannot open "+basename+"_fin.tab.");
+            globalLogger__.error("WVFStudy :: Cannot open "+basename+"_fin.tab.");
             deleteVF();
             return false;
         }
@@ -607,7 +607,7 @@ bool WVFStudy::readTables( std::string basename )
                 {
                     if( !readPoints( fp ) )
                     {
-                        globalLogger__.error("Cannot read singular points in "+basename+"_inf.tab ("+std::to_string(j)+"): "+lasterror.toUTF8()+".");
+                        globalLogger__.error("WVFStudy :: Cannot read singular points in "+basename+"_inf.tab ("+std::to_string(j)+"): "+lasterror.toUTF8()+".");
                         deleteVF();
                         fclose(fp);
                         return false;
@@ -620,7 +620,7 @@ bool WVFStudy::readTables( std::string basename )
                 {
                     if( !readPoints( fp ) )
                     {
-                        globalLogger__.error("Cannot read singular points in "+basename+"_inf.tab ("+std::to_string(j)+"): "+lasterror.toUTF8()+".");
+                        globalLogger__.error("WVFStudy :: Cannot read singular points in "+basename+"_inf.tab ("+std::to_string(j)+"): "+lasterror.toUTF8()+".");
                         deleteVF();
                         fclose(fp);
                         return false;
@@ -631,7 +631,7 @@ bool WVFStudy::readTables( std::string basename )
         }
         else
         {
-            globalLogger__.error("Cannot open "+basename+"_inf.tab.");
+            globalLogger__.error("WVFStudy :: Cannot open "+basename+"_inf.tab.");
             deleteVF();
             return false;
         }

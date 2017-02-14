@@ -24,7 +24,7 @@
 
 #ifdef ANTZ
 #define MAPLE_PATH "/usr/share/maple11/bin/maple"
-#define TMP_DIR "/home/osr/tmp/wp4/"
+#define TMP_DIR "/home/p4/tmp/"
 #else
 #define MAPLE_PATH "/home/osr/maple2015/bin/maple"
 #define TMP_DIR "/tmp/"
