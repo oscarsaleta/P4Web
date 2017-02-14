@@ -25,6 +25,7 @@
 #include "custom.h"
 #include "MyLogger.h"
 
+#include <boost/filesystem.hpp>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -62,12 +63,12 @@ using namespace Wt;
 
 HomeLeft::HomeLeft(WContainerWidget *parent) :
     WContainerWidget(parent),
-    evaluatedSignal_(this),
-    errorSignal_(this),
-    //onPlotSignal_(this),
     loggedIn_(false),
     settingsContainer_(nullptr),
-    viewContainer_(nullptr)
+    viewContainer_(nullptr),
+    orbitsContainer_(nullptr),
+    orbitsStartSelected_(false),
+    evaluated_(false)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
@@ -80,7 +81,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     // set up maple parameters that will not change
     str_bindir = "/usr/local/p4/bin/";
     str_p4m = str_bindir+"p4.m";
-    str_tmpdir = "/tmp/";
+    str_tmpdir = TMP_DIR;
     str_lypexe = "lyapunov";
     str_sepexe = "separatrice";
     str_exeprefix = "";
@@ -228,6 +229,8 @@ void HomeLeft::setupConnectors()
 
 void HomeLeft::fileUploaded()
 {
+    globalLogger__.debug("HomeLeft :: input file uploaded");
+
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
     // input validation
@@ -240,10 +243,26 @@ void HomeLeft::fileUploaded()
 
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
+#ifdef ANTZ
+    globalLogger__.debug("(ANTZ) :: copying uploaded file to "+std::string(TMP_DIR));
+
+    try {
+        boost::filesystem::copy_file(fileUploadName_, TMP_DIR+fileUploadName_.substr(5));
+        fileUploadName_ = TMP_DIR+fileUploadName_.substr(5);
+    } catch (const boost::filesystem::filesystem_error& e) {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return;
+    }
+#endif
+
+    evaluated_ = false;
+
     parseInputFile();
 
     if (loggedIn_)
         tabs_->setCurrentWidget(settingsContainer_);
+
+    globalLogger__.debug("HomeLeft :: file read correctly.");
     
 }
 
@@ -338,7 +357,7 @@ void HomeLeft::parseInputFile()
         } else {
             //prepareSaveFile();
             errorSignal_.emit("File uploaded. Press the Evaluate button to start computing.");
-            globalLogger__.info("HomeLeft :: Input file uploaded with name "+fileUploadName_);
+            globalLogger__.debug("HomeLeft :: Input file uploaded with name "+fileUploadName_);
         }
         f.close();
     }
@@ -348,7 +367,7 @@ void HomeLeft::parseInputFile()
 std::string HomeLeft::openTempStream(std::string prefix, std::string suffix/*, std::ofstream &f*/)
 {
     std::string fullname;
-    prefix += "/XXXXXX" + suffix;
+    prefix += "XXXXXX" + suffix;
     std::vector<char> dst_prefix(prefix.begin(), prefix.end());
     dst_prefix.push_back('\0');
 
@@ -398,7 +417,7 @@ void HomeLeft::setParams()
         str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
         str_userp = std::to_string(PLWeightPSpinBox_->value());
         str_userq = std::to_string(PLWeightQSpinBox_->value());
-        time_limit = "60";
+        time_limit = "120";
     }
 }
 
@@ -407,9 +426,13 @@ void HomeLeft::prepareMapleFile()
     std::ofstream mplFile;
 
     if (fileUploadName_.empty())
-        fileUploadName_ = openTempStream("/tmp",".mpl"/*,mplFile*/);
+        fileUploadName_ = openTempStream(TMP_DIR,".mpl"/*,mplFile*/);
 
-    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc|std::fstream::out);
+    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc);
+    
+    // repair file permissions
+    std::string command = "chmod 644 "+fileUploadName_+".mpl";
+    system(command.c_str());
 
     str_vectable = fileUploadName_+"_vec.tab";
     str_fintab = fileUploadName_+"_fin.tab";
@@ -422,6 +445,7 @@ void HomeLeft::prepareMapleFile()
 
     if (mplFile.is_open())
         fillMapleScript(fileUploadName_,mplFile);
+    mplFile.close();
 }
 
 void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
@@ -467,7 +491,7 @@ void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
         << "finally: closeallfiles();\n"
         << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
 
-    globalLogger__.info("HomeLeft :: filled Maple script "+fname);
+    globalLogger__.debug("HomeLeft :: filled Maple script "+fname);
 }
 
 void HomeLeft::evaluate()
@@ -477,18 +501,26 @@ void HomeLeft::evaluate()
         return;
     }
 
-    errorSignal_.emit("Evaluating vector field...");
+    //errorSignal_.emit("Evaluating vector field...");
+
+    evaluated_ = true;
 
     prepareMapleFile();
 
     pid_t pid = fork();
     if (pid < 0) {
-        errorSignal_.emit("Fork error");
+        errorSignal_.emit("Error creating Maple thread");
         globalLogger__.error("HomeLeft :: error during Maple script execution");
     } else if (pid == 0) {
         // create vector of arguments for execvp
         std::vector<char *> commands;
-        commands.push_back("maple");
+#ifdef ANTZ
+        commands.push_back("ssh");
+        commands.push_back("p4@a01");
+        commands.push_back("-i");
+        commands.push_back("/var/www/claus_ssh/idrsa-1");
+#endif
+        commands.push_back(MAPLE_PATH);
         commands.push_back("-T ,1048576"); // 1GB memory limit
         char *aux = new char [fileUploadName_.length()+1];
         std::strcpy(aux,fileUploadName_.c_str());
@@ -515,6 +547,7 @@ void HomeLeft::evaluate()
 }
 
 
+
 void HomeLeft::prepareSaveFile()
 {
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
@@ -527,7 +560,7 @@ void HomeLeft::prepareSaveFile()
 
     if (fileUploadName_.empty()) {
         if (saveFileName_.empty()) {
-            saveFileName_ = openTempStream("/tmp",".txt"/*,saveFile*/);
+            saveFileName_ = openTempStream(TMP_DIR,".txt"/*,saveFile*/);
             saveFileName_ += ".txt";
         }
     } else
@@ -573,7 +606,7 @@ void HomeLeft::prepareSaveFile()
 
 void HomeLeft::onPlot()
 {
-    if ( fileUploadName_.empty() ) {
+    if ( !evaluated_ ) {
         errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
     } else {
         globalLogger__.debug("HomeLeft :: sending onPlot signal");
@@ -715,6 +748,23 @@ void HomeLeft::showSettings()
     PLWeightQSpinBox_->setValue(1);
     t->bindWidget("q",PLWeightQSpinBox_);
 
+    // enable separatrice test parameters only if separatrice testing is on Yes
+    levAppSpinBox_->disable();
+    numericLevelSpinBox_->disable();
+    maxLevelSpinBox_->disable();
+    separatricesBtnGroup_->checkedChanged().connect(std::bind([=] () {
+        if (separatricesBtnGroup_->checkedId()==No) {
+            levAppSpinBox_->disable();
+            numericLevelSpinBox_->disable();
+            maxLevelSpinBox_->disable();
+        } else {
+            levAppSpinBox_->enable();
+            numericLevelSpinBox_->enable();
+            maxLevelSpinBox_->enable();
+        }
+    }));
+
+
 
     /* view settings */
     viewContainer_ = new WContainerWidget(this);
@@ -769,23 +819,7 @@ void HomeLeft::showSettings()
     t->bindString("maxy-tooltip",WString::tr("tooltip.view-maxy"));
     t->bindWidget("maxy",viewMaxY_);
 
-
-    // enable separatrice test parameters only if separatrice testing is on Yes
-    levAppSpinBox_->disable();
-    numericLevelSpinBox_->disable();
-    maxLevelSpinBox_->disable();
-    separatricesBtnGroup_->checkedChanged().connect(std::bind([=] () {
-        if (separatricesBtnGroup_->checkedId()==No) {
-            levAppSpinBox_->disable();
-            numericLevelSpinBox_->disable();
-            maxLevelSpinBox_->disable();
-        } else {
-            levAppSpinBox_->enable();
-            numericLevelSpinBox_->enable();
-            maxLevelSpinBox_->enable();
-        }
-    }));
-
+    // enable view range boxes only if sphere is not selected
     viewComboBox_->changed().connect(std::bind([=] () {
         switch(viewComboBox_->currentIndex()) {
         case 0:
@@ -794,8 +828,6 @@ void HomeLeft::showSettings()
             viewMinY_->disable();
             viewMaxX_->disable();
             viewMaxY_->disable();
-            //PLWeightPSpinBox_->enable();
-            //PLWeightQSpinBox_->enable();
             break;
         case 1:
         case 2:
@@ -807,11 +839,50 @@ void HomeLeft::showSettings()
             viewMinY_->enable();
             viewMaxX_->enable();
             viewMaxY_->enable();
-            //PLWeightPSpinBox_->disable();
-            //PLWeightQSpinBox_->disable();
             break;
         }
     }));
+
+
+
+    // orbits integration
+    orbitsContainer_ = new WContainerWidget(this);
+    orbitsContainer_->setId("orbitsContainer_");
+    tabs_->addTab(orbitsContainer_,"Orbit integration");
+
+    t = new WTemplate(WString::tr("template.orbits-dialog"),orbitsContainer_);
+    t->addFunction("id",WTemplate::Functions::id);
+
+    orbitsXLineEdit_ = new WLineEdit(orbitsContainer_);
+    t->bindWidget("x",orbitsXLineEdit_);
+    t->bindString("point-label",WString::tr("tooltip.orbits-selected-point"));
+    orbitsYLineEdit_ = new WLineEdit(orbitsContainer_);
+    t->bindWidget("y",orbitsYLineEdit_);
+
+    orbitsForwardsBtn_ = new WPushButton("Forwards",orbitsContainer_);
+    orbitsContinueBtn_ = new WPushButton("Continue",orbitsContainer_);
+    orbitsContinueBtn_->disable();
+    orbitsBackwardsBtn_ = new WPushButton("Backwards",orbitsContainer_);
+    t->bindWidget("fw",orbitsForwardsBtn_);
+    t->bindWidget("cnt",orbitsContinueBtn_);
+    t->bindWidget("bw",orbitsBackwardsBtn_);
+
+    orbitsDeleteOneBtn_ = new WPushButton("Delete last orbit",orbitsContainer_);
+    orbitsDeleteOneBtn_->setStyleClass("btn btn-warning");
+    orbitsDeleteOneBtn_->disable();
+    orbitsDeleteAllBtn_ = new WPushButton("Delete all orbits",orbitsContainer_);
+    orbitsDeleteAllBtn_->setStyleClass("btn btn-danger");
+    orbitsDeleteAllBtn_->disable();
+    t->bindWidget("dl",orbitsDeleteOneBtn_);
+    t->bindWidget("da",orbitsDeleteAllBtn_);
+
+    // enable delete orbits and continue if integrate button has been pressed
+    orbitsForwardsBtn_->clicked().connect(this,&HomeLeft::onOrbitsForwardsBtn);
+    orbitsBackwardsBtn_->clicked().connect(this,&HomeLeft::onOrbitsBackwardsBtn);
+    orbitsContinueBtn_->clicked().connect(this,&HomeLeft::onOrbitsContinueBtn);
+    orbitsDeleteOneBtn_->clicked().connect(this,&HomeLeft::onOrbitsDeleteOneBtn);
+    orbitsDeleteAllBtn_->clicked().connect(this,&HomeLeft::onOrbitsDeleteAllBtn);
+
 
     tabs_->setCurrentWidget(settingsContainer_);
 
@@ -820,15 +891,20 @@ void HomeLeft::showSettings()
 void HomeLeft::hideSettings()
 {
     loggedIn_ = false;
+    if (settingsContainer_ != nullptr) {
+        tabs_->removeTab(settingsContainer_);
+        delete settingsContainer_;
+        settingsContainer_ = nullptr;
+    }
     if (viewContainer_ != nullptr) {
-        tabs_->closeTab(tabs_->indexOf(viewContainer_));
+        tabs_->removeTab(viewContainer_);
         delete viewContainer_;
         viewContainer_ = nullptr;
     }
-    if (settingsContainer_ != nullptr) {      
-        tabs_->closeTab(tabs_->indexOf(settingsContainer_));  
-        delete settingsContainer_;
-        settingsContainer_ = nullptr;
+    if (orbitsContainer_ != nullptr) {
+        tabs_->removeTab(orbitsContainer_);
+        delete orbitsContainer_;
+        orbitsContainer_ = nullptr;
     }
 }
 
@@ -840,4 +916,86 @@ void HomeLeft::resetUI()
         hideSettings();
         showSettings();
     }
+}
+
+void HomeLeft::showOrbitsDialog( bool clickValid, double x, double y )
+{
+    if (!loggedIn_)
+        return;
+
+    tabs_->setCurrentWidget(orbitsContainer_);
+
+    if (clickValid) {
+        orbitsXLineEdit_->setText(std::to_string(x));
+        orbitsYLineEdit_->setText(std::to_string(y));
+        orbitsForwardsBtn_->enable();
+        orbitsBackwardsBtn_->enable();
+        orbitsContinueBtn_->disable();
+    }
+
+}
+
+void HomeLeft::onOrbitsForwardsBtn()
+{
+    if (!evaluated_ || orbitsXLineEdit_->text().empty() || orbitsYLineEdit_->text().empty())
+        return;
+    
+    orbitsStartSelected_ = true;
+    //if (orbitIntegrationStarted_)
+
+    orbitsContinueBtn_->enable();
+    //orbitsDeleteOneBtn_->enable();
+    //orbitsDeleteAllBtn_->enable();
+    orbitsForwardsBtn_->disable();
+
+    globalLogger__.debug("HomeLeft :: orbit start ("+orbitsXLineEdit_->text().toUTF8()+","+
+        orbitsYLineEdit_->text().toUTF8()+")");
+    orbitIntegrateSignal_.emit(1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
+}
+
+void HomeLeft::onOrbitsBackwardsBtn()
+{
+    if (!evaluated_ || orbitsXLineEdit_->text().empty() || orbitsYLineEdit_->text().empty())
+        return;
+    
+    orbitsStartSelected_ = true;
+    //if (orbitIntegrationStarted_)
+
+    orbitsContinueBtn_->enable();
+    //orbitsDeleteOneBtn_->enable();
+    //orbitsDeleteAllBtn_->enable();
+    orbitsBackwardsBtn_->disable();
+
+    orbitIntegrateSignal_.emit(-1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
+}
+
+void HomeLeft::onOrbitsContinueBtn()
+{
+    if (orbitsStartSelected_ /*&& orbitIntegrationStarted_*/) {
+        orbitIntegrateSignal_.emit(0,0.0,0.0);
+    }
+}
+
+void HomeLeft::onOrbitsDeleteOneBtn()
+{
+    orbitsStartSelected_ = false;
+    
+    orbitsContinueBtn_->disable();
+    orbitsForwardsBtn_->enable();
+    orbitsBackwardsBtn_->enable();
+    orbitsDeleteAllBtn_->disable();
+    orbitsDeleteOneBtn_->disable();
+
+    orbitDeleteSignal_.emit(1);
+}
+
+void HomeLeft::onOrbitsDeleteAllBtn()
+{
+    orbitsStartSelected_ = false;
+
+    orbitsContinueBtn_->disable();
+    orbitsForwardsBtn_->enable();
+    orbitsBackwardsBtn_->enable();
+
+    orbitDeleteSignal_.emit(0);
 }

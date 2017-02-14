@@ -91,10 +91,10 @@
  */
 class WWinSphere : public Wt::WPaintedWidget
 {
-    static int numSpheres;          /**< spheres are constructed as a linked list
+    /*static int numSpheres;          /**< spheres are constructed as a linked list
                                         and when a new sphere is created, this counter
                                         increases */
-    static WWinSphere **SphereList; ///< linked list of spheres
+    //static WWinSphere **SphereList; ///< linked list of spheres
 
 public:
     /**
@@ -209,11 +209,7 @@ public:
      * @return       Always @c true
      */
     bool getChartPos( int chart, double x1, double y1, double * pos );
-    //void adjustToNewSize( void );
 
-    //void Signal_Evaluating( void );
-    //void Signal_Changed( void );
-    
     /**
      * Plot a saddle
      * @param p saddle struct
@@ -297,7 +293,6 @@ public:
      */
     P4POLYLINES *produceEllipse( double cx, double cy, double a, double b, bool dotted, double resa, double resb );
 
-    //void prepareDrawing( void );
     /**
      * Draw a point with a given color
      * @param x     point is (x,y)
@@ -314,7 +309,6 @@ public:
      * @param color color (defined in color.h)
      */
     void drawLine( double x1, double y1, double x2, double y2, int color );
-    //void finishDrawing( void );
 
 
     /**
@@ -334,6 +328,24 @@ public:
     bool setupPlot( void );
     //void updatePointSelection( void );
 
+
+    void integrateOrbit( int dir );
+
+    orbits_points * integrate_orbit( double pcoord[3],double step,int dir,int color, int points_to_int,struct orbits_points **orbit );
+
+    void drawOrbit( double * pcoord, struct orbits_points * points, int color );
+
+    bool startOrbit( double x, double y, bool R );
+
+    void drawOrbits();
+
+    void deleteLastOrbit();
+
+
+
+
+
+
     /**
      * React to a mouse hover event to set a string
      *
@@ -347,10 +359,33 @@ public:
     void mouseMovementEvent( Wt::WMouseEvent e );
 
     /**
+     * React to a mouse click event to emit the coordinates
+     *
+     * This function takes the coordinates of the mouse cursor
+     * where the click has been performed, and sends them to the
+     * parent widget (HomeRight)
+     * 
+     * @param e WMouseEvent, contains the coordinates of the mouse cursor
+     */
+    void mouseClickEvent( Wt::WMouseEvent e );
+
+    Wt::Signal<Wt::WString>& hoverSignal() { return hoverSignal_; }
+    Wt::Signal<bool,double,double>& clickedSignal() { return clickedSignal_; }
+
+    /**
      * Method that sends a signal to print some message in the output
      * text area from #HomeRight
      */
     Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
+
+    Wt::WPainter *staticPainter;       /**< pointer to a painter linked to a paint device
+                                            created in a paint event. This makes possible
+                                            to distribute painting to different functions
+                                            and compiling units (even from outside the
+                                            object) */
+
+    bool plotDone_;
+    
 
 protected:
     /**
@@ -363,16 +398,15 @@ protected:
     void paintEvent( Wt::WPaintDevice * p );
 
 private:
+
+    Wt::Signal<Wt::WString> hoverSignal_;
+    Wt::Signal<bool,double,double> clickedSignal_;
     /**
      * Signal emitted when there's an error while reading results from Maple
      */
     Wt::Signal<std::string> errorSignal_;
 
-    Wt::WPainter * staticPainter;       /**< pointer to a painter linked to a paint device
-                                            created in a paint event. This makes possible
-                                            to distribute painting to different functions
-                                            and compiling units (even from outside the
-                                            object) */
+    
     Wt::WContainerWidget * parentWnd;   /**< parent widget (stored from @c parent, argument
                                             passed to constructor) */
     bool ReverseYaxis;                  /**< when calculating coordinates: this determines
@@ -384,6 +418,9 @@ private:
                                         Lyapunov circle */
 
     void setChartString(int p, int q, bool isu1v1chart, bool negchart);
+
+    bool plotPrepared_;
+
 
 };
 

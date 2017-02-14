@@ -34,7 +34,6 @@
 #include <Wt/WMenu>
 #include <Wt/WMenuItem>
 #include <Wt/WMessageBox>
-#include <Wt/WNavigationBar>
 #include <Wt/WPopupMenu>
 #include <Wt/WStackedWidget>
 #include <Wt/WString>
@@ -127,11 +126,14 @@ void MainUI::setupUI()
     globalLogger__.debug("MainUI :: HomeRight created");
     t->bindWidget("right",rightContainer_);
 
-    // connect signals sent from left to actions performed by right
+    // connect signals sent from left to actions performed by right (and vice versa)
     leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
     leftContainer_->onPlotSphereSignal().connect(rightContainer_,&HomeRight::onSpherePlot);
     leftContainer_->onPlotPlaneSignal().connect(rightContainer_,&HomeRight::onPlanePlot);
+    leftContainer_->orbitIntegrateSignal().connect(rightContainer_,&HomeRight::onOrbitsIntegrate);
+    leftContainer_->orbitDeleteSignal().connect(rightContainer_,&HomeRight::onOrbitsDelete);
+    rightContainer_->sphereClickedSignal().connect(leftContainer_,&HomeLeft::showOrbitsDialog);
     globalLogger__.debug("MainUI :: signals connected");
 
     globalLogger__.debug("MainUI :: MainUI set up");
@@ -158,12 +160,13 @@ void MainUI::handlePathChange()
 {
     WApplication *app = WApplication::instance();
 
-    if (app->internalPath() == "/login")
+    if (app->internalPath() == "/login") {
+        globalLogger__.debug("MainUI :: handle internal path change /login");
         if (session_.login().loggedIn()) {
             session_.login().logout();
         } else
             mainStack_->setCurrentWidget(authWidget_);
-    else {
+    } else {
         mainStack_->setCurrentWidget(pageContainer_);
         globalLogger__.debug("MainUI :: setting main page as current view");
     }

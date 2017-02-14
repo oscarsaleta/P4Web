@@ -62,8 +62,8 @@
 using namespace Wt;
 
 
-int WWinSphere::numSpheres = 0;
-WWinSphere * * WWinSphere::SphereList = nullptr;
+//int WWinSphere::numSpheres = 0;
+//WWinSphere * * WWinSphere::SphereList = nullptr;
 
 
 /*
@@ -84,17 +84,19 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     basename_(basename),
     parentWnd(parent),
     typeOfView_(0),
-    projection_(projection)
+    projection_(projection),
+    plotPrepared_(false),
+    plotDone_(false)
 {
     study_ = new WVFStudy(projection);
 
     ReverseYaxis = false;
 
-    SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
+    /*SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
     SphereList[numSpheres++] = this;
     if( numSpheres > 1 ) {
         SphereList[numSpheres-2]->next = this;
-    }
+    }*/
 
     resize(width_,height_);
     
@@ -103,6 +105,7 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     PLCircle = nullptr;
 
     mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
+    clicked().connect(this,&WWinSphere::mouseClickEvent);
 
 }
 
@@ -115,17 +118,19 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     viewMinX_(minx),
     viewMaxX_(maxx),
     viewMinY_(miny),
-    viewMaxY_(maxy)
+    viewMaxY_(maxy),
+    plotPrepared_(false),
+    plotDone_(false)
 {
     study_ = new WVFStudy();
 
     ReverseYaxis = false;
 
-    SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
+    /*SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
     SphereList[numSpheres++] = this;
     if( numSpheres > 1 ) {
         SphereList[numSpheres-2]->next = this;
-    }
+    }*/
 
     resize(width_,height_);
     
@@ -134,6 +139,7 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     PLCircle = nullptr;
 
     mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
+    clicked().connect(this,&WWinSphere::mouseClickEvent);
 
 }
 
@@ -156,7 +162,7 @@ WWinSphere::~WWinSphere()
         t = nullptr;
     }
 
-    for( i = 0; i < numSpheres; i++ ) {
+    /*for( i = 0; i < numSpheres; i++ ) {
         if( SphereList[i] == this )
             break;
     }
@@ -169,12 +175,15 @@ WWinSphere::~WWinSphere()
     if( i < numSpheres-1 )
         memmove( SphereList+i, SphereList+i+1, sizeof(WWinSphere *) * (numSpheres-i-1) );
 
-    numSpheres--;
+    numSpheres--;*/
 }
 
 
 bool WWinSphere::setupPlot( void )
 {
+    if (plotPrepared_)
+        return true;
+
     if (!study_->readTables(basename_)) {
         //parent()->printError("Error while reading results. Evaluate the vector field first");
         //delete this;
@@ -266,6 +275,25 @@ bool WWinSphere::setupPlot( void )
     dx = x1-x0;
     dy = y1-y0;
 
+
+    switch(study_->typeofview) {
+    case TYPEOFVIEW_PLANE:
+    case TYPEOFVIEW_SPHERE:
+        chartString_ = "";
+        break;
+    case TYPEOFVIEW_U1:
+        setChartString(study_->p,study_->q,true,false);
+        break;
+    case TYPEOFVIEW_U2:
+        setChartString(study_->p,study_->q,false,false);
+        break;
+    case TYPEOFVIEW_V1:
+        setChartString(study_->p,study_->q,true,true);
+        break;
+    case TYPEOFVIEW_V2:
+        setChartString(study_->p,study_->q,false,true);
+        break;
+    }
     
     if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
         CircleAtInfinity = produceEllipse( 0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0) );
@@ -278,33 +306,34 @@ bool WWinSphere::setupPlot( void )
 
 void WWinSphere::paintEvent( WPaintDevice * p )
 {
-    globalLogger__.debug("Projection is "+std::to_string(study_->config_projection));
-    if (!setupPlot()) {
-        // TODO: enviar senyal des d'aquí per imprimir error a output
-        errorSignal_.emit("Error while reading Maple results, probably time ran out during execution.");
+    if (!(plotPrepared_=setupPlot())) {
+        errorSignal_.emit("Error while reading Maple results, evaluate the vector field first. If you did, probably the execution ran out of time.");
         return;
     }
     WPainter paint(p);
-    paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
     staticPainter = &paint;
-    if( study_->typeofview != TYPEOFVIEW_PLANE ) {
-        if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
-            if( study_->plweights ) {
-                plotPoincareLyapunovSphere(); //not used
-            } else {
-                plotPoincareSphere(); // only one used for now
-            }
-        } else
-            plotLineAtInfinity(); //not used
+    if (!plotDone_) {
+        paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
+        if( study_->typeofview != TYPEOFVIEW_PLANE ) {
+            if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
+                if( study_->plweights ) {
+                    plotPoincareLyapunovSphere(); //not used
+                } else {
+                    plotPoincareSphere(); // only one used for now
+                }
+            } else
+                plotLineAtInfinity(); //not used
+        }
+        //plotGcf();
+        //drawLimitCycles(this);
+        plotSeparatrices();
+        for (int cnt=0;cnt<10;cnt++)
+            plot_all_sep(this);
+        plotPoints();
+    } else {
+        drawOrbits();
     }
-    //plotGcf();
-    //drawOrbits(this);
-    //drawLimitCycles(this);
-    //plotSeparatrices();
-    for (int cnt=0;cnt<10;cnt++)
-        plot_all_sep(this);
-    plotPoints();
-    
+    plotDone_ = true;
 }
 
 void WWinSphere::setChartString( int p, int q, bool isu1v1chart, bool negchart )
@@ -351,17 +380,29 @@ void WWinSphere::mouseMovementEvent( WMouseEvent e )
     if ((study_->*(study_->is_valid_viewcoord))(wx,wy,pcoord)) {
         switch (study_->typeofview) {
         case TYPEOFVIEW_PLANE:
-            if (study_->typeofstudy == TYPEOFSTUDY_ONE)
-                buf = WString("Local study  (x,y) = ({1},{2})").arg(std::to_string(wx)).arg(std::to_string(wy));
-            else
-                buf = WString("Planar view  (x,y) = ({1},{2})").arg(std::to_string(wx)).arg(std::to_string(wy));
+            if (study_->typeofstudy == TYPEOFSTUDY_ONE) {
+                buf = WString("Local study  (x,y) = ({1},{2})")
+                    .arg(std::to_string(wx))
+                    .arg(std::to_string(wy));
+            } else {
+                buf = WString("Planar view  (x,y) = ({1},{2})")
+                    .arg(std::to_string(wx))
+                    .arg(std::to_string(wy));
+            }
             break;
         case TYPEOFVIEW_SPHERE:
             (study_->*(study_->sphere_to_R2))(pcoord[0],pcoord[1],pcoord[2],ucoord);
-            if (study_->p == 1 && study_->q == 1)
-                buf = WString("The Poincare sphere (x,y) = ({1},{2})").arg(std::to_string(ucoord[0])).arg(std::to_string(ucoord[1]));
-            else
-                buf = WString("The P-L sphere of type ({1},{2})  (x,y) = ({3},{4})").arg(study_->p).arg(study_->q).arg(std::to_string(ucoord[0])).arg(std::to_string(ucoord[1]));
+            if (study_->p == 1 && study_->q == 1) {
+                buf = WString("The Poincare sphere (x,y) = ({1},{2})")
+                    .arg(std::to_string(ucoord[0]))
+                    .arg(std::to_string(ucoord[1]));
+            } else {
+                buf = WString("The P-L sphere of type ({1},{2})  (x,y) = ({3},{4})")
+                    .arg(study_->p)
+                    .arg(study_->q)
+                    .arg(std::to_string(ucoord[0]))
+                    .arg(std::to_string(ucoord[1]));
+            }
             break;
         case TYPEOFVIEW_U1:
             (study_->*(study_->sphere_to_U1))(pcoord[0],pcoord[1],pcoord[2],ucoord);
@@ -415,8 +456,11 @@ void WWinSphere::mouseMovementEvent( WMouseEvent e )
         case TYPEOFVIEW_SPHERE:
             if (study_->p == 1 && study_->q ==1)
                 buf = "The Poincare sphere";
-            else
-                buf = WString("The P-L sphere of type ({1},{2})").arg(study_->p).arg(study_->q);
+            else {
+                buf = WString("The P-L sphere of type ({1},{2})")
+                    .arg(study_->p)
+                    .arg(study_->q);
+            }
             break;
         case TYPEOFVIEW_U1:
             buf = "The U1 chart";
@@ -433,8 +477,24 @@ void WWinSphere::mouseMovementEvent( WMouseEvent e )
         }
     }
     
-    plotCaption_ = buf;
+    hoverSignal_.emit(buf);
 }
+
+void WWinSphere::mouseClickEvent( WMouseEvent e )
+{
+    double wx = coWorldX(e.widget().x);
+    double wy = coWorldY(e.widget().y);
+    double pcoord[3];
+    double ucoord[2];
+    if ((study_->*(study_->is_valid_viewcoord))(wx,wy,pcoord)) {
+        (study_->*(study_->sphere_to_R2))(pcoord[0],pcoord[1],pcoord[2],ucoord);
+        clickedSignal_.emit(true,ucoord[0],ucoord[1]);
+    } else {
+        clickedSignal_.emit(false,0,0);
+    }
+}
+
+
 
 double WWinSphere::coWorldX( int x )
 {
@@ -1132,102 +1192,16 @@ void WWinSphere::drawPoint( double x, double y, int color )
         _x=coWinX(x);
         _y=coWinY(y);
 
-        if( paintedXMin > _x ) paintedXMin = _x;
-        if( paintedXMax < _x ) paintedXMax = _x;
-        if( paintedYMin > _y ) paintedYMin = _y;
-        if( paintedYMax < _y ) paintedYMax = _y;
+        if( paintedXMin > _x )
+            paintedXMin = _x;
+        if( paintedXMax < _x )
+            paintedXMax = _x;
+        if( paintedYMin > _y )
+            paintedYMin = _y;
+        if( paintedYMax < _y )
+            paintedYMax = _y;
 
-        staticPainter->drawPoint( _x, _y );
+        staticPainter->drawPoint( (double)_x, (double)_y );
     }
 }
 
-
-
-
-/*void WWinSphere::refresh( void )
-{
-    //isPainterCacheDirty = true;
-    update();
-}*/
-
-/*void WWinSphere::CalculateHeightFromWidth( int * width, int * height, int maxheight = -1, double aspectratio = 1  )
-{
-    // given an optimal width in *width, this procedure calculates the
-    // corresponding height in order to maintain the given aspectratio
-    // If however the maximum height is violated, then we choose to
-    // have the maximum height and calculate the corresponding width.
-
-    // aspect ratio is 
-
-    double w, h;
-    
-    w = (double)(*width);
-    h = w * dy / dx;
-    h *= aspectratio;
-
-    if( (int)(h+0.5) <= maxheight || maxheight == -1 ) {
-        *height = (int)(h+0.5);
-    }
-    else
-    {
-        *height = maxheight;
-        
-        h = (double)maxheight;
-        w = h * dx /dy;
-        w /= aspectratio;
-
-        *width = (int)(w+0.5);
-    }
-}*/
-
-
-/*void WWinSphere::prepareDrawing()
-{
-    if( PainterCache == nullptr ) {
-        isPainterCacheDirty = true;
-        PainterCache = new QPixmap( size() );
-    }
-    staticPainter = new QPainter(PainterCache);
-    
-    paintedXMin = width()-1;
-    paintedYMin = height()-1;
-    paintedXMax = 0;
-    paintedYMax = 0;
-    
-    if( next != nullptr )
-        next->prepareDrawing();
-}*/
-
-/*void WWinSphere::finishDrawing()
-{
-    if( next != nullptr )
-        next->finishDrawing();
-
-    if( staticPainter != nullptr ) {
-        staticPainter->end();
-        delete staticPainter;
-        staticPainter = nullptr;
-
-        if( paintedXMin < 0 ) paintedXMin = 0;
-        if( paintedXMax >= width() ) paintedXMax = width()-1;
-        if( paintedYMin < 0 ) paintedYMin = 0;
-        if( paintedYMax >= height() ) paintedYMax = height()-1;
-
-        if( paintedYMax >= paintedYMin && paintedXMax >= paintedXMin )
-            update( paintedXMin, paintedYMin, paintedXMax-paintedXMin+1, paintedYMax-paintedYMin+1);
-    }
-}*/
-
-/*void WWinSphere::Signal_Evaluating( void )
-{
-    QPalette palette;
-    palette.setColor(backgroundRole(), QXFIGCOLOR(spherebgcolor = CBACKGROUND) );
-    setPalette(palette);
-}
-
-void WWinSphere::Signal_Changed( void )
-{
-    QPalette palette;
-    palette.setColor(backgroundRole(), QXFIGCOLOR(spherebgcolor = DARKGRAY) );
-    setPalette(palette);
-}*/

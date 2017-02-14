@@ -31,6 +31,12 @@ using namespace Wt;
 MyApplication::MyApplication(const WEnvironment &env) :
     WApplication(env)
 {
+    // add resource files for strings and templates
+    messageResourceBundle().use(appRoot()+"resources/xml/strings");
+    messageResourceBundle().use(appRoot()+"resources/xml/templates");
+    // install sendmail in order for this to work
+    messageResourceBundle().use(appRoot()+"resources/xml/mail_strings");
+
     // set Bootstrap 3 theme
     WBootstrapTheme *theme = new WBootstrapTheme(this);
     theme->setVersion(WBootstrapTheme::Version3);
@@ -39,11 +45,7 @@ MyApplication::MyApplication(const WEnvironment &env) :
     // add our own CSS file for some tweaks
     addAllStyleSheets();
 
-    // add resource files for strings and templates
-    messageResourceBundle().use(appRoot()+"xml/strings");
-    messageResourceBundle().use(appRoot()+"xml/templates");
-    // install sendmail in order for this to work
-    messageResourceBundle().use(appRoot()+"xml/mail_strings");
+    
 
 
 
@@ -62,5 +64,5 @@ MyApplication::~MyApplication()
 
 void MyApplication::addAllStyleSheets()
 {
-    useStyleSheet("css/main.css");
+    useStyleSheet("resources/css/main.css");
 }

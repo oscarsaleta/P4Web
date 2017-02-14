@@ -39,7 +39,10 @@ body {
   text-align: center;
 }
 
-
+/* crosshair cursor when hovering the plot region */
+#sphere_ {
+  cursor: crosshair;
+}
 
 
 /* settings for double panel pages */
@@ -47,20 +50,6 @@ body {
 	font-size: 0;
 }
 
-/*.half-box-left {
-  float: left;
-  width: 580px;
-  margin-top: 10px;
-  vertical-align: top;
-  font-size: 14px;
-}
-.half-box-right {
-  margin-top: 10px;
-  float: right;
-  width: 600px;
-  vertical-align: top;
-  font-size: 14px;
-}*/
 
 /* inline load button */
 #infileUploadWidget_ {

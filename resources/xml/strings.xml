@@ -160,4 +160,8 @@
     Enter your differential equations here. Use Maple syntax.
   </message>
 
+  <message id="tooltip.orbits-selected-point">
+    Start point of orbit. You can either select a point by clicking on the plot widget, or fill the form with a custom starting point.
+  </message>
+
 </messages>

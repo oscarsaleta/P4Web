@@ -31,6 +31,7 @@
 #include <Wt/WContainerWidget>
 
 #include <Wt/WString>
+//#include <Wt/WMouseEvent>
 
 class WWinSphere;
 
@@ -142,9 +143,20 @@ public:
      * @param e WMouseEvent (needed to connect the function to the event,
      * although it's not used here)
      */
-    void mouseMovedEvent( Wt::WMouseEvent e );
+    void mouseMovedEvent( Wt::WString caption );
 
+    void sphereClicked( bool clickValid, double x, double y );
+
+    Wt::Signal<bool,double,double>& sphereClickedSignal()
+    {
+        return sphereClickedSignal_;
+    }
+
+    void onOrbitsIntegrate( int dir, double x0, double y0 );
+    void onOrbitsDelete(int flag);
+    
 private:
+    bool orbitStarted_;
     int projection_;
     double viewMinX_;
     double viewMaxX_;
@@ -184,9 +196,15 @@ private:
     void showInfResults();
     void clearResults();
 
+    void setupSphereAndPlot();
+
+    void sphereClicked(Wt::WMouseEvent e);
+
     /*void plotSingularPoints();
     void plotSeparatrices();
     void clearPlot();*/
+
+    Wt::Signal<bool,double,double> sphereClickedSignal_;
     
 };
 

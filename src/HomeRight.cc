@@ -23,6 +23,7 @@
 #include "file_tab.h"
 #include "MyLogger.h"
 #include "win_sphere.h"
+//#include "math_orbits.h"
 
 #include <iostream>
 #include <fstream>
@@ -43,7 +44,8 @@ using namespace Wt;
 HomeRight::HomeRight(WContainerWidget *parent) :
     WContainerWidget(parent),
     plotCaption_(nullptr),
-    sphere_(nullptr)
+    sphere_(nullptr),
+    orbitStarted_(false)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
@@ -256,30 +258,12 @@ void HomeRight::clearResults()
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
 {
-    globalLogger__.debug("received projection value " + std::to_string(projection));
     if (sphere_ != nullptr) {
         delete sphere_;
         sphere_ = nullptr;
     }
     sphere_ = new WWinSphere(plotContainer_,550,550,basename,projection);
-    sphere_->setId("sphere_");
-    sphere_->setMargin(5,Top);
-    plotContainer_->addWidget(sphere_);
-
-    if (plotCaption_ != nullptr) {
-        delete plotCaption_;
-        plotCaption_ = nullptr;
-    }
-    plotCaption_ = new WText(plotContainer_);
-    plotCaption_->setId("plotCaption_");
-    plotContainer_->addWidget(plotCaption_);
-
-    sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
-    sphere_->errorSignal().connect(this,&HomeRight::printError);
-
-    sphere_->update();
-    tabWidget_->setCurrentIndex(1);
-    globalLogger__.debug("HomeRight :: reacted to onPlot signal");
+    setupSphereAndPlot();
 }
 
 void HomeRight::onPlanePlot(std::string basename, int type, double minx, double maxx, double miny, double maxy)
@@ -289,6 +273,12 @@ void HomeRight::onPlanePlot(std::string basename, int type, double minx, double 
         sphere_ = nullptr;
     }
     sphere_ = new WWinSphere(plotContainer_,550,550,basename,type,minx,maxx,miny,maxy);
+    
+    setupSphereAndPlot();
+}
+
+void HomeRight::setupSphereAndPlot()
+{
     sphere_->setId("sphere_");
     sphere_->setMargin(5,Top);
     plotContainer_->addWidget(sphere_);
@@ -301,17 +291,53 @@ void HomeRight::onPlanePlot(std::string basename, int type, double minx, double 
     plotCaption_->setId("plotCaption_");
     plotContainer_->addWidget(plotCaption_);
 
-    sphere_->mouseMoved().connect(this,&HomeRight::mouseMovedEvent);
+    sphere_->hoverSignal().connect(this,&HomeRight::mouseMovedEvent);
     sphere_->errorSignal().connect(this,&HomeRight::printError);
+    sphere_->clickedSignal().connect(this,&HomeRight::sphereClicked);
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
     globalLogger__.debug("HomeRight :: reacted to onPlot signal");
 }
 
-void HomeRight::mouseMovedEvent( WMouseEvent e )
+void HomeRight::mouseMovedEvent( WString caption )
 {
-    plotCaption_->setText(sphere_->plotCaption_);
+    plotCaption_->setText(caption);
+}
+
+void HomeRight::sphereClicked( bool clickValid, double x, double y )
+{
+    sphereClickedSignal_.emit(clickValid,x,y);
+}
+
+void HomeRight::onOrbitsIntegrate( int dir, double x0, double y0 )
+{
+    if (dir==1 || dir==-1)
+        orbitStarted_ = sphere_->startOrbit(x0,y0,true);
+    
+    globalLogger__.debug("HomeRight :: orbit started = "+std::to_string(orbitStarted_));
+
+    if (orbitStarted_) {
+        sphere_->integrateOrbit(dir);
+        globalLogger__.debug("HomeRight :: orbit integrated...");
+        // update with flag PaintUpdate so widget is not cleared before painting orbit
+        sphere_->update(PaintUpdate);
+    }
+
+}
+
+void HomeRight::onOrbitsDelete(int flag)
+{
+    if (sphere_ == nullptr || sphere_->study_ == nullptr)
+        return;
+
+    if (flag == 0)
+        sphere_->study_->deleteOrbit(sphere_->study_->first_orbit);
+    else if (flag == 1)
+        sphere_->study_->deleteOrbit(sphere_->study_->current_orbit);
+
+    sphere_->plotDone_ = false;
+    sphere_->update();
 }
 
 /*void HomeRight::clearPlot()

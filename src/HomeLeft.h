@@ -22,6 +22,14 @@
 #ifndef HOMELEFT_H
 #define HOMELEFT_H
 
+#ifdef ANTZ
+#define MAPLE_PATH "/usr/share/maple11/bin/maple"
+#define TMP_DIR "/home/p4/tmp/"
+#else
+#define MAPLE_PATH "/home/osr/maple2015/bin/maple"
+#define TMP_DIR "/tmp/"
+#endif
+
 #define ACCURACY_DEFAULT 8
 #define PRECISION_DEFAULT 0
 #define EPSILON_DEFAULT 0.01
@@ -80,20 +88,73 @@ public:
     void hideSettings();
 
     /**
+     * Show orbit dialog when plot is clicked
+     *
+     * Additionally, fill x0 and y0 forms with the coordinates for the
+     * point, if these are valid coordinates for the current view.
+     * 
+     * @param clickValid @c true if coords are valid, @c false otherwise
+     * @param x          x coordinate
+     * @param y          y coordinate
+     */
+    void showOrbitsDialog( bool clickValid, double x, double y );
+
+    /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
-    Wt::Signal<std::string>& evaluatedSignal() { return evaluatedSignal_; }
+    Wt::Signal<std::string>& evaluatedSignal()
+    { 
+        return evaluatedSignal_;
+    }
     /**
      * Method that sends a signal to print some message in the output text area from #HomeRight
      */
-    Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
+    Wt::Signal<std::string>& errorSignal()
+    {
+        return errorSignal_;
+    }
     /**
      * Method that sends a signal when the plot button is pressed in order to display a plot
+     *
+     * This specific signal is sent when a sphere plot is issued
      */
-    Wt::Signal<std::string,double>& onPlotSphereSignal(){ return onPlotSphereSignal_; }
-    Wt::Signal<std::string,int,double,double,double,double>& onPlotPlaneSignal(){ return onPlotPlaneSignal_; }
+    Wt::Signal<std::string,double>& onPlotSphereSignal()
+    {
+        return onPlotSphereSignal_;
+    }
+    /**
+     * Method that sends a signal when the plot button is pressed in order to display a plot
+     *
+     * This specific signal is sent when a plane or chart plot is issued
+     */
+    Wt::Signal<std::string,int,double,double,double,double>& onPlotPlaneSignal()
+    {
+        return onPlotPlaneSignal_;
+    }
+    /**
+     * Orbit integration signal
+     *
+     * The int can be -1 (backwards), 0 (continue) or 1 (forwards). The doubles are the
+     * coordinates
+     */
+    Wt::Signal<int,double,double>& orbitIntegrateSignal()
+    {
+        return orbitIntegrateSignal_;
+    }
+    /**
+     * Signal to delete orbits
+     *
+     * The int can be 1 (delete last) or 0 (delete all)
+     */
+    Wt::Signal<int>& orbitDeleteSignal()
+    {
+        return orbitDeleteSignal_;
+    }
+
 
 private:
+    bool evaluated_;
+
     /* PUBLIC UI (no need to log in) */
     Wt::WGroupBox       *equationsBox_;
     Wt::WFileUpload     *fileUploadWidget_;
@@ -112,6 +173,7 @@ private:
     Wt::WTabWidget      *tabs_;
 
     /* PRIVATE UI (log in needed) */
+    // evaluation parameters
     Wt::WContainerWidget    *settingsContainer_;
     Wt::WButtonGroup        *calculationsBtnGroup_;
     enum Calculations       { Algebraic = 0, Numeric = 1 };
@@ -126,7 +188,7 @@ private:
     Wt::WSpinBox            *maxWeakLevelSpinBox_;
     Wt::WSpinBox            *PLWeightPSpinBox_;
     Wt::WSpinBox            *PLWeightQSpinBox_;
-
+    // view settings
     Wt::WContainerWidget    *viewContainer_;
     Wt::WComboBox           *viewComboBox_;
     Wt::WLineEdit           *viewProjection_;
@@ -134,12 +196,24 @@ private:
     Wt::WLineEdit           *viewMinY_;
     Wt::WLineEdit           *viewMaxX_;
     Wt::WLineEdit           *viewMaxY_;
+    // orbits dialog
+    Wt::WContainerWidget    *orbitsContainer_;
+    Wt::WLineEdit           *orbitsXLineEdit_;
+    Wt::WLineEdit           *orbitsYLineEdit_;
+    Wt::WPushButton         *orbitsForwardsBtn_;
+    Wt::WPushButton         *orbitsContinueBtn_;
+    Wt::WPushButton         *orbitsBackwardsBtn_;
+    Wt::WPushButton         *orbitsDeleteOneBtn_;
+    Wt::WPushButton         *orbitsDeleteAllBtn_;
+    bool                    orbitsStartSelected_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
     Wt::Signal<std::string> errorSignal_;
     Wt::Signal<std::string,double> onPlotSphereSignal_;
     Wt::Signal<std::string,int,double,double,double,double> onPlotPlaneSignal_;
+    Wt::Signal<int,double,double> orbitIntegrateSignal_;
+    Wt::Signal<int> orbitDeleteSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -169,6 +243,13 @@ private:
     void onPlot();
     // set default/widget evaluation parameters
     void setParams();
+    // react to button presses in orbits tab
+    void onOrbitsForwardsBtn();
+    void onOrbitsBackwardsBtn();
+    void onOrbitsContinueBtn();
+    void onOrbitsDeleteOneBtn();
+    void onOrbitsDeleteAllBtn();
+
 
     /* MAPLE FILE PARAMETERS */
     bool loggedIn_;
