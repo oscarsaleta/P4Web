@@ -320,7 +320,7 @@ void HomeRight::onOrbitsIntegrateSignal( int dir, double x0, double y0 )
     if (orbitStarted_) {
         sphere_->integrateOrbit(dir);
         globalLogger__.debug("HomeRight :: orbit integrated...");
-        sphere_->update();
+        sphere_->update(PaintUpdate);
     }
 
 }

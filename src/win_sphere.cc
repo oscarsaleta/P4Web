@@ -85,7 +85,8 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     parentWnd(parent),
     typeOfView_(0),
     projection_(projection),
-    plotPrepared_(false)
+    plotPrepared_(false),
+    plotDone_(false)
 {
     study_ = new WVFStudy(projection);
 
@@ -118,7 +119,8 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     viewMaxX_(maxx),
     viewMinY_(miny),
     viewMaxY_(maxy),
-    plotPrepared_(false)
+    plotPrepared_(false),
+    plotDone_(false)
 {
     study_ = new WVFStudy();
 
@@ -309,26 +311,28 @@ void WWinSphere::paintEvent( WPaintDevice * p )
         return;
     }
     WPainter paint(p);
-    paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
     staticPainter = &paint;
-    if( study_->typeofview != TYPEOFVIEW_PLANE ) {
-        if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
-            if( study_->plweights ) {
-                plotPoincareLyapunovSphere(); //not used
-            } else {
-                plotPoincareSphere(); // only one used for now
-            }
-        } else
-            plotLineAtInfinity(); //not used
+    if (!plotDone_) {
+        paint.fillRect(0.,0.,width_,height_, WBrush(QXFIGCOLOR(CBACKGROUND)));
+        if( study_->typeofview != TYPEOFVIEW_PLANE ) {
+            if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
+                if( study_->plweights ) {
+                    plotPoincareLyapunovSphere(); //not used
+                } else {
+                    plotPoincareSphere(); // only one used for now
+                }
+            } else
+                plotLineAtInfinity(); //not used
+        }
+        //plotGcf();
+        //drawLimitCycles(this);
+        //plotSeparatrices();
+        for (int cnt=0;cnt<10;cnt++)
+            plot_all_sep(this);
+        plotPoints();
     }
-    //plotGcf();
     drawOrbits();
-    //drawLimitCycles(this);
-    plotSeparatrices();
-    for (int cnt=0;cnt<10;cnt++)
-        plot_all_sep(this);
-    plotPoints();
-    
+    plotDone_ = true;
 }
 
 void WWinSphere::setChartString( int p, int q, bool isu1v1chart, bool negchart )
