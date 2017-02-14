@@ -428,7 +428,7 @@ void HomeLeft::prepareMapleFile()
     if (fileUploadName_.empty())
         fileUploadName_ = openTempStream(TMP_DIR,".mpl"/*,mplFile*/);
 
-    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc|std::fstream::out);
+    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc|std::fstream::out|std::fstream::in);
 
     str_vectable = fileUploadName_+"_vec.tab";
     str_fintab = fileUploadName_+"_fin.tab";
