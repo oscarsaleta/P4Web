@@ -944,8 +944,8 @@ void HomeLeft::onOrbitsForwardsBtn()
     //if (orbitIntegrationStarted_)
 
     orbitsContinueBtn_->enable();
-    orbitsDeleteOneBtn_->enable();
-    orbitsDeleteAllBtn_->enable();
+    //orbitsDeleteOneBtn_->enable();
+    //orbitsDeleteAllBtn_->enable();
     orbitsForwardsBtn_->disable();
 
     globalLogger__.debug("HomeLeft :: orbit start ("+orbitsXLineEdit_->text().toUTF8()+","+
@@ -962,8 +962,8 @@ void HomeLeft::onOrbitsBackwardsBtn()
     //if (orbitIntegrationStarted_)
 
     orbitsContinueBtn_->enable();
-    orbitsDeleteOneBtn_->enable();
-    orbitsDeleteAllBtn_->enable();
+    //orbitsDeleteOneBtn_->enable();
+    //orbitsDeleteAllBtn_->enable();
     orbitsBackwardsBtn_->disable();
 
     orbitIntegrateSignal_.emit(-1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));

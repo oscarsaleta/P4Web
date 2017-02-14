@@ -326,12 +326,13 @@ void WWinSphere::paintEvent( WPaintDevice * p )
         }
         //plotGcf();
         //drawLimitCycles(this);
-        //plotSeparatrices();
+        plotSeparatrices();
         for (int cnt=0;cnt<10;cnt++)
             plot_all_sep(this);
         plotPoints();
+    } else {
+        drawOrbits();
     }
-    drawOrbits();
     plotDone_ = true;
 }
 

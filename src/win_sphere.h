@@ -384,6 +384,9 @@ public:
                                             and compiling units (even from outside the
                                             object) */
 
+    bool plotDone_;
+    
+
 protected:
     /**
      * Paint event for this painted widget
@@ -417,7 +420,6 @@ private:
     void setChartString(int p, int q, bool isu1v1chart, bool negchart);
 
     bool plotPrepared_;
-    bool plotDone_;
 
 
 };

@@ -336,7 +336,8 @@ void HomeRight::onOrbitsDelete(int flag)
     else if (flag == 1)
         sphere_->study_->deleteOrbit(sphere_->study_->current_orbit);
 
-    sphere_->update();    
+    sphere_->plotDone_ = false;
+    sphere_->update();
 }
 
 /*void HomeRight::clearPlot()
