@@ -6,7 +6,7 @@ The aim of this project is to create a web version of <a href="htpps://github.co
 
 ## Acknowledgements
 
-This project would not be possible without the support of Joan Torregrossa, from the GSD UAB, and the original authors of P4: J. C. Artés, C. Herssens, P. De Maesschalck, F. Dumortier and J. Llibre.
+This project would not be possible without the support of Joan Torregrossa, and the original authors of P4: J. C. Artés, C. Herssens, P. De Maesschalck, F. Dumortier and J. Llibre.
 
 ## Screenshots
 
