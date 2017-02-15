@@ -151,6 +151,10 @@ public:
         return orbitDeleteSignal_;
     }
 
+    Wt::Signal<int>& resetSignal()
+    {
+        return resetSignal_;
+    }
 
 private:
     bool evaluated_;
@@ -206,6 +210,7 @@ private:
     Wt::WPushButton         *orbitsDeleteOneBtn_;
     Wt::WPushButton         *orbitsDeleteAllBtn_;
     bool                    orbitsStartSelected_;
+    //bool                    orbitIntegrationStarted_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
@@ -214,6 +219,7 @@ private:
     Wt::Signal<std::string,int,double,double,double,double> onPlotPlaneSignal_;
     Wt::Signal<int,double,double> orbitIntegrateSignal_;
     Wt::Signal<int> orbitDeleteSignal_;
+    Wt::Signal<int> resetSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
