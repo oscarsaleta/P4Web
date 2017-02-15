@@ -155,6 +155,8 @@ public:
     void onOrbitsIntegrate( int dir, double x0, double y0 );
     void onOrbitsDelete(int flag);
     
+    void onReset( int dummy );
+
 private:
     bool orbitStarted_;
     int projection_;

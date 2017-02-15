@@ -129,6 +129,7 @@ void MainUI::setupUI()
     // connect signals sent from left to actions performed by right (and vice versa)
     leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
+    leftContainer_->resetSignal().connect(rightContainer_,&HomeRight::onReset);
     leftContainer_->onPlotSphereSignal().connect(rightContainer_,&HomeRight::onSpherePlot);
     leftContainer_->onPlotPlaneSignal().connect(rightContainer_,&HomeRight::onPlanePlot);
     leftContainer_->orbitIntegrateSignal().connect(rightContainer_,&HomeRight::onOrbitsIntegrate);

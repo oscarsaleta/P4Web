@@ -152,41 +152,33 @@ WWinSphere::~WWinSphere()
     while( CircleAtInfinity != nullptr ) {
         t = CircleAtInfinity;
         CircleAtInfinity = t->next;
-        delete t;//free( t );
+        delete t;
         t = nullptr;
     }
     while( PLCircle != nullptr ) {
         t = PLCircle;
         PLCircle = t->next;
-        delete t;//free( t );
+        delete t;
         t = nullptr;
     }
 
-    /*for( i = 0; i < numSpheres; i++ ) {
-        if( SphereList[i] == this )
-            break;
+    if (study_ != nullptr) {
+        delete study_;
+        study_ = nullptr;
     }
-    if( i == numSpheres )
-        return;         // error: sphere not found?
-
-    if( i > 0 )
-        SphereList[i-1]->next = next;
-
-    if( i < numSpheres-1 )
-        memmove( SphereList+i, SphereList+i+1, sizeof(WWinSphere *) * (numSpheres-i-1) );
-
-    numSpheres--;*/
 }
 
 
 bool WWinSphere::setupPlot( void )
 {
-    if (plotPrepared_)
+    if (plotPrepared_) {
+        firstTimePlot_ = false;
         return true;
+    }
+    else
+        firstTimePlot_ = true;
 
     if (!study_->readTables(basename_)) {
-        //parent()->printError("Error while reading results. Evaluate the vector field first");
-        //delete this;
         return false;
     } else {
         switch(typeOfView_) {
@@ -317,23 +309,25 @@ void WWinSphere::paintEvent( WPaintDevice * p )
         if( study_->typeofview != TYPEOFVIEW_PLANE ) {
             if( study_->typeofview == TYPEOFVIEW_SPHERE ) {
                 if( study_->plweights ) {
-                    plotPoincareLyapunovSphere(); //not used
+                    plotPoincareLyapunovSphere();
                 } else {
-                    plotPoincareSphere(); // only one used for now
+                    plotPoincareSphere();
                 }
             } else
-                plotLineAtInfinity(); //not used
+                plotLineAtInfinity();
         }
         //plotGcf();
         //drawLimitCycles(this);
         plotSeparatrices();
-        for (int cnt=0;cnt<10;cnt++)
-            plot_all_sep(this);
+        if (firstTimePlot_)
+            for (int cnt=0;cnt<10;cnt++)
+                plot_all_sep(this);
         plotPoints();
+        drawOrbits();
+        plotDone_ = true;
     } else {
         drawOrbits();
     }
-    plotDone_ = true;
 }
 
 void WWinSphere::setChartString( int p, int q, bool isu1v1chart, bool negchart )
@@ -342,23 +336,23 @@ void WWinSphere::setChartString( int p, int q, bool isu1v1chart, bool negchart )
     if (isu1v1chart) {
         // { x = +/- 1/z2^p, y = z1/z2^q }
         if (p!=1 && q!=1)
-            buf = WString("[x={1}/z2^{2}, y=z1/z2^{3}]").arg((int)(negchart ? -1 : 1)).arg(p).arg(q);
+            buf = WString("{x={1}/z2^{2}, y=z1/z2^{3}}").arg((int)(negchart ? -1 : 1)).arg(p).arg(q);
         else if (p==1 && q!=1)
-            buf = WString("[x={1}/z2, y=z1/z2^{2}]").arg((int)(negchart ? -1 : 1)).arg(q);
+            buf = WString("{x={1}/z2, y=z1/z2^{2}}").arg((int)(negchart ? -1 : 1)).arg(q);
         else if (p!=1 && q==1)
-            buf = WString("[x={1}/z2^{2}, y=z1/z2]").arg((int)(negchart ? -1 : 1)).arg(p);
+            buf = WString("{x={1}/z2^{2}, y=z1/z2}").arg((int)(negchart ? -1 : 1)).arg(p);
         else
-            buf = WString("[x={1}/z2, y=z1/z2]").arg((int)(negchart ? -1 : 1));
+            buf = WString("{x={1}/z2, y=z1/z2}").arg((int)(negchart ? -1 : 1));
     } else {
         // { x = z1/z2^p, y = +/- 1/z2^q }
         if (p!=1 && q!=1)
-            buf = WString("[x=1/z2^{1}, y={2}/z2^{3}]").arg(p).arg((int)(negchart ? -1 : 1)).arg(q);
+            buf = WString("{x=1/z2^{1}, y={2}/z2^{3}}").arg(p).arg((int)(negchart ? -1 : 1)).arg(q);
         else if (p==1 && q!=1)
-            buf = WString("[x=1/z2, y={1}/z2^{2}]").arg((int)(negchart ? -1 : 1)).arg(q);
+            buf = WString("{x=1/z2, y={1}/z2^{2}}").arg((int)(negchart ? -1 : 1)).arg(q);
         else if (p!=1 && q==1)
-            buf = WString("[x=1/z2^{1}, y={2}/z2]").arg(p).arg((int)(negchart ? -1 : 1));
+            buf = WString("{x=1/z2^{1}, y={2}/z2}").arg(p).arg((int)(negchart ? -1 : 1));
         else
-            buf = WString("[x=1/z2, y={1}/z2]").arg((int)(negchart ? -1 : 1));
+            buf = WString("{x=1/z2, y={1}/z2}").arg((int)(negchart ? -1 : 1));
     }
     chartString_ = buf;
 }

@@ -111,30 +111,30 @@ bool WWinSphere::startOrbit( double x, double y, bool R )
     double pcoord[3];
     double ucoord[2];
 
-    if ( study_->first_orbit == nullptr ) {
-        study_->first_orbit = new orbits;
-        study_->current_orbit = study_->first_orbit;
-    } else {
-        study_->current_orbit->next_orbit = new orbits;
-        study_->current_orbit = study_->current_orbit->next_orbit;
-    }
     if ( R )
         (study_->*(study_->R2_to_sphere))(x,y,pcoord);
     else
         (study_->*(study_->viewcoord_to_sphere))(x,y,pcoord); 
 
+    if ( study_->first_orbit == nullptr ) {
+        study_->first_orbit = new orbits;
+        study_->current_orbit = study_->first_orbit;
+    } else {
+        if (pcoord[0] == study_->current_orbit->pcoord[0]
+            && pcoord[1] == study_->current_orbit->pcoord[1]
+            && pcoord[2] == study_->current_orbit->pcoord[2]) {
+            return false;
+        }
+        study_->current_orbit->next_orbit = new orbits;
+        study_->current_orbit = study_->current_orbit->next_orbit;
+    }
+    
     copy_x_into_y( pcoord, study_->current_orbit->pcoord );
     study_->current_orbit->color = CORBIT;
-    /*study_->current_orbit->f_orbits->color = CORBIT;
-    study_->current_orbit->f_orbits->pcoord[0] = pcoord[0];
-    study_->current_orbit->f_orbits->pcoord[1] = pcoord[1];
-    study_->current_orbit->f_orbits->pcoord[2] = pcoord[2];
-    study_->current_orbit->f_orbits->next_point = nullptr;*/
     study_->current_orbit->f_orbits = nullptr;
     study_->current_orbit->next_orbit = nullptr;
 
     (study_->*(study_->sphere_to_viewcoord))( pcoord[0], pcoord[1], pcoord[2], ucoord );
-    //drawPoint( ucoord[0], ucoord[1], CORBIT );
 
     return true;
 }
@@ -206,7 +206,6 @@ void WWinSphere::deleteLastOrbit()
     study_->deleteOrbitPoint( orbit2->f_orbits );
     delete orbit2;
     orbit2 = nullptr;
-    update();
 }
 
 

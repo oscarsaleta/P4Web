@@ -67,7 +67,6 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     settingsContainer_(nullptr),
     viewContainer_(nullptr),
     orbitsContainer_(nullptr),
-    orbitsStartSelected_(false),
     evaluated_(false)
 {
     // set CSS class for inline 50% of the screen
@@ -226,6 +225,15 @@ void HomeLeft::setupConnectors()
     globalLogger__.debug("HomeLeft :: connectors set up");
 }
 
+
+/*void HomeLeft::tryUpload()
+{
+    fileUploadWidget_->upload();
+    if (fileUploadWidget_->empty()) {
+        WPushButton *btn = new WPushButton("Upload");
+
+    }
+}*/
 
 void HomeLeft::fileUploaded()
 {
@@ -538,7 +546,7 @@ void HomeLeft::evaluate()
         waitpid(pid,&status,0);
         if (status == 0) {
             evaluatedSignal_.emit(fileUploadName_);
-            globalLogger__.info("HomeLeft :: Maple script successfully executed");
+            globalLogger__.debug("HomeLeft :: Maple script successfully executed");
         } else {
             errorSignal_.emit("Error during Maple script execution");
             globalLogger__.error("HomeLeft :: Maple error: "+std::to_string(status));
@@ -912,10 +920,13 @@ void HomeLeft::resetUI()
 {
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
+    
     if (loggedIn_) {
         hideSettings();
         showSettings();
     }
+
+    resetSignal_.emit(1);
 }
 
 void HomeLeft::showOrbitsDialog( bool clickValid, double x, double y )
@@ -944,8 +955,8 @@ void HomeLeft::onOrbitsForwardsBtn()
     //if (orbitIntegrationStarted_)
 
     orbitsContinueBtn_->enable();
-    //orbitsDeleteOneBtn_->enable();
-    //orbitsDeleteAllBtn_->enable();
+    orbitsDeleteOneBtn_->enable();
+    orbitsDeleteAllBtn_->enable();
     orbitsForwardsBtn_->disable();
 
     globalLogger__.debug("HomeLeft :: orbit start ("+orbitsXLineEdit_->text().toUTF8()+","+
@@ -959,11 +970,10 @@ void HomeLeft::onOrbitsBackwardsBtn()
         return;
     
     orbitsStartSelected_ = true;
-    //if (orbitIntegrationStarted_)
 
     orbitsContinueBtn_->enable();
-    //orbitsDeleteOneBtn_->enable();
-    //orbitsDeleteAllBtn_->enable();
+    orbitsDeleteOneBtn_->enable();
+    orbitsDeleteAllBtn_->enable();
     orbitsBackwardsBtn_->disable();
 
     orbitIntegrateSignal_.emit(-1,std::stod(orbitsXLineEdit_->text()),std::stod(orbitsYLineEdit_->text()));
@@ -971,9 +981,8 @@ void HomeLeft::onOrbitsBackwardsBtn()
 
 void HomeLeft::onOrbitsContinueBtn()
 {
-    if (orbitsStartSelected_ /*&& orbitIntegrationStarted_*/) {
+    if (orbitsStartSelected_)
         orbitIntegrateSignal_.emit(0,0.0,0.0);
-    }
 }
 
 void HomeLeft::onOrbitsDeleteOneBtn()
@@ -983,8 +992,8 @@ void HomeLeft::onOrbitsDeleteOneBtn()
     orbitsContinueBtn_->disable();
     orbitsForwardsBtn_->enable();
     orbitsBackwardsBtn_->enable();
-    orbitsDeleteAllBtn_->disable();
-    orbitsDeleteOneBtn_->disable();
+    //orbitsDeleteAllBtn_->disable();
+    //orbitsDeleteOneBtn_->disable();
 
     orbitDeleteSignal_.emit(1);
 }
@@ -998,4 +1007,5 @@ void HomeLeft::onOrbitsDeleteAllBtn()
     orbitsBackwardsBtn_->enable();
 
     orbitDeleteSignal_.emit(0);
+    //onPlotSphereSignal_.emit(fileUploadName_,-1);
 }

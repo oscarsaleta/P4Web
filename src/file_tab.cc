@@ -452,7 +452,6 @@ void WVFStudy::deleteOrbit( orbits * p )
 // read filename_vec.tab
 // read filename_inf.tab
 // read filename_fin.tab
-// TODO: read files from scp (libssh)
 bool WVFStudy::readTables( std::string basename )
 {
     FILE * fp;
