@@ -167,14 +167,20 @@ private:
 
     Wt::WTabWidget *tabWidget_;
 
-    Wt::WContainerWidget *outputContainer_;
-    Wt::WTextArea *outputTextArea_;
-    Wt::WString outputTextAreaContent_;
-    Wt::WToolBar *outputButtonsToolbar_;
-    Wt::WPushButton *fullResButton_;
-    Wt::WPushButton *finResButton_;
-    Wt::WPushButton *infResButton_;
-    Wt::WPushButton *clearOutputButton_;
+    Wt::WContainerWidget    *outputContainer_;
+    Wt::WTextArea           *outputTextArea_;
+    Wt::WString             outputTextAreaContent_;
+    Wt::WToolBar            *outputButtonsToolbar_;
+    Wt::WSplitButton        *fullResButton_;
+    Wt::WMenuItem           *fullResAnchor_;
+    Wt::WFileResource       *fullResFile_;
+    Wt::WSplitButton        *finResButton_;
+    Wt::WMenuItem           *finResAnchor_;
+    Wt::WFileResource       *finResFile_;
+    Wt::WSplitButton        *infResButton_;
+    Wt::WMenuItem           *infResAnchor_;
+    Wt::WFileResource       *infResFile_;
+    Wt::WPushButton         *clearOutputButton_;
 
     std::string fileName_;
     std::string fullResults_;

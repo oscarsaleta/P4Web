@@ -920,6 +920,9 @@ void HomeLeft::resetUI()
 {
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
+
+    saveAnchor_->hide();
+    prepSaveButton_->show();
     
     if (loggedIn_) {
         hideSettings();

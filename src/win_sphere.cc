@@ -92,12 +92,6 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
 
     ReverseYaxis = false;
 
-    /*SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
-    SphereList[numSpheres++] = this;
-    if( numSpheres > 1 ) {
-        SphereList[numSpheres-2]->next = this;
-    }*/
-
     resize(width_,height_);
     
     next = nullptr;
@@ -125,12 +119,6 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     study_ = new WVFStudy();
 
     ReverseYaxis = false;
-
-    /*SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
-    SphereList[numSpheres++] = this;
-    if( numSpheres > 1 ) {
-        SphereList[numSpheres-2]->next = this;
-    }*/
 
     resize(width_,height_);
     

@@ -68,7 +68,7 @@
         <div class="col-sm-10" title="${vf-tooltip}">${yeq}</div>
       </div>
       <div class="form-group">
-        <div class="btn-group-md col-sm-offset-2 col-sm-10">
+        <div class="form-actions col-sm-offset-2 col-sm-10">
           ${eval}
           ${plot}
           ${prep-save}${down-save}
@@ -230,14 +230,10 @@
         </div>
       </div>
       <div class="form-group">
-        <div class="btn-group-md col-sm-offset-2 col-sm-2">
-          ${fw}
-        </div>
-        <div class="btn-group-md col-sm-2">
-          ${cnt}
-        </div>
-        <div class="btn-group-md col-sm-2">
-          ${bw}
+        <div class="form-actions col-sm-offset-2 col-sm-10">
+            ${fw}
+            ${cnt}
+            ${bw}
         </div>
       </div>
     </div>
