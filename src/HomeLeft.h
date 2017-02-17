@@ -151,6 +151,13 @@ public:
         return orbitDeleteSignal_;
     }
 
+    /**
+     * Signal to reset everything
+     *
+     * We need to send a signal so HomeRight also resets its UI.
+     * The int is just a dummy value because we cannot sent empty
+     * signals for some reason.
+     */
     Wt::Signal<int>& resetSignal()
     {
         return resetSignal_;

@@ -145,27 +145,61 @@ public:
      */
     void mouseMovedEvent( Wt::WString caption );
 
+    /**
+     * React to a click on the sphere by printing the coordinates below
+     * 
+     * @param clickValid wether the click was in valid coordinates
+     * @param x          x coordinate
+     * @param y          y coordinate
+     */
     void sphereClicked( bool clickValid, double x, double y );
 
+    /**
+     * Send signal of click on plot so we can start orbit integration
+     */
     Wt::Signal<bool,double,double>& sphereClickedSignal()
     {
         return sphereClickedSignal_;
     }
 
+    /**
+     * React to an orbit integration request
+     *
+     * The @c dir argument tells the direction of integration. If
+     * dir=0, then we just continue the integration in the last
+     * direction used.
+     * 
+     * @param dir direction of integration (-1, 0 or 1)
+     * @param x0  x coordinate of starting point
+     * @param y0  y coordinate of starting point
+     */
     void onOrbitsIntegrate( int dir, double x0, double y0 );
+
+    /**
+     * React to an orbit delete request
+     * 
+     * @param flag can be 0 (delete all) or 1 (delete last)
+     */
     void onOrbitsDelete(int flag);
     
+    /**
+     * React to reset signal from HomeLeft
+     *
+     * Delete sphere, clean outputand reset view to output tab
+     * 
+     * @param dummy not needed but signals cannot be empty
+     */
     void onReset( int dummy );
 
 private:
-    bool orbitStarted_;
-    int projection_;
-    double viewMinX_;
-    double viewMaxX_;
-    double viewMinY_;
-    double viewMaxY_;
+    bool                    orbitStarted_;
+    int                     projection_;
+    double                  viewMinX_;
+    double                  viewMaxX_;
+    double                  viewMinY_;
+    double                  viewMaxY_;
 
-    Wt::WTabWidget *tabWidget_;
+    Wt::WTabWidget          *tabWidget_;
 
     Wt::WContainerWidget    *outputContainer_;
     Wt::WTextArea           *outputTextArea_;
@@ -182,19 +216,19 @@ private:
     Wt::WFileResource       *infResFile_;
     Wt::WPushButton         *clearOutputButton_;
 
-    std::string fileName_;
-    std::string fullResults_;
-    std::string finResults_;
-    std::string infResults_;
+    std::string             fileName_;
+    std::string             fullResults_;
+    std::string             finResults_;
+    std::string             infResults_;
 
-    WWinSphere *sphere_;
+    WWinSphere              *sphere_;
 
-    Wt::WContainerWidget *plotContainer_;
-    Wt::WText *plotCaption_;
-    /*Wt::WToolBar *plotButtonsToolbar_;
-    Wt::WPushButton *clearPlotButton_;
-    Wt::WPushButton *plotPointsButton_;
-    Wt::WPushButton *plotSeparatricesButton_;*/
+    Wt::WContainerWidget    *plotContainer_;
+    Wt::WText               *plotCaption_;
+    /*Wt::WToolBar            *plotButtonsToolbar_;
+    Wt::WPushButton         *clearPlotButton_;
+    Wt::WPushButton         *plotPointsButton_;
+    Wt::WPushButton         *plotSeparatricesButton_;*/
 
     void setupUI();
     void setupConnectors();
