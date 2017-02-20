@@ -37,7 +37,8 @@
  * That said, the code has been heavily modified because this application uses <b>NO Qt</b>
  * classes or functions. The UI and backend elements have been build from zero using the
  * <b>Wt library</b> (<a href="https://www.webtoolkit.eu/wt">https://www.webtoolkit.eu/wt</a>),
- * because it is highly convenient to create web applications based on existing C++ code.
+ * because it is highly convenient for creating web applications based on existing
+ * C++ code.
  */
 
 
