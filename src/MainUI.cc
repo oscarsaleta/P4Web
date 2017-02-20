@@ -95,6 +95,10 @@ void MainUI::setupUI()
     addWidget(title_);
     globalLogger__.debug("MainUI :: title set up");
 
+    WText *disclaimer = new WText(WString::tr("mainui.disclaimer"));
+    disclaimer->setStyleClass("small center");
+    addWidget(disclaimer);
+
     // this is used to change page content
     mainStack_ = new WStackedWidget();
     mainStack_->setId("mainStack_");

@@ -31,6 +31,10 @@
     <h1><strong>WP4</strong>: <small>Web</small> Planar Polynomial Phase Portraits</h1>
   </message>
 
+  <message id="mainui.disclaimer">
+    <small>This is a development version. If you find any problems, please <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send an email</a> so we can keep improving the site.</small>
+  </message>
+
   <message id="homeleft.equationboxtitle">
     Differential system:
   </message>
