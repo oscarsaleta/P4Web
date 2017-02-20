@@ -58,7 +58,7 @@ int main (int argc, char **argv)
 
     try {
         WServer server(argc, argv, WTHTTP_CONFIGURATION);
-        server.addEntryPoint(Wt::Application,createApplication,std::string(),"favicon.ico");
+        server.addEntryPoint(Wt::Application,createApplication,"/WP4.wt","favicon.ico");
         Session::configureAuth();
         server.run();
 
