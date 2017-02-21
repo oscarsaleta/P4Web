@@ -23,11 +23,13 @@
 #define HOMELEFT_H
 
 #ifdef ANTZ
-#define MAPLE_PATH "/usr/share/maple11/bin/maple"
-#define TMP_DIR "/home/p4/tmp/"
+    #define MAPLE_PATH "/usr/share/maple11/bin/maple"
+    #define P4_BINDIR "/home/p4/p4/bin/"
+    #define TMP_DIR "/home/p4/tmp/"
 #else
-#define MAPLE_PATH "/home/osr/maple2015/bin/maple"
-#define TMP_DIR "/tmp/"
+    #define MAPLE_PATH "/home/osr/maple2015/bin/maple"
+    #define P4_BINDIR "/usr/local/p4/bin/"
+    #define TMP_DIR "/tmp/"
 #endif
 
 #define ACCURACY_DEFAULT 8

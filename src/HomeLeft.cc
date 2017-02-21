@@ -78,7 +78,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     setupConnectors();
 
     // set up maple parameters that will not change
-    str_bindir = "/usr/local/p4/bin/";
+    str_bindir = P4_BINDIR;
     str_p4m = str_bindir+"p4.m";
     str_tmpdir = TMP_DIR;
     str_lypexe = "lyapunov";
