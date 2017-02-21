@@ -1,11 +1,11 @@
-/*  P4 (Polynomial Planar Phase Portraits) WEB VERSION SOURCE CODE
+/*  WP4 (Web - Polynomial Planar Phase Portraits) SOURCE CODE
  *  Software to study polynomial planar differential systems and represent
  *  their phase portrait in several spaces, such as Poincaré sphere. 
- *  URL: http://github.com/oscarsaleta/P4Web
+ *  URL: http://github.com/oscarsaleta/WP4
  *
  *  Copyright (C) 2016  O. Saleta
  *
- *  This program is free software: you can redistribute it and/or modify
+ *  WP4 is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU Lesser General Public License as published
  *  by the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
