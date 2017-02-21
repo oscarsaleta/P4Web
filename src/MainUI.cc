@@ -130,6 +130,11 @@ void MainUI::setupUI()
     globalLogger__.debug("MainUI :: HomeRight created");
     t->bindWidget("right",rightContainer_);
 
+    // copyright
+    WText *copyright = new WText(WString::tr("mainui.copyright"));
+    copyright->setId("copyright");
+    addWidget(copyright);
+
     // connect signals sent from left to actions performed by right (and vice versa)
     leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
     leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);

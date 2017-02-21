@@ -44,8 +44,8 @@
   <!-- Main UI dual column template -->
   <message id="template.mainui">
     <div class="row">
-      <div class="col-sm-6">${left}</div>
-      <div class="col-sm-6">${right}</div>
+      <div class="col-xs-12 col-sm-6">${left}</div>
+      <div class="col-xs-12 col-sm-6">${right}</div>
     </div>
   </message>
 

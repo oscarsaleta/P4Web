@@ -39,6 +39,12 @@ body {
   text-align: center;
 }
 
+#copyright {
+  font-size: 8px;
+  text-align: right;
+  margin: auto;
+}
+
 /* crosshair cursor when hovering the plot region */
 #sphere_ {
   cursor: crosshair;
