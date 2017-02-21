@@ -59,7 +59,11 @@ int main (int argc, char **argv)
 
     try {
         WServer server(argc, argv, WTHTTP_CONFIGURATION);
+#ifdef ANTZ
         server.addEntryPoint(Wt::Application,createApplication,"/WP4.wt","favicon.ico");
+#else
+        server.addEntryPoint(Wt::Application,createApplication,std::string(),"favicon.ico");
+#endif
         Session::configureAuth();
         server.run();
 

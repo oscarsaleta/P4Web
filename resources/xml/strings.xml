@@ -31,12 +31,9 @@
     <h1><strong>WP4</strong>: <small>Web</small> Planar Polynomial Phase Portraits</h1>
   </message>
 
-  <message id="mainui.disclaimer">
-    <small>This is a development version. If you find any problems, please <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send an email</a> so we can keep improving the site.</small>
-  </message>
-
-  <message id="mainui.copyright">
-    <p align="right">&copy; Oscar Saleta, 2017</p>
+  <message id="mainui.disclaimer-copyright">
+    <p style="float:left">This is a development version. If you find any problems, please <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send an email</a> or <a href="https://github.com/oscarsaleta/WP4/issues/new">create an issue in GitHub</a>, so we can keep improving the site.</p>
+    <p style="float:right">&copy; 2017 Oscar Saleta.</p>
   </message>
 
   <message id="homeleft.equationboxtitle">

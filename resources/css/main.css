@@ -40,9 +40,8 @@ body {
 }
 
 #copyright {
-  font-size: 8px;
-  text-align: right;
-  margin: auto;
+  margin-top: 20px;
+  font-size: 10px;
 }
 
 /* crosshair cursor when hovering the plot region */

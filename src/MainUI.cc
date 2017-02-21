@@ -95,10 +95,6 @@ void MainUI::setupUI()
     addWidget(title_);
     globalLogger__.debug("MainUI :: title set up");
 
-    WText *disclaimer = new WText(WString::tr("mainui.disclaimer"));
-    disclaimer->setStyleClass("small center");
-    addWidget(disclaimer);
-
     // this is used to change page content
     mainStack_ = new WStackedWidget();
     mainStack_->setId("mainStack_");
@@ -131,7 +127,7 @@ void MainUI::setupUI()
     t->bindWidget("right",rightContainer_);
 
     // copyright
-    WText *copyright = new WText(WString::tr("mainui.copyright"));
+    WText *copyright = new WText(WString::tr("mainui.disclaimer-copyright"));
     copyright->setId("copyright");
     addWidget(copyright);
 
