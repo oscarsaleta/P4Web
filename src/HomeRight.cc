@@ -25,21 +25,16 @@
 #include "win_sphere.h"
 //#include "math_orbits.h"
 
-#include <chrono>
-#include <ctime>
 #include <iostream>
 #include <fstream>
 #include <string>
 
 #include <Wt/WBreak>
 #include <Wt/WEvent>
-#include <Wt/WFileResource>
 #include <Wt/WGroupBox>
 #include <Wt/WImage>
 #include <Wt/WMenuItem>
-#include <Wt/WPopupMenu>
 #include <Wt/WPushButton>
-#include <Wt/WSplitButton>
 #include <Wt/WTabWidget>
 #include <Wt/WToolBar>
 
@@ -107,31 +102,22 @@ void HomeRight::setupUI()
     outputButtonsToolbar_->setMargin(5,Top);
     outputButtonsToolbar_->setMargin(5,Bottom);
 
-    fullResButton_ = new WSplitButton("Full output");
+    fullResButton_ = new WPushButton("Full output");
     fullResButton_->setId("fullResButton_");
+    fullResButton_->setStyleClass("btn-default btn");
     fullResButton_->setToolTip(WString::tr("tooltip.homeright-full-button"),XHTMLText);
-    WPopupMenu *popup = new WPopupMenu();
-    fullResAnchor_ = new WMenuItem("Download");
-    popup->addItem(fullResAnchor_);
-    fullResButton_->dropDownButton()->setMenu(popup);
     outputButtonsToolbar_->addButton(fullResButton_);
 
-    finResButton_ = new WSplitButton("Finite");
+    finResButton_ = new WPushButton("Finite");
     finResButton_->setId("finResButton_");
+    finResButton_->setStyleClass("btn-default btn");
     finResButton_->setToolTip(WString::tr("tooltip.homeright-finite-button"),XHTMLText);
-    popup = new WPopupMenu();
-    finResAnchor_ = new WMenuItem("Download");
-    popup->addItem(finResAnchor_);
-    finResButton_->dropDownButton()->setMenu(popup);
     outputButtonsToolbar_->addButton(finResButton_);
 
-    infResButton_ = new WSplitButton("Infinite");
+    infResButton_ = new WPushButton("Infinite");
     infResButton_->setId("infResButton_");
+    infResButton_->setStyleClass("btn-default btn");
     infResButton_->setToolTip(WString::tr("tooltip.homeright-infinite-button"),XHTMLText);
-    popup = new WPopupMenu();
-    infResAnchor_ = new WMenuItem("Download");
-    popup->addItem(infResAnchor_);
-    infResButton_->dropDownButton()->setMenu(popup);
     outputButtonsToolbar_->addButton(infResButton_);
 
     outputButtonsToolbar_->addSeparator();
@@ -183,9 +169,9 @@ void HomeRight::setupUI()
 void HomeRight::setupConnectors()
 {
     // output buttons
-    fullResButton_->actionButton()->clicked().connect(this,&HomeRight::fullResults);
-    finResButton_->actionButton()->clicked().connect(this,&HomeRight::showFinResults);
-    infResButton_->actionButton()->clicked().connect(this,&HomeRight::showInfResults);
+    fullResButton_->clicked().connect(this,&HomeRight::fullResults);
+    finResButton_->clicked().connect(this,&HomeRight::showFinResults);
+    infResButton_->clicked().connect(this,&HomeRight::showInfResults);
     clearOutputButton_->clicked().connect(this,&HomeRight::clearResults);
     // plot buttons
     /*plotPointsButton_->clicked().connect(this,&HomeRight::plotSingularPoints);
@@ -198,21 +184,7 @@ void HomeRight::setupConnectors()
 void HomeRight::readResults(std::string fileName)
 {
     tabWidget_->setCurrentIndex(0);
-
-    if (fullResFile_ != nullptr) {
-        delete fullResFile_;
-        fullResFile_ = nullptr;
-    }
-    if (finResFile_ != nullptr) {
-        delete finResFile_;
-        finResFile_ = nullptr;
-    }
-    if (infResFile_ != nullptr) {
-        delete infResFile_;
-        infResFile_ = nullptr;
-    }
-
-
+    
     std::ifstream resultsFile;
     std::string line;
 
@@ -225,15 +197,6 @@ void HomeRight::readResults(std::string fileName)
         while(getline(resultsFile,line))
             fullResults_ += line + "\n";
         resultsFile.close();
-
-        fullResFile_ = new WFileResource(fileName_+".res");
-        char date[100];
-        std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        std::strftime(date,sizeof(date),"%F_%R",std::localtime(&now));
-    
-        fullResFile_->suggestFileName("WP4_"+std::string(date)+".res");
-
-        fullResAnchor_->setLink(fullResFile_);
     }
 
     // read finite singular points results
@@ -243,15 +206,6 @@ void HomeRight::readResults(std::string fileName)
         while (getline(resultsFile,line))
             finResults_ += line + "\n";
         resultsFile.close();
-
-        finResFile_ = new WFileResource(fileName_+"_fin.res");
-        char date[100];
-        std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        std::strftime(date,sizeof(date),"%F_%R",std::localtime(&now));
-    
-        finResFile_->suggestFileName("WP4_"+std::string(date)+"_fin.res");
-
-        finResAnchor_->setLink(finResFile_);
     }
     
     // add title for infinite region (missing in inf.res)
@@ -262,15 +216,6 @@ void HomeRight::readResults(std::string fileName)
         while(getline(resultsFile,line))
             infResults_ += line + "\n";
         resultsFile.close();
-
-        infResFile_ = new WFileResource(fileName_+"_inf.res");
-        char date[100];
-        std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-        std::strftime(date,sizeof(date),"%F_%R",std::localtime(&now));
-    
-        infResFile_->suggestFileName("WP4_"+std::string(date)+"_inf.res");
-
-        infResAnchor_->setLink(infResFile_);
     }
 
     fullResults();
