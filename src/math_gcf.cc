@@ -35,7 +35,7 @@ static int GcfDashes = 0;
 static bool GcfError = false;
 
 // non-static global variables
-orbits_points * last_gcf_point = nullptr;
+orbits_points * last_gcf_point = nullptr; // TODO: fer membre de WVFStudy?
 
 // static functions
 static void insert_gcf_point( double x0, double y0, double z0, int dashes );
@@ -45,15 +45,17 @@ static bool read_gcf( void (*chart)(double,double,double *) );
 // function definitions
 bool WWinSphere::evalGcfStart( int dashes, int points, int precis )
 {
-    if( study_->gcf_points != nullptr ) {
-        sp->prepareDrawing();
-        draw_gcf( sp, study_->gcf_points, CBACKGROUND, GcfDashes );
-        sp->finishDrawing();
+    if ( study_->gcf_points != nullptr ) {
+        /* here we just paint in black over the previous gcf,
+           we can simply reset the plot or something */
+        //sp->prepareDrawing();
+        //draw_gcf( sp, study_->gcf_points, CBACKGROUND, GcfDashes );
+        //sp->finishDrawing();
         study_->deleteOrbitPoint( study_->gcf_points );
         study_->gcf_points = nullptr;
     }
 
-    if( study_->plweights )
+    if ( study_->plweights )
         GcfTask = EVAL_GCF_LYP_R2;
     else
         GcfTask = EVAL_GCF_R2;
@@ -61,24 +63,26 @@ bool WWinSphere::evalGcfStart( int dashes, int points, int precis )
     GcfError = false;
     //GcfSphere = sp;
     GcfDashes = dashes;
+    // TODO si això ho ha de fer homeright, haurem d'enviar una senyal
     return runTask( GcfTask, points, precis );
 }
 
-bool WWinSphere::evalGcfContinue( int points, int prec ) // returns true when finished.  Then run EvalGCfFinish to see if error occurred or not
+// returns true when finished.  Then run EvalGCfFinish to see if error occurred or not
+bool WWinSphere::evalGcfContinue( int points, int prec )
 {
-    if( GcfTask == EVAL_GCF_NONE )
+    if ( GcfTask == EVAL_GCF_NONE )
         return true;
 
-    if( !ReadTaskResults( GcfTask ) ) {
+    if ( !ReadTaskResults( GcfTask ) ) {
         GcfError = true;
         return true;
     }
     GcfTask++;
-    if( GcfTask == EVAL_GCF_FINISHPOINCARE || GcfTask == EVAL_GCF_FINISHLYAPUNOV ) {
+    if ( GcfTask == EVAL_GCF_FINISHPOINCARE || GcfTask == EVAL_GCF_FINISHLYAPUNOV ) {
         return true;
     }
     
-    if( !runTask( GcfTask, points, prec ) ) {
+    if ( !runTask( GcfTask, points, prec ) ) {
         GcfError = true;
         return true;
     }
@@ -88,7 +92,7 @@ bool WWinSphere::evalGcfContinue( int points, int prec ) // returns true when fi
 
 bool WWinSphere::evalGcfFinish( void )      // return false in case an error occured
 {
-    if( GcfTask != EVAL_GCF_NONE ) {
+    if ( GcfTask != EVAL_GCF_NONE ) {
         // TODO: this stuff must only be called from a paintEvent
         // maybe call update?
 
@@ -98,8 +102,7 @@ bool WWinSphere::evalGcfFinish( void )      // return false in case an error occ
 
         GcfTask = EVAL_GCF_NONE;
 
-        if( GcfError )
-        {
+        if ( GcfError ) {
             GcfError = false;
             return false;
         }
@@ -113,19 +116,22 @@ bool runTask( int task, int points, int prec )
 
     switch( task ) {
     case EVAL_GCF_R2:
-        value = ThisVF->prepareGcf( VFResults.gcf, -1, 1, prec, points  );
+    // TODO: either send signal to homeleft to prepare file or prepare it
+    // in homeright or in sphere
+    // la signal seria <P4POLYNOM,int,int,int,int>
+        value = ThisVF->prepareGcf( /*TODO: sphere_->*/study_->gcf, -1, 1, prec, points );
         break;
     case EVAL_GCF_U1:
-        value = ThisVF->prepareGcf( VFResults.gcf_U1, 0, 1, prec, points  );
+        value = ThisVF->prepareGcf(study_->gcf_U1, 0, 1, prec, points);
         break;
     case EVAL_GCF_V1:
-        value = ThisVF->prepareGcf( VFResults.gcf_U1, -1, 0, prec, points  );
+        value = ThisVF->prepareGcf(study_->gcf_U1, -1, 0, prec, points);
         break;
     case EVAL_GCF_U2:
-        value = ThisVF->prepareGcf( VFResults.gcf_U2, 0, 1, prec, points  );
+        value = ThisVF->prepareGcf(study_->gcf_U2, 0, 1, prec, points);
         break;
     case EVAL_GCF_V2:
-        value = ThisVF->prepareGcf( VFResults.gcf_U2, -1, 0, prec, points );
+        value = ThisVF->prepareGcf(study_->gcf_U2, -1, 0, prec, points);
         break;
     case EVAL_GCF_LYP_R2:
         value = ThisVF->prepareGcf_LyapunovR2(prec, points);
@@ -147,7 +153,7 @@ bool runTask( int task, int points, int prec )
         break;
     }
 
-    if( value )
+    if ( value )
         return ThisVF->evaluateGcf();
     else
         return false;
@@ -183,33 +189,30 @@ static bool ReadTaskResults( int task ) // , int points, int prec, int memory )
     return value;
 }
 
-void draw_gcf( QWinSphere * spherewnd, struct orbits_points * sep, int color, int dashes )
+void WWinSphere::draw_gcf( orbits_points * sep, int color, int dashes )
 {
     double pcoord[3];
 
     while( sep != nullptr )
     {
-        if(sep->dashes && dashes)
-            (*plot_l)(spherewnd,pcoord,sep->pcoord,color);
+        if (sep->dashes && dashes)
+            (*plot_l)(this,pcoord,sep->pcoord,color);
         else
-            (*plot_p)(spherewnd,sep->pcoord,color);
+            (*plot_p)(this,sep->pcoord,color);
         copy_x_into_y(sep->pcoord,pcoord);
 
         sep=sep->next_point;
     }
 } 
 
-static void insert_gcf_point( double x0, double y0, double z0, int dashes )
+void WVFStudy::insert_gcf_point( double x0, double y0, double z0, int dashes )
 {
-    if( VFResults.gcf_points != nullptr  )
-    {
-        last_gcf_point->next_point = new orbits_points;//(struct orbits_points *) malloc(sizeof(struct orbits_points));
+    if ( gcf_points != nullptr  ) {
+        last_gcf_point->next_point = new orbits_points;
         last_gcf_point = last_gcf_point->next_point; 
-    }
-    else
-    {
-        last_gcf_point = new orbits_points;//(struct orbits_points *) malloc(sizeof(struct orbits_points));
-        VFResults.gcf_points = last_gcf_point;
+    } else {
+        last_gcf_point = new orbits_points;
+        gcf_points = last_gcf_point;
     }
 
     last_gcf_point->pcoord[0] = x0;
@@ -231,20 +234,20 @@ static bool read_gcf( void (*chart)(double,double,double *) )
     int d,c;
 
     fp = fopen( QFile::encodeName( ThisVF->getfilename_gcf() ), "r" );
-    if( fp == nullptr )
+    if ( fp == nullptr )
         return false;
 
-    if( ThisVF->symbolicpackage == PACKAGE_REDUCE )
+    if ( ThisVF->symbolicpackage == PACKAGE_REDUCE )
     {
         // search the x-label, and check for error.
         
-    FILE * fp2;
-    fp2 = fopen( QFile::encodeName( ThisVF->getfilename_gcfresults() ), "r" );
-    if( fp ==nullptr )
-    {
-        fclose(fp);
-        return false;
-    }
+        FILE * fp2;
+        fp2 = fopen( QFile::encodeName( ThisVF->getfilename_gcfresults() ), "r" );
+        if ( fp ==nullptr )
+        {
+            fclose(fp);
+            return false;
+        }
         char str[256];
         t = 3;
         while( !feof( fp2 ) )
@@ -253,19 +256,19 @@ static bool read_gcf( void (*chart)(double,double,double *) )
                 fclose(fp2);
                 return false;
             }
-            if( !strcmp( str, "Heap" ) )
+            if ( !strcmp( str, "Heap" ) )
             {
                 // Reduce ran out of memory
                 t=3;
                 break;
             }
-            if( !strcmp( str, "xlabel" ) )
+            if ( !strcmp( str, "xlabel" ) )
             {
                 if (fscanf( fp2, "%s", str )!=1) {
                     fclose(fp2);
                     return false;
                 }
-                if( !strcmp( str, "\"x\"") )
+                if ( !strcmp( str, "\"x\"") )
                     t = 1;      // order is ok: it is a x versus y plot
                 else
                     t = 0;      // order is reversed: it is a y versus x plot
@@ -273,7 +276,7 @@ static bool read_gcf( void (*chart)(double,double,double *) )
             }
         }
         fclose(fp2);
-        if( t == 3 )
+        if ( t == 3 )
             return false;
 
         for (uint_fast8_t cnt=0;cnt<8;cnt++) {
@@ -282,7 +285,7 @@ static bool read_gcf( void (*chart)(double,double,double *) )
                 return false;
             }
         }
-        if( t != 0 )
+        if ( t != 0 )
             chart( x, y, pcoord );
         else
             chart( y, x, pcoord );
@@ -293,7 +296,7 @@ static bool read_gcf( void (*chart)(double,double,double *) )
         while( !feof(fp) )
         {
             d = 0;
-            if( c != '\n' )
+            if ( c != '\n' )
             {
                 d = 1;
                 ungetc(c, fp);
@@ -302,7 +305,7 @@ static bool read_gcf( void (*chart)(double,double,double *) )
                 fclose(fp);
                 return false;
             }
-            if( t != 0 )
+            if ( t != 0 )
                 chart( x, y, pcoord );
             else
                 chart( y, x, pcoord );
@@ -328,7 +331,7 @@ static bool read_gcf( void (*chart)(double,double,double *) )
             }
             for( c = getc(fp); isspace(c); )
                 c =getc(fp);
-            if( c != ',' )
+            if ( c != ',' )
                 break;
         }
     }

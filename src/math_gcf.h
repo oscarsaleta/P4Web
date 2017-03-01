@@ -24,7 +24,7 @@
 #include "file_tab.h"
 #include "win_sphere.h"
 
-
+// TODO: canviar això per un enum
 #define EVAL_GCF_NONE               0
 #define EVAL_GCF_R2                 1
 #define EVAL_GCF_U1                 2
