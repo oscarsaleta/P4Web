@@ -93,9 +93,7 @@ bool WWinSphere::evalGcfContinue( int points, int prec )
 bool WWinSphere::evalGcfFinish( void )      // return false in case an error occured
 {
     if ( GcfTask != EVAL_GCF_NONE ) {
-        // TODO: this stuff must only be called from a paintEvent
-        // maybe call update?
-
+        // TODO: aqui vol pintar ja....
         /*GcfSphere->prepareDrawing();
         draw_gcf( GcfSphere, VFResults.gcf_points, CSING, 1 );
         GcfSphere->finishDrawing();*/
@@ -119,7 +117,7 @@ bool runTask( int task, int points, int prec )
     // TODO: either send signal to homeleft to prepare file or prepare it
     // in homeright or in sphere
     // la signal seria <P4POLYNOM,int,int,int,int>
-        value = ThisVF->prepareGcf( /*TODO: sphere_->*/study_->gcf, -1, 1, prec, points );
+        value = ThisVF->prepareGcf( /*FIXME: sphere_->*/study_->gcf, -1, 1, prec, points );
         break;
     case EVAL_GCF_U1:
         value = ThisVF->prepareGcf(study_->gcf_U1, 0, 1, prec, points);
@@ -159,6 +157,7 @@ bool runTask( int task, int points, int prec )
         return false;
 }
 
+// TODO: can this be static?
 void rplane_plsphere0( double x, double y, double * pcoord )
 {
     R2_to_plsphere(x*cos(y),x*sin(y),pcoord);
@@ -233,107 +232,27 @@ static bool read_gcf( void (*chart)(double,double,double *) )
     double pcoord[3];
     int d,c;
 
+    // TODO: change name of file, el reb la funció?
     fp = fopen( QFile::encodeName( ThisVF->getfilename_gcf() ), "r" );
     if ( fp == nullptr )
         return false;
 
-    if ( ThisVF->symbolicpackage == PACKAGE_REDUCE )
+    k=0;
+    while( 1 )
     {
-        // search the x-label, and check for error.
-        
-        FILE * fp2;
-        fp2 = fopen( QFile::encodeName( ThisVF->getfilename_gcfresults() ), "r" );
-        if ( fp ==nullptr )
+        d=0;
+        while( fscanf( fp, "%lf %lf", &x, &y ) == 2 )
         {
-            fclose(fp);
-            return false;
+            k++;
+            chart(x,y,pcoord);
+            insert_gcf_point( pcoord[0], pcoord[1], pcoord[2], d);
+            //d=1;
+            d=GcfDashes;
         }
-        char str[256];
-        t = 3;
-        while( !feof( fp2 ) )
-        {
-            if (fscanf( fp2, "%s", str )!=1) {
-                fclose(fp2);
-                return false;
-            }
-            if ( !strcmp( str, "Heap" ) )
-            {
-                // Reduce ran out of memory
-                t=3;
-                break;
-            }
-            if ( !strcmp( str, "xlabel" ) )
-            {
-                if (fscanf( fp2, "%s", str )!=1) {
-                    fclose(fp2);
-                    return false;
-                }
-                if ( !strcmp( str, "\"x\"") )
-                    t = 1;      // order is ok: it is a x versus y plot
-                else
-                    t = 0;      // order is reversed: it is a y versus x plot
-                break;
-            }
-        }
-        fclose(fp2);
-        if ( t == 3 )
-            return false;
-
-        for (uint_fast8_t cnt=0;cnt<8;cnt++) {
-            if (fscanf(fp,"%lf %lf",&x,&y)!=1) {       // seems we have to skip 8 values
-                fclose(fp);
-                return false;
-            }
-        }
-        if ( t != 0 )
-            chart( x, y, pcoord );
-        else
-            chart( y, x, pcoord );
-        insert_gcf_point(pcoord[0],pcoord[1],pcoord[2],0);
-        getc(fp);
-        getc(fp);
-        c=getc(fp);
-        while( !feof(fp) )
-        {
-            d = 0;
-            if ( c != '\n' )
-            {
-                d = 1;
-                ungetc(c, fp);
-            }
-            if (fscanf(fp,"%lf %lf",&x,&y)!=1) {
-                fclose(fp);
-                return false;
-            }
-            if ( t != 0 )
-                chart( x, y, pcoord );
-            else
-                chart( y, x, pcoord );
-            insert_gcf_point(pcoord[0],pcoord[1],pcoord[2],d);
-            getc(fp);
-            getc(fp);
-            c = getc(fp);
-        }
-    }
-    else
-    {
-        k=0;
-        while( 1 )
-        {
-            d=0;
-            while( fscanf( fp, "%lf %lf", &x, &y ) == 2 )
-            {
-                k++;
-                chart(x,y,pcoord);
-                insert_gcf_point( pcoord[0], pcoord[1], pcoord[2], d);
-                //d=1;
-                d=GcfDashes;
-            }
-            for( c = getc(fp); isspace(c); )
-                c =getc(fp);
-            if ( c != ',' )
-                break;
-        }
+        for( c = getc(fp); isspace(c); )
+            c =getc(fp);
+        if ( c != ',' )
+            break;
     }
     
     fclose(fp);
