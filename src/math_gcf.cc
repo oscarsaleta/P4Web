@@ -20,9 +20,9 @@
 #include "math_gcf.h"
 
 #include "custom.h"
-#include "file_vf.h"
+//#include "file_vf.h"
 #include "math_p4.h"
-#include "math_charts.h"
+//#include "math_charts.h"
 #include "plot_tools.h"
 
 #include <cmath>
@@ -69,8 +69,7 @@ bool WWinSphere::evalGcfContinue( int points, int prec ) // returns true when fi
     if( GcfTask == EVAL_GCF_NONE )
         return true;
 
-    if( !ReadTaskResults( GcfTask ) ) // , points, prec, memory ) )
-    {
+    if( !ReadTaskResults( GcfTask ) ) {
         GcfError = true;
         return true;
     }
@@ -87,13 +86,15 @@ bool WWinSphere::evalGcfContinue( int points, int prec ) // returns true when fi
     return false; // still busy
 }
 
-bool evalGcfFinish( void )      // return false in case an error occured
+bool WWinSphere::evalGcfFinish( void )      // return false in case an error occured
 {
-    if( GcfTask != EVAL_GCF_NONE )
-    {
-        GcfSphere->prepareDrawing();
+    if( GcfTask != EVAL_GCF_NONE ) {
+        // TODO: this stuff must only be called from a paintEvent
+        // maybe call update?
+
+        /*GcfSphere->prepareDrawing();
         draw_gcf( GcfSphere, VFResults.gcf_points, CSING, 1 );
-        GcfSphere->finishDrawing();
+        GcfSphere->finishDrawing();*/
 
         GcfTask = EVAL_GCF_NONE;
 

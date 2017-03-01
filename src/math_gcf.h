@@ -42,9 +42,9 @@
 
 extern orbits_points * last_gcf_point;
 
-bool evalGcfStart( QWinSphere * sp, int dashes, int points, int precis );
-bool evalGcfContinue( int points, int prec );
-bool evalGcfFinish( void );
+//bool evalGcfStart( QWinSphere * sp, int dashes, int points, int precis );
+//bool evalGcfContinue( int points, int prec );
+//bool evalGcfFinish( void );
 bool runTask( int task, int points, int prec );
 void rplane_plsphere0( double x, double y, double * pcoord );
 void draw_gcf( QWinSphere * spherewnd, orbits_points * sep, int color, int dashes );
