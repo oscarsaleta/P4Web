@@ -36,7 +36,6 @@
 #include <vector>
 
 #include <Wt/WAnchor>
-//#include <Wt/WAnimation>
 #include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WButtonGroup>
