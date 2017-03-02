@@ -335,7 +335,18 @@ public:
 
     void deleteLastOrbit();
 
-
+    /**
+     * Start evaluation of GCF
+     *
+     * This function enters a loop in which the CGF is evaluated
+     * in every chart.
+     * 
+     * @param  dashes display CGF separatrice in dashes or points
+     * @param  points number of points to integrate
+     * @param  precis precision of integration
+     * @return        @c true if no error, @c false otherwise
+     */
+    bool evalGcfStart( int dashes, int points, int precis );
 
 
 
