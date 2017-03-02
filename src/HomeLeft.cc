@@ -1003,5 +1003,4 @@ void HomeLeft::onOrbitsDeleteAllBtn()
     orbitsBackwardsBtn_->enable();
 
     orbitDeleteSignal_.emit(0);
-    //onPlotSphereSignal_.emit(fileUploadName_,-1);
 }
