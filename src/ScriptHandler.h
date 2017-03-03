@@ -13,7 +13,7 @@
 class ScriptHandler
 {
 public:
-    ScriptHandler();
+    ScriptHandler(); //TODO ???
     ~ScriptHandler();
     
     void setBaseFileName(std::string fname)

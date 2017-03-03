@@ -21,6 +21,7 @@
 
 #include "custom.h"
 #include "MyLogger.h"
+#include "ScriptHandler.h"
 
 #include <boost/filesystem.hpp>
 #include <chrono>
@@ -100,12 +101,10 @@ HomeLeft::~HomeLeft()
     delete equationsBox_;
 
     globalLogger__.debug("HomeLeft :: deleted correctly");
-
 }
 
 void HomeLeft::setupUI()
 {
-
     WLabel *label;
 
     // Equation boxes
