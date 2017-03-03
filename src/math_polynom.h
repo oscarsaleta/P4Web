@@ -83,6 +83,25 @@ void delete_term2( P4POLYNOM2 p );
  */
 void delete_term3( P4POLYNOM3 p );
 
+/**
+ * Used for creating GCF files
+ * @param buf       string where result is stored
+ * @param f         linked list of terms a*x^i*y^j
+ * @param isfirst   indicates whether the
+ * @param x         name of "x" variable
+ * @param y         name of "y" variable
+ */
+char * printterm2( char * buf, P4POLYNOM2 f, bool isfirst, const char * x, const char * y );
+/**
+ * Used for creating GCF files
+ * @param buf string where result is stored
+ * @param f linked list of terms a*r^i*cos(theta1)^j*sin(theta2)^k
+ * @param isfirst
+ * @param r
+ * @param Co
+ * @param Si
+ */
+char * printterm3( char * buf, P4POLYNOM3 f, bool isfirst, const char * r, const char * Co, const char * Si );
 
 
 #endif // MATH_POLYNOM_H

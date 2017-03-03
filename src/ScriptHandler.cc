@@ -1,6 +1,12 @@
+#pragma GCC diagnostic ignored "-Wno-unused-result"
+
+#include "ScriptHandler.h"
+
+#include "file_tab.h"
 #include "MyLogger.h"
 
 #include <cstdlib>
+#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -9,7 +15,7 @@
 #include <unistd.h>
 #include <vector>
 
-std::string ScriptHandler::openTempStream(std::string prefix, std::string suffix)
+std::string randomFileName(std::string prefix, std::string suffix)
 {
     std::string fullname;
     prefix += "XXXXXX" + suffix;
@@ -28,12 +34,12 @@ std::string ScriptHandler::openTempStream(std::string prefix, std::string suffix
     return prefix;
 }
 
-std::ofstream prepareMapleFile(std::string fname, mapleParamsStruct &prms)
+bool prepareMapleFile(std::string fname, mapleParamsStruct &prms)
 {
     std::ofstream mplFile;
 
     if (fname.empty())
-        fname = openTempStream(TMP_DIR,".mpl");
+        fname = randomFileName(TMP_DIR,".mpl");
 
     mplFile.open((fname+".mpl").c_str(),std::fstream::trunc);
     
@@ -47,10 +53,16 @@ std::ofstream prepareMapleFile(std::string fname, mapleParamsStruct &prms)
     prms.str_inftab = fname+"_inf.tab";
     prms.str_infres = fname+"_inf.res";
 
-    return mplFile;
+    if (mplFile.is_open()) {
+        fillMapleScript(mplFile,prms);
+        mplFile.close();
+        return true;
+    } else {
+        return false;
+    }
 }
 
-void HomeLeft::fillMapleScript(std::ofstream &f, mapleParamsStruct prms)
+void fillMapleScript(std::ofstream &f, mapleParamsStruct prms)
 {
     f << "restart;" << std::endl;
     f << "read( \"" << prms.str_p4m << "\" );" << std::endl;
@@ -71,8 +83,8 @@ void HomeLeft::fillMapleScript(std::ofstream &f, mapleParamsStruct prms)
     f << "finite_res := \"" << prms.str_finres << "\":" << std::endl;
     f << "infinite_table := \"" << prms.str_inftab << "\":" << std::endl;
     f << "infinite_res := \"" << prms.str_infres << "\":" << std::endl;
-    f << "if (type(parse(\"" << xEquationInput_->text() << "\"),polynom)) then" << std::endl;
-    f << "  if (type(parse(\"" << yEquationInput_->text() << "\"),polynom)) then" << std::endl;
+    f << "if (type(parse(\"" << prms.str_xeq << "\"),polynom)) then" << std::endl;
+    f << "  if (type(parse(\"" << prms.str_yeq << "\"),polynom)) then" << std::endl;
     f << "    user_f := " << prms.str_userf << ":" << std::endl;
     f << "  else `quit(1)` end if:" << std::endl;
     f << "else `quit(1)` end if:" << std::endl;
@@ -122,10 +134,87 @@ int evaluateMapleScript (std::string fname)
         // execute command
         char **command = commands.data();
         int status = execvp(command[0],command);
-        return status; //NOTE needed?
+        return status; //NOTE: needed?
     } else {
         int status;
         waitpid(pid,&status,0);
         return status;
     }
+}
+
+bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int precision, int numpoints )
+{
+    int i;
+    char buf[100];
+    
+    // open original maple script (will get overwritten?!)
+    std::ofstream fp(std::string(fname+".mpl").c_str(), std::ios::trunc);
+    if (fp.is_open()) {
+        fp << "restart;" << std::endl;
+        fp << "read( \"" << std::string(P4_BINDIR) << "p4gcf.m" << "\" ):" << std::endl;
+        fp << "user_file := \"" << fname+"_gcf.tab" << "\":" << std::endl;
+        fp << "user_numpoints := " << std::to_string(numpoints) << ":" << std::endl;
+        fp << "user_x1 := -1.0:" << std::endl;
+        fp << "user_x2 := 1.0:" << std::endl;
+        fp << "user_y1 := " << std::to_string(y1) << ":" << std::endl;
+        fp << "user_y2 := " << std::to_string(y2) << ":" << std::endl;
+        fp << "u := x:" << std::endl;
+        fp << "v := y:" << std::endl;
+        fp << "user_f := ";
+        for (int i=0; f!=nullptr; i++) {
+            
+        }
+    }
+
+    /*std::string mainmaple;
+    std::string user_platform;
+    std::string user_file;
+    std::string filedotmpl;
+    QByteArray ba_mainmaple;
+    QByteArray ba_user_file;
+
+    filedotmpl = getmaplefilename();
+
+    fp = fopen( QFile::encodeName( filedotmpl ), "w" );
+    if ( fp == nullptr )
+        return false;
+
+    mainmaple = getP4MaplePath();
+    mainmaple += QDir::separator();
+
+    user_platform = USERPLATFORM;
+    mainmaple += MAINMAPLEGCFFILE;
+
+    ba_mainmaple = maplepathformat( mainmaple );
+    user_file = getfilename_gcf();
+    removeFile( user_file );
+    ba_user_file = maplepathformat( user_file );
+
+    fprintf( fp, "restart;\n" );
+    fprintf( fp, "read( \"%s\" );\n",       (const char *)ba_mainmaple );
+    fprintf( fp, "user_file := \"%s\":\n",  (const char *)ba_user_file );
+    fprintf( fp, "user_numpoints := %d:\n",     numpoints );
+    fprintf( fp, "user_x1 := %g:\n",        (float)(-1.0) );
+    fprintf( fp, "user_x2 := %g:\n",        (float)1.0 );
+    fprintf( fp, "user_y1 := %g:\n",        (float)y1 );
+    fprintf( fp, "user_y2 := %g:\n",        (float)y2 );
+
+    fprintf( fp, "u := %s:\n",          "x" );
+    fprintf( fp, "v := %s:\n",          "y" );
+    fprintf( fp, "user_f := " );
+    for ( i = 0; f != nullptr; i++ )
+    {
+        fprintf( fp, "%s", printterm2( buf, f, (i==0) ? true : false, "x", "y" ) );
+        f = f->next_term2;
+    }
+    if ( i == 0 )
+        fprintf( fp, "0:\n" );
+    else
+        fprintf( fp, ":\n" );
+
+    fprintf( fp, "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:\n" );
+
+    fclose( fp );*/
+    
+    return true;
 }

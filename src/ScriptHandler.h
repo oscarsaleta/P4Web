@@ -45,12 +45,12 @@ struct mapleParamsStruct {
     std::string str_userp;
     std::string str_userq;
     std::string time_limit;
-}
+};
 
-std::string openTempStream(std::string prefix, std::string suffix);
-std::ofstream prepareMapleFile(std::string fname, mapleParamsStruct& prms);
+std::string randomFileName(std::string prefix, std::string suffix);
+bool prepareMapleFile(std::string fname, mapleParamsStruct& prms);
 void fillMapleScript(std::ofstream& f, mapleParamsStruct prms);
-void evaluateMapleScript(std::string fname);
+int evaluateMapleScript(std::string fname);
 void fillSaveFile(mapleParamsStruct prms); //TODO: mirar inputs i outputs necessaris
 
 //TODO copiar codi de file_vf.cpp i adaptar

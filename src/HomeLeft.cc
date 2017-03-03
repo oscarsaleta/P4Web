@@ -21,14 +21,12 @@
 
 #include "custom.h"
 #include "MyLogger.h"
-#include "ScriptHandler.h"
 
 #include <boost/filesystem.hpp>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -366,9 +364,9 @@ void HomeLeft::parseInputFile()
 
 void HomeLeft::setParams()
 {
-    prms.xeq = xEquationInput_->text();
-    prms.yeq = yEquationInput_->text();
-    prms.str_userf = "[ "+prms.xeq+", "+prms.yeq+" ]";
+    mplParams.str_xeq = xEquationInput_->text().toUTF8();
+    mplParams.str_yeq = yEquationInput_->text().toUTF8();
+    mplParams.str_userf = "[ "+mplParams.str_xeq+", "+mplParams.str_yeq+" ]";
     if (!loggedIn_) {
         mplParams.str_critpoints = "0";
         mplParams.str_saveall = "false";
@@ -413,19 +411,18 @@ void HomeLeft::evaluate()
 
     evaluated_ = true;
 
-    std::ofstream outfile = prepareMapleFile(fileUploadName_,mplParams);
-    if (outfile.is_open()) {
-        setParams();
-        fillMapleScript(outfile,mplParams)
+    setParams();
+    
+    if (prepareMapleFile(fileUploadName_,mplParams)) {
         globalLogger__.debug("HomeLeft :: filled Maple script "+fileUploadName_);
-        outfile.close();
     } else {
         errorSignal_.emit("Error creating Maple script.");
         globalLogger__.error("HomeLeft :: Error creating Maple script.");
         return;
     }
 
-    if (evaluateMapleScript(fileUploadName_) == 0) {
+    int status = evaluateMapleScript(fileUploadName_);
+    if ( status == 0) {
         evaluatedSignal_.emit(fileUploadName_);
         globalLogger__.debug("HomeLeft :: Maple script successfully executed");
     } else {
@@ -448,7 +445,7 @@ void HomeLeft::prepareSaveFile()
 
     if (fileUploadName_.empty()) {
         if (saveFileName_.empty()) {
-            saveFileName_ = openTempStream(TMP_DIR,".txt"/*,saveFile*/);
+            saveFileName_ = randomFileName(TMP_DIR,".txt");
             saveFileName_ += ".txt";
         }
     } else
@@ -458,21 +455,21 @@ void HomeLeft::prepareSaveFile()
 
     setParams();
 
-    saveFile << 0                               << std::endl;   // typeofstudy
-    saveFile << (mplParams.str_numeric == WString("true") ? 1 : 0) << std::endl;   // numeric
-    saveFile << mplParams.str_precision                   << std::endl;   // precision
-    saveFile << mplParams.str_epsilon                     << std::endl;   // epsilon
-    saveFile << (mplParams.str_testsep == WString("true") ? 1 : 0) << std::endl;   // test sep
-    saveFile << mplParams.str_taylor                      << std::endl;   // taylor level
-    saveFile << mplParams.str_numericlevel                << std::endl;   // numeric level
-    saveFile << mplParams.str_maxlevel                    << std::endl;   // max levels
-    saveFile << mplParams.str_weaklevel                   << std::endl;   // weakness level
-    saveFile << mplParams.str_userp                       << std::endl;   // p
-    saveFile << mplParams.str_userq                       << std::endl;   // q
-    saveFile << xEquationInput_->text()         << std::endl;   // x'
-    saveFile << yEquationInput_->text()         << std::endl;   // y'
-    saveFile << mplParams.str_gcf                         << std::endl;   // gcf
-    saveFile << 0                               << std::endl;   // numparams
+    saveFile << 0                                                   << std::endl;   // typeofstudy
+    saveFile << (mplParams.str_numeric == WString("true") ? 1 : 0)  << std::endl;   // numeric
+    saveFile << mplParams.str_precision                             << std::endl;   // precision
+    saveFile << mplParams.str_epsilon                               << std::endl;   // epsilon
+    saveFile << (mplParams.str_testsep == WString("true") ? 1 : 0)  << std::endl;   // test sep
+    saveFile << mplParams.str_taylor                                << std::endl;   // taylor level
+    saveFile << mplParams.str_numericlevel                          << std::endl;   // numeric level
+    saveFile << mplParams.str_maxlevel                              << std::endl;   // max levels
+    saveFile << mplParams.str_weaklevel                             << std::endl;   // weakness level
+    saveFile << mplParams.str_userp                                 << std::endl;   // p
+    saveFile << mplParams.str_userq                                 << std::endl;   // q
+    saveFile << xEquationInput_->text()                             << std::endl;   // x'
+    saveFile << yEquationInput_->text()                             << std::endl;   // y'
+    saveFile << mplParams.str_gcf                                   << std::endl;   // gcf
+    saveFile << 0                                                   << std::endl;   // numparams
 
     saveFile.close();
 

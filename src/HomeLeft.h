@@ -19,6 +19,8 @@
 #ifndef HOMELEFT_H
 #define HOMELEFT_H
 
+#include "ScriptHandler.h"
+
 #define ACCURACY_DEFAULT 8
 #define PRECISION_DEFAULT 0
 #define EPSILON_DEFAULT 0.01
