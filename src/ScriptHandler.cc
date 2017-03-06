@@ -148,6 +148,7 @@ int evaluateMapleScript (std::string fname)
     }
 }
 
+
 bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int precision, int numpoints )
 {
     int i;
@@ -167,7 +168,7 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int preci
         fp << "u := x:" << std::endl;
         fp << "v := y:" << std::endl;
         fp << "user_f := ";
-        for (int i=0; f!=nullptr; i++) {
+        for (i=0; f!=nullptr; i++) {
             fp <<  printterm2( buf, f, (i==0) ? true : false, "x", "y" );
             f = f->next_term2;
         }
@@ -175,10 +176,107 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int preci
             fp << "0:" << std::endl;
         else
             fp << ":" << std::endl;
+        
+        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" ) << std::endl;
+
         globalLogger__.debug("ScriptHandler :: prepared GCF file "+fname);
         fp.close();
         return true;
     }
     globalLogger__.error("ScriptHandler :: cannot prepare GCF file");
     return false;   
+}
+
+
+bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1, double theta2, int precision, int numpoints )
+{
+    char buf[100];
+    int i;
+
+    /*f = VFResults.gcf_C;*/
+
+    std::ofstream fp(std::string(fname+".mpl").c_str(), std::ios::trunc);
+
+    if (fp.is_open()) {
+        fp << "restart;" << std::endl;
+        fp << "read(\"" << std::string(P4_BINDIR) << "p4gcf.m" << "\" ):" << std::endl;
+        fp << "user_file := \"" << fname+"_gcf.tab" << "\":" << std::endl;
+        fp << "user_numpoints := " << std::to_string(numpoints) << ":" << std::endl;
+        fp << "user_x1 := 0.0:" << std::endl;
+        fp << "user_x2 := 1.0:" << std::endl;
+        fp << "user_y1 := " << std::to_string(theta1) << ":" << std::endl;
+        fp << "user_y2 := " << std::to_string(theta2) << ":" << std::endl;
+        fp << "u := cos(y):" << std::endl;
+        fp << "v := sin(y):" << std::endl;
+        fp << "user_f := ";
+        for (i=0; f!=nullptr; i++) {
+            fp <<  printterm3( buf, f, (i==0) ? true : false, "x", "U", "V" );
+            f = f->next_term2;
+        }
+        if (i==0)
+            fp << "0:" << std::endl;
+        else
+            fp << ":" << std::endl;
+        
+        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" ) << std::endl;
+        
+        globalLogger__.debug("ScriptHandler :: prepared GCF_LyapunovCyl file "+fname);
+        fp.close();
+        return true;
+    }
+    globalLogger__.error("ScriptHandler :: cannot prepare GCF_LyapunovCyl file");
+    return false; 
+}
+
+
+bool prepareGcf_LyapunovR2( std::string fname, P4POLYNOM2 f, int precision, int numpoints )
+{
+    FILE * fp;
+    char buf[100];
+    int i;
+
+    //f = VFResults.gcf;
+
+    std::ofstream fp(std::string(fname+".mpl").c_str(),std::ios::trunc);
+
+    if (fp.is_open()) {
+        fp << "restart;" << std::endl;
+        fp << "read( \"" + std::string(P4_BINDIR) << "p4gcf.m" << "\" ):" << std::endl;
+        fp << "user_file := \"" + fname+"_gcf.tab" << "\":" << std::endl;
+        fp << "user_numpoints := " + std::to_string(numpoints) << ":" << std::endl;
+        fp << "user_x1 := 0.0:" << std::endl;
+        fp << "user_x2 := 1.0:" << std::endl;
+        fp << "user_y1 := 0.0:" << std::endl;
+        fp << "user_y2 := " std::to_string(TWOPI); << ":" << std::endl;
+        fp << "u := x*cos(y):" << std::endl;
+        fp << "v := y*sin(y):" << std::endl;
+        fp << "user_f := ";
+
+        fprintf( fp, "user_numpoints := %d:\n", numpoints );
+        fprintf( fp, "user_x1 := %g:\n",        (float)0.0 );
+        fprintf( fp, "user_x2 := %g:\n",        (float)1.0 );
+        fprintf( fp, "user_y1 := %g:\n",        (float)0.0 );
+        fprintf( fp, "user_y2 := %g:\n",        (float)TWOPI );
+    
+        fprintf( fp, "u := %s:\n",          "x*cos(y)" );
+        fprintf( fp, "v := %s:\n",          "x*sin(y)" );
+        fprintf( fp, "user_f := " );
+    
+        for( i = 0; f != nullptr; i++ ) {
+            fp << printterm2( buf, f, (i==0) ? true : false, "U", "V" );
+            f = f->next_term2;
+        }
+        if( i == 0 )
+            fp << "0:" << std::endl;
+        else
+            fp <<":" << std::endl;
+    
+        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" ) << std::endl;
+
+        globalLogger__.debug("ScriptHandler :: prepared GCF_LyapunovR2 file "+fname);
+        fp.close();
+        return true;
+    }
+    globalLogger__.error("ScriptHandler :: cannot prepare GCF_LyapunovR2 file");    
+    return false;
 }
