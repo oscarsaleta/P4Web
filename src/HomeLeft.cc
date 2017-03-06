@@ -451,6 +451,7 @@ void HomeLeft::prepareSaveFile()
     } else
         saveFileName_ = fileUploadName_;
 
+    fillSaveFile(saveFileName_, mplParams);
     saveFile.open(saveFileName_.c_str(),std::fstream::out|std::fstream::trunc);
 
     setParams();
