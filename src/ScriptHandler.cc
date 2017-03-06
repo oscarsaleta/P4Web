@@ -1,8 +1,10 @@
-#pragma GCC diagnostic ignored "-Wno-unused-result"
+#pragma GCC diagnostic ignored "-Wunused-result"
+#pragma GCC diagnostic ignored "-Wwrite-strings"
 
 #include "ScriptHandler.h"
 
 #include "file_tab.h"
+#include "math_polynom.h"
 #include "MyLogger.h"
 
 #include <cstdlib>
@@ -56,8 +58,10 @@ bool prepareMapleFile(std::string fname, mapleParamsStruct &prms)
     if (mplFile.is_open()) {
         fillMapleScript(mplFile,prms);
         mplFile.close();
+        globalLogger__.debug("ScriptHandler :: prepared Maple file " + fname);
         return true;
     } else {
+        globalLogger__.error("ScriptHandler :: cannot prepare Maple file");
         return false;
     }
 }
@@ -104,6 +108,7 @@ void fillMapleScript(std::ofstream &f, mapleParamsStruct prms)
         << "printf( \"! Error (\%a) \%a\\n\", lastexception[1], lastexception[2] );\n"
         << "finally: closeallfiles();\n"
         << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
+    globalLogger__.debug("ScriptHandler :: filled Maple file");
 }
 
 int evaluateMapleScript (std::string fname)
@@ -134,10 +139,11 @@ int evaluateMapleScript (std::string fname)
         // execute command
         char **command = commands.data();
         int status = execvp(command[0],command);
-        return status; //NOTE: needed?
+        return status; //NOTE needed?
     } else {
         int status;
         waitpid(pid,&status,0);
+        globalLogger__.debug("ScriptHandler :: forked Maple execution finished");
         return status;
     }
 }
@@ -162,59 +168,17 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int preci
         fp << "v := y:" << std::endl;
         fp << "user_f := ";
         for (int i=0; f!=nullptr; i++) {
-            
+            fp <<  printterm2( buf, f, (i==0) ? true : false, "x", "y" );
+            f = f->next_term2;
         }
+        if (i==0)
+            fp << "0:" << std::endl;
+        else
+            fp << ":" << std::endl;
+        globalLogger__.debug("ScriptHandler :: prepared GCF file "+fname);
+        fp.close();
+        return true;
     }
-
-    /*std::string mainmaple;
-    std::string user_platform;
-    std::string user_file;
-    std::string filedotmpl;
-    QByteArray ba_mainmaple;
-    QByteArray ba_user_file;
-
-    filedotmpl = getmaplefilename();
-
-    fp = fopen( QFile::encodeName( filedotmpl ), "w" );
-    if ( fp == nullptr )
-        return false;
-
-    mainmaple = getP4MaplePath();
-    mainmaple += QDir::separator();
-
-    user_platform = USERPLATFORM;
-    mainmaple += MAINMAPLEGCFFILE;
-
-    ba_mainmaple = maplepathformat( mainmaple );
-    user_file = getfilename_gcf();
-    removeFile( user_file );
-    ba_user_file = maplepathformat( user_file );
-
-    fprintf( fp, "restart;\n" );
-    fprintf( fp, "read( \"%s\" );\n",       (const char *)ba_mainmaple );
-    fprintf( fp, "user_file := \"%s\":\n",  (const char *)ba_user_file );
-    fprintf( fp, "user_numpoints := %d:\n",     numpoints );
-    fprintf( fp, "user_x1 := %g:\n",        (float)(-1.0) );
-    fprintf( fp, "user_x2 := %g:\n",        (float)1.0 );
-    fprintf( fp, "user_y1 := %g:\n",        (float)y1 );
-    fprintf( fp, "user_y2 := %g:\n",        (float)y2 );
-
-    fprintf( fp, "u := %s:\n",          "x" );
-    fprintf( fp, "v := %s:\n",          "y" );
-    fprintf( fp, "user_f := " );
-    for ( i = 0; f != nullptr; i++ )
-    {
-        fprintf( fp, "%s", printterm2( buf, f, (i==0) ? true : false, "x", "y" ) );
-        f = f->next_term2;
-    }
-    if ( i == 0 )
-        fprintf( fp, "0:\n" );
-    else
-        fprintf( fp, ":\n" );
-
-    fprintf( fp, "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:\n" );
-
-    fclose( fp );*/
-    
-    return true;
+    globalLogger__.error("ScriptHandler :: cannot prepare GCF file");
+    return false;   
 }

@@ -200,7 +200,7 @@ void delete_term3( P4POLYNOM3 p )
 //
 // Following are used in preparation of GCF :
 
-char * printterm2( char * buf, struct term2 * f, bool isfirst, const char * x, const char * y )
+char * printterm2( char * buf, P4POLYNOM2 f, bool isfirst, const char * x, const char * y )
 {
     if( f->coeff == 0 )
     {
@@ -270,7 +270,7 @@ char * printterm2( char * buf, struct term2 * f, bool isfirst, const char * x, c
     return buf;
 }
 
-char * printterm3( char * buf, struct term3 * f, bool isfirst, const char * r, const char * Co, const char * Si )
+char * printterm3( char * buf, P4POLYNOM3 f, bool isfirst, const char * r, const char * Co, const char * Si )
 {
     if( f->coeff == 0 )
     {
