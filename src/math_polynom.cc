@@ -195,3 +195,178 @@ void delete_term3( P4POLYNOM3 p )
     }
 }
 
+// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
+//
+// Following are used in preparation of GCF :
+
+char * printterm2( char * buf, P4POLYNOM2 f, bool isfirst, const char * x, const char * y )
+{
+    if( f->coeff == 0 )
+    {
+        if( isfirst )
+            strcpy( buf, "0" );
+        else
+            *buf = 0;
+        return buf;
+    }
+
+    if( (f->coeff == 1 || f->coeff == -1) && (f->exp_x != 0 || f->exp_y != 0) )
+    {
+        if( f->coeff < 0 )
+            sprintf( buf, "-" );
+        else
+            if( isfirst )
+                *buf = 0;
+            else
+                sprintf( buf, "+" );
+
+        if( f->exp_x != 0 )
+        {
+            if( f->exp_x != 1 )
+                sprintf( buf+strlen(buf), "%s^%d", x, f->exp_x );
+            else
+                sprintf( buf+strlen(buf), "%s", x );
+
+            if( f->exp_y != 0 )
+            {
+                if( f->exp_y != 1 )
+                    sprintf( buf+strlen(buf), "*%s^%d", y, f->exp_y );
+                else
+                    sprintf( buf+strlen(buf), "*%s", y );
+            }
+        }
+        else if( f->exp_y != 0 )
+        {
+            if( f->exp_y != 1 )
+                sprintf( buf+strlen(buf), "%s^%d", y, f->exp_y );
+            else
+                sprintf( buf+strlen(buf), "%s", y );
+        }
+
+        return buf;
+    }
+
+    if( isfirst )
+        sprintf( buf, "%g", (float)(f->coeff) );
+    else
+        sprintf( buf, "%+g", (float)(f->coeff) );
+
+    if( f->exp_x != 0 )
+    {
+        if( f->exp_x != 1 )
+            sprintf( buf+strlen(buf), "*%s^%d", x, f->exp_x );
+        else
+            sprintf( buf+strlen(buf), "*%s", x );
+    }
+    if( f->exp_y != 0 )
+    {
+        if( f->exp_y != 1 )
+            sprintf( buf+strlen(buf), "*%s^%d", y, f->exp_y );
+        else
+            sprintf( buf+strlen(buf), "*%s", y );
+    }
+
+    return buf;
+}
+
+char * printterm3( char * buf, P4POLYNOM3 f, bool isfirst, const char * r, const char * Co, const char * Si )
+{
+    if( f->coeff == 0 )
+    {
+        if( isfirst )
+            strcpy( buf, "0" );
+        else
+            *buf = 0;
+        return buf;
+    }
+
+    if( (f->coeff == 1 || f->coeff == -1) && (f->exp_r != 0 || f->exp_Co != 0 || f->exp_Si != 0 ) )
+    {
+        if( f->coeff < 0 )
+            sprintf( buf, "-" );
+        else
+            if( isfirst )
+                *buf = 0;
+            else
+                sprintf( buf, "+" );
+
+        if( f->exp_r != 0 )
+        {
+            if( f->exp_r != 1 )
+                sprintf( buf+strlen(buf), "%s^%d", r, f->exp_r );
+            else
+                sprintf( buf+strlen(buf), "%s", r );
+
+            if( f->exp_Co != 0 )
+            {
+                if( f->exp_Co != 1 )
+                    sprintf( buf+strlen(buf), "*%s^%d", Co, f->exp_Co );
+                else
+                    sprintf( buf+strlen(buf), "*%s", Co );
+            }
+            if( f->exp_Si != 0 )
+            {
+                if( f->exp_Si != 1 )
+                    sprintf( buf+strlen(buf), "*%s^%d", Si, f->exp_Si );
+                else
+                    sprintf( buf+strlen(buf), "*%s", Si );
+            }
+        }
+        else
+            if( f->exp_Co != 0 )
+            {
+                if( f->exp_Co != 1 )
+                    sprintf( buf+strlen(buf), "%s^%d", Co, f->exp_Co );
+                else
+                    sprintf( buf+strlen(buf), "%s", Co );
+
+                if( f->exp_Si != 0 )
+                {
+                    if( f->exp_Si != 1 )
+                        sprintf( buf+strlen(buf), "*%s^%d", Si, f->exp_Si );
+                    else
+                        sprintf( buf+strlen(buf), "*%s", Si );
+                }
+            }
+            else if( f->exp_Si != 0 )
+            {
+                if( f->exp_Si != 1 )
+                    sprintf( buf+strlen(buf), "%s^%d", Si, f->exp_Si );
+                else
+                    sprintf( buf+strlen(buf), "%s", Si );
+            }
+
+        return buf;
+    }
+
+    if( isfirst )
+        sprintf( buf, "%g", f->coeff );
+    else
+        sprintf( buf, "%+g", f->coeff );
+
+    if( f->exp_r != 0 )
+    {
+        if( f->exp_r != 1 )
+            sprintf( buf+strlen(buf), "*%s^%d", r, f->exp_r );
+        else
+            sprintf( buf+strlen(buf), "*%s", r );
+    }
+    if( f->exp_Co != 0 )
+    {
+        if( f->exp_Co != 1 )
+            sprintf( buf+strlen(buf), "*%s^%d", Co, f->exp_Co );
+        else
+            sprintf( buf+strlen(buf), "*%s", Co );
+    }
+    if( f->exp_Si != 0 )
+    {
+        if( f->exp_Si != 1 )
+            sprintf( buf+strlen(buf), "*%s^%d", Si, f->exp_Si );
+        else
+            sprintf( buf+strlen(buf), "*%s", Si );
+    }
+
+    return buf;
+}
+

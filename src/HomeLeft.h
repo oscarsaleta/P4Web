@@ -19,15 +19,7 @@
 #ifndef HOMELEFT_H
 #define HOMELEFT_H
 
-#ifdef ANTZ
-    #define MAPLE_PATH "/usr/share/maple11/bin/maple"
-    #define P4_BINDIR "/home/p4/p4/bin/"
-    #define TMP_DIR "/home/p4/tmp/"
-#else
-    #define MAPLE_PATH "/home/osr/maple2015/bin/maple"
-    #define P4_BINDIR "/usr/local/p4/bin/"
-    #define TMP_DIR "/tmp/"
-#endif
+#include "ScriptHandler.h"
 
 #define ACCURACY_DEFAULT 8
 #define PRECISION_DEFAULT 0
@@ -162,6 +154,9 @@ public:
         return resetSignal_;
     }
 
+    /* MAPLE FILE PARAMETERS */
+    mapleParamsStruct mplParams; 
+
 private:
     bool evaluated_;
 
@@ -240,12 +235,6 @@ private:
     void fileTooLarge();
     // read uploaded file
     void parseInputFile();
-    // open writable file with random name in tmp folder
-    std::string openTempStream(std::string, std::string/*, std::ofstream&*/);
-    // prepare to write the maple script
-    void prepareMapleFile();
-    // write the options inside the maple script
-    void fillMapleScript(std::string, std::ofstream&);
     // run maple on the script
     void evaluate();
     // write a tmp save file in server for download
@@ -262,41 +251,7 @@ private:
     void onOrbitsDeleteOneBtn();
     void onOrbitsDeleteAllBtn();
 
-
-    /* MAPLE FILE PARAMETERS */
     bool loggedIn_;
-    Wt::WString str_bindir;
-    Wt::WString str_p4m;
-    Wt::WString str_tmpdir;
-    Wt::WString str_lypexe;
-    Wt::WString str_sepexe;
-    Wt::WString str_exeprefix;
-    Wt::WString str_platform;
-    Wt::WString str_sumtablepath;
-    Wt::WString str_removecmd;
-    Wt::WString str_simplify;
-    Wt::WString str_simplifycmd;
-    Wt::WString str_critpoints;
-    Wt::WString str_saveall;
-    Wt::WString str_vectable;
-    Wt::WString str_fintab;
-    Wt::WString str_finres;
-    Wt::WString str_inftab;
-    Wt::WString str_infres;
-    Wt::WString str_userf;
-    Wt::WString str_gcf;
-    Wt::WString str_numeric;
-    Wt::WString str_epsilon;
-    Wt::WString str_testsep;
-    Wt::WString str_precision;
-    Wt::WString str_precision0;
-    Wt::WString str_taylor;
-    Wt::WString str_numericlevel;
-    Wt::WString str_maxlevel;
-    Wt::WString str_weaklevel;
-    Wt::WString str_userp;
-    Wt::WString str_userq;
-    Wt::WString time_limit;
 
 };
 

@@ -27,16 +27,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <fcntl.h>
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <sys/wait.h>
-#include <unistd.h>
 #include <vector>
 
 #include <Wt/WAnchor>
-//#include <Wt/WAnimation>
 #include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WButtonGroup>
@@ -75,17 +71,17 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     setupConnectors();
 
     // set up maple parameters that will not change
-    str_bindir = P4_BINDIR;
-    str_p4m = str_bindir+"p4.m";
-    str_tmpdir = TMP_DIR;
-    str_lypexe = "lyapunov";
-    str_sepexe = "separatrice";
-    str_exeprefix = "";
-    str_platform = "LINUX";
-    str_sumtablepath = "/usr/local/p4/sumtables/";
-    str_removecmd = "rm";
-    str_simplify = "false";
-    str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
+    mplParams.str_bindir = P4_BINDIR;
+    mplParams.str_p4m = mplParams.str_bindir+"p4.m";
+    mplParams.str_tmpdir = TMP_DIR;
+    mplParams.str_lypexe = "lyapunov";
+    mplParams.str_sepexe = "separatrice";
+    mplParams.str_exeprefix = "";
+    mplParams.str_platform = "LINUX";
+    mplParams.str_sumtablepath = "/usr/local/p4/sumtables/";
+    mplParams.str_removecmd = "rm";
+    mplParams.str_simplify = "false";
+    mplParams.str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
 
     globalLogger__.debug("HomeLeft :: created correctly");
 
@@ -101,12 +97,10 @@ HomeLeft::~HomeLeft()
     delete equationsBox_;
 
     globalLogger__.debug("HomeLeft :: deleted correctly");
-
 }
 
 void HomeLeft::setupUI()
 {
-
     WLabel *label;
 
     // Equation boxes
@@ -368,135 +362,44 @@ void HomeLeft::parseInputFile()
     }
 }
 
-
-std::string HomeLeft::openTempStream(std::string prefix, std::string suffix/*, std::ofstream &f*/)
-{
-    std::string fullname;
-    prefix += "XXXXXX" + suffix;
-    std::vector<char> dst_prefix(prefix.begin(), prefix.end());
-    dst_prefix.push_back('\0');
-
-    int fd = mkstemps(&dst_prefix[0],4);
-    if (fd != -1) {
-        prefix.assign(dst_prefix.begin(), dst_prefix.end()-1-4);
-        fullname = prefix+suffix;
-        //f.open(fullname.c_str(), std::ios_base::trunc | std::ios_base::out);
-        close(fd);
-    }
-
-    globalLogger__.debug("HomeLeft :: created temp file "+fullname);
-
-    return prefix;
-}
-
 void HomeLeft::setParams()
 {
+    mplParams.str_xeq = xEquationInput_->text().toUTF8();
+    mplParams.str_yeq = yEquationInput_->text().toUTF8();
+    mplParams.str_userf = "[ "+mplParams.str_xeq+", "+mplParams.str_yeq+" ]";
     if (!loggedIn_) {
-        str_critpoints = "0";
-        str_saveall = "false";
-        str_gcf = "0";
-        str_numeric = "true";
-        str_epsilon = "0.01";
-        str_testsep = "false";
-        str_precision = "8";
-        str_precision0 = "0";
-        str_taylor = "6";
-        str_numericlevel = "10";
-        str_maxlevel = "20";
-        str_weaklevel = "0";
-        str_userp = "1";
-        str_userq = "1";
-        time_limit = "30";
+        mplParams.str_critpoints = "0";
+        mplParams.str_saveall = "false";
+        mplParams.str_gcf = "0";
+        mplParams.str_numeric = "true";
+        mplParams.str_epsilon = "0.01";
+        mplParams.str_testsep = "false";
+        mplParams.str_precision = "8";
+        mplParams.str_precision0 = "0";
+        mplParams.str_taylor = "6";
+        mplParams.str_numericlevel = "10";
+        mplParams.str_maxlevel = "20";
+        mplParams.str_weaklevel = "0";
+        mplParams.str_userp = "1";
+        mplParams.str_userq = "1";
+        mplParams.time_limit = "30";
     } else {
-        str_critpoints = "0";
-        str_saveall = "false";
-        str_gcf = "0";
-        str_numeric = (calculationsBtnGroup_->checkedId() == Numeric) ? "true" : "false";
-        str_epsilon = std::to_string(epsilonSpinBox_->value());
-        str_testsep = (separatricesBtnGroup_->checkedId() == No) ? "false" : "true";
-        str_precision = std::to_string(accuracySpinBox_->value());
-        str_precision0 = std::to_string(precisionSpinBox_->value());
-        str_taylor = std::to_string(levAppSpinBox_->value());
-        str_numericlevel = std::to_string(numericLevelSpinBox_->value());
-        str_maxlevel = std::to_string(maxLevelSpinBox_->value());
-        str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
-        str_userp = std::to_string(PLWeightPSpinBox_->value());
-        str_userq = std::to_string(PLWeightQSpinBox_->value());
-        time_limit = "120";
+        mplParams.str_critpoints = "0";
+        mplParams.str_saveall = "false";
+        mplParams.str_gcf = "0";
+        mplParams.str_numeric = (calculationsBtnGroup_->checkedId() == Numeric) ? "true" : "false";
+        mplParams.str_epsilon = std::to_string(epsilonSpinBox_->value());
+        mplParams.str_testsep = (separatricesBtnGroup_->checkedId() == No) ? "false" : "true";
+        mplParams.str_precision = std::to_string(accuracySpinBox_->value());
+        mplParams.str_precision0 = std::to_string(precisionSpinBox_->value());
+        mplParams.str_taylor = std::to_string(levAppSpinBox_->value());
+        mplParams.str_numericlevel = std::to_string(numericLevelSpinBox_->value());
+        mplParams.str_maxlevel = std::to_string(maxLevelSpinBox_->value());
+        mplParams.str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
+        mplParams.str_userp = std::to_string(PLWeightPSpinBox_->value());
+        mplParams.str_userq = std::to_string(PLWeightQSpinBox_->value());
+        mplParams.time_limit = "120";
     }
-}
-
-void HomeLeft::prepareMapleFile()
-{
-    std::ofstream mplFile;
-
-    if (fileUploadName_.empty())
-        fileUploadName_ = openTempStream(TMP_DIR,".mpl"/*,mplFile*/);
-
-    mplFile.open((fileUploadName_+".mpl").c_str(),std::fstream::trunc);
-    
-    // repair file permissions
-    std::string command = "chmod 644 "+fileUploadName_+".mpl";
-    system(command.c_str());
-
-    str_vectable = fileUploadName_+"_vec.tab";
-    str_fintab = fileUploadName_+"_fin.tab";
-    str_finres = fileUploadName_+"_fin.res";
-    str_inftab = fileUploadName_+"_inf.tab";
-    str_infres = fileUploadName_+"_inf.res";
-    str_userf = "[ "+xEquationInput_->text()+", "+yEquationInput_->text()+" ]";
-
-    setParams();
-
-    if (mplFile.is_open())
-        fillMapleScript(fileUploadName_,mplFile);
-    mplFile.close();
-}
-
-void HomeLeft::fillMapleScript(std::string fname, std::ofstream &f)
-{
-    f << "restart;" << std::endl;
-    f << "read( \"" << str_p4m << "\" );" << std::endl;
-    f << "user_bindir := \"" << str_bindir << "\":" << std::endl;
-    f << "user_tmpdir := \"" << str_tmpdir << "\":" << std::endl;
-    f << "user_lypexe := \"" << str_lypexe << "\":" << std::endl;
-    f << "user_sepexe := \"" << str_sepexe << "\":" << std::endl;
-    f << "user_exeprefix := \"" << str_exeprefix << "\":" << std::endl;
-    f << "user_platform := \"" << str_platform << "\":" << std::endl;
-    f << "user_sumtablepath := \"" << str_sumtablepath << "\":" << std::endl;
-    f << "user_removecmd := \"" << str_removecmd << "\":" << std::endl;
-    f << "user_simplify := " << str_simplify << ":" << std::endl;
-    f << "user_simplifycmd := " << str_simplifycmd << ":" << std::endl;
-    f << "all_crit_points := " << str_critpoints << ":" << std::endl;
-    f << "save_all := " << str_saveall << ":" << std::endl;
-    f << "vec_table := \"" << str_vectable << "\":" << std::endl;
-    f << "finite_table := \"" << str_fintab << "\":" << std::endl;
-    f << "finite_res := \"" << str_finres << "\":" << std::endl;
-    f << "infinite_table := \"" << str_inftab << "\":" << std::endl;
-    f << "infinite_res := \"" << str_infres << "\":" << std::endl;
-    f << "if (type(parse(\"" << xEquationInput_->text() << "\"),polynom)) then" << std::endl;
-    f << "  if (type(parse(\"" << yEquationInput_->text() << "\"),polynom)) then" << std::endl;
-    f << "    user_f := " << str_userf << ":" << std::endl;
-    f << "  else `quit(1)` end if:" << std::endl;
-    f << "else `quit(1)` end if:" << std::endl;
-    f << "user_gcf := " << str_gcf << ":" << std::endl;
-    f << "user_numeric :=" << str_numeric << ":" << std::endl;
-    f << "epsilon := " << str_epsilon << ":" << std::endl;
-    f << "test_sep := " << str_testsep << ":" << std::endl;
-    f << "user_precision := " << str_precision << ":" << std::endl;
-    f << "user_precision0 := " << str_precision0 << ":" << std::endl;
-    f << "taylor_level := " << str_taylor << ":" << std::endl;
-    f << "numeric_level := " << str_numericlevel << ":" << std::endl;
-    f << "max_level := " << str_maxlevel << ":" << std::endl;
-    f << "weakness_level := " << str_weaklevel << ":" << std::endl;
-    f << "user_p := " << str_userp << ":" << std::endl;
-    f << "user_q := " << str_userq << ":" << std::endl;
-    f << "try timelimit("<<time_limit<<",p4main()) catch:"  << std::endl
-        << "printf( \"! Error (\%a) \%a\\n\", lastexception[1], lastexception[2] );\n"
-        << "finally: closeallfiles();\n"
-        << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
-
-    globalLogger__.debug("HomeLeft :: filled Maple script "+fname);
 }
 
 void HomeLeft::evaluate()
@@ -506,48 +409,25 @@ void HomeLeft::evaluate()
         return;
     }
 
-    //errorSignal_.emit("Evaluating vector field...");
-
     evaluated_ = true;
 
-    prepareMapleFile();
-
-    pid_t pid = fork();
-    if (pid < 0) {
-        errorSignal_.emit("Error creating Maple thread");
-        globalLogger__.error("HomeLeft :: error during Maple script execution");
-    } else if (pid == 0) {
-        // create vector of arguments for execvp
-        std::vector<char *> commands;
-#ifdef ANTZ
-        commands.push_back("ssh");
-        commands.push_back("p4@a01");
-        commands.push_back("-i");
-        commands.push_back("/var/www/claus_ssh/idrsa-1");
-#endif
-        commands.push_back(MAPLE_PATH);
-        commands.push_back("-T ,1048576"); // 1GB memory limit
-        char *aux = new char [fileUploadName_.length()+1];
-        std::strcpy(aux,fileUploadName_.c_str());
-        std::strcat(aux,".mpl");
-        commands.push_back(aux);
-        commands.push_back(nullptr);
-        // output from this thread goes to "fileUploadName_.res"
-        int fd = open((fileUploadName_+".res").c_str(),O_WRONLY|O_CREAT|O_TRUNC,0666);
-        dup2(fd,1);
-        // execute command
-        char **command = commands.data();
-        int status = execvp(command[0],command);
+    setParams();
+    
+    if (prepareMapleFile(fileUploadName_,mplParams)) {
+        globalLogger__.debug("HomeLeft :: filled Maple script "+fileUploadName_);
     } else {
-        int status;
-        waitpid(pid,&status,0);
-        if (status == 0) {
-            evaluatedSignal_.emit(fileUploadName_);
-            globalLogger__.debug("HomeLeft :: Maple script successfully executed");
-        } else {
-            errorSignal_.emit("Error during Maple script execution");
-            globalLogger__.error("HomeLeft :: Maple error: "+std::to_string(status));
-        }
+        errorSignal_.emit("Error creating Maple script.");
+        globalLogger__.error("HomeLeft :: Error creating Maple script.");
+        return;
+    }
+
+    int status = evaluateMapleScript(fileUploadName_);
+    if ( status == 0) {
+        evaluatedSignal_.emit(fileUploadName_);
+        globalLogger__.debug("HomeLeft :: Maple script successfully executed");
+    } else {
+        errorSignal_.emit("Error during Maple script execution");
+        globalLogger__.error("HomeLeft :: Maple error: "+std::to_string(status));
     }
 }
 
@@ -565,7 +445,7 @@ void HomeLeft::prepareSaveFile()
 
     if (fileUploadName_.empty()) {
         if (saveFileName_.empty()) {
-            saveFileName_ = openTempStream(TMP_DIR,".txt"/*,saveFile*/);
+            saveFileName_ = randomFileName(TMP_DIR,".txt");
             saveFileName_ += ".txt";
         }
     } else
@@ -575,21 +455,21 @@ void HomeLeft::prepareSaveFile()
 
     setParams();
 
-    saveFile << 0                               << std::endl;   // typeofstudy
-    saveFile << (str_numeric == WString("true") ? 1 : 0) << std::endl;   // numeric
-    saveFile << str_precision                   << std::endl;   // precision
-    saveFile << str_epsilon                     << std::endl;   // epsilon
-    saveFile << (str_testsep == WString("true") ? 1 : 0) << std::endl;   // test sep
-    saveFile << str_taylor                      << std::endl;   // taylor level
-    saveFile << str_numericlevel                << std::endl;   // numeric level
-    saveFile << str_maxlevel                    << std::endl;   // max levels
-    saveFile << str_weaklevel                   << std::endl;   // weakness level
-    saveFile << str_userp                       << std::endl;   // p
-    saveFile << str_userq                       << std::endl;   // q
-    saveFile << xEquationInput_->text()         << std::endl;   // x'
-    saveFile << yEquationInput_->text()         << std::endl;   // y'
-    saveFile << str_gcf                         << std::endl;   // gcf
-    saveFile << 0                               << std::endl;   // numparams
+    saveFile << 0                                                   << std::endl;   // typeofstudy
+    saveFile << (mplParams.str_numeric == WString("true") ? 1 : 0)  << std::endl;   // numeric
+    saveFile << mplParams.str_precision                             << std::endl;   // precision
+    saveFile << mplParams.str_epsilon                               << std::endl;   // epsilon
+    saveFile << (mplParams.str_testsep == WString("true") ? 1 : 0)  << std::endl;   // test sep
+    saveFile << mplParams.str_taylor                                << std::endl;   // taylor level
+    saveFile << mplParams.str_numericlevel                          << std::endl;   // numeric level
+    saveFile << mplParams.str_maxlevel                              << std::endl;   // max levels
+    saveFile << mplParams.str_weaklevel                             << std::endl;   // weakness level
+    saveFile << mplParams.str_userp                                 << std::endl;   // p
+    saveFile << mplParams.str_userq                                 << std::endl;   // q
+    saveFile << xEquationInput_->text()                             << std::endl;   // x'
+    saveFile << yEquationInput_->text()                             << std::endl;   // y'
+    saveFile << mplParams.str_gcf                                   << std::endl;   // gcf
+    saveFile << 0                                                   << std::endl;   // numparams
 
     saveFile.close();
 
@@ -1004,5 +884,4 @@ void HomeLeft::onOrbitsDeleteAllBtn()
     orbitsBackwardsBtn_->enable();
 
     orbitDeleteSignal_.emit(0);
-    //onPlotSphereSignal_.emit(fileUploadName_,-1);
 }
