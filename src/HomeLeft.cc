@@ -453,7 +453,7 @@ void HomeLeft::prepareSaveFile()
 
     if (!fillSaveFile(saveFileName_, mplParams)) {
         globalLogger__.error("Cannot create save file "+saveFileName_);
-        errorSignal_.emit("Could not create save file. You can notify this error to osr@mat.uab.cat, sorry for the inconvenience.");
+        errorSignal_.emit("Could not create save file. You can notify this error at osr@mat.uab.cat, sorry for the inconvenience.");
         return;
     }
 
