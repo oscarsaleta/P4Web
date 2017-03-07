@@ -93,55 +93,36 @@ public:
     /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
-    Wt::Signal<std::string>& evaluatedSignal()
-    { 
-        return evaluatedSignal_;
-    }
+    Wt::Signal<std::string>& evaluatedSignal() {  return evaluatedSignal_; }
     /**
      * Method that sends a signal to print some message in the output text area from #HomeRight
      */
-    Wt::Signal<std::string>& errorSignal()
-    {
-        return errorSignal_;
-    }
+    Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
     /**
      * Method that sends a signal when the plot button is pressed in order to display a plot
      *
      * This specific signal is sent when a sphere plot is issued
      */
-    Wt::Signal<std::string,double>& onPlotSphereSignal()
-    {
-        return onPlotSphereSignal_;
-    }
+    Wt::Signal<std::string,double>& onPlotSphereSignal() { return onPlotSphereSignal_; }
     /**
      * Method that sends a signal when the plot button is pressed in order to display a plot
      *
      * This specific signal is sent when a plane or chart plot is issued
      */
-    Wt::Signal<std::string,int,double,double,double,double>& onPlotPlaneSignal()
-    {
-        return onPlotPlaneSignal_;
-    }
+    Wt::Signal<std::string,int,double,double,double,double>& onPlotPlaneSignal() { return onPlotPlaneSignal_; }
     /**
      * Orbit integration signal
      *
      * The int can be -1 (backwards), 0 (continue) or 1 (forwards). The doubles are the
      * coordinates
      */
-    Wt::Signal<int,double,double>& orbitIntegrateSignal()
-    {
-        return orbitIntegrateSignal_;
-    }
+    Wt::Signal<int,double,double>& orbitIntegrateSignal() { return orbitIntegrateSignal_; }
     /**
      * Signal to delete orbits
      *
      * The int can be 1 (delete last) or 0 (delete all)
      */
-    Wt::Signal<int>& orbitDeleteSignal()
-    {
-        return orbitDeleteSignal_;
-    }
-
+    Wt::Signal<int>& orbitDeleteSignal() { return orbitDeleteSignal_; }
     /**
      * Signal to reset everything
      *
@@ -149,10 +130,14 @@ public:
      * The int is just a dummy value because we cannot sent empty
      * signals for some reason.
      */
-    Wt::Signal<int>& resetSignal()
-    {
-        return resetSignal_;
-    }
+    Wt::Signal<int>& resetSignal() { return resetSignal_; }
+    /**
+     * Signal to compute gcf
+     *
+     * Only sent if there is a gcf. Makes HomeRight call the 
+     * needed functions of the sphere to compute the gcf
+     */
+    Wt::Signal<std::string>& gcfSignal() { return gcfSignal_; }
 
     /* MAPLE FILE PARAMETERS */
     mapleParamsStruct mplParams; 
@@ -222,6 +207,7 @@ private:
     Wt::Signal<int,double,double> orbitIntegrateSignal_;
     Wt::Signal<int> orbitDeleteSignal_;
     Wt::Signal<int> resetSignal_;
+    Wt::Signal<std::string> gcfSignal_;
 
     /* FUNCTIONS */
     // sets up public UI

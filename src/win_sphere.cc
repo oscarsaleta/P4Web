@@ -98,6 +98,9 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     CircleAtInfinity = nullptr;
     PLCircle = nullptr;
 
+    gcfTask_ = EVAL_GCF_NONE;
+    gcfError_ = false;
+
     mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
     clicked().connect(this,&WWinSphere::mouseClickEvent);
 
@@ -131,6 +134,9 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     next = nullptr;
     CircleAtInfinity = nullptr;
     PLCircle = nullptr;
+
+    gcfTask_ = EVAL_GCF_NONE;
+    gcfError_ = false;
 
     mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
     clicked().connect(this,&WWinSphere::mouseClickEvent);
@@ -310,12 +316,15 @@ void WWinSphere::paintEvent( WPaintDevice * p )
             } else
                 plotLineAtInfinity();
         }
-        //plotGcf();
+        plotGcf();
         //drawLimitCycles(this);
         plotSeparatrices();
-        if (firstTimePlot_)
-            for (int cnt=0;cnt<10;cnt++)
+        if (firstTimePlot_) {
+            for (int cnt=0;cnt<10;cnt++) {
                 plot_all_sep(this);
+                plotGcf();
+            }
+        }
         plotPoints();
         drawOrbits();
         plotDone_ = true;
@@ -831,10 +840,10 @@ void WWinSphere::plotSeparatrices( void )
         plotPointSeparatrices( dp );
 }
 
-/*void WWinSphere::plotGcf(void )
+void WWinSphere::plotGcf(void)
 {
-    draw_gcf( this, study_->gcf_points, CSING, 1 );
-}*/
+    draw_gcf( study_->gcf_points, CSING, 1 );
+}
 
 
 // -----------------------------------------------------------------------

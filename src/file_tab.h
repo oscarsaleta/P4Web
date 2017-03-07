@@ -404,6 +404,18 @@ struct weak_focus
 class WVFStudy
 {
 public:
+
+    // class constructor and destructor methods
+
+    /**
+     * Constructor method
+     */
+    WVFStudy(double projection=DEFAULT_PROJECTION);
+    /**
+     * Destructor method
+     */
+    ~WVFStudy();
+
     // general information
 
     int typeofstudy;            ///< type of study for these results
@@ -458,6 +470,7 @@ public:
     P4POLYNOM3                  gcf_C;      ///< gcf in C
 
     orbits_points * gcf_points;             ///< orbits points of the gcf
+    orbits_points * last_gcf_point;         ///< last gcf point
 
     // limit cycles
 
@@ -657,18 +670,6 @@ public:
      * math_changedir.h.
      */
     int (WVFStudy::*change_dir)( double * );
-
-public:
-    /**
-     * Constructor method
-     */
-    WVFStudy(double projection=DEFAULT_PROJECTION);
-    /**
-     * Destructor method
-     */
-    ~WVFStudy();
-
-public:
 
     // initialization and destruction of structures
 
@@ -1114,6 +1115,13 @@ public:
      * @param rcoord length 2 vector where V2 chart coordinates will be stored
      */
     void psphere_to_UU2( double X, double Y, double Z, double * rcoord );
+    /**
+     * Change coords from cylinder to Poincaré-Lyapunov sphere
+     * @param r      radius of cylinder coords
+     * @param theta  angle of cylinder coords
+     * @param pcoord pointer where new coords are stored
+     */
+    void cylinder_to_plsphere( double r, double theta, double * pcoord);
     // -----------------------------------------------------------------------
     //                      math_p4.cc FUNCTIONS
     // -----------------------------------------------------------------------
@@ -1145,6 +1153,25 @@ public:
      */
     void rk78( void (WVFStudy::*deriv)( double *, double * ), double y[2], double * hh,
                 double hmi, double hma, double e1);
+    // -----------------------------------------------------------------------
+    //                      math_gcf.cc FUNCTIONS
+    // -----------------------------------------------------------------------
+    /**
+     * Specialized function for coordinate transformation used in Gcf eval_U1_vec_field
+     *
+     * @param x      x coordinate
+     * @param y      y coordinate
+     * @param pcoord pointer to new coordinates
+     */
+    void rplane_plsphere0( double x, double y, double * pcoord );
+    /**
+     * Insert new point in GCF linked list
+     * @param x0     1st coordinate
+     * @param y0     2nd coordinate
+     * @param z0     3rd coordinate
+     * @param dashes dashes for @c orbits_points struct
+     */
+    void insert_gcf_point( double x0, double y0, double z0, int dashes );
 
 private:
     //void dumpSeparatrices( Wt::WTextArea * m, sep * separ, int margin );
@@ -1186,7 +1213,6 @@ private:
     //                          FINITE_ANNULUS
     // -----------------------------------------------------------------------
     void finite_annulus( double x, double y, double * u );
-    void cylinder_to_plsphere( double r, double theta, double * pcoord);
     void U1_to_plsphere( double x0, double y0, double * pcoord);
     void xyrevU1_to_plsphere( double z1, double z2, double * pcoord);
     void V1_to_plsphere( double x0, double y0, double * pcoord);

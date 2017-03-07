@@ -17,12 +17,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "math_gcf.h"
+#include "win_sphere.h"
 
 #include "custom.h"
-//#include "file_vf.h"
 #include "math_p4.h"
-//#include "math_charts.h"
+#include "MyLogger.h"
 #include "plot_tools.h"
 #include "ScriptHandler.h"
 
@@ -30,21 +29,15 @@
 
 
 // static global variables
-static int GcfTask = EVAL_GCF_NONE;             // TODO: fer membre de WWinSphere?
-//static QWinSphere * GcfSphere = nullptr;
-static int GcfDashes = 0;
-static bool GcfError = false;
-
-// non-static global variables
-orbits_points * last_gcf_point = nullptr; // TODO: fer membre de WVFStudy?
-
-// static functions
-static void insert_gcf_point( double x0, double y0, double z0, int dashes );
-static bool ReadTaskResults( int ); // , int, int, int );
-static bool read_gcf( void (*chart)(double,double,double *) );
+static int GcfDashes = 1;
 
 // function definitions
-bool WWinSphere::evalGcfStart( int dashes, int points, int precis )
+void WVFStudy::rplane_plsphere0( double x, double y, double * pcoord )
+{
+    R2_to_plsphere(x*cos(y),x*sin(y),pcoord);
+}
+
+bool WWinSphere::evalGcfStart( std::string fname, int dashes, int points, int precis )
 {
     if ( study_->gcf_points != nullptr ) {
         /* here we just paint in black over the previous gcf,
@@ -57,34 +50,37 @@ bool WWinSphere::evalGcfStart( int dashes, int points, int precis )
     }
 
     if ( study_->plweights )
-        GcfTask = EVAL_GCF_LYP_R2;
+        gcfTask_ = EVAL_GCF_LYP_R2;
     else
-        GcfTask = EVAL_GCF_R2;
+        gcfTask_ = EVAL_GCF_R2;
 
-    GcfError = false;
+    gcfError_ = false;
     //GcfSphere = sp;
     GcfDashes = dashes;
-    // TODO si això ho ha de fer homeright, haurem d'enviar una senyal
-    return runTask( GcfTask, points, precis );
+    if (runTask( fname, gcfTask_, points, precis ) < 0)
+        return false;
+    return true;
 }
 
 // returns true when finished.  Then run EvalGCfFinish to see if error occurred or not
-bool WWinSphere::evalGcfContinue( int points, int prec )
+bool WWinSphere::evalGcfContinue( std::string fname, int points, int prec )
 {
-    if ( GcfTask == EVAL_GCF_NONE )
+    if ( gcfTask_ == EVAL_GCF_NONE )
         return true;
 
-    if ( !ReadTaskResults( GcfTask ) ) {
-        GcfError = true;
+    if ( !readTaskResults( fname, gcfTask_ ) ) {
+        gcfError_ = true;
+        globalLogger__.error("WWinSphere :: error at gcf readTaskResults");
         return true;
     }
-    GcfTask++;
-    if ( GcfTask == EVAL_GCF_FINISHPOINCARE || GcfTask == EVAL_GCF_FINISHLYAPUNOV ) {
+    gcfTask_++;
+    if ( gcfTask_ == EVAL_GCF_FINISHPOINCARE || gcfTask_ == EVAL_GCF_FINISHLYAPUNOV ) {
         return true;
     }
     
-    if ( !runTask( GcfTask, points, prec ) ) {
-        GcfError = true;
+    if ( runTask( fname, gcfTask_, points, prec ) < 0 ) {
+        gcfError_ = true;
+        globalLogger__.error("WWinSphere :: error at gcf runTask");
         return true;
     }
 
@@ -93,27 +89,27 @@ bool WWinSphere::evalGcfContinue( int points, int prec )
 
 bool WWinSphere::evalGcfFinish( void )      // return false in case an error occured
 {
-    if ( GcfTask != EVAL_GCF_NONE ) {
+    if ( gcfTask_ != EVAL_GCF_NONE ) {
         // TODO: aqui vol pintar ja....
         /*GcfSphere->prepareDrawing();
         draw_gcf( GcfSphere, VFResults.gcf_points, CSING, 1 );
         GcfSphere->finishDrawing();*/
 
-        GcfTask = EVAL_GCF_NONE;
+        gcfTask_ = EVAL_GCF_NONE;
 
-        if ( GcfError ) {
-            GcfError = false;
+        if ( gcfError_ ) {
+            gcfError_ = false;
             return false;
         }
     }
     return true;
 }
 
-bool WWinSphere::runTask( int task, int points, int prec )
+int WWinSphere::runTask( std::string fname, int task, int points, int prec )
 {
     bool value;
-    std::string fname = randomFileName(TMP_DIR,"_gcf.tab");
-    
+    //std::string fname = randomFileName(TMP_DIR,"_gcf.tab");
+
     switch( task ) {
     case EVAL_GCF_R2:
         value = prepareGcf(fname,study_->gcf,-1,1,prec,points );
@@ -151,34 +147,47 @@ bool WWinSphere::runTask( int task, int points, int prec )
     }
 
     if ( value )
-        return evaluateMapleScript(fname); //TODO: implementar a ScriptHandler
+        return evaluateMapleScript(fname);
     else
-        return false;
+        return -1;
 }
 
-// TODO: can this be static?
-void rplane_plsphere0( double x, double y, double * pcoord )
-{
-    R2_to_plsphere(x*cos(y),x*sin(y),pcoord);
-}
-
-static bool ReadTaskResults( int task ) // , int points, int prec, int memory )
+//TODO: posar a winsphere.h
+bool WWinSphere::readTaskResults( std::string fname, int task ) // , int points, int prec, int memory )
 {
     bool value;
 
     switch( task ) {
-    case EVAL_GCF_R2:       value = read_gcf( R2_to_psphere ); break;
-    case EVAL_GCF_U1:       value = read_gcf( U1_to_psphere ); break;
-    case EVAL_GCF_V1:       value = read_gcf( VV1_to_psphere ); break;
-    case EVAL_GCF_U2:       value = read_gcf( U2_to_psphere ); break;
-    case EVAL_GCF_V2:       value = read_gcf( VV2_to_psphere ); break;
-    case EVAL_GCF_LYP_R2:   value = read_gcf( rplane_plsphere0 ); break;
-                            // here: the old herc files contained (the equivalent of)
-                            // value = read_gcf( rplane_psphere );
-    case EVAL_GCF_CYL1:     value = read_gcf( cylinder_to_plsphere ); break;
-    case EVAL_GCF_CYL2:     value = read_gcf( cylinder_to_plsphere ); break;
-    case EVAL_GCF_CYL3:     value = read_gcf( cylinder_to_plsphere ); break;
-    case EVAL_GCF_CYL4:     value = read_gcf( cylinder_to_plsphere ); break;
+    case EVAL_GCF_R2:
+        value = read_gcf( fname, &WVFStudy::R2_to_psphere );
+        break;
+    case EVAL_GCF_U1:
+        value = read_gcf( fname, &WVFStudy::U1_to_psphere );
+        break;
+    case EVAL_GCF_V1:
+        value = read_gcf( fname, &WVFStudy::VV1_to_psphere );
+        break;
+    case EVAL_GCF_U2:
+        value = read_gcf( fname, &WVFStudy::U2_to_psphere );
+        break;
+    case EVAL_GCF_V2:
+        value = read_gcf( fname, &WVFStudy::VV2_to_psphere );
+        break;
+    case EVAL_GCF_LYP_R2:
+        value = read_gcf( fname, &WVFStudy::rplane_plsphere0 );
+        break;
+    case EVAL_GCF_CYL1:
+        value = read_gcf( fname, &WVFStudy::cylinder_to_plsphere );
+        break;
+    case EVAL_GCF_CYL2:
+        value = read_gcf( fname, &WVFStudy::cylinder_to_plsphere );
+        break;
+    case EVAL_GCF_CYL3:
+        value = read_gcf( fname, &WVFStudy::cylinder_to_plsphere );
+        break;
+    case EVAL_GCF_CYL4:
+        value = read_gcf( fname, &WVFStudy::cylinder_to_plsphere );
+        break;
     default:
         value = false;
     }
@@ -221,17 +230,17 @@ void WVFStudy::insert_gcf_point( double x0, double y0, double z0, int dashes )
     last_gcf_point->next_point = nullptr;
 }
 
-static bool read_gcf( void (*chart)(double,double,double *) )
+bool WWinSphere::read_gcf( std::string fname, void (WVFStudy::*chart)(double,double,double *) )
 {
     int t;
     int k;
-    FILE * fp;
+    FILE* fp;
     double x, y;
     double pcoord[3];
     int d,c;
 
     // TODO: change name of file, el reb la funció?
-    fp = fopen( QFile::encodeName( ThisVF->getfilename_gcf() ), "r" );
+    fp = fopen( std::string(fname+"_gcf.tab").c_str(), "r" );
     if ( fp == nullptr )
         return false;
 
@@ -242,8 +251,8 @@ static bool read_gcf( void (*chart)(double,double,double *) )
         while( fscanf( fp, "%lf %lf", &x, &y ) == 2 )
         {
             k++;
-            chart(x,y,pcoord);
-            insert_gcf_point( pcoord[0], pcoord[1], pcoord[2], d);
+            (study_->*chart)(x,y,pcoord);
+            study_->insert_gcf_point( pcoord[0], pcoord[1], pcoord[2], d);
             //d=1;
             d=GcfDashes;
         }

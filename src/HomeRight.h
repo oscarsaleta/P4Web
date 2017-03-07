@@ -30,6 +30,10 @@
 #include <Wt/WString>
 //#include <Wt/WMouseEvent>
 
+#define GCF_DASHES 1
+#define GCF_POINTS 40
+#define GCF_PRECIS 12
+
 class WWinSphere;
 
 /** 
@@ -170,14 +174,14 @@ public:
      * @param x0  x coordinate of starting point
      * @param y0  y coordinate of starting point
      */
-    void onOrbitsIntegrate( int dir, double x0, double y0 );
+    void onOrbitsIntegrate ( int dir, double x0, double y0 );
 
     /**
      * React to an orbit delete request
      * 
      * @param flag can be 0 (delete all) or 1 (delete last)
      */
-    void onOrbitsDelete(int flag);
+    void onOrbitsDelete (int flag);
     
     /**
      * React to reset signal from HomeLeft
@@ -186,7 +190,9 @@ public:
      * 
      * @param dummy not needed but signals cannot be empty
      */
-    void onReset( int dummy );
+    void onReset ( int dummy );
+
+    void onGcfEval ( std::string fname );
 
 private:
     bool                    orbitStarted_;

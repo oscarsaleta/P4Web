@@ -435,6 +435,7 @@ void HomeLeft::evaluate()
         errorSignal_.emit("Error during Maple script execution");
         globalLogger__.error("HomeLeft :: Maple error: "+std::to_string(status));
     }
+    
 }
 
 
@@ -498,6 +499,11 @@ void HomeLeft::onPlot()
                 std::stod(viewMaxY_->text()));    
             }
             tabs_->setCurrentWidget(viewContainer_);
+        }
+        // send GCF evaluate signal here because we needed HomeRight to create the sphere first
+        if ( mplParams.str_gcf != "0" ) {
+            gcfSignal_.emit(fileUploadName_);
+            globalLogger__.debug("HomeLeft :: sent signal for GCF evaluation");
         }
     }
 }

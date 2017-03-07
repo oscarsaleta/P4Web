@@ -92,6 +92,7 @@ WVFStudy::WVFStudy(double projection) :
     gcf_V2 = nullptr;
     gcf_C = nullptr;
     gcf_points = nullptr;
+    last_gcf_point = nullptr;
 
     // initialize limit cycles & orbits
 
@@ -183,6 +184,7 @@ void WVFStudy::deleteVF()
     delete_term2( gcf_V2 );
     delete_term3( gcf_C );
     deleteOrbitPoint( gcf_points );
+    deleteOrbitPoint( last_gcf_point );
 
     gcf = nullptr;
     gcf_U1 = nullptr;

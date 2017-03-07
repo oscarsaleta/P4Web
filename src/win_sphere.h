@@ -58,6 +58,19 @@
 //#include <Wt/WString>
 #include <Wt/WPaintedWidget>
 
+#define EVAL_GCF_NONE               0
+#define EVAL_GCF_R2                 1
+#define EVAL_GCF_U1                 2
+#define EVAL_GCF_U2                 3
+#define EVAL_GCF_V1                 4
+#define EVAL_GCF_V2                 5
+#define EVAL_GCF_FINISHPOINCARE     6
+#define EVAL_GCF_LYP_R2             7
+#define EVAL_GCF_CYL1               8
+#define EVAL_GCF_CYL2               9
+#define EVAL_GCF_CYL3               10
+#define EVAL_GCF_CYL4               11
+#define EVAL_GCF_FINISHLYAPUNOV     12
 
 //#define SELECTINGPOINTSTEPS         5
 //#define SELECTINGPOINTSPEED         150
@@ -123,11 +136,11 @@ public:
     WVFStudy *study_;           ///< WVFStudy object which will parse results from Maple
     std::string basename_;      ///< filename where Maple output is stored
     int typeOfView_;            ///< type of view for *study_
-    int projection_;
-    double viewMinX_;
-    double viewMaxX_;
-    double viewMinY_;
-    double viewMaxY_;
+    int projection_;            ///< used for sphere view
+    double viewMinX_;           ///< used for plane view
+    double viewMaxX_;           ///< used for plane view
+    double viewMinY_;           ///< used for plane view
+    double viewMaxY_;           ///< used for plane view
     
     /**
      * X Coordinate change: from world (double) to window (int) coordinates
@@ -322,17 +335,25 @@ public:
     bool setupPlot( void );
     //void updatePointSelection( void );
 
-
+    /**
+     * Start orbit integration in a given direction
+     *
+     * Implemented in math_orbits.cc
+     * 
+     * @param dir -1, 1 indicates direction, 0 tells the function to continue
+     */
     void integrateOrbit( int dir );
-
-    orbits_points * integrate_orbit( double pcoord[3],double step,int dir,int color, int points_to_int,struct orbits_points **orbit );
-
-    void drawOrbit( double * pcoord, struct orbits_points * points, int color );
-
+    /**
+     * Start orbit integration from a point
+     * @param  x x coordinate of starting point
+     * @param  y y coordinate of starting point
+     * @param  R if 0 then point selected in the drawing canvas else in the orbit window
+     * @return   @c true if ok, @c false if orbit is already integrated
+     */
     bool startOrbit( double x, double y, bool R );
-
-    void drawOrbits();
-
+    /**
+     * Delete last integrated orbit from @c study_ and the plot
+     */
     void deleteLastOrbit();
 
     /**
@@ -341,15 +362,16 @@ public:
      * This function enters a loop in which the CGF is evaluated
      * in every chart.
      * 
+     * @param  fname  filename where maple gcf scripts will be saved
      * @param  dashes display CGF separatrice in dashes or points
      * @param  points number of points to integrate
      * @param  precis precision of integration
      * @return        @c true if no error, @c false otherwise
      */
-    bool evalGcfStart( int dashes, int points, int precis );
-
-
-
+    bool evalGcfStart( std::string fname, int dashes, int points, int precis );
+    //TODO: doc
+    bool evalGcfContinue( std::string fname, int points, int prec );
+    bool evalGcfFinish( void );
 
     /**
      * React to a mouse hover event to set a string
@@ -374,12 +396,30 @@ public:
      */
     void mouseClickEvent( Wt::WMouseEvent e );
 
+    /**
+     * Method that sends a signal when mouse is hovered over plot region
+     * 
+     * This is used for printing mouse coordinates in the plot caption
+     *
+     * @return the signal
+     */
     Wt::Signal<Wt::WString>& hoverSignal() { return hoverSignal_; }
+    /**
+     * Method that sends a signal when user clicks on plot region
+     *
+     * This is used for selecting a point where orbit integration has
+     * to start
+     *
+     * @return the signal
+     */
     Wt::Signal<bool,double,double>& clickedSignal() { return clickedSignal_; }
 
     /**
-     * Method that sends a signal to print some message in the output
-     * text area from #HomeRight
+     * Method that sends a signal to print some message
+     *
+     * The message is written in the output text area from #HomeRight
+     *
+     * @return the signal
      */
     Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
 
@@ -389,7 +429,8 @@ public:
                                             and compiling units (even from outside the
                                             object) */
 
-    bool plotDone_;
+    bool plotDone_; ///< flag used to not replot every time we just want to update something
+    bool gcfError_; ///< flag that indicates if evalGcfContinue has found an error
     
 
 protected:
@@ -403,12 +444,11 @@ protected:
     void paintEvent( Wt::WPaintDevice * p );
 
 private:
-
+    // signal fired when mouse is hovered over the plot region (for caption)
     Wt::Signal<Wt::WString> hoverSignal_;
+    // signal fired when user clicks on plot (for orbits)
     Wt::Signal<bool,double,double> clickedSignal_;
-    /**
-     * Signal emitted when there's an error while reading results from Maple
-     */
+    // signal emitted when there's an error while reading results from Maple
     Wt::Signal<std::string> errorSignal_;
 
     
@@ -421,13 +461,25 @@ private:
     P4POLYLINES * CircleAtInfinity; ///< linked list of lines that form the Poincaré circle
     P4POLYLINES * PLCircle;         /**< linked list of lines that form the Poincaré-
                                         Lyapunov circle */
-
+    // used for plot caption
     void setChartString(int p, int q, bool isu1v1chart, bool negchart);
-
+    // used for not redoing plot when orbits or other objects are plotted over the original
     bool plotPrepared_;
     bool firstTimePlot_;
+    // integrate orbit from a point and store the result as a linked list
+    orbits_points * integrate_orbit(double pcoord[3],double step,int dir,int color,int points_to_int,struct orbits_points **orbit);
+    // draw orbit starting from a point
+    void drawOrbit( double * pcoord, struct orbits_points * points, int color );
+    // draw all orbits (calling drawOrbit() for each one)
+    void drawOrbits();
 
-
+    // used for gcf
+    int gcfTask_;
+    int runTask( std::string fname, int task, int points, int prec );
+    void draw_gcf( orbits_points * sep, int color, int dashes );
+    void plotGcf( void );
+    bool read_gcf( std::string fname, void (WVFStudy::*chart)(double,double,double *) );
+    bool readTaskResults( std::string fname, int task );
 };
 
 

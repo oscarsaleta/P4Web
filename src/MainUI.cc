@@ -136,6 +136,7 @@ void MainUI::setupUI()
     leftContainer_->onPlotPlaneSignal().connect(rightContainer_,&HomeRight::onPlanePlot);
     leftContainer_->orbitIntegrateSignal().connect(rightContainer_,&HomeRight::onOrbitsIntegrate);
     leftContainer_->orbitDeleteSignal().connect(rightContainer_,&HomeRight::onOrbitsDelete);
+    leftContainer_->gcfSignal().connect(rightContainer_,&HomeRight::onGcfEval); // TODO: fer aquesta funcio
     rightContainer_->sphereClickedSignal().connect(leftContainer_,&HomeLeft::showOrbitsDialog);
     globalLogger__.debug("MainUI :: signals connected");
 
