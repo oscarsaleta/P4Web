@@ -166,6 +166,7 @@ private:
     std::string         fileUploadName_;
     Wt::WLineEdit       *xEquationInput_;
     Wt::WLineEdit       *yEquationInput_;
+    Wt::WLineEdit       *gcfEquationInput_;
     Wt::WPushButton     *evalButton_;
     Wt::WPushButton     *plotButton_;
     Wt::WPushButton     *prepSaveButton_;

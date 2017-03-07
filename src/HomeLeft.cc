@@ -123,9 +123,12 @@ void HomeLeft::setupUI()
     xEquationInput_->setId("xEquationInput_");
     yEquationInput_ = new WLineEdit();
     yEquationInput_->setId("yEquationInput_");
+    gcfEquationInput_ = new WLineEdit();
+    gcfEquationInput_->setId("gcfEquationInput_");
     t->bindString("vf-tooltip",WString::tr("tooltip.vectorfield"));
     t->bindWidget("xeq",xEquationInput_);
     t->bindWidget("yeq",yEquationInput_);
+    t->bindWidget("gcf",gcfEquationInput_);
 
     // eval button
     evalButton_ = new WPushButton("Evaluate",equationsBox_);
@@ -333,6 +336,8 @@ void HomeLeft::parseInputFile()
                 case 12:
                     yEquationInput_->setText(line);
                     break;
+                case 13:
+                    gcfEquationInput_->setText(line);
                 }
                 i++;
             }
@@ -342,6 +347,8 @@ void HomeLeft::parseInputFile()
                     xEquationInput_->setText(WString::fromUTF8(line));
                 else if (i==12)
                     yEquationInput_->setText(WString::fromUTF8(line));
+                else if (i==13)
+                    gcfEquationInput_->setText(WString::fromUTF8(line));
                 i++;
             }
         }
@@ -366,11 +373,11 @@ void HomeLeft::setParams()
 {
     mplParams.str_xeq = xEquationInput_->text().toUTF8();
     mplParams.str_yeq = yEquationInput_->text().toUTF8();
+    mplParams.str_gcf = gcfEquationInput_->text().empty() ? "0" : gcfEquationInput_->text().toUTF8();
     mplParams.str_userf = "[ "+mplParams.str_xeq+", "+mplParams.str_yeq+" ]";
     if (!loggedIn_) {
         mplParams.str_critpoints = "0";
         mplParams.str_saveall = "false";
-        mplParams.str_gcf = "0";
         mplParams.str_numeric = "true";
         mplParams.str_epsilon = "0.01";
         mplParams.str_testsep = "false";
@@ -386,7 +393,6 @@ void HomeLeft::setParams()
     } else {
         mplParams.str_critpoints = "0";
         mplParams.str_saveall = "false";
-        mplParams.str_gcf = "0";
         mplParams.str_numeric = (calculationsBtnGroup_->checkedId() == Numeric) ? "true" : "false";
         mplParams.str_epsilon = std::to_string(epsilonSpinBox_->value());
         mplParams.str_testsep = (separatricesBtnGroup_->checkedId() == No) ? "false" : "true";

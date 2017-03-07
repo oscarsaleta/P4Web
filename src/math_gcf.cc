@@ -24,12 +24,13 @@
 #include "math_p4.h"
 //#include "math_charts.h"
 #include "plot_tools.h"
+#include "ScriptHandler.h"
 
 #include <cmath>
 
 
 // static global variables
-static int GcfTask = EVAL_GCF_NONE;             // TODO fer membre de WWinSphere?
+static int GcfTask = EVAL_GCF_NONE;             // TODO: fer membre de WWinSphere?
 //static QWinSphere * GcfSphere = nullptr;
 static int GcfDashes = 0;
 static bool GcfError = false;
@@ -108,43 +109,41 @@ bool WWinSphere::evalGcfFinish( void )      // return false in case an error occ
     return true;
 }
 
-bool runTask( int task, int points, int prec )
+bool WWinSphere::runTask( int task, int points, int prec )
 {
     bool value;
-
+    std::string fname = randomFileName(TMP_DIR,"_gcf.tab");
+    
     switch( task ) {
     case EVAL_GCF_R2:
-    // TODO: either send signal to homeleft to prepare file or prepare it
-    // in homeright or in sphere
-    // la signal seria <P4POLYNOM,int,int,int,int>
-        value = ThisVF->prepareGcf( /*FIXME: sphere_->*/study_->gcf, -1, 1, prec, points );
+        value = prepareGcf(fname,study_->gcf,-1,1,prec,points );
         break;
     case EVAL_GCF_U1:
-        value = ThisVF->prepareGcf(study_->gcf_U1, 0, 1, prec, points);
+        value = prepareGcf(fname,study_->gcf_U1,0,1,prec,points);
         break;
     case EVAL_GCF_V1:
-        value = ThisVF->prepareGcf(study_->gcf_U1, -1, 0, prec, points);
+        value = prepareGcf(fname,study_->gcf_U1,-1,0,prec,points);
         break;
     case EVAL_GCF_U2:
-        value = ThisVF->prepareGcf(study_->gcf_U2, 0, 1, prec, points);
+        value = prepareGcf(fname,study_->gcf_U2,0,1,prec,points);
         break;
     case EVAL_GCF_V2:
-        value = ThisVF->prepareGcf(study_->gcf_U2, -1, 0, prec, points);
+        value = prepareGcf(fname,study_->gcf_U2,-1,0,prec,points);
         break;
     case EVAL_GCF_LYP_R2:
-        value = ThisVF->prepareGcf_LyapunovR2(prec, points);
+        value = prepareGcf_LyapunovR2(fname,study_->gcf,prec,points);
         break;
     case EVAL_GCF_CYL1:
-        value = ThisVF->prepareGcf_LyapunovCyl(-PI_DIV4,PI_DIV4, prec, points);
+        value = prepareGcf_LyapunovCyl(fname,study_->gcf_C,-PI_DIV4,PI_DIV4,prec,points);
         break;
     case EVAL_GCF_CYL2:
-        value = ThisVF->prepareGcf_LyapunovCyl( PI_DIV4, PI-PI_DIV4, prec, points);
+        value = prepareGcf_LyapunovCyl(fname,study_->gcf_C,PI_DIV4,PI-PI_DIV4,prec,points);
         break;
     case EVAL_GCF_CYL3:
-        value = ThisVF->prepareGcf_LyapunovCyl( PI-PI_DIV4, PI+PI_DIV4, prec, points);
+        value = prepareGcf_LyapunovCyl(fname,study_->gcf_C,PI-PI_DIV4,PI+PI_DIV4,prec,points);
         break;
     case EVAL_GCF_CYL4:
-        value = ThisVF->prepareGcf_LyapunovCyl(-PI+PI_DIV4,-PI_DIV4, prec, points);
+        value = prepareGcf_LyapunovCyl(fname,study_->gcf_C,-PI+PI_DIV4,-PI_DIV4,prec,points);
         break;
     default:
         value = false;
@@ -152,7 +151,7 @@ bool runTask( int task, int points, int prec )
     }
 
     if ( value )
-        return ThisVF->evaluateGcf();
+        return evaluateMapleScript(fname); //TODO: implementar a ScriptHandler
     else
         return false;
 }
@@ -167,8 +166,7 @@ static bool ReadTaskResults( int task ) // , int points, int prec, int memory )
 {
     bool value;
 
-    switch( task )
-    {
+    switch( task ) {
     case EVAL_GCF_R2:       value = read_gcf( R2_to_psphere ); break;
     case EVAL_GCF_U1:       value = read_gcf( U1_to_psphere ); break;
     case EVAL_GCF_V1:       value = read_gcf( VV1_to_psphere ); break;

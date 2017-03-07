@@ -206,7 +206,7 @@ void HomeRight::readResults(std::string fileName)
     }
     
     // add title for infinite region (missing in inf.res)
-    infResults_ = "AT THE INFINITE REGION \n";
+    infResults_ = "AT INFINITY \n";
     // read infinite singular points results
     resultsFile.open((fileName_+"_inf.res").c_str());
     if(resultsFile.is_open()) {
