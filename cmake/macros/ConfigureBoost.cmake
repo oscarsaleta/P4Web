@@ -3,8 +3,6 @@ find_package(Boost 1.49 REQUIRED system filesystem signals)
 add_definitions(-DBOOST_DATE_TIME_NO_LIB)
 add_definitions(-DBOOST_REGEX_NO_LIB)
 add_definitions(-DBOOST_CHRONO_NO_LIB)
-add_definitions(-DBOOST_SIGNALS_NO_DEPRECATION_WARNING)
-add_definitions(-DBoost_USE_MULTITHREADED=OFF)
 
 # Find if Boost was compiled in C++03 mode because it requires -DBOOST_NO_CXX11_SCOPED_ENUMS
 
