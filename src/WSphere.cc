@@ -176,8 +176,7 @@ bool WSphere::setupPlot( void )
     if (plotPrepared_) {
         firstTimePlot_ = false;
         return true;
-    }
-    else
+    } else
         firstTimePlot_ = true;
 
     if (!study_->readTables(basename_)) {
@@ -297,26 +296,26 @@ bool WSphere::setupPlot( void )
 
     if (gcfEval_) {
         // TODO: opcio de canviar auqests parametres?
-        int result = evalGcfStart(fname,GCF_DASHES,GCF_POINTS,GCF_PRECIS);
+        int result = evalGcfStart(gcfFname_,GCF_DASHES,GCF_POINTS,GCF_PRECIS);
         if (!result) {
             globalLogger__.error("WSphere :: cannot compute Gcf");
-            return;
+            return false;
         }
         // this calls evalGcfContinue at least once
         int i=0;
         do {
-            result = sphere_->evalGcfContinue(fname,GCF_POINTS,GCF_PRECIS);
-            if (sphere_->gcfError_) {
+            result = evalGcfContinue(gcfFname_,GCF_POINTS,GCF_PRECIS);
+            if (gcfError_) {
                 globalLogger__.error("WSphere :: error while computing evalGcfContinue at step: "+std::to_string(i));
-                return;
+                return false;
             }
             i++;
         } while (!result);
         // finish evaluation
-        result = sphere_->evalGcfFinish();
+        result = evalGcfFinish();
         if (!result) {
             globalLogger__.error("WSphere :: error while computing evalGcfFinish");
-            return;
+            return false;
         }
         globalLogger__.debug("WSphere :: computed Gcf");
     }

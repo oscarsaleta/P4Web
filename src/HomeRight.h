@@ -30,9 +30,6 @@
 #include <Wt/WString>
 //#include <Wt/WMouseEvent>
 
-#define GCF_DASHES 1
-#define GCF_POINTS 40
-#define GCF_PRECIS 12
 
 class WSphere;
 

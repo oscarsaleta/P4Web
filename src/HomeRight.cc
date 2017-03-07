@@ -360,6 +360,7 @@ void HomeRight::onGcfEval(std::string fname)
         return;
     
     sphere_->gcfEval_ = true;
+    sphere_->gcfFname_ = fname;
     sphere_->plotDone_ = false;
     sphere_->update();
 

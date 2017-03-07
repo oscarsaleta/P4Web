@@ -72,6 +72,10 @@
 #define EVAL_GCF_CYL4               11
 #define EVAL_GCF_FINISHLYAPUNOV     12
 
+#define GCF_DASHES 1
+#define GCF_POINTS 80
+#define GCF_PRECIS 12
+
 //#define SELECTINGPOINTSTEPS         5
 //#define SELECTINGPOINTSPEED         150
 
@@ -414,6 +418,7 @@ public:
 
     bool plotDone_; ///< flag used to not replot every time we just want to update something
     bool gcfEval_;  ///< flag used to make the sphere compute gcf
+    std::string gcfFname_;
     
 
 protected:
