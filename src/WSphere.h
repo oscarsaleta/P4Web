@@ -39,7 +39,7 @@
 
 /*!
  * @brief This file implements the class WSphere
- * @file win_sphere.h
+ * @file WSphere.h
  *
  * The WSphere class holds a WVFStudy object and also
  * contains all the information and methods needed for plotting
@@ -357,23 +357,6 @@ public:
     void deleteLastOrbit();
 
     /**
-     * Start evaluation of GCF
-     *
-     * This function enters a loop in which the CGF is evaluated
-     * in every chart.
-     * 
-     * @param  fname  filename where maple gcf scripts will be saved
-     * @param  dashes display CGF separatrice in dashes or points
-     * @param  points number of points to integrate
-     * @param  precis precision of integration
-     * @return        @c true if no error, @c false otherwise
-     */
-    bool evalGcfStart( std::string fname, int dashes, int points, int precis );
-    //TODO: doc
-    bool evalGcfContinue( std::string fname, int points, int prec );
-    bool evalGcfFinish( void );
-
-    /**
      * React to a mouse hover event to set a string
      *
      * This function takes the coordinates of the mouse cursor,
@@ -430,7 +413,7 @@ public:
                                             object) */
 
     bool plotDone_; ///< flag used to not replot every time we just want to update something
-    bool gcfError_; ///< flag that indicates if evalGcfContinue has found an error
+    bool gcfEval_;  ///< flag used to make the sphere compute gcf
     
 
 protected:
@@ -474,7 +457,11 @@ private:
     void drawOrbits();
 
     // used for gcf
+    bool gcfError_;
     int gcfTask_;
+    bool evalGcfStart( std::string fname, int dashes, int points, int precis );
+    bool evalGcfContinue( std::string fname, int points, int prec );
+    bool evalGcfFinish( void );
     int runTask( std::string fname, int task, int points, int prec );
     void draw_gcf( orbits_points * sep, int color, int dashes );
     void plotGcf( void );

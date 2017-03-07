@@ -22,7 +22,7 @@
 
 
 #include "file_tab.h"
-#include "win_sphere.h"
+#include "WSphere.h"
 
 // TODO: canviar això per un enum
 #define EVAL_GCF_NONE               0
@@ -47,7 +47,7 @@ extern orbits_points * last_gcf_point;
 //bool evalGcfFinish( void );
 //bool runTask( int task, int points, int prec );
 //void rplane_plsphere0( double x, double y, double * pcoord );
-//void draw_gcf( QWinSphere * spherewnd, orbits_points * sep, int color, int dashes ); //TODO: implement in win_sphere
+//void draw_gcf( QWinSphere * spherewnd, orbits_points * sep, int color, int dashes ); //TODO: implement in WSphere
 
 
 #endif // MATH_GCF_H

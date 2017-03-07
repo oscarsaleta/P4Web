@@ -34,7 +34,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "win_sphere.h"
+#include "WSphere.h"
 #include "file_tab.h"
 //#include "math_orbits.h"
 

@@ -43,7 +43,7 @@
  */
 
 #include "file_tab.h"
-#include "win_sphere.h"
+#include "WSphere.h"
 
 
 /*extern void (*change_epsilon)( WSphere *, double );

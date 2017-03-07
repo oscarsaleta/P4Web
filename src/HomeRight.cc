@@ -19,7 +19,7 @@
 
 #include "file_tab.h"
 #include "MyLogger.h"
-#include "win_sphere.h"
+#include "WSphere.h"
 //#include "math_orbits.h"
 
 #include <iostream>
@@ -358,30 +358,11 @@ void HomeRight::onGcfEval(std::string fname)
     globalLogger__.debug("HomeRight :: received gcf signal with fname "+fname);
     if (sphere_ == nullptr)
         return;
+    
+    sphere_->gcfEval_ = true;
+    sphere_->plotDone_ = false;
+    sphere_->update();
 
-    // TODO: opcio de canviar auqests parametres?
-    int result = sphere_->evalGcfStart(fname,GCF_DASHES,GCF_POINTS,GCF_PRECIS);
-    if (!result) {
-        globalLogger__.error("HomeRight :: cannot compute Gcf");
-        return;
-    }
-    // this calls evalGcfContinue at least once
-    int i=0;
-    do {
-        result = sphere_->evalGcfContinue(fname,GCF_POINTS,GCF_PRECIS);
-        if (sphere_->gcfError_) {
-            globalLogger__.error("HomeRight :: error while computing evalGcfContinue at step: "+std::to_string(i));
-            return;
-        }
-        i++;
-    } while (!result);
-    // finish evaluation
-    result = sphere_->evalGcfFinish();
-    if (!result) {
-        globalLogger__.error("HomeRight :: error while computing evalGcfFinish");
-        return;
-    }
-    globalLogger__.debug("HomeRight :: computed Gcf");
 }
 
 /*void HomeRight::clearPlot()

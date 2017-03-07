@@ -34,7 +34,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "win_sphere.h"
+#include "WSphere.h"
 
 #include "custom.h"
 #include "file_tab.h"
@@ -98,6 +98,7 @@ WSphere::WSphere( WContainerWidget * parent, int width, int height, std::string 
     CircleAtInfinity = nullptr;
     PLCircle = nullptr;
 
+    gcfEval_ = false;
     gcfTask_ = EVAL_GCF_NONE;
     gcfError_ = false;
 
@@ -135,6 +136,7 @@ WSphere::WSphere( WContainerWidget * parent, int width, int height, std::string 
     CircleAtInfinity = nullptr;
     PLCircle = nullptr;
 
+    gcfEval_ = false;
     gcfTask_ = EVAL_GCF_NONE;
     gcfError_ = false;
 
@@ -293,7 +295,7 @@ bool WSphere::setupPlot( void )
             PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
     }
 
-    if (evaluatingGcf) {
+    if (gcfEval_) {
         // TODO: opcio de canviar auqests parametres?
         int result = evalGcfStart(fname,GCF_DASHES,GCF_POINTS,GCF_PRECIS);
         if (!result) {
@@ -305,7 +307,7 @@ bool WSphere::setupPlot( void )
         do {
             result = sphere_->evalGcfContinue(fname,GCF_POINTS,GCF_PRECIS);
             if (sphere_->gcfError_) {
-                globalLogger__.error("HomeRight :: error while computing evalGcfContinue at step: "+std::to_string(i));
+                globalLogger__.error("WSphere :: error while computing evalGcfContinue at step: "+std::to_string(i));
                 return;
             }
             i++;
@@ -313,10 +315,10 @@ bool WSphere::setupPlot( void )
         // finish evaluation
         result = sphere_->evalGcfFinish();
         if (!result) {
-            globalLogger__.error("HomeRight :: error while computing evalGcfFinish");
+            globalLogger__.error("WSphere :: error while computing evalGcfFinish");
             return;
         }
-        globalLogger__.debug("HomeRight :: computed Gcf");
+        globalLogger__.debug("WSphere :: computed Gcf");
     }
 
     return true;

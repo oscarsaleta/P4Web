@@ -42,7 +42,7 @@
  * @file plot_tools.h
  */
 
-#include "win_sphere.h"
+#include "WSphere.h"
 
 /**
  * Pointer to a function that plots a line in the sphere

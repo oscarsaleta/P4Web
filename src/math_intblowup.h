@@ -43,7 +43,7 @@
  */
 
 #include "file_tab.h"
-#include "win_sphere.h"
+#include "WSphere.h"
 
 /**
  * Integrate blowup separatrices for a non elementary singular point
