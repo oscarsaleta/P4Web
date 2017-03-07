@@ -4,6 +4,7 @@
 #include "ScriptHandler.h"
 
 #include "file_tab.h"
+#include "math_p4.h"
 #include "math_polynom.h"
 #include "MyLogger.h"
 
@@ -24,9 +25,9 @@ std::string randomFileName(std::string prefix, std::string suffix)
     std::vector<char> dst_prefix(prefix.begin(), prefix.end());
     dst_prefix.push_back('\0');
 
-    int fd = mkstemps(&dst_prefix[0],4);
+    int fd = mkstemps(&dst_prefix[0],suffix.length());
     if (fd != -1) {
-        prefix.assign(dst_prefix.begin(), dst_prefix.end()-1-4);
+        prefix.assign(dst_prefix.begin(), dst_prefix.end()-1-suffix.length());
         fullname = prefix+suffix;
         close(fd);
     }
@@ -148,6 +149,31 @@ int evaluateMapleScript (std::string fname)
     }
 }
 
+bool fillSaveFile(std::string fname, mapleParamsStruct prms)
+{
+    std::ofstream fp(fname.c_str(),std::ios::trunc);
+
+    if (fp.is_open()) {
+        fp << 0                                                 << std::endl;   // typeofstudy
+        fp << (prms.str_numeric == std::string("true") ? 1 : 0) << std::endl;   // numeric
+        fp << prms.str_precision                                << std::endl;   // precision
+        fp << prms.str_epsilon                                  << std::endl;   // epsilon
+        fp << (prms.str_testsep == std::string("true") ? 1 : 0) << std::endl;   // test sep
+        fp << prms.str_taylor                                   << std::endl;   // taylor level
+        fp << prms.str_numericlevel                             << std::endl;   // numeric level
+        fp << prms.str_maxlevel                                 << std::endl;   // max levels
+        fp << prms.str_weaklevel                                << std::endl;   // weakness level
+        fp << prms.str_userp                                    << std::endl;   // p
+        fp << prms.str_userq                                    << std::endl;   // q
+        fp << prms.str_xeq                                      << std::endl;   // x'
+        fp << prms.str_yeq                                      << std::endl;   // y'
+        fp << prms.str_gcf                                      << std::endl;   // gcf
+        fp << 0                                                 << std::endl;   // numparams
+
+        fp.close();
+        return true;
+    }
+}
 
 bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int precision, int numpoints )
 {
@@ -177,7 +203,7 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int preci
         else
             fp << ":" << std::endl;
         
-        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" ) << std::endl;
+        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" << std::endl;
 
         globalLogger__.debug("ScriptHandler :: prepared GCF file "+fname);
         fp.close();
@@ -211,14 +237,14 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1, doub
         fp << "user_f := ";
         for (i=0; f!=nullptr; i++) {
             fp <<  printterm3( buf, f, (i==0) ? true : false, "x", "U", "V" );
-            f = f->next_term2;
+            f = f->next_term3;
         }
         if (i==0)
             fp << "0:" << std::endl;
         else
             fp << ":" << std::endl;
         
-        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" ) << std::endl;
+        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" << std::endl;
         
         globalLogger__.debug("ScriptHandler :: prepared GCF_LyapunovCyl file "+fname);
         fp.close();
@@ -231,7 +257,6 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1, doub
 
 bool prepareGcf_LyapunovR2( std::string fname, P4POLYNOM2 f, int precision, int numpoints )
 {
-    FILE * fp;
     char buf[100];
     int i;
 
@@ -247,21 +272,11 @@ bool prepareGcf_LyapunovR2( std::string fname, P4POLYNOM2 f, int precision, int 
         fp << "user_x1 := 0.0:" << std::endl;
         fp << "user_x2 := 1.0:" << std::endl;
         fp << "user_y1 := 0.0:" << std::endl;
-        fp << "user_y2 := " std::to_string(TWOPI); << ":" << std::endl;
+        fp << "user_y2 := " << std::to_string(TWOPI) << ":" << std::endl;
         fp << "u := x*cos(y):" << std::endl;
         fp << "v := y*sin(y):" << std::endl;
         fp << "user_f := ";
 
-        fprintf( fp, "user_numpoints := %d:\n", numpoints );
-        fprintf( fp, "user_x1 := %g:\n",        (float)0.0 );
-        fprintf( fp, "user_x2 := %g:\n",        (float)1.0 );
-        fprintf( fp, "user_y1 := %g:\n",        (float)0.0 );
-        fprintf( fp, "user_y2 := %g:\n",        (float)TWOPI );
-    
-        fprintf( fp, "u := %s:\n",          "x*cos(y)" );
-        fprintf( fp, "v := %s:\n",          "x*sin(y)" );
-        fprintf( fp, "user_f := " );
-    
         for( i = 0; f != nullptr; i++ ) {
             fp << printterm2( buf, f, (i==0) ? true : false, "U", "V" );
             f = f->next_term2;
@@ -271,7 +286,7 @@ bool prepareGcf_LyapunovR2( std::string fname, P4POLYNOM2 f, int precision, int 
         else
             fp <<":" << std::endl;
     
-        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" ) << std::endl;
+        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" << std::endl;
 
         globalLogger__.debug("ScriptHandler :: prepared GCF_LyapunovR2 file "+fname);
         fp.close();

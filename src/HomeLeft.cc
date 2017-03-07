@@ -451,27 +451,11 @@ void HomeLeft::prepareSaveFile()
     } else
         saveFileName_ = fileUploadName_;
 
-    saveFile.open(saveFileName_.c_str(),std::fstream::out|std::fstream::trunc);
-
-    setParams();
-
-    saveFile << 0                                                   << std::endl;   // typeofstudy
-    saveFile << (mplParams.str_numeric == WString("true") ? 1 : 0)  << std::endl;   // numeric
-    saveFile << mplParams.str_precision                             << std::endl;   // precision
-    saveFile << mplParams.str_epsilon                               << std::endl;   // epsilon
-    saveFile << (mplParams.str_testsep == WString("true") ? 1 : 0)  << std::endl;   // test sep
-    saveFile << mplParams.str_taylor                                << std::endl;   // taylor level
-    saveFile << mplParams.str_numericlevel                          << std::endl;   // numeric level
-    saveFile << mplParams.str_maxlevel                              << std::endl;   // max levels
-    saveFile << mplParams.str_weaklevel                             << std::endl;   // weakness level
-    saveFile << mplParams.str_userp                                 << std::endl;   // p
-    saveFile << mplParams.str_userq                                 << std::endl;   // q
-    saveFile << xEquationInput_->text()                             << std::endl;   // x'
-    saveFile << yEquationInput_->text()                             << std::endl;   // y'
-    saveFile << mplParams.str_gcf                                   << std::endl;   // gcf
-    saveFile << 0                                                   << std::endl;   // numparams
-
-    saveFile.close();
+    if (!fillSaveFile(saveFileName_, mplParams)) {
+        globalLogger__.error("Cannot create save file "+saveFileName_);
+        errorSignal_.emit("Could not create save file. You can notify this error at osr@mat.uab.cat, sorry for the inconvenience.");
+        return;
+    }
 
     saveFileResource_ = new WFileResource(saveFileName_);
 
@@ -491,7 +475,7 @@ void HomeLeft::prepareSaveFile()
 
 void HomeLeft::onPlot()
 {
-    if ( !evaluated_ ) {
+    if (!evaluated_) {
         errorSignal_.emit("Cannot read results, evaluate a vector field first.\n");
     } else {
         globalLogger__.debug("HomeLeft :: sending onPlot signal");
@@ -524,12 +508,10 @@ void HomeLeft::showSettings()
         delete viewContainer_;
         viewContainer_ = nullptr;
     }
-    
 
     WRadioButton *button;
     WDoubleValidator *validator;
     WTemplate *t;
-
 
     /* evaluation parameters */
     settingsContainer_ = new WContainerWidget(this);
@@ -565,7 +547,6 @@ void HomeLeft::showSettings()
     t->bindString("sep-tooltip",WString::tr("tooltip.separatrices"));
     t->bindWidget("sep-no",button);
 
-
     // accuracy
     accuracySpinBox_ = new WSpinBox(settingsContainer_);
     accuracySpinBox_->setRange(1,14);
@@ -590,7 +571,6 @@ void HomeLeft::showSettings()
     t->bindWidget("eps",epsilonSpinBox_);
     t->bindString("eps-tooltip",WString::tr("tooltip.epsilon"));
 
-
     // level of approximation
     levAppSpinBox_ = new WSpinBox(settingsContainer_);
     levAppSpinBox_->setRange(0,10);
@@ -605,7 +585,6 @@ void HomeLeft::showSettings()
     t->bindWidget("num",numericLevelSpinBox_);
     t->bindString("num-tooltip",WString::tr("tooltip.numeric-level"));
 
-
     // maximum level
     maxLevelSpinBox_ = new WSpinBox(settingsContainer_);
     maxLevelSpinBox_->setRange(15,25);
@@ -619,7 +598,6 @@ void HomeLeft::showSettings()
     maxWeakLevelSpinBox_->setValue(4);
     t->bindWidget("weak",maxWeakLevelSpinBox_);
     t->bindString("weak-tooltip",WString::tr("tooltip.maximum-weakness-level"));
-
 
     // p q
     PLWeightPSpinBox_ = new WSpinBox(settingsContainer_);
@@ -648,8 +626,6 @@ void HomeLeft::showSettings()
             maxLevelSpinBox_->enable();
         }
     }));
-
-
 
     /* view settings */
     viewContainer_ = new WContainerWidget(this);
@@ -728,8 +704,6 @@ void HomeLeft::showSettings()
         }
     }));
 
-
-
     // orbits integration
     orbitsContainer_ = new WContainerWidget(this);
     orbitsContainer_->setId("orbitsContainer_");
@@ -768,9 +742,7 @@ void HomeLeft::showSettings()
     orbitsDeleteOneBtn_->clicked().connect(this,&HomeLeft::onOrbitsDeleteOneBtn);
     orbitsDeleteAllBtn_->clicked().connect(this,&HomeLeft::onOrbitsDeleteAllBtn);
 
-
     tabs_->setCurrentWidget(settingsContainer_);
-
 }
 
 void HomeLeft::hideSettings()
