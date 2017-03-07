@@ -56,8 +56,8 @@
 using namespace Wt;
 
 
-//int WWinSphere::numSpheres = 0;
-//WWinSphere * * WWinSphere::SphereList = nullptr;
+//int WSphere::numSpheres = 0;
+//WSphere * * WSphere::SphereList = nullptr;
 
 
 /*
@@ -72,7 +72,7 @@ using namespace Wt;
 
 // parameters _x1,... are irrelevant if isZoom is false
 
-WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::string basename, double projection) :
+WSphere::WSphere( WContainerWidget * parent, int width, int height, std::string basename, double projection) :
     width_(width),
     height_(height),
     basename_(basename),
@@ -86,7 +86,7 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
 
     ReverseYaxis = false;
 
-    /*SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
+    /*SphereList = (WSphere * *)realloc( SphereList, sizeof(WSphere *) * (numSpheres+1) );
     SphereList[numSpheres++] = this;
     if( numSpheres > 1 ) {
         SphereList[numSpheres-2]->next = this;
@@ -101,12 +101,12 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     gcfTask_ = EVAL_GCF_NONE;
     gcfError_ = false;
 
-    mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
-    clicked().connect(this,&WWinSphere::mouseClickEvent);
+    mouseMoved().connect(this,&WSphere::mouseMovementEvent);
+    clicked().connect(this,&WSphere::mouseClickEvent);
 
 }
 
-WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::string basename, int type, double minx, double maxx, double miny, double maxy) :
+WSphere::WSphere( WContainerWidget * parent, int width, int height, std::string basename, int type, double minx, double maxx, double miny, double maxy) :
     width_(width),
     height_(height),
     basename_(basename),
@@ -123,7 +123,7 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
 
     ReverseYaxis = false;
 
-    /*SphereList = (WWinSphere * *)realloc( SphereList, sizeof(WWinSphere *) * (numSpheres+1) );
+    /*SphereList = (WSphere * *)realloc( SphereList, sizeof(WSphere *) * (numSpheres+1) );
     SphereList[numSpheres++] = this;
     if( numSpheres > 1 ) {
         SphereList[numSpheres-2]->next = this;
@@ -138,13 +138,13 @@ WWinSphere::WWinSphere( WContainerWidget * parent, int width, int height, std::s
     gcfTask_ = EVAL_GCF_NONE;
     gcfError_ = false;
 
-    mouseMoved().connect(this,&WWinSphere::mouseMovementEvent);
-    clicked().connect(this,&WWinSphere::mouseClickEvent);
+    mouseMoved().connect(this,&WSphere::mouseMovementEvent);
+    clicked().connect(this,&WSphere::mouseClickEvent);
 
 }
 
 
-WWinSphere::~WWinSphere()
+WSphere::~WSphere()
 {
     int i;
 
@@ -169,7 +169,7 @@ WWinSphere::~WWinSphere()
 }
 
 
-bool WWinSphere::setupPlot( void )
+bool WSphere::setupPlot( void )
 {
     if (plotPrepared_) {
         firstTimePlot_ = false;
@@ -292,11 +292,38 @@ bool WWinSphere::setupPlot( void )
         if( study_->plweights )
             PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
     }
+
+    if (evaluatingGcf) {
+        // TODO: opcio de canviar auqests parametres?
+        int result = evalGcfStart(fname,GCF_DASHES,GCF_POINTS,GCF_PRECIS);
+        if (!result) {
+            globalLogger__.error("WSphere :: cannot compute Gcf");
+            return;
+        }
+        // this calls evalGcfContinue at least once
+        int i=0;
+        do {
+            result = sphere_->evalGcfContinue(fname,GCF_POINTS,GCF_PRECIS);
+            if (sphere_->gcfError_) {
+                globalLogger__.error("HomeRight :: error while computing evalGcfContinue at step: "+std::to_string(i));
+                return;
+            }
+            i++;
+        } while (!result);
+        // finish evaluation
+        result = sphere_->evalGcfFinish();
+        if (!result) {
+            globalLogger__.error("HomeRight :: error while computing evalGcfFinish");
+            return;
+        }
+        globalLogger__.debug("HomeRight :: computed Gcf");
+    }
+
     return true;
 }
 
 
-void WWinSphere::paintEvent( WPaintDevice * p )
+void WSphere::paintEvent( WPaintDevice * p )
 {
     if (!(plotPrepared_=setupPlot())) {
         errorSignal_.emit("Error while reading Maple results, evaluate the vector field first. If you did, probably the execution ran out of time.");
@@ -333,7 +360,7 @@ void WWinSphere::paintEvent( WPaintDevice * p )
     }
 }
 
-void WWinSphere::setChartString( int p, int q, bool isu1v1chart, bool negchart )
+void WSphere::setChartString( int p, int q, bool isu1v1chart, bool negchart )
 {
     WString buf;
     if (isu1v1chart) {
@@ -360,7 +387,7 @@ void WWinSphere::setChartString( int p, int q, bool isu1v1chart, bool negchart )
     chartString_ = buf;
 }
 
-void WWinSphere::mouseMovementEvent( WMouseEvent e )
+void WSphere::mouseMovementEvent( WMouseEvent e )
 {
     int x,y;
     double wx,wy;
@@ -477,7 +504,7 @@ void WWinSphere::mouseMovementEvent( WMouseEvent e )
     hoverSignal_.emit(buf);
 }
 
-void WWinSphere::mouseClickEvent( WMouseEvent e )
+void WSphere::mouseClickEvent( WMouseEvent e )
 {
     double wx = coWorldX(e.widget().x);
     double wy = coWorldY(e.widget().y);
@@ -493,7 +520,7 @@ void WWinSphere::mouseClickEvent( WMouseEvent e )
 
 
 
-double WWinSphere::coWorldX( int x )
+double WSphere::coWorldX( int x )
 {
     double wx;
 
@@ -502,7 +529,7 @@ double WWinSphere::coWorldX( int x )
     return (wx*dx + x0);
 }
 
-double WWinSphere::coWorldY( int y )
+double WSphere::coWorldY( int y )
 {
     double wy;
 
@@ -511,7 +538,7 @@ double WWinSphere::coWorldY( int y )
     return (wy*dy + y0);
 }
 
-int WWinSphere::coWinX( double x )
+int WSphere::coWinX( double x )
 {
     double wx;
     int iwx;
@@ -526,7 +553,7 @@ int WWinSphere::coWinX( double x )
     return iwx;
 }
 
-int WWinSphere::coWinH( double deltax )
+int WSphere::coWinH( double deltax )
 {
     double wx;
 
@@ -535,7 +562,7 @@ int WWinSphere::coWinH( double deltax )
     return (int)(wx+0.5);
 }
 
-int WWinSphere::coWinV( double deltay )
+int WSphere::coWinV( double deltay )
 {
     double wy;
 
@@ -544,7 +571,7 @@ int WWinSphere::coWinV( double deltay )
     return (int)(wy+0.5);
 }
 
-int WWinSphere::coWinY( double y )
+int WSphere::coWinY( double y )
 {
     double wy;
     int iwy;
@@ -561,7 +588,7 @@ int WWinSphere::coWinY( double y )
 
 
 
-bool WWinSphere::getChartPos( int chart, double x1, double y1, double * pos )
+bool WSphere::getChartPos( int chart, double x1, double y1, double * pos )
 {
     double pcoord[3];
 
@@ -590,7 +617,7 @@ bool WWinSphere::getChartPos( int chart, double x1, double y1, double * pos )
     return true;
 }
 
-/*void WWinSphere::updatePointSelection( void )
+/*void WSphere::updatePointSelection( void )
 {
      if( SelectingPointStep == 0 )
      {
@@ -613,7 +640,7 @@ bool WWinSphere::getChartPos( int chart, double x1, double y1, double * pos )
 //                          PLOT SINGULAR POINTS
 // -----------------------------------------------------------------------
 
-void WWinSphere::plotPoint( struct saddle * p )
+void WSphere::plotPoint( struct saddle * p )
 {
     double pos[2];
     int x, y;
@@ -635,7 +662,7 @@ void WWinSphere::plotPoint( struct saddle * p )
     }
 }
 
-void WWinSphere::plotPoint( struct node * p )
+void WSphere::plotPoint( struct node * p )
 {
     double pos[2];
     int x, y;
@@ -661,7 +688,7 @@ void WWinSphere::plotPoint( struct node * p )
     }
 }
 
-void WWinSphere::plotPoint( struct weak_focus * p )
+void WSphere::plotPoint( struct weak_focus * p )
 {
     double pos[2];
     int x, y;
@@ -697,7 +724,7 @@ void WWinSphere::plotPoint( struct weak_focus * p )
     }
 }
 
-void WWinSphere::plotPoint( struct strong_focus * p )
+void WSphere::plotPoint( struct strong_focus * p )
 {
     double pos[2];
     int x, y;
@@ -723,7 +750,7 @@ void WWinSphere::plotPoint( struct strong_focus * p )
     }
 }
 
-void WWinSphere::plotPoint( struct degenerate * p )
+void WSphere::plotPoint( struct degenerate * p )
 {
     double pos[2];
     int x, y;
@@ -746,7 +773,7 @@ void WWinSphere::plotPoint( struct degenerate * p )
     }
 }
 
-void WWinSphere::plotPoint( struct semi_elementary * p )
+void WSphere::plotPoint( struct semi_elementary * p )
 {
     double pos[2];
     int x, y;
@@ -778,7 +805,7 @@ void WWinSphere::plotPoint( struct semi_elementary * p )
     }
 }
 
-void WWinSphere::plotPoints( void )
+void WSphere::plotPoints( void )
 {
     struct saddle * sp;
     struct node * np;
@@ -801,7 +828,7 @@ void WWinSphere::plotPoints( void )
         plotPoint( dp );
 }
 
-void WWinSphere::plotPointSeparatrices( struct semi_elementary * p )
+void WSphere::plotPointSeparatrices( struct semi_elementary * p )
 {
     struct sep * separatrice;
 
@@ -809,7 +836,7 @@ void WWinSphere::plotPointSeparatrices( struct semi_elementary * p )
         draw_sep( this, separatrice->first_sep_point );
 }
 
-void WWinSphere::plotPointSeparatrices( struct saddle * p )
+void WSphere::plotPointSeparatrices( struct saddle * p )
 {
     struct sep * separatrice;
 
@@ -817,7 +844,7 @@ void WWinSphere::plotPointSeparatrices( struct saddle * p )
         draw_sep( this, separatrice->first_sep_point );
 }
 
-void WWinSphere::plotPointSeparatrices( struct degenerate * p )
+void WSphere::plotPointSeparatrices( struct degenerate * p )
 {
     struct blow_up_points *blow_up;
 
@@ -826,7 +853,7 @@ void WWinSphere::plotPointSeparatrices( struct degenerate * p )
     }
 }
 
-void WWinSphere::plotSeparatrices( void )
+void WSphere::plotSeparatrices( void )
 {
     struct saddle * sp;
     struct semi_elementary * sep;
@@ -840,7 +867,7 @@ void WWinSphere::plotSeparatrices( void )
         plotPointSeparatrices( dp );
 }
 
-void WWinSphere::plotGcf(void)
+void WSphere::plotGcf(void)
 {
     draw_gcf( study_->gcf_points, CSING, 1 );
 }
@@ -850,7 +877,7 @@ void WWinSphere::plotGcf(void)
 //                          PLOT TOOLS
 // -----------------------------------------------------------------------
 
-P4POLYLINES * WWinSphere::produceEllipse( double cx, double cy, double a, double b,
+P4POLYLINES * WSphere::produceEllipse( double cx, double cy, double a, double b,
                                           bool dotted, double resa, double resb )
 {
     // this is an exact copy of the plotEllipse routine, except that output is stored
@@ -1005,7 +1032,7 @@ P4POLYLINES * WWinSphere::produceEllipse( double cx, double cy, double a, double
 }
 
 
-void WWinSphere::plotPoincareSphere( void )
+void WSphere::plotPoincareSphere( void )
 {
     int color;
     WPainterPath path;
@@ -1022,7 +1049,7 @@ void WWinSphere::plotPoincareSphere( void )
 
 }
 
-void WWinSphere::plotPoincareLyapunovSphere( void )
+void WSphere::plotPoincareLyapunovSphere( void )
 {
     int color;
     WPainterPath *path = new WPainterPath();
@@ -1054,7 +1081,7 @@ void WWinSphere::plotPoincareLyapunovSphere( void )
     return;
 }
 
-void WWinSphere::plotLineAtInfinity( void )
+void WSphere::plotLineAtInfinity( void )
 {
     switch( study_->typeofview ) {
     case TYPEOFVIEW_U1:
@@ -1081,7 +1108,7 @@ void WWinSphere::plotLineAtInfinity( void )
 
 
 
-void WWinSphere::drawLine( double _x1, double _y1, double _x2, double _y2, int color )
+void WSphere::drawLine( double _x1, double _y1, double _x2, double _y2, int color )
 {
     int wx1, wy1, wx2, wy2;
 
@@ -1179,7 +1206,7 @@ void WWinSphere::drawLine( double _x1, double _y1, double _x2, double _y2, int c
     }
 }
 
-void WWinSphere::drawPoint( double x, double y, int color )
+void WSphere::drawPoint( double x, double y, int color )
 {
     int _x, _y;
     if( staticPainter != nullptr ) {

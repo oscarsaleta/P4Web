@@ -37,7 +37,7 @@ void WVFStudy::rplane_plsphere0( double x, double y, double * pcoord )
     R2_to_plsphere(x*cos(y),x*sin(y),pcoord);
 }
 
-bool WWinSphere::evalGcfStart( std::string fname, int dashes, int points, int precis )
+bool WSphere::evalGcfStart( std::string fname, int dashes, int points, int precis )
 {
     if ( study_->gcf_points != nullptr ) {
         /* here we just paint in black over the previous gcf,
@@ -63,14 +63,14 @@ bool WWinSphere::evalGcfStart( std::string fname, int dashes, int points, int pr
 }
 
 // returns true when finished.  Then run EvalGCfFinish to see if error occurred or not
-bool WWinSphere::evalGcfContinue( std::string fname, int points, int prec )
+bool WSphere::evalGcfContinue( std::string fname, int points, int prec )
 {
     if ( gcfTask_ == EVAL_GCF_NONE )
         return true;
 
     if ( !readTaskResults( fname, gcfTask_ ) ) {
         gcfError_ = true;
-        globalLogger__.error("WWinSphere :: error at gcf readTaskResults");
+        globalLogger__.error("WSphere :: error at gcf readTaskResults");
         return true;
     }
     gcfTask_++;
@@ -80,14 +80,14 @@ bool WWinSphere::evalGcfContinue( std::string fname, int points, int prec )
     
     if ( runTask( fname, gcfTask_, points, prec ) < 0 ) {
         gcfError_ = true;
-        globalLogger__.error("WWinSphere :: error at gcf runTask");
+        globalLogger__.error("WSphere :: error at gcf runTask");
         return true;
     }
 
     return false; // still busy
 }
 
-bool WWinSphere::evalGcfFinish( void )      // return false in case an error occured
+bool WSphere::evalGcfFinish( void )      // return false in case an error occured
 {
     if ( gcfTask_ != EVAL_GCF_NONE ) {
         // TODO: aqui vol pintar ja....
@@ -105,7 +105,7 @@ bool WWinSphere::evalGcfFinish( void )      // return false in case an error occ
     return true;
 }
 
-int WWinSphere::runTask( std::string fname, int task, int points, int prec )
+int WSphere::runTask( std::string fname, int task, int points, int prec )
 {
     bool value;
     //std::string fname = randomFileName(TMP_DIR,"_gcf.tab");
@@ -153,7 +153,7 @@ int WWinSphere::runTask( std::string fname, int task, int points, int prec )
 }
 
 //TODO: posar a winsphere.h
-bool WWinSphere::readTaskResults( std::string fname, int task ) // , int points, int prec, int memory )
+bool WSphere::readTaskResults( std::string fname, int task ) // , int points, int prec, int memory )
 {
     bool value;
 
@@ -195,7 +195,7 @@ bool WWinSphere::readTaskResults( std::string fname, int task ) // , int points,
     return value;
 }
 
-void WWinSphere::draw_gcf( orbits_points * sep, int color, int dashes )
+void WSphere::draw_gcf( orbits_points * sep, int color, int dashes )
 {
     double pcoord[3];
 
@@ -230,7 +230,7 @@ void WVFStudy::insert_gcf_point( double x0, double y0, double z0, int dashes )
     last_gcf_point->next_point = nullptr;
 }
 
-bool WWinSphere::read_gcf( std::string fname, void (WVFStudy::*chart)(double,double,double *) )
+bool WSphere::read_gcf( std::string fname, void (WVFStudy::*chart)(double,double,double *) )
 {
     int t;
     int k;

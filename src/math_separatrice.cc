@@ -48,11 +48,11 @@
 #include <cmath>
 
 
-/*void (*change_epsilon)( WWinSphere *, double ) = nullptr;
-void (*start_plot_sep)( WWinSphere * ) = nullptr;
-void (*cont_plot_sep)( WWinSphere * ) = nullptr;
-void (*plot_next_sep)( WWinSphere * ) = nullptr;
-void (*select_next_sep)( WWinSphere * ) = nullptr;*/
+/*void (*change_epsilon)( WSphere *, double ) = nullptr;
+void (*start_plot_sep)( WSphere * ) = nullptr;
+void (*cont_plot_sep)( WSphere * ) = nullptr;
+void (*plot_next_sep)( WSphere * ) = nullptr;
+void (*select_next_sep)( WSphere * ) = nullptr;*/
 
 int findSepColor2( P4POLYNOM2 f, int type, double y[2] )
 {
@@ -225,7 +225,7 @@ void WVFStudy::integrate_lyapunov_sep( double p0, double p1, double p2, double *
     } 
 }
 
-static orbits_points *integrate_sep( WWinSphere * spherewnd, double pcoord[3], double step,
+static orbits_points *integrate_sep( WSphere * spherewnd, double pcoord[3], double step,
                                            int dir, int type, int points_to_int, orbits_points **orbit )
 {
     int i,d,h;
@@ -357,7 +357,7 @@ static double find_step( term1 * sep, double epsilon, int dir)
     return(t2);
 }
               
-orbits_points * plot_separatrice(WWinSphere * spherewnd, double x0, double y0,double a11, double a12,
+orbits_points * plot_separatrice(WSphere * spherewnd, double x0, double y0,double a11, double a12,
                                         double a21, double a22, double epsilon, sep * sep1,
                                         orbits_points ** orbit, short int chart)
 {
@@ -568,7 +568,7 @@ void make_transformations(transformations * trans, double x0, double y0, double 
     }
 }
 
-static orbits_points * plot_sep_blow_up( WWinSphere * spherewnd, double x0, double y0,
+static orbits_points * plot_sep_blow_up( WSphere * spherewnd, double x0, double y0,
                             int chart, double epsilon, blow_up_points *de_sep, orbits_points ** orbit )
 {
     double h,t=0,y,pcoord[3],pcoord2[3],point[2];
@@ -732,7 +732,7 @@ static orbits_points * plot_sep_blow_up( WWinSphere * spherewnd, double x0, doub
 }
 
 /*
-void start_plot_saddle_sep( WWinSphere * spherewnd )
+void start_plot_saddle_sep( WSphere * spherewnd )
 {
     double p[3];
     orbits_points *points;
@@ -763,7 +763,7 @@ void start_plot_saddle_sep( WWinSphere * spherewnd )
     }
 }
 
-void cont_plot_saddle_sep( WWinSphere * spherewnd )
+void cont_plot_saddle_sep( WSphere * spherewnd )
 {
     double p[3];
     orbits_points *points;
@@ -778,7 +778,7 @@ void cont_plot_saddle_sep( WWinSphere * spherewnd )
     spherewnd->study_->selected_sep->last_sep_point = points;
 }
 
-void plot_next_saddle_sep( WWinSphere * spherewnd )
+void plot_next_saddle_sep( WSphere * spherewnd )
 {
     draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
     if ( !(spherewnd->study_->selected_sep=spherewnd->study_->selected_sep->next_sep) )
@@ -786,7 +786,7 @@ void plot_next_saddle_sep( WWinSphere * spherewnd )
     start_plot_saddle_sep( spherewnd );
 }
 
-void select_next_saddle_sep( WWinSphere * spherewnd )
+void select_next_saddle_sep( WSphere * spherewnd )
 {
     draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
     if ( !(spherewnd->study_->selected_sep = spherewnd->study_->selected_sep->next_sep) )
@@ -794,7 +794,7 @@ void select_next_saddle_sep( WWinSphere * spherewnd )
     draw_selected_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point,CW_SEP);
 }*/ 
             
-static void plot_all_saddle_sep(WWinSphere * spherewnd, saddle *point)
+static void plot_all_saddle_sep(WSphere * spherewnd, saddle *point)
 {
     sep *sep1;
     orbits_points *points;
@@ -822,7 +822,7 @@ static void plot_all_saddle_sep(WWinSphere * spherewnd, saddle *point)
     }
 }
 /*
-void start_plot_se_sep( WWinSphere * spherewnd )
+void start_plot_se_sep( WSphere * spherewnd )
 {
     orbits_points *points;
     double p[3];
@@ -845,7 +845,7 @@ void start_plot_se_sep( WWinSphere * spherewnd )
     }
 }
 
-void cont_plot_se_sep( WWinSphere * spherewnd )
+void cont_plot_se_sep( WSphere * spherewnd )
 {
     double p[3];
     orbits_points *points;
@@ -857,7 +857,7 @@ void cont_plot_se_sep( WWinSphere * spherewnd )
     spherewnd->study_->selected_sep->last_sep_point = points;
 }
 
-void plot_next_se_sep( WWinSphere * spherewnd )
+void plot_next_se_sep( WSphere * spherewnd )
 {
     draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
     if ( !(spherewnd->study_->selected_sep = spherewnd->study_->selected_sep->next_sep) )
@@ -866,7 +866,7 @@ void plot_next_se_sep( WWinSphere * spherewnd )
 }        
 
 
-void select_next_se_sep( WWinSphere * spherewnd )
+void select_next_se_sep( WSphere * spherewnd )
 {
     draw_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point);
     if ( !(spherewnd->study_->selected_sep = spherewnd->study_->selected_sep->next_sep) )
@@ -874,7 +874,7 @@ void select_next_se_sep( WWinSphere * spherewnd )
     draw_selected_sep(spherewnd,spherewnd->study_->selected_sep->first_sep_point,CW_SEP);
 }  
 */
-static void plot_all_se_sep(WWinSphere * spherewnd, semi_elementary *point)
+static void plot_all_se_sep(WSphere * spherewnd, semi_elementary *point)
 {
     sep *sep1;
     orbits_points *points;
@@ -907,7 +907,7 @@ static void plot_all_se_sep(WWinSphere * spherewnd, semi_elementary *point)
     }
 }    
 /*
-void start_plot_de_sep( WWinSphere * spherewnd )
+void start_plot_de_sep( WSphere * spherewnd )
 {
   orbits_points *points;
   double p[3];
@@ -952,7 +952,7 @@ void start_plot_de_sep( WWinSphere * spherewnd )
     }
 }
 
-void cont_plot_de_sep( WWinSphere * spherewnd )
+void cont_plot_de_sep( WSphere * spherewnd )
 {
     double p[3];
     orbits_points * points;
@@ -984,7 +984,7 @@ void cont_plot_de_sep( WWinSphere * spherewnd )
     spherewnd->study_->selected_de_sep->last_sep_point = points; 
 }
 
-void plot_next_de_sep( WWinSphere * spherewnd )
+void plot_next_de_sep( WSphere * spherewnd )
 {
     draw_sep(spherewnd,spherewnd->study_->selected_de_sep->first_sep_point);
     if ( !(spherewnd->study_->selected_de_sep = spherewnd->study_->selected_de_sep->next_blow_up_point) )
@@ -993,7 +993,7 @@ void plot_next_de_sep( WWinSphere * spherewnd )
 }        
 
 
-void select_next_de_sep( WWinSphere * spherewnd )
+void select_next_de_sep( WSphere * spherewnd )
 {
     draw_sep(spherewnd,spherewnd->study_->selected_de_sep->first_sep_point);
     if ( !(spherewnd->study_->selected_de_sep = spherewnd->study_->selected_de_sep->next_blow_up_point) )
@@ -1001,7 +1001,7 @@ void select_next_de_sep( WWinSphere * spherewnd )
     draw_selected_sep(spherewnd,spherewnd->study_->selected_de_sep->first_sep_point,CW_SEP);
 }  
 */
-static void plot_all_de_sep( WWinSphere * spherewnd, struct degenerate *point)
+static void plot_all_de_sep( WSphere * spherewnd, struct degenerate *point)
 {
     blow_up_points *de_sep;
     orbits_points *sep;
@@ -1041,14 +1041,14 @@ static void plot_all_de_sep( WWinSphere * spherewnd, struct degenerate *point)
 }
 
 
-void plot_all_sep( WWinSphere * spherewnd )
+void plot_all_sep( WSphere * spherewnd )
 {
     plot_all_saddle_sep( spherewnd, spherewnd->study_->first_saddle_point );
     plot_all_se_sep( spherewnd, spherewnd->study_->first_se_point ); 
     plot_all_de_sep( spherewnd, spherewnd->study_->first_de_point );
 }  
 
-void draw_sep( WWinSphere * spherewnd, orbits_points *sep )
+void draw_sep( WSphere * spherewnd, orbits_points *sep )
 {
     double pcoord[3];
 
@@ -1063,7 +1063,7 @@ void draw_sep( WWinSphere * spherewnd, orbits_points *sep )
     }
 }
 
-void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep,int color)
+void draw_selected_sep( WSphere * spherewnd, orbits_points *sep,int color)
 {
     double pcoord[3];
 
@@ -1078,7 +1078,7 @@ void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep,int color)
     }
 }
 
-void change_epsilon_saddle( WWinSphere * spherewnd, double epsilon)
+void change_epsilon_saddle( WSphere * spherewnd, double epsilon)
 {
     sep *separatrice;
 
@@ -1093,7 +1093,7 @@ void change_epsilon_saddle( WWinSphere * spherewnd, double epsilon)
     }
 }
 
-void change_epsilon_se( WWinSphere * spherewnd, double epsilon)
+void change_epsilon_se( WSphere * spherewnd, double epsilon)
 {
     sep *separatrice;
 
@@ -1108,7 +1108,7 @@ void change_epsilon_se( WWinSphere * spherewnd, double epsilon)
     }
 }
 
-void change_epsilon_de( WWinSphere * spherewnd, double epsilon)
+void change_epsilon_de( WSphere * spherewnd, double epsilon)
 {
     blow_up_points *separatrice;
 

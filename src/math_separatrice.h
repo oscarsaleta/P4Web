@@ -46,35 +46,35 @@
 #include "win_sphere.h"
 
 
-/*extern void (*change_epsilon)( WWinSphere *, double );
-extern void (*start_plot_sep)( WWinSphere * );
-extern void (*cont_plot_sep)( WWinSphere * );
-extern void (*plot_next_sep)( WWinSphere * );
-extern void (*select_next_sep)( WWinSphere * );
+/*extern void (*change_epsilon)( WSphere *, double );
+extern void (*start_plot_sep)( WSphere * );
+extern void (*cont_plot_sep)( WSphere * );
+extern void (*plot_next_sep)( WSphere * );
+extern void (*select_next_sep)( WSphere * );
 
-void start_plot_saddle_sep( WWinSphere * spherewnd );
-void cont_plot_saddle_sep( WWinSphere * spherewnd );
-void plot_next_saddle_sep( WWinSphere * spherewnd );
-void select_next_saddle_sep( WWinSphere * spherewnd );
-void change_epsilon_saddle( WWinSphere * spherewnd, double e );
+void start_plot_saddle_sep( WSphere * spherewnd );
+void cont_plot_saddle_sep( WSphere * spherewnd );
+void plot_next_saddle_sep( WSphere * spherewnd );
+void select_next_saddle_sep( WSphere * spherewnd );
+void change_epsilon_saddle( WSphere * spherewnd, double e );
 
-void start_plot_se_sep( WWinSphere * spherewnd );
-void cont_plot_se_sep( WWinSphere * spherewnd );
-void plot_next_se_sep( WWinSphere * spherewnd );
-void select_next_se_sep( WWinSphere * spherewnd );
-void change_epsilon_se( WWinSphere * spherewnd, double e);
+void start_plot_se_sep( WSphere * spherewnd );
+void cont_plot_se_sep( WSphere * spherewnd );
+void plot_next_se_sep( WSphere * spherewnd );
+void select_next_se_sep( WSphere * spherewnd );
+void change_epsilon_se( WSphere * spherewnd, double e);
 
-void start_plot_de_sep( WWinSphere * spherewnd );
-void cont_plot_de_sep( WWinSphere * spherewnd );
-void plot_next_de_sep( WWinSphere * spherewnd );
-void select_next_de_sep( WWinSphere * spherewnd );
-void change_epsilon_de( WWinSphere * spherewnd, double e );*/
+void start_plot_de_sep( WSphere * spherewnd );
+void cont_plot_de_sep( WSphere * spherewnd );
+void plot_next_de_sep( WSphere * spherewnd );
+void select_next_de_sep( WSphere * spherewnd );
+void change_epsilon_de( WSphere * spherewnd, double e );*/
 
 /**
  * Compute all separatrices for all singularities
  * @param spherewnd sphere object where the study and plot are stored
  */
-void plot_all_sep( WWinSphere * spherewnd );
+void plot_all_sep( WSphere * spherewnd );
 /**
  * Draw separatrice
  * @param spherewnd sphere object
@@ -82,7 +82,7 @@ void plot_all_sep( WWinSphere * spherewnd );
  *
  * This function draws a separatrice with its default color
  */
-void draw_sep( WWinSphere * spherewnd, orbits_points *sep );
+void draw_sep( WSphere * spherewnd, orbits_points *sep );
 /**
  * Draw separatrice with specified color
  * @param spherewnd sphere object
@@ -91,7 +91,7 @@ void draw_sep( WWinSphere * spherewnd, orbits_points *sep );
  *
  * Same as draw_sep() but with a custom color
  */
-void draw_selected_sep( WWinSphere * spherewnd, orbits_points *sep, int color);
+void draw_selected_sep( WSphere * spherewnd, orbits_points *sep, int color);
 
 /**
  * Find color for a P4POLYNOM2 of a given type at a given point
@@ -140,7 +140,7 @@ int change_type(int type);
  * Then we integrate using WVFStudy::rk78() (calling WVFStudy::integrate_poincare_sep()
  * or WVFStudy::integrate_lyapunov_sep() depending on which sphere are we working on).
  */
-orbits_points * plot_separatrice(WWinSphere * spherewnd, double x0, double y0,double a11, double a12,
+orbits_points * plot_separatrice(WSphere * spherewnd, double x0, double y0,double a11, double a12,
                                         double a21, double a22, double epsilon, sep * sep1,
                                         orbits_points ** orbit, short int chart);
 

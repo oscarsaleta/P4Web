@@ -40,8 +40,8 @@
 
 #include <cmath>
 
-void (*plot_l)( WWinSphere *, double *, double *, int ) = spherePlotLine;
-void (*plot_p)( WWinSphere *, double *, int ) = spherePlotPoint;
+void (*plot_l)( WSphere *, double *, double *, int ) = spherePlotLine;
+void (*plot_p)( WSphere *, double *, int ) = spherePlotPoint;
 
 /*
 void plotEllipse( QPainter * p, int cx, int cy, int a, int b, int color, bool dotted,
@@ -66,7 +66,7 @@ void plotEllipse( QPainter * p, int cx, int cy, int a, int b, int color, bool do
 }
 */
 
-void spherePlotLine( WWinSphere * sp, double * p1, double * p2, int color )
+void spherePlotLine( WSphere * sp, double * p1, double * p2, int color )
 {
     double ucoord1[2];
     double ucoord2[2];
@@ -87,7 +87,7 @@ void spherePlotLine( WWinSphere * sp, double * p1, double * p2, int color )
     }
 }
 
-void spherePlotPoint( WWinSphere * sp, double * p, int color )
+void spherePlotPoint( WSphere * sp, double * p, int color )
 {
     double ucoord[2];
 
@@ -99,7 +99,7 @@ void spherePlotPoint( WWinSphere * sp, double * p, int color )
     }
 }
 
-/*void spherePrintLine( WWinSphere * sp, double * p1, double * p2, int color )
+/*void spherePrintLine( WSphere * sp, double * p1, double * p2, int color )
 {
     double ucoord1[2];
     double ucoord2[2];
@@ -114,7 +114,7 @@ void spherePlotPoint( WWinSphere * sp, double * p, int color )
     }
 }*/
 
-/*void spherePrintPoint( WWinSphere * sp, double * p, int color )
+/*void spherePrintPoint( WSphere * sp, double * p, int color )
 {
     double ucoord[2];
 

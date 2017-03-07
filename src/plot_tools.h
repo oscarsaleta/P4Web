@@ -47,11 +47,11 @@
 /**
  * Pointer to a function that plots a line in the sphere
  */
-extern void (*plot_l)( WWinSphere *, double *, double *, int );
+extern void (*plot_l)( WSphere *, double *, double *, int );
 /**
  * Pointer to a function that plots a point in the sphere
  */
-extern void (*plot_p)( WWinSphere *, double *, int );
+extern void (*plot_p)( WSphere *, double *, int );
 
 /**
  * Plot a line in the sphere
@@ -60,17 +60,17 @@ extern void (*plot_p)( WWinSphere *, double *, int );
  * @param p2    Line is given by two points (which are 2 element arrays)
  * @param color Color of the line (given by codes from color.h)
  */
-void spherePlotLine( WWinSphere * sp, double * p1, double * p2, int color );
+void spherePlotLine( WSphere * sp, double * p1, double * p2, int color );
 /**
  * Plot a point in the sphere
  * @param sp    Sphere
  * @param p     Point to plot (2 element array)
  * @param color Color (given by codes from color.h)
  */
-void spherePlotPoint( WWinSphere * sp, double * p, int color );
+void spherePlotPoint( WSphere * sp, double * p, int color );
 
-//void spherePrintLine( WWinSphere * sp, double * p1, double * p2, int color );
-//void spherePrintPoint( WWinSphere * sp, double * p, int color );
+//void spherePrintLine( WSphere * sp, double * p1, double * p2, int color );
+//void spherePrintPoint( WSphere * sp, double * p, int color );
 
 /**
  * Intersects a line with a rectangle

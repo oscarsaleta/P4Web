@@ -259,7 +259,7 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
         delete sphere_;
         sphere_ = nullptr;
     }
-    sphere_ = new WWinSphere(plotContainer_,550,550,basename,projection);
+    sphere_ = new WSphere(plotContainer_,550,550,basename,projection);
     setupSphereAndPlot();
 }
 
@@ -269,8 +269,7 @@ void HomeRight::onPlanePlot(std::string basename, int type, double minx, double 
         delete sphere_;
         sphere_ = nullptr;
     }
-    sphere_ = new WWinSphere(plotContainer_,550,550,basename,type,minx,maxx,miny,maxy);
-    
+    sphere_ = new WSphere(plotContainer_,550,550,basename,type,minx,maxx,miny,maxy);
     setupSphereAndPlot();
 }
 

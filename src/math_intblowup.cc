@@ -59,7 +59,7 @@ void WVFStudy::eval_blow_vec_field( double * y, double * f)
     f[1]=eval_term2(vec_field[1],y);
 }
 
-struct orbits_points * integrate_blow_up( WWinSphere * spherewnd, //double x0, double y0,
+struct orbits_points * integrate_blow_up( WSphere * spherewnd, //double x0, double y0,
                     double * pcoord2,
                     struct blow_up_points * de_sep, double step,int dir, int type,
                     struct orbits_points ** orbit, int chart )

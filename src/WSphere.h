@@ -38,10 +38,10 @@
 #define WIN_SPHERE_H
 
 /*!
- * @brief This file implements the class WWinSphere
+ * @brief This file implements the class WSphere
  * @file win_sphere.h
  *
- * The WWinSphere class holds a WVFStudy object and also
+ * The WSphere class holds a WVFStudy object and also
  * contains all the information and methods needed for plotting
  * the contents of the study (the output from Maple and also
  * the separatrices computed numerically) in a plane or sphere
@@ -77,7 +77,7 @@
 
 /**
  * Sphere class, which performs the plotting work
- * @class WWinSphere
+ * @class WSphere
  *
  * This class derives from Wt::WPaintedWidget, so it is in fact
  * a widget in which we can paint.
@@ -93,15 +93,15 @@
  * causes problems (each new vector field study modifies that object
  * and renders other sessions unusable).
  *
- * This is why we made that every WWinSphere has its own WVFStudy,
+ * This is why we made that every WSphere has its own WVFStudy,
  * this way there are no conflicts.
  */
-class WWinSphere : public Wt::WPaintedWidget
+class WSphere : public Wt::WPaintedWidget
 {
     /*static int numSpheres;          /**< spheres are constructed as a linked list
                                         and when a new sphere is created, this counter
                                         increases */
-    //static WWinSphere **SphereList; ///< linked list of spheres
+    //static WSphere **SphereList; ///< linked list of spheres
 
 public:
     /**
@@ -112,7 +112,7 @@ public:
      * @param basename      name of the file that contains Maple output for the current vector field
      * @param projection    projection for the sphere
      */
-    WWinSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="", double projection=-1.0 );
+    WSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="", double projection=-1.0 );
     /**
      * Constructor method for a planar (or chart) plot
      * @param *parent   container widget which created the sphere
@@ -125,11 +125,11 @@ public:
      * @param miny      minimum y for plot
      * @param maxy      maximum y for plot
      */
-    WWinSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="", int type=1, double minx=-1, double maxx=1, double miny=-1, double maxy=1);
+    WSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="", int type=1, double minx=-1, double maxx=1, double miny=-1, double maxy=1);
     /**
      * Destructor method
      */
-    ~WWinSphere();
+    ~WSphere();
 
     int width_;                 ///< width of the plotting area
     int height_;                ///< height of the plotting area
@@ -203,7 +203,7 @@ public:
     Wt::WString plotCaption_;   ///< string that shows type of view and cursor coordinates
 
     int spherebgcolor;          ///< background color
-    WWinSphere * next;          ///< next WWinSphere (linked list)
+    WSphere * next;          ///< next WSphere (linked list)
     //int SelectingX, SelectingY, SelectingPointStep, SelectingPointRadius;
     //QTimer * SelectingTimer;
 

@@ -57,7 +57,7 @@
  * @param  chart     chart in which to perform computations
  * @return           pointer to first orbit
  */
-orbits_points * integrate_blow_up( WWinSphere * spherewnd, double * pcoord2,
+orbits_points * integrate_blow_up( WSphere * spherewnd, double * pcoord2,
                     blow_up_points * de_sep, double step, int dir, int type,
                     orbits_points ** orbit, int chart );
 

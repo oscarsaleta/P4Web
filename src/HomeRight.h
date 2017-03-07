@@ -34,7 +34,7 @@
 #define GCF_POINTS 40
 #define GCF_PRECIS 12
 
-class WWinSphere;
+class WSphere;
 
 /** 
  * This class holds the UI from the right side of the website
@@ -54,8 +54,8 @@ class WWinSphere;
  *
  * The <b>Plot</b> tab has a WPaintedWidget, which is a widget in which we can paint.
  * This tab holds the Poincaré sphere plots for the phase portraits of the
- * evaluated vector field. The plotting work is done by the #WWinSphere class,
- * which is instantiated inside HomeRight by a private @c WWinSphere @c sphere_
+ * evaluated vector field. The plotting work is done by the #WSphere class,
+ * which is instantiated inside HomeRight by a private @c WSphere @c sphere_
  * object.
  *
  * The <b>Legend</b> tab simply holds a static image picked from the original P4.
@@ -104,11 +104,11 @@ public:
      *
      * This method is connected to the Plot button of HomeLeft by the onPlot
      * signal. Here there is no "plotting" work, everything is handled by
-     * #WWinSphere. This method only triggers an @c update of the @c sphere_
+     * #WSphere. This method only triggers an @c update of the @c sphere_
      * object.
      * 
      * @param basename      This is a filename for the Maple results file. The
-     * #WWinSphere class needs this file to parse it and paint accordingly.
+     * #WSphere class needs this file to parse it and paint accordingly.
      * @param projection    projection for the sphere view
      */
     void onSpherePlot(std::string basename, double projection);
@@ -118,11 +118,11 @@ public:
      *
      * This method is connected to the Plot button of HomeLeft by the onPlot
      * signal. Here there is no "plotting" work, everything is handled by
-     * #WWinSphere. This method only triggers an @c update of the @c sphere_
+     * #WSphere. This method only triggers an @c update of the @c sphere_
      * object.
      * 
      * @param basename This is a filename for the Maple results file. The
-     * #WWinSphere class needs this file to parse it and paint accordingly.
+     * #WSphere class needs this file to parse it and paint accordingly.
      * @param type     type of view (R2,U1,U2,V1,V2)
      * @param minx     min x for plot range
      * @param maxx     max x for plot range
@@ -139,7 +139,7 @@ public:
      *
      * Actually, the work is not done here. This function simply sets the
      * text of the caption widget to the caption WString (member of 
-     * the WWinSphere *study_ object).
+     * the WSphere *study_ object).
      * 
      * @param e WMouseEvent (needed to connect the function to the event,
      * although it's not used here)
@@ -218,7 +218,7 @@ private:
     std::string             finResults_;
     std::string             infResults_;
 
-    WWinSphere              *sphere_;
+    WSphere              *sphere_;
 
     Wt::WContainerWidget    *plotContainer_;
     Wt::WText               *plotCaption_;

@@ -54,7 +54,7 @@
 //
 // dir = -1: backwards, dir=0: continue, dir=+1: forwards
 
-void WWinSphere::integrateOrbit( int dir )
+void WSphere::integrateOrbit( int dir )
 {
     orbits_points *sep;
     double pcoord[3],ucoord[2];
@@ -100,7 +100,7 @@ void WWinSphere::integrateOrbit( int dir )
 //// -----------------------------------------------------------------------
 ///* R=0 then point selected in the drawing canvas else in the orbit window */
 
-bool WWinSphere::startOrbit( double x, double y, bool R )
+bool WSphere::startOrbit( double x, double y, bool R )
 {
     double pcoord[3];
     double ucoord[2];
@@ -137,7 +137,7 @@ bool WWinSphere::startOrbit( double x, double y, bool R )
 ////                      DRAWORBIT
 //// -----------------------------------------------------------------------
 
-void WWinSphere::drawOrbit( double * pcoord, orbits_points * points, int color )
+void WSphere::drawOrbit( double * pcoord, orbits_points * points, int color )
 {
     double pcoord1[3];
 
@@ -161,7 +161,7 @@ void WWinSphere::drawOrbit( double * pcoord, orbits_points * points, int color )
 ////                      DRAWORBITS
 //// -----------------------------------------------------------------------
 // called from paintEvent()
-void WWinSphere::drawOrbits()
+void WSphere::drawOrbits()
 {
     orbits * orbit;
 
@@ -174,7 +174,7 @@ void WWinSphere::drawOrbits()
 ////                      DELETELASTORBIT
 //// -----------------------------------------------------------------------
 
-void WWinSphere::deleteLastOrbit()
+void WSphere::deleteLastOrbit()
 {
     orbits *orbit1,*orbit2;
 
@@ -296,7 +296,7 @@ void WVFStudy::integrate_lyapunov_orbit( double p0, double p1, double p2, double
     } 
 }
 
-orbits_points * WWinSphere::integrate_orbit( double pcoord[3],double step,int dir,int color,
+orbits_points * WSphere::integrate_orbit( double pcoord[3],double step,int dir,int color,
     int points_to_int,orbits_points **orbit)
 {
     int i,d,h;
