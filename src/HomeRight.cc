@@ -318,6 +318,7 @@ void HomeRight::onReset( int dummy )
     outputTextArea_->setText(outputTextAreaContent_);
 
     tabWidget_->setCurrentIndex(0);
+    
 }
 
 
@@ -332,6 +333,8 @@ void HomeRight::onOrbitsIntegrate( int dir, double x0, double y0 )
     globalLogger__.debug("HomeRight :: orbit integrated...");
     // update with flag PaintUpdate so widget is not cleared before painting orbit
     sphere_->update(PaintUpdate);
+    if (tabWidget_->currentIndex()!=1)
+        tabWidget_->setCurrentIndex(1);
 
 }
 
@@ -351,6 +354,8 @@ void HomeRight::onOrbitsDelete(int flag)
 
     sphere_->plotDone_ = false;
     sphere_->update();
+    if (tabWidget_->currentIndex()!=1)
+        tabWidget_->setCurrentIndex(1);
 }
 
 // FIXME:
@@ -367,6 +372,8 @@ void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints, int pre
     sphere_->gcfPrec_ = prec;
     sphere_->plotDone_ = false;
     sphere_->update(PaintUpdate);
+    if (tabWidget_->currentIndex()!=1)
+        tabWidget_->setCurrentIndex(1);
 
 }
 

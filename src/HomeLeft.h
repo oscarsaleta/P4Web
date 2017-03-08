@@ -21,16 +21,39 @@
 
 #include "ScriptHandler.h"
 
-#define ACCURACY_DEFAULT 8
-#define PRECISION_DEFAULT 0
-#define EPSILON_DEFAULT 0.01
-#define APPROX_DEFAULT 6
-#define NUMERIC_DEFAULT 10
-#define MAXIMUM_DEFAULT 20
-#define WEAKNESS_DEFAULT 4
-#define P_DEFAULT 1
-#define Q_DEFAULT 1
+#define ACCURACY_MIN        1
+#define ACCURACY_MAX        14
+#define ACCURACY_DEFAULT    8
+#define PRECISION_MIN       0
+#define PRECISION_MAX       15
+#define PRECISION_DEFAULT   0
+#define EPSILON_MIN         0.01
+#define EPSILON_MAX         0.3
+#define EPSILON_DEFAULT     0.01
+#define APPROX_MIN          1
+#define APPROX_MAX          10
+#define APPROX_DEFAULT      6
+#define NUMERIC_MIN         5
+#define NUMERIC_MAX         15
+#define NUMERIC_DEFAULT     10
+#define MAXIMUM_MIN         15
+#define MAXIMUM_MAX         25
+#define MAXIMUM_DEFAULT     20
+#define WEAKNESS_MIN        0
+#define WEAKNESS_MAX        8
+#define WEAKNESS_DEFAULT    4
+#define PQ_MIN              1
+#define PQ_MAX              10
+#define PQ_DEFAULT          1
 
+#define PROJECTION_DEFAULT  -1
+
+#define GCF_NP_MIN          1
+#define GCF_NP_MAX          99
+#define GCF_NP_DEFAULT      40
+#define GCF_PREC_MIN        8
+#define GCF_PREC_MAX        16
+#define GCF_PREC_DEFAULT    12
 
 /*!
  * @brief Left side of UI

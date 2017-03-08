@@ -325,10 +325,10 @@ void HomeLeft::parseInputFile()
                     maxWeakLevelSpinBox_->setValue((stoi(line)>0)?stoi(line):WEAKNESS_DEFAULT);
                     break;
                 case 9:
-                    PLWeightPSpinBox_->setValue((stoi(line)>0)?stoi(line):P_DEFAULT);
+                    PLWeightPSpinBox_->setValue((stoi(line)>0)?stoi(line):PQ_DEFAULT);
                     break;
                 case 10:
-                    PLWeightQSpinBox_->setValue((stoi(line)>0)?stoi(line):Q_DEFAULT);
+                    PLWeightQSpinBox_->setValue((stoi(line)>0)?stoi(line):PQ_DEFAULT);
                     break;
                 case 11:
                     xEquationInput_->setText(line);
@@ -391,20 +391,78 @@ void HomeLeft::setParams()
         mplParams.str_userq = "1";
         mplParams.time_limit = "30";
     } else {
+        // validators
+        double dval;
+        int ival;
+        // set parameters
         mplParams.str_critpoints = "0";
         mplParams.str_saveall = "false";
         mplParams.str_numeric = (calculationsBtnGroup_->checkedId() == Numeric) ? "true" : "false";
-        mplParams.str_epsilon = std::to_string(epsilonSpinBox_->value());
+        dval = epsilonSpinBox_->value();
+        if (dval < EPSILON_MIN || dval > EPSILON_MAX) {
+            mplParams.str_epsilon = std::to_string(EPSILON_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_epsilon out of bounds, setting to default value");
+        } else {
+            mplParams.str_epsilon = std::to_string(dval);
+        }
         mplParams.str_testsep = (separatricesBtnGroup_->checkedId() == No) ? "false" : "true";
-        mplParams.str_precision = std::to_string(accuracySpinBox_->value());
-        mplParams.str_precision0 = std::to_string(precisionSpinBox_->value());
-        mplParams.str_taylor = std::to_string(levAppSpinBox_->value());
-        mplParams.str_numericlevel = std::to_string(numericLevelSpinBox_->value());
-        mplParams.str_maxlevel = std::to_string(maxLevelSpinBox_->value());
-        mplParams.str_weaklevel = std::to_string(maxWeakLevelSpinBox_->value());
-        mplParams.str_userp = std::to_string(PLWeightPSpinBox_->value());
-        mplParams.str_userq = std::to_string(PLWeightQSpinBox_->value());
-        mplParams.time_limit = "120";
+        ival = accuracySpinBox_->value();
+        if (ival < ACCURACY_MIN || ival > ACCURACY_MAX) {
+            mplParams.str_precision = std::to_string(ACCURACY_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_precision out of bounds, setting to default value");
+        } else {
+            mplParams.str_precision = std::to_string(ival);
+        }
+        ival = precisionSpinBox_->value();
+        if (ival < PRECISION_MIN || ival > PRECISION_MAX) {
+            mplParams.str_precision0 = std::to_string(PRECISION_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_precision0 out of bounds, setting to default value");
+        } else {
+            mplParams.str_precision0 = std::to_string(ival);
+        }
+        ival = levAppSpinBox_->value();
+        if (ival < APPROX_MIN || ival > APPROX_MAX) {
+            mplParams.str_taylor = std::to_string(APPROX_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_taylor out of bounds, setting to default value");
+        } else {
+            mplParams.str_taylor = std::to_string(ival);
+        }
+        ival = numericLevelSpinBox_->value();
+        if (ival < NUMERIC_MIN || ival > NUMERIC_MAX) {
+            mplParams.str_numericlevel = std::to_string(NUMERIC_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_numericlevel out of bounds, setting to default value");
+        } else {
+            mplParams.str_numericlevel = std::to_string(ival);        
+        }
+        ival = maxLevelSpinBox_->value();
+        if (ival < MAXIMUM_MIN || ival > MAXIMUM_MAX) {
+            mplParams.str_maxlevel = std::to_string(MAXIMUM_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_maxlevel out of bounds, setting to default value");
+        } else {
+            mplParams.str_maxlevel = std::to_string(ival);
+        }
+        ival = maxWeakLevelSpinBox_->value();
+        if (ival < WEAKNESS_MIN || ival > WEAKNESS_MAX) {
+            mplParams.str_weaklevel = std::to_string(WEAKNESS_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_weaklevel out of bounds, setting to default value");
+        } else {
+            mplParams.str_weaklevel = std::to_string(ival);
+        }
+        ival = PLWeightPSpinBox_->value();
+        if (ival < PQ_MIN || ival > PQ_MAX) {
+            mplParams.str_userp = std::to_string(PQ_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_userp out of bounds, setting to default value");
+        } else {
+            mplParams.str_userp = std::to_string(ival);
+        }
+        ival = PLWeightQSpinBox_->value();
+        if (ival < PQ_MIN || ival > PQ_MAX) {
+            mplParams.str_userq = std::to_string(PQ_DEFAULT);
+            globalLogger__.warning("HomeLeft :: str_userq out of bounds, setting to default value");
+        } else {
+            mplParams.str_userq = std::to_string(ival);
+        }
+        mplParams.time_limit = "180";
     }
 }
 
@@ -492,13 +550,47 @@ void HomeLeft::onPlot()
             onPlotSphereSignal_.emit(fileUploadName_,-1);
         else {
             if (viewComboBox_->currentIndex() == 0) {
-                onPlotSphereSignal_.emit(fileUploadName_,std::stod(viewProjection_->text()));
+                double proj;
+                try {
+                    proj = std::stod(viewProjection_->text());
+                } catch (...) {
+                    proj = PROJECTION_DEFAULT;
+                    viewProjection_->setText(std::to_string(PROJECTION_DEFAULT));
+                    globalLogger__.warning("HomeLeft :: bad view settings, setting to default value");
+                }
+                onPlotSphereSignal_.emit(fileUploadName_,proj);
             } else {
+                double minx,maxx,miny,maxy;
+                try {
+                    minx = std::stod(viewMinX_->text());
+                } catch (...) {
+                    minx = -1;
+                    viewMinX_->setText("-1");
+                    globalLogger__.warning("HomeLeft :: bad view settings, setting to default value");
+                }
+                try {
+                    maxx = std::stod(viewMaxX_->text());
+                } catch (...) {
+                    maxx = 1;
+                    viewMaxX_->setText("1");
+                    globalLogger__.warning("HomeLeft :: bad view settings, setting to default value");
+                }
+                try {
+                    miny = std::stod(viewMinY_->text());
+                } catch (...) {
+                    miny = -1;
+                    viewMinY_->setText("-1");
+                    globalLogger__.warning("HomeLeft :: bad view settings, setting to default value");
+                }
+                try {
+                    maxy = std::stod(viewMaxY_->text());
+                } catch (...) {
+                    maxy = 1;
+                    viewMaxY_->setText("1");
+                    globalLogger__.warning("HomeLeft :: bad view settings, setting to default value");
+                }
                 onPlotPlaneSignal_.emit(fileUploadName_,viewComboBox_->currentIndex(),
-                std::stod(viewMinX_->text()),
-                std::stod(viewMaxX_->text()),
-                std::stod(viewMinY_->text()),
-                std::stod(viewMaxY_->text()));    
+                    minx,maxx,miny,maxy);
             }
             tabs_->setCurrentWidget(viewContainer_);
         }
@@ -559,16 +651,16 @@ void HomeLeft::showSettings()
 
     // accuracy
     accuracySpinBox_ = new WSpinBox(settingsContainer_);
-    accuracySpinBox_->setRange(1,14);
-    accuracySpinBox_->setValue(8);
+    accuracySpinBox_->setRange(ACCURACY_MIN,ACCURACY_MAX);
+    accuracySpinBox_->setValue(ACCURACY_DEFAULT);
     accuracySpinBox_->setInline(true);
     t->bindWidget("acc",accuracySpinBox_);
     t->bindString("acc-tooltip",WString::tr("tooltip.accuracy"));
 
     // precision
     precisionSpinBox_ = new WSpinBox(settingsContainer_);
-    precisionSpinBox_->setRange(0,8);
-    precisionSpinBox_->setValue(0);
+    precisionSpinBox_->setRange(PRECISION_MIN,PRECISION_MAX);
+    precisionSpinBox_->setValue(PRECISION_DEFAULT);
     t->bindWidget("pre",precisionSpinBox_);
     t->bindString("pre-tooltip",WString::tr("tooltip.precision"));
 
@@ -576,49 +668,49 @@ void HomeLeft::showSettings()
     epsilonSpinBox_ = new WDoubleSpinBox(settingsContainer_);
     epsilonSpinBox_->setDecimals(2);
     epsilonSpinBox_->setSingleStep(0.01);
-    epsilonSpinBox_->setValue(0.01);
-    epsilonSpinBox_->setRange(0.01,0.3);
+    epsilonSpinBox_->setRange(EPSILON_MIN,EPSILON_MAX);
+    epsilonSpinBox_->setValue(EPSILON_DEFAULT);
     t->bindWidget("eps",epsilonSpinBox_);
     t->bindString("eps-tooltip",WString::tr("tooltip.epsilon"));
 
     // level of approximation
     levAppSpinBox_ = new WSpinBox(settingsContainer_);
-    levAppSpinBox_->setRange(0,10);
-    levAppSpinBox_->setValue(6);
+    levAppSpinBox_->setRange(APPROX_MIN,APPROX_MAX);
+    levAppSpinBox_->setValue(APPROX_DEFAULT);
     t->bindWidget("app",levAppSpinBox_);
     t->bindString("app-tooltip",WString::tr("tooltip.approximation-level"));
 
     // numeric level
     numericLevelSpinBox_ = new WSpinBox(settingsContainer_);
-    numericLevelSpinBox_->setRange(5,15);
-    numericLevelSpinBox_->setValue(8);
+    numericLevelSpinBox_->setRange(NUMERIC_MIN,NUMERIC_MAX);
+    numericLevelSpinBox_->setValue(NUMERIC_DEFAULT);
     t->bindWidget("num",numericLevelSpinBox_);
     t->bindString("num-tooltip",WString::tr("tooltip.numeric-level"));
 
     // maximum level
     maxLevelSpinBox_ = new WSpinBox(settingsContainer_);
-    maxLevelSpinBox_->setRange(15,25);
-    maxLevelSpinBox_->setValue(20);
+    maxLevelSpinBox_->setRange(MAXIMUM_MIN,MAXIMUM_MAX);
+    maxLevelSpinBox_->setValue(MAXIMUM_DEFAULT);
     t->bindWidget("max",maxLevelSpinBox_);
     t->bindString("max-tooltip",WString::tr("tooltip.maximum-level"));
     
     // max weakness level
     maxWeakLevelSpinBox_ = new WSpinBox(settingsContainer_);
-    maxWeakLevelSpinBox_->setRange(0,8);
-    maxWeakLevelSpinBox_->setValue(4);
+    maxWeakLevelSpinBox_->setRange(WEAKNESS_MIN,WEAKNESS_MAX);
+    maxWeakLevelSpinBox_->setValue(WEAKNESS_DEFAULT);
     t->bindWidget("weak",maxWeakLevelSpinBox_);
     t->bindString("weak-tooltip",WString::tr("tooltip.maximum-weakness-level"));
 
     // p q
     PLWeightPSpinBox_ = new WSpinBox(settingsContainer_);
-    PLWeightPSpinBox_->setRange(1,10);
-    PLWeightPSpinBox_->setValue(1);
+    PLWeightPSpinBox_->setRange(PQ_MIN,PQ_MAX);
+    PLWeightPSpinBox_->setValue(PQ_DEFAULT);
     t->bindWidget("p",PLWeightPSpinBox_);
     t->bindString("pq-tooltip",WString::tr("tooltip.poincare-lyapunov-weights"));
     
     PLWeightQSpinBox_ = new WSpinBox(settingsContainer_);
-    PLWeightQSpinBox_->setRange(1,10);
-    PLWeightQSpinBox_->setValue(1);
+    PLWeightQSpinBox_->setRange(PQ_MIN,PQ_MAX);
+    PLWeightQSpinBox_->setValue(PQ_DEFAULT);
     t->bindWidget("q",PLWeightQSpinBox_);
 
     // enable separatrice test parameters only if separatrice testing is on Yes
@@ -777,15 +869,15 @@ void HomeLeft::showSettings()
 
     // n points
     gcfNPointsSpinBox_ = new WSpinBox(gcfContainer_);
-    gcfNPointsSpinBox_->setRange(1,99);
-    gcfNPointsSpinBox_->setValue(40);
+    gcfNPointsSpinBox_->setRange(GCF_NP_MIN,GCF_NP_MAX);
+    gcfNPointsSpinBox_->setValue(GCF_NP_DEFAULT);
     t->bindWidget("nps",gcfNPointsSpinBox_);
     t->bindString("gcf-tooltip-nps",WString::tr("tooltip.gcf-npoints"));
 
     // precision
     gcfPrecisionSpinBox_ = new WSpinBox(gcfContainer_);
-    gcfPrecisionSpinBox_->setRange(8,16);
-    gcfPrecisionSpinBox_->setValue(12);
+    gcfPrecisionSpinBox_->setRange(GCF_PREC_MIN,GCF_PREC_MAX);
+    gcfPrecisionSpinBox_->setValue(GCF_PREC_DEFAULT);
     t->bindWidget("gcf-prc",gcfPrecisionSpinBox_);
     t->bindString("gcf-tooltip-prc",WString::tr("tooltip.gcf-prc"));
 
@@ -925,8 +1017,16 @@ void HomeLeft::onPlotGcfBtn()
     } else if ( mplParams.str_gcf == "0" ) {
         errorSignal_.emit("The current vector field has no specified common factor.");
     } else {
-        int npoints = gcfNPointsSpinBox_->value(); //TODO: validar
-        int prec = gcfPrecisionSpinBox_->value(); //TODO: validar
+        int npoints = gcfNPointsSpinBox_->value();
+        if (npoints < GCF_NP_MIN || npoints > GCF_NP_MAX) {
+            npoints = GCF_NP_DEFAULT;
+            globalLogger__.warning("HomeLeft :: gcf npoints out of bounds, setting to default value");
+        }
+        int prec = gcfPrecisionSpinBox_->value();
+        if (prec < GCF_NP_MIN || prec > GCF_NP_MAX) {
+            prec = GCF_PREC_DEFAULT;
+            globalLogger__.warning("HomeLeft :: gcf precision out of bounds, setting to default value");
+        }
         gcfSignal_.emit(fileUploadName_,gcfAppearanceBtnGrp_->checkedId(),npoints,prec);
         globalLogger__.debug("HomeLeft :: sent signal for GCF evaluation");
     }
