@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
     This file is part of WP4 (http://github.com/oscarsaleta/WP4)
 
@@ -16,7 +17,6 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<?xml version="1.0" encoding="UTF-8" ?>
 <messages>
 
   <message id="wapplication.settitle">
@@ -28,7 +28,8 @@
   </message>
 
   <message id="mainui.disclaimer-copyright">
-    <p style="float:left">This is a development version. If you find any problems, please <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send an email</a> or <a href="https://github.com/oscarsaleta/WP4/issues/new">create an issue in GitHub</a>, so we can keep improving the site.</p>
+    <p style="float:left">This is a development version. Please report any problem <a href="https://github.com/oscarsaleta/WP4/issues/new">in GitHub</a>
+    and <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send suggestions</a> for improving the site.</p>
     <p style="float:right">&copy; 2017 Oscar Saleta.</p>
   </message>
 
@@ -52,17 +53,20 @@
     Logged in as <b>{1}</b>. 
   </message>
 
-  <message id="tooltip.calculations">
+  <!-- Tooltips -->
+
+  <message id="tooltip.calculations" style="margin-left:5px">
     Let the symbolic manipulator work in algebraic or numeric mode.
-    The symbolic package will automatically switch over to numeric calculations whenever a symbolic study is impossible.
+    The symbolic package will automatically switch over to numeric calculations
+    whenever a symbolic study is impossible.
   </message>
 
   <message id="tooltip.separatrices">
-    Enable/disable numeric testing of the Taylor developments for separatrices.
+    Enable/disable numeric testing of the Taylor developments for separatrices.  
   </message>
 
   <message id="tooltip.accuracy">
-    Number of digits required when checking for zero equality.
+    Number of digits required when checking for zero equality.  
   </message>
 
   <message id="tooltip.precision">
@@ -70,61 +74,61 @@
   </message>
 
   <message id="tooltip.epsilon">
-    Default epsilon for separatrices. Can take values from 0.01 to 0.3.
+    Default epsilon for separatrices. Can take values from 0.01 to 0.3.  
   </message>
 
   <message id="tooltip.approximation-level">
-    Order of Taylor approximation. This order is increased as long as the separatrice test fails.
+    Order of Taylor approximation. This order is increased as long as the separatrice test fails.  
   </message>
 
   <message id="tooltip.numeric-level">
-    Start working numerically when order of Taylor approximation reaches this level.
+    Start working numerically when order of Taylor approximation reaches this level.  
   </message>
 
   <message id="tooltip.maximum-level">
-    Maximum order of Taylor approximation. Stop testing separatrices at this order.
+    Maximum order of Taylor approximation. Stop testing separatrices at this order.  
   </message>
 
   <message id="tooltip.maximum-weakness-level">
-    Maximum order of Lyapunov constants to be computed for weak foci.
+    Maximum order of Lyapunov constants to be computed for weak foci.  
   </message>
 
   <message id="tooltip.poincare-lyapunov-weights">
-    Poincaré-Lyapunov weights.
+    Poincaré-Lyapunov weights.  
   </message>
 
   <message id="tooltip.homeleft-eval-button">
     Evaluate the vector field to find singularities, compute Lyapunov constants
-      and blow-up when needed, and integrate separatrices.
+      and blow-up when needed, and integrate separatrices.  
   </message>
 
   <message id="tooltip.homeleft-plot-button">
-    Plot the evaluated vector field in the Poincaré sphere.
+    Plot the evaluated vector field in the Poincaré sphere.  
   </message>
 
   <message id="tooltip.homeleft-save-button">
     Save the current vector field and evaluation parameters to a P4 compatible
-      input file.
+      input file.  
   </message>
 
   <message id="tooltip.homeleft-clear-button">
-    Clear the x' and y' input fields.
+    Clear the x' and y' input fields.  
   </message>
 
   <message id="tooltip.homeright-full-button">
-    Show the full Maple output for the currently evaluated vector field.
+    Show the full Maple output for the currently evaluated vector field.  
   </message>
 
   <message id="tooltip.homeright-finite-button">
-    Show the output regarding finite singularities.
+    Show the output regarding finite singularities.  
   </message>
 
   <message id="tooltip.homeright-infinite-button">
-    Show the output regarding singularities at the infinite.
+    Show the output regarding singularities at the infinite.  
   </message>
 
   <message id="tooltip.homeright-clear-button">
-    Clear output text area.
+    Clear output text area.  
   </message>
 
   <message id="tooltip.view-select">
@@ -138,31 +142,47 @@
   </message>
 
   <message id="tooltip.view-projection">
-    Choose projection point of the Poincare sphere. Point must be <![CDATA[<]]> 0. Only relevant for sphere view.
+    Choose projection point of the Poincare sphere. Point must be <![CDATA[<]]> 0. Only relevant for sphere view.  
   </message>
 
   <message id="tooltip.view-minx">
-    Minimum coordinate on the horizontal axis. Only relevant for plane or chart view.
+    Minimum coordinate on the horizontal axis. Only relevant for plane or chart view.  
   </message>
 
   <message id="tooltip.view-maxx">
-    Maximum coordinate on the horizontal axis. Only relevant for plane or chart view.
+    Maximum coordinate on the horizontal axis. Only relevant for plane or chart view.  
   </message>
 
   <message id="tooltip.view-miny">
-    Minimum coordinate on the vertical axis. Only relevant for plane or chart view.
+    Minimum coordinate on the vertical axis. Only relevant for plane or chart view.  
   </message>
 
   <message id="tooltip.view-maxy">
-    Maximum coordinate on the vertical axis. Only relevant for plane or chart view.
+    Maximum coordinate on the vertical axis. Only relevant for plane or chart view.  
   </message>
 
   <message id="tooltip.vectorfield">
-    Enter your differential equations here. Use Maple syntax.
+    Enter your differential equations here. Use Maple syntax.  
   </message>
 
   <message id="tooltip.orbits-selected-point">
-    Start point of orbit. You can either select a point by clicking on the plot widget, or fill the form with a custom starting point.
+    Start point of orbit. You can either select a point by clicking on the plot widget, or fill the form with a custom starting point.  
+  </message>
+
+  <message id="tooltip.gcf-appearance-dots">
+    Plot individual points of the curve of singularities.  
+  </message>
+
+  <message id="tooltip.gcf-appearance-dashes">
+    Connect points of the curve of singularities with small line segments.  
+  </message>
+
+  <message id="tooltip.gcf-npoints">
+    Number of points.
+  </message>
+
+  <message id="tooltip.gcf-prc">
+    Required precision.
   </message>
 
 </messages>

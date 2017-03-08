@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
     This file is part of WP4 (http://github.com/oscarsaleta/WP4)
 
@@ -16,7 +17,6 @@
     You should have received a copy of the GNU Lesser General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
-<?xml version="1.0" encoding="UTF-8"?>
 <messages xmlns:if="Wt.WTemplate.conditions">
   
   <!-- template for login -->
@@ -87,7 +87,7 @@
       </div>
       <div class="form-group">
         <label class="control-label col-sm-2" title="${vf-tooltip}" for="${id:gcf}">
-          GCF=
+          Gcf=
         </label>
         <div class="col-sm-10" title="${vf-tooltip}">${gcf}</div>
       </div>
@@ -127,10 +127,10 @@
           <div name="radio-calc">${calc-algebraic}</div>
           <div name="radio-calc">${calc-numeric}</div>
         </div>
-        <label class="control-label col-sm-3 col-sm-offset-1" title="${sep-tooltip}" for="${id:sep}">
+        <label class="control-label col-sm-3 col-sm-offset-1" title="${sep-tooltip}" for="sep">
           Test separatrices:
         </label>
-        <div class="col-sm-2" title="${sep-tooltip}">
+        <div id="sep" class="col-sm-2" title="${sep-tooltip}">
           <div name="radio-sep">${sep-yes}</div>
           <div name="radio-sep">${sep-no}</div>
         </div>
@@ -227,7 +227,7 @@
 
 
   <!-- HomeLeft orbit integration tab template -->
-  <message id="template.orbits-dialog">
+  <message id="template.homeleft-orbits">
     <p></p>
     <div class="form-horizontal">
       <div class="form-group">
@@ -262,6 +262,37 @@
         </div>
         <div class="btn-group-md col-sm-2">
           ${bw}
+        </div>
+      </div>
+    </div>
+  </message>
+
+  <!-- HomeLeft GCF settings template -->
+  <message id="template.homeleft-gcf">
+    <p></p>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-2 col-sm-offset-1" for="dots">
+          Appearance:
+        </label>
+        <element id="dots" class="col-sm-2 col-sm-offset-1" title="${gcf-tooltip-dots}">${gcf-dots}</element>
+        <element class="col-sm-2" title="${gcf-tooltip-dashes}">${gcf-dashes}</element>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-offset-1 col-sm-3" title="${gcf-tooltip-nps}" for="${id:nps}">
+          Number of points:
+        </label>
+        <div class="col-sm-2" title="${gcf-tooltip-nps}">${nps}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-2 col-sm-offset-1" title="${gcf-tooltip-prc}" for="${id:gcf-prc}">
+          Precision:
+        </label>
+        <div class="col-sm-2 col-sm-offset-1" title="${gcf-tooltip-prc}">${gcf-prc}</div>
+      </div>
+      <div class="form-group">
+        <div class="btn-group-md col-sm-offset-1 col-sm-3">
+          ${gcf-btn}
         </div>
       </div>
     </div>

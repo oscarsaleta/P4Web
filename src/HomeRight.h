@@ -189,7 +189,8 @@ public:
      */
     void onReset ( int dummy );
 
-    void onGcfEval ( std::string fname );
+    void onGcfEval(std::string fname, int pointdash, int npoints, int prec);
+
 
 private:
     bool                    orbitStarted_;

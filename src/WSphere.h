@@ -55,7 +55,6 @@
 #include <Wt/WPainter>
 #include <Wt/WPaintDevice>
 #include <Wt/WPointF>
-//#include <Wt/WString>
 #include <Wt/WPaintedWidget>
 
 #define EVAL_GCF_NONE               0
@@ -116,7 +115,8 @@ public:
      * @param basename      name of the file that contains Maple output for the current vector field
      * @param projection    projection for the sphere
      */
-    WSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="", double projection=-1.0 );
+    WSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="",
+        double projection=-1.0 );
     /**
      * Constructor method for a planar (or chart) plot
      * @param *parent   container widget which created the sphere
@@ -129,7 +129,8 @@ public:
      * @param miny      minimum y for plot
      * @param maxy      maximum y for plot
      */
-    WSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="", int type=1, double minx=-1, double maxx=1, double miny=-1, double maxy=1);
+    WSphere( Wt::WContainerWidget *parent=0, int width=255, int height=255, std::string basename="",
+        int type=1, double minx=-1, double maxx=1, double miny=-1, double maxy=1);
     /**
      * Destructor method
      */
@@ -274,8 +275,6 @@ public:
      * Plot all separatrices
      */
     void plotSeparatrices( void );
-    
-    //void plotGcf( void );
     /**
      * Plot Poincaré sphere (circle at infinity)
      */
@@ -419,6 +418,9 @@ public:
     bool plotDone_; ///< flag used to not replot every time we just want to update something
     bool gcfEval_;  ///< flag used to make the sphere compute gcf
     std::string gcfFname_;
+    int gcfNPoints_;
+    int gcfPrec_;
+    int gcfDashes_;
     
 
 protected:

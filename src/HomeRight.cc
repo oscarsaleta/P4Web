@@ -89,7 +89,8 @@ void HomeRight::setupUI()
     outputTextArea_ = new WTextArea(outputTextAreaContent_);
     outputTextArea_->setId("outputTextArea_");
     outputTextArea_->setReadOnly(true);
-    outputTextArea_->resize(550,550);
+    outputTextArea_->setMinimumSize(550,550);
+    outputTextArea_->resize(WLength::Auto,550);
     outputTextArea_->setMargin(5,Top);
     outputContainer_->addWidget(outputTextArea_);
 
@@ -353,16 +354,19 @@ void HomeRight::onOrbitsDelete(int flag)
 }
 
 // FIXME:
-void HomeRight::onGcfEval(std::string fname)
+void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints, int prec)
 {
     globalLogger__.debug("HomeRight :: received gcf signal with fname "+fname);
     if (sphere_ == nullptr)
         return;
     
     sphere_->gcfEval_ = true;
+    sphere_->gcfDashes_ = pointdash;
     sphere_->gcfFname_ = fname;
+    sphere_->gcfNPoints_ = npoints;
+    sphere_->gcfPrec_ = prec;
     sphere_->plotDone_ = false;
-    sphere_->update();
+    sphere_->update(PaintUpdate);
 
 }
 

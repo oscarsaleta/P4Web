@@ -101,6 +101,9 @@ WSphere::WSphere( WContainerWidget * parent, int width, int height, std::string 
     gcfEval_ = false;
     gcfTask_ = EVAL_GCF_NONE;
     gcfError_ = false;
+    gcfDashes_ = GCF_DASHES;
+    gcfNPoints_ = GCF_POINTS;
+    gcfPrec_ = GCF_PRECIS;
 
     mouseMoved().connect(this,&WSphere::mouseMovementEvent);
     clicked().connect(this,&WSphere::mouseClickEvent);
@@ -139,6 +142,9 @@ WSphere::WSphere( WContainerWidget * parent, int width, int height, std::string 
     gcfEval_ = false;
     gcfTask_ = EVAL_GCF_NONE;
     gcfError_ = false;
+    gcfDashes_ = GCF_DASHES;
+    gcfNPoints_ = GCF_POINTS;
+    gcfPrec_ = GCF_PRECIS;
 
     mouseMoved().connect(this,&WSphere::mouseMovementEvent);
     clicked().connect(this,&WSphere::mouseClickEvent);
@@ -294,32 +300,6 @@ bool WSphere::setupPlot( void )
             PLCircle = produceEllipse( 0.0, 0.0, RADIUS, RADIUS, true, coWinH(RADIUS), coWinV(RADIUS) );
     }
 
-    if (gcfEval_) {
-        // TODO: opcio de canviar auqests parametres?
-        int result = evalGcfStart(gcfFname_,GCF_DASHES,GCF_POINTS,GCF_PRECIS);
-        if (!result) {
-            globalLogger__.error("WSphere :: cannot compute Gcf");
-            return false;
-        }
-        // this calls evalGcfContinue at least once
-        int i=0;
-        do {
-            result = evalGcfContinue(gcfFname_,GCF_POINTS,GCF_PRECIS);
-            if (gcfError_) {
-                globalLogger__.error("WSphere :: error while computing evalGcfContinue at step: "+std::to_string(i));
-                return false;
-            }
-            i++;
-        } while (!result);
-        // finish evaluation
-        result = evalGcfFinish();
-        if (!result) {
-            globalLogger__.error("WSphere :: error while computing evalGcfFinish");
-            return false;
-        }
-        globalLogger__.debug("WSphere :: computed Gcf");
-    }
-
     return true;
 }
 
@@ -330,6 +310,7 @@ void WSphere::paintEvent( WPaintDevice * p )
         errorSignal_.emit("Error while reading Maple results, evaluate the vector field first. If you did, probably the execution ran out of time.");
         return;
     }
+        
     WPainter paint(p);
     staticPainter = &paint;
     if (!plotDone_) {
@@ -344,19 +325,42 @@ void WSphere::paintEvent( WPaintDevice * p )
             } else
                 plotLineAtInfinity();
         }
-        plotGcf();
+        if (gcfEval_) {
+            int result = evalGcfStart(gcfFname_,gcfDashes_,gcfNPoints_,gcfPrec_);
+            if (!result) {
+                globalLogger__.error("WSphere :: cannot compute Gcf");
+            } else {
+                // this calls evalGcfContinue at least once
+                int i=0;
+                do {
+                    result = evalGcfContinue(gcfFname_,GCF_POINTS,GCF_PRECIS);
+                    if (gcfError_) {
+                        globalLogger__.error("WSphere :: error while computing evalGcfContinue at step: "+std::to_string(i));
+                        break;
+                    }
+                    i++;
+                } while (!result);
+                // finish evaluation
+                result = evalGcfFinish();
+                if (!result) {
+                    globalLogger__.error("WSphere :: error while computing evalGcfFinish");
+                } else {
+                    globalLogger__.debug("WSphere :: computed Gcf");
+                }
+            }
+            plotGcf();        
+        }
         //drawLimitCycles(this);
         plotSeparatrices();
         if (firstTimePlot_) {
             for (int cnt=0;cnt<10;cnt++) {
                 plot_all_sep(this);
-                plotGcf();
             }
         }
         plotPoints();
         drawOrbits();
         plotDone_ = true;
-    } else {
+    } else { //only draw orbits and gcf
         drawOrbits();
     }
 }

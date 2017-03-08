@@ -137,7 +137,7 @@ public:
      * Only sent if there is a gcf. Makes HomeRight call the 
      * needed functions of the sphere to compute the gcf
      */
-    Wt::Signal<std::string>& gcfSignal() { return gcfSignal_; }
+    Wt::Signal<std::string,int,int,int>& gcfSignal() { return gcfSignal_; }
 
     /* MAPLE FILE PARAMETERS */
     mapleParamsStruct mplParams; 
@@ -197,7 +197,14 @@ private:
     Wt::WPushButton         *orbitsDeleteOneBtn_;
     Wt::WPushButton         *orbitsDeleteAllBtn_;
     bool                    orbitsStartSelected_;
-    //bool                    orbitIntegrationStarted_;
+    // gcf dialog
+    Wt::WContainerWidget    *gcfContainer_;
+    Wt::WButtonGroup        *gcfAppearanceBtnGrp_;
+    enum Appearance         { Dots = 0, Dashes = 1 };
+    Wt::WSpinBox            *gcfNPointsSpinBox_;
+    Wt::WSpinBox            *gcfPrecisionSpinBox_;
+    Wt::WPushButton         *gcfPlotBtn_;
+
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
@@ -207,7 +214,7 @@ private:
     Wt::Signal<int,double,double> orbitIntegrateSignal_;
     Wt::Signal<int> orbitDeleteSignal_;
     Wt::Signal<int> resetSignal_;
-    Wt::Signal<std::string> gcfSignal_;
+    Wt::Signal<std::string,int,int,int> gcfSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -237,6 +244,8 @@ private:
     void onOrbitsContinueBtn();
     void onOrbitsDeleteOneBtn();
     void onOrbitsDeleteAllBtn();
+    // react to button presses in gcf tab
+    void onPlotGcfBtn();
 
     bool loggedIn_;
 

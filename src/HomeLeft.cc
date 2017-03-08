@@ -410,10 +410,12 @@ void HomeLeft::setParams()
 
 void HomeLeft::evaluate()
 {
+    // validate parameters
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
         errorSignal_.emit("Cannot evaluate yet, insert a vector field in the input forms.");
         return;
     }
+
 
     evaluated_ = true;
 
@@ -500,11 +502,7 @@ void HomeLeft::onPlot()
             }
             tabs_->setCurrentWidget(viewContainer_);
         }
-        // send GCF evaluate signal here because we needed HomeRight to create the sphere first
-        if ( mplParams.str_gcf != "0" ) {
-            gcfSignal_.emit(fileUploadName_);
-            globalLogger__.debug("HomeLeft :: sent signal for GCF evaluation");
-        }
+        
     }
 }
 
@@ -716,12 +714,12 @@ void HomeLeft::showSettings()
         }
     }));
 
-    // orbits integration
+    /* orbits integration */
     orbitsContainer_ = new WContainerWidget(this);
     orbitsContainer_->setId("orbitsContainer_");
-    tabs_->addTab(orbitsContainer_,"Orbit integration");
+    tabs_->addTab(orbitsContainer_,"Orbits");
 
-    t = new WTemplate(WString::tr("template.orbits-dialog"),orbitsContainer_);
+    t = new WTemplate(WString::tr("template.homeleft-orbits"),orbitsContainer_);
     t->addFunction("id",WTemplate::Functions::id);
 
     orbitsXLineEdit_ = new WLineEdit(orbitsContainer_);
@@ -754,6 +752,50 @@ void HomeLeft::showSettings()
     orbitsDeleteOneBtn_->clicked().connect(this,&HomeLeft::onOrbitsDeleteOneBtn);
     orbitsDeleteAllBtn_->clicked().connect(this,&HomeLeft::onOrbitsDeleteAllBtn);
 
+
+    /* gcf settings */
+    gcfContainer_ = new WContainerWidget(this);
+    gcfContainer_->setId("gcfContainer_");
+    tabs_->addTab(gcfContainer_,"Gcf");
+
+    t = new WTemplate(WString::tr("template.homeleft-gcf"),gcfContainer_);
+    t->addFunction("id",WTemplate::Functions::id);
+
+    // appearance
+    gcfAppearanceBtnGrp_ = new WButtonGroup(gcfContainer_);
+    button = new WRadioButton("Dots",gcfContainer_);
+    button->setInline(true);
+    t->bindWidget("gcf-dots",button);
+    t->bindString("gcf-tooltip-dots",WString::tr("tooltip.gcf-appearance-dots"));
+    gcfAppearanceBtnGrp_->addButton(button,Dots);
+    button = new WRadioButton("Dashes",gcfContainer_);
+    button->setInline(true);
+    gcfAppearanceBtnGrp_->addButton(button,Dashes);
+    gcfAppearanceBtnGrp_->setCheckedButton(gcfAppearanceBtnGrp_->button(Dashes));
+    t->bindWidget("gcf-dashes",button);
+    t->bindString("gcf-tooltip-dashes",WString::tr("tooltip.gcf-appearance-dashes"));
+
+    // n points
+    gcfNPointsSpinBox_ = new WSpinBox(gcfContainer_);
+    gcfNPointsSpinBox_->setRange(1,99);
+    gcfNPointsSpinBox_->setValue(40);
+    t->bindWidget("nps",gcfNPointsSpinBox_);
+    t->bindString("gcf-tooltip-nps",WString::tr("tooltip.gcf-npoints"));
+
+    // precision
+    gcfPrecisionSpinBox_ = new WSpinBox(gcfContainer_);
+    gcfPrecisionSpinBox_->setRange(8,16);
+    gcfPrecisionSpinBox_->setValue(12);
+    t->bindWidget("gcf-prc",gcfPrecisionSpinBox_);
+    t->bindString("gcf-tooltip-prc",WString::tr("tooltip.gcf-prc"));
+
+    // plot gcf button
+    gcfPlotBtn_ = new WPushButton("Plot GCF",gcfContainer_);
+    t->bindWidget("gcf-btn",gcfPlotBtn_);
+
+    // connect gcf plot button to function
+    gcfPlotBtn_->clicked().connect(this,&HomeLeft::onPlotGcfBtn);
+
     tabs_->setCurrentWidget(settingsContainer_);
 }
 
@@ -775,12 +817,18 @@ void HomeLeft::hideSettings()
         delete orbitsContainer_;
         orbitsContainer_ = nullptr;
     }
+    if (gcfContainer_ != nullptr) {
+        tabs_->removeTab(gcfContainer_);
+        delete gcfContainer_;
+        gcfContainer_ = nullptr;
+    }
 }
 
 void HomeLeft::resetUI()
 {
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
+    gcfEquationInput_->setText(std::string());
     
     if (loggedIn_) {
         hideSettings();
@@ -868,4 +916,18 @@ void HomeLeft::onOrbitsDeleteAllBtn()
     orbitsBackwardsBtn_->enable();
 
     orbitDeleteSignal_.emit(0);
+}
+
+void HomeLeft::onPlotGcfBtn()
+{
+    if (!evaluated_) {
+        errorSignal_.emit("Introduce and evaluate a vector field with a common factor first.");
+    } else if ( mplParams.str_gcf == "0" ) {
+        errorSignal_.emit("The current vector field has no specified common factor.");
+    } else {
+        int npoints = gcfNPointsSpinBox_->value(); //TODO: validar
+        int prec = gcfPrecisionSpinBox_->value(); //TODO: validar
+        gcfSignal_.emit(fileUploadName_,gcfAppearanceBtnGrp_->checkedId(),npoints,prec);
+        globalLogger__.debug("HomeLeft :: sent signal for GCF evaluation");
+    }
 }
