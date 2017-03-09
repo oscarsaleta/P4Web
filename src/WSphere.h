@@ -357,7 +357,7 @@ public:
     /**
      * Delete last integrated orbit from @c study_ and the plot
      */
-    void deleteLastOrbit();
+    void deleteLastOrbit( void );
 
     /**
      * React to a mouse hover event to set a string

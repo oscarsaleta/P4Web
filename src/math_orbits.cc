@@ -98,8 +98,6 @@ void WSphere::integrateOrbit( int dir )
 //// -----------------------------------------------------------------------
 ////                      STARTORBIT
 //// -----------------------------------------------------------------------
-///* R=0 then point selected in the drawing canvas else in the orbit window */
-
 bool WSphere::startOrbit( double x, double y, bool R )
 {
     double pcoord[3];
@@ -182,14 +180,11 @@ void WSphere::deleteLastOrbit()
         return;
 
     orbit2 = study_->current_orbit;
-    //drawOrbit( orbit2->pcoord, orbit2->f_orbits, spherebgcolor );
-
     if ( study_->first_orbit == study_->current_orbit ) {
         study_->first_orbit = nullptr;
         study_->current_orbit = nullptr;
     } else {
         orbit1 = study_->first_orbit;
-    
         do {
             study_->current_orbit = orbit1;
             orbit1 = orbit1->next_orbit;

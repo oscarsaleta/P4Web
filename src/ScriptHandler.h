@@ -31,13 +31,13 @@
 #include "file_tab.h"
 
 #ifdef ANTZ
-#define MAPLE_PATH "/usr/share/maple11/bin/maple"
-#define P4_BINDIR "/home/p4/p4/bin/"
-#define TMP_DIR "/home/p4/tmp/"
+#define MAPLE_PATH "/usr/share/maple11/bin/maple"   ///< path to Maple executable
+#define P4_BINDIR "/home/p4/p4/bin/"                ///< path to P4 Maple scripts
+#define TMP_DIR "/home/p4/tmp/"                     ///< path to tmp folder
 #else
-#define MAPLE_PATH "/home/osr/maple2015/bin/maple"
-#define P4_BINDIR "/usr/local/p4/bin/"
-#define TMP_DIR "/tmp/"
+#define MAPLE_PATH "/home/osr/maple2015/bin/maple"  ///< path to Maple executable
+#define P4_BINDIR "/usr/local/p4/bin/"              ///< path to P4 Maple scripts
+#define TMP_DIR "/tmp/"                             ///< path to tmp folder
 #endif
 
 /**
@@ -126,7 +126,7 @@ int evaluateMapleScript(std::string fname);
  * This format is compatible with P4. If a user is not logged in, every parameter
  * will be saved as the default parameters.
  */
-bool fillSaveFile(std::string fname, mapleParamsStruct prms); //TODO: mirar inputs i outputs necessaris
+bool fillSaveFile(std::string fname, mapleParamsStruct prms);
 
 //TODO copiar codi de file_vf.cpp i adaptar
 /**

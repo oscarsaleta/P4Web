@@ -32,7 +32,7 @@
 namespace dbo = Wt::Dbo;
 
 class User;
-typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo;
+typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo; ///< authentication info for a user
 
 /**
  * User class
@@ -55,6 +55,10 @@ public:
     }
 };
 
+/**
+ * Define several templates for the User to
+ * communicate with the database
+ */
 DBO_EXTERN_TEMPLATES(User);
 
 #endif /* USER_H */
