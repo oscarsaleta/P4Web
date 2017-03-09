@@ -10,8 +10,7 @@
 
 #include <cstdlib>
 #include <fcntl.h>
-#include <fstream>
-#include <iostream>
+#include <stdio.h>
 #include <string>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -39,12 +38,12 @@ std::string randomFileName(std::string prefix, std::string suffix)
 
 bool prepareMapleFile(std::string fname, mapleParamsStruct &prms)
 {
-    std::ofstream mplFile;
+    FILE *mplFile;
 
     if (fname.empty())
         fname = randomFileName(TMP_DIR,".mpl");
 
-    mplFile.open((fname+".mpl").c_str(),std::fstream::trunc);
+    mplFile = fopen((fname+".mpl").c_str(),"w");
     
     // repair file permissions
     std::string command = "chmod 644 "+fname+".mpl";
@@ -56,9 +55,9 @@ bool prepareMapleFile(std::string fname, mapleParamsStruct &prms)
     prms.str_inftab = fname+"_inf.tab";
     prms.str_infres = fname+"_inf.res";
 
-    if (mplFile.is_open()) {
+    if (mplFile != nullptr) {
         fillMapleScript(mplFile,prms);
-        mplFile.close();
+        fclose(mplFile);
         globalLogger__.debug("ScriptHandler :: prepared Maple file " + fname);
         return true;
     } else {
@@ -67,48 +66,51 @@ bool prepareMapleFile(std::string fname, mapleParamsStruct &prms)
     }
 }
 
-void fillMapleScript(std::ofstream &f, mapleParamsStruct prms)
+void fillMapleScript(FILE *f, mapleParamsStruct prms)
 {
-    f << "restart;" << std::endl;
-    f << "read( \"" << prms.str_p4m << "\" );" << std::endl;
-    f << "user_bindir := \"" << prms.str_bindir << "\":" << std::endl;
-    f << "user_tmpdir := \"" << prms.str_tmpdir << "\":" << std::endl;
-    f << "user_lypexe := \"" << prms.str_lypexe << "\":" << std::endl;
-    f << "user_sepexe := \"" << prms.str_sepexe << "\":" << std::endl;
-    f << "user_exeprefix := \"" << prms.str_exeprefix << "\":" << std::endl;
-    f << "user_platform := \"" << prms.str_platform << "\":" << std::endl;
-    f << "user_sumtablepath := \"" << prms.str_sumtablepath << "\":" << std::endl;
-    f << "user_removecmd := \"" << prms.str_removecmd << "\":" << std::endl;
-    f << "user_simplify := " << prms.str_simplify << ":" << std::endl;
-    f << "user_simplifycmd := " << prms.str_simplifycmd << ":" << std::endl;
-    f << "all_crit_points := " << prms.str_critpoints << ":" << std::endl;
-    f << "save_all := " << prms.str_saveall << ":" << std::endl;
-    f << "vec_table := \"" << prms.str_vectable << "\":" << std::endl;
-    f << "finite_table := \"" << prms.str_fintab << "\":" << std::endl;
-    f << "finite_res := \"" << prms.str_finres << "\":" << std::endl;
-    f << "infinite_table := \"" << prms.str_inftab << "\":" << std::endl;
-    f << "infinite_res := \"" << prms.str_infres << "\":" << std::endl;
-    f << "if (type(parse(\"" << prms.str_xeq << "\"),polynom)) then" << std::endl;
-    f << "  if (type(parse(\"" << prms.str_yeq << "\"),polynom)) then" << std::endl;
-    f << "    user_f := " << prms.str_userf << ":" << std::endl;
-    f << "  else `quit(1)` end if:" << std::endl;
-    f << "else `quit(1)` end if:" << std::endl;
-    f << "user_gcf := " << prms.str_gcf << ":" << std::endl;
-    f << "user_numeric :=" << prms.str_numeric << ":" << std::endl;
-    f << "epsilon := " << prms.str_epsilon << ":" << std::endl;
-    f << "test_sep := " << prms.str_testsep << ":" << std::endl;
-    f << "user_precision := " << prms.str_precision << ":" << std::endl;
-    f << "user_precision0 := " << prms.str_precision0 << ":" << std::endl;
-    f << "taylor_level := " << prms.str_taylor << ":" << std::endl;
-    f << "numeric_level := " << prms.str_numericlevel << ":" << std::endl;
-    f << "max_level := " << prms.str_maxlevel << ":" << std::endl;
-    f << "weakness_level := " << prms.str_weaklevel << ":" << std::endl;
-    f << "user_p := " << prms.str_userp << ":" << std::endl;
-    f << "user_q := " << prms.str_userq << ":" << std::endl;
-    f << "try timelimit("<<prms.time_limit<<",p4main()) catch:"  << std::endl
-        << "printf( \"! Error (\%a) \%a\\n\", lastexception[1], lastexception[2] );\n"
-        << "finally: closeallfiles();\n"
-        << "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n";
+    fprintf(f, "restart;\n");
+    fprintf(f, "read( \"%s\" ):\n",                         prms.str_p4m.c_str());
+    fprintf(f, "user_bindir := \"%s\":\n",                  prms.str_bindir.c_str());
+    fprintf(f, "user_tmpdir := \"%s\":\n",                  prms.str_tmpdir.c_str());
+    fprintf(f, "user_lypexe := \"%s\":\n",                  prms.str_lypexe.c_str());
+    fprintf(f, "user_sepexe := \"%s\":\n",                  prms.str_sepexe.c_str());
+    fprintf(f, "user_exeprefix := \"%s\":\n",               prms.str_exeprefix.c_str());
+    fprintf(f, "user_platform := \"%s\":\n",                prms.str_platform.c_str());
+    fprintf(f, "user_sumtablepath := \"%s\":\n",            prms.str_sumtablepath.c_str());
+    fprintf(f, "user_removecmd := \"%s\":\n",               prms.str_removecmd.c_str());
+    fprintf(f, "user_simplify := %s:\n",                    prms.str_simplify.c_str());
+    fprintf(f, "user_simplifycmd := %s:\n",                 prms.str_simplifycmd.c_str());
+    fprintf(f, "all_crit_points := %s:\n",                  prms.str_critpoints.c_str());
+    fprintf(f, "save_all := %s:\n",                         prms.str_saveall.c_str());
+    fprintf(f, "vec_table := \"%s\":\n",                    prms.str_vectable.c_str());
+    fprintf(f, "finite_table := \"%s\":\n",                 prms.str_fintab.c_str());
+    fprintf(f, "finite_res := \"%s\":\n",                   prms.str_finres.c_str());
+    fprintf(f, "infinite_table := \"%s\":\n",               prms.str_inftab.c_str());
+    fprintf(f, "infinite_res := \"%s\":\n",                 prms.str_infres.c_str());
+    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n",   prms.str_xeq.c_str());
+    fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n", prms.str_yeq.c_str());
+    fprintf(f, "    user_f := %s:\n",                       prms.str_userf.c_str());
+    fprintf(f, "  else `quit(1)` end if:\n");
+    fprintf(f, "else `quit(1)` end if:\n");
+    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n",   prms.str_gcf.c_str());
+    fprintf(f, "  user_gcf := %s:\n",                       prms.str_gcf.c_str());
+    fprintf(f, "else `quit(1)` end if:\n");
+    fprintf(f, "user_numeric := %s:\n",                     prms.str_numeric.c_str());
+    fprintf(f, "epsilon := %s:\n",                          prms.str_epsilon.c_str());
+    fprintf(f, "test_sep := %s:\n",                         prms.str_testsep.c_str());
+    fprintf(f, "user_precision := %s:\n",                   prms.str_precision.c_str());
+    fprintf(f, "user_precision0 := %s:\n",                  prms.str_precision0.c_str());
+    fprintf(f, "taylor_level := %s:\n",                     prms.str_taylor.c_str());
+    fprintf(f, "numeric_level := %s:\n",                    prms.str_numericlevel.c_str());
+    fprintf(f, "max_level := %s:\n",                        prms.str_maxlevel.c_str());
+    fprintf(f, "weakness_level := %s:\n",                   prms.str_weaklevel.c_str());
+    fprintf(f, "user_p := %s:\n",                           prms.str_userp.c_str());
+    fprintf(f, "user_q := %s:\n",                           prms.str_userq.c_str());
+    fprintf(f, "try timelimit(%s,p4main()) catch:\n",       prms.time_limit.c_str());
+    fprintf(f, "printf( \"! Error (%%a) %%a\\n\", lastexception[1], lastexception[2] );\n");
+    fprintf(f, "finally: closeallfiles();\n");
+    fprintf(f, "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n");
+
     globalLogger__.debug("ScriptHandler :: filled Maple file");
 }
 
@@ -151,26 +153,26 @@ int evaluateMapleScript (std::string fname)
 
 bool fillSaveFile(std::string fname, mapleParamsStruct prms)
 {
-    std::ofstream fp(fname.c_str(),std::ios::trunc);
+    FILE *fp = fopen(fname.c_str(),"w");
 
-    if (fp.is_open()) {
-        fp << 0                                                 << std::endl;   // typeofstudy
-        fp << (prms.str_numeric == std::string("true") ? 1 : 0) << std::endl;   // numeric
-        fp << prms.str_precision                                << std::endl;   // precision
-        fp << prms.str_epsilon                                  << std::endl;   // epsilon
-        fp << (prms.str_testsep == std::string("true") ? 1 : 0) << std::endl;   // test sep
-        fp << prms.str_taylor                                   << std::endl;   // taylor level
-        fp << prms.str_numericlevel                             << std::endl;   // numeric level
-        fp << prms.str_maxlevel                                 << std::endl;   // max levels
-        fp << prms.str_weaklevel                                << std::endl;   // weakness level
-        fp << prms.str_userp                                    << std::endl;   // p
-        fp << prms.str_userq                                    << std::endl;   // q
-        fp << prms.str_xeq                                      << std::endl;   // x'
-        fp << prms.str_yeq                                      << std::endl;   // y'
-        fp << prms.str_gcf                                      << std::endl;   // gcf
-        fp << 0                                                 << std::endl;   // numparams
+    if (fp != nullptr) {
+        fprintf(fp, "0\n");                                                             // typeofstudy
+        fprintf(fp, "%s\n", (prms.str_numeric == std::string("true") ? "1" : "0") );    // numeric
+        fprintf(fp, "%s\n", prms.str_precision.c_str()                            );    // precision
+        fprintf(fp, "%s\n", prms.str_epsilon.c_str()                              );    // epsilon
+        fprintf(fp, "%s\n", (prms.str_testsep == std::string("true") ? "1" : "0") );    // test sep
+        fprintf(fp, "%s\n", prms.str_taylor.c_str()                               );    // taylor level
+        fprintf(fp, "%s\n", prms.str_numericlevel.c_str()                         );    // numeric level
+        fprintf(fp, "%s\n", prms.str_maxlevel.c_str()                             );    // max levels
+        fprintf(fp, "%s\n", prms.str_weaklevel.c_str()                            );    // weakness level
+        fprintf(fp, "%s\n", prms.str_userp.c_str()                                );    // p
+        fprintf(fp, "%s\n", prms.str_userq.c_str()                                );    // q
+        fprintf(fp, "%s\n", prms.str_xeq.c_str()                                  );    // x'
+        fprintf(fp, "%s\n", prms.str_yeq.c_str()                                  );    // y'
+        fprintf(fp, "%s\n", prms.str_gcf.c_str()                                  );    // gcf
+        fprintf(fp, "0\n");                                                             // numparams
 
-        fp.close();
+        fclose(fp);
         return true;
     }
 }
@@ -181,32 +183,32 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int preci
     char buf[100];
     
     // open original maple script (will get overwritten?!)
-    std::ofstream fp(std::string(fname+".mpl").c_str(), std::ios::trunc);
-    if (fp.is_open()) {
-        fp << "restart;" << std::endl;
-        fp << "read( \"" << std::string(P4_BINDIR) << "p4gcf.m" << "\" ):" << std::endl;
-        fp << "user_file := \"" << fname+"_gcf.tab" << "\":" << std::endl;
-        fp << "user_numpoints := " << std::to_string(numpoints) << ":" << std::endl;
-        fp << "user_x1 := -1.0:" << std::endl;
-        fp << "user_x2 := 1.0:" << std::endl;
-        fp << "user_y1 := " << std::to_string(y1) << ":" << std::endl;
-        fp << "user_y2 := " << std::to_string(y2) << ":" << std::endl;
-        fp << "u := x:" << std::endl;
-        fp << "v := y:" << std::endl;
-        fp << "user_f := ";
+    FILE *fp = fopen(std::string(fname+".mpl").c_str(), "w");
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read( \"%s\" ):\n",        P4_BINDIR);
+        fprintf(fp, "user_file := \"%s\":\n",   std::string(fname+"_gcf.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n",  numpoints);
+        fprintf(fp, "user_x1 := -1.0:\n");
+        fprintf(fp, "user_x2 := 1.0:\n");
+        fprintf(fp, "user_y1 := %g:\n",         y1);
+        fprintf(fp, "user_y2 := %g:\n",         y2);
+        fprintf(fp, "u := x:\n");
+        fprintf(fp, "v := y:\n");
+        fprintf(fp, "user_f := ");
         for (i=0; f!=nullptr; i++) {
-            fp <<  printterm2( buf, f, (i==0) ? true : false, "x", "y" );
+            fprintf(fp, "%s",                   printterm2( buf, f, (i==0) ? true : false, "x", "y" ));
             f = f->next_term2;
         }
         if (i==0)
-            fp << "0:" << std::endl;
+            fprintf(fp, "0:\n");
         else
-            fp << ":" << std::endl;
+            fprintf(fp, ":\n");
         
-        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" << std::endl;
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:\n");
 
         globalLogger__.debug("ScriptHandler :: prepared GCF file "+fname);
-        fp.close();
+        fclose(fp);
         return true;
     }
     globalLogger__.error("ScriptHandler :: cannot prepare GCF file");
@@ -221,33 +223,33 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1, doub
 
     /*f = VFResults.gcf_C;*/
 
-    std::ofstream fp(std::string(fname+".mpl").c_str(), std::ios::trunc);
+    FILE *fp = fopen(std::string(fname+".mpl").c_str(), "w");
 
-    if (fp.is_open()) {
-        fp << "restart;" << std::endl;
-        fp << "read(\"" << std::string(P4_BINDIR) << "p4gcf.m" << "\" ):" << std::endl;
-        fp << "user_file := \"" << fname+"_gcf.tab" << "\":" << std::endl;
-        fp << "user_numpoints := " << std::to_string(numpoints) << ":" << std::endl;
-        fp << "user_x1 := 0.0:" << std::endl;
-        fp << "user_x2 := 1.0:" << std::endl;
-        fp << "user_y1 := " << std::to_string(theta1) << ":" << std::endl;
-        fp << "user_y2 := " << std::to_string(theta2) << ":" << std::endl;
-        fp << "u := cos(y):" << std::endl;
-        fp << "v := sin(y):" << std::endl;
-        fp << "user_f := ";
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read(\"%s\"):\n", std::string(std::string(P4_BINDIR)+std::string("p4gcf.m")).c_str());
+        fprintf(fp, "user_file := \"%s\":\n", std::string(fname+"_gcf.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n", numpoints);
+        fprintf(fp, "user_x1 := 0.0:\n");
+        fprintf(fp, "user_x2 := 1.0:\n");
+        fprintf(fp, "user_y1 := %g:\n", theta1);
+        fprintf(fp, "user_y2 := %g:\n", theta2);
+        fprintf(fp, "u := cos(y):\n");
+        fprintf(fp, "v := sin(y):\n");
+        fprintf(fp, "user_f := ");
         for (i=0; f!=nullptr; i++) {
-            fp <<  printterm3( buf, f, (i==0) ? true : false, "x", "U", "V" );
+            fprintf(fp, "%s", printterm3( buf, f, (i==0) ? true : false, "x", "U", "V" ));
             f = f->next_term3;
         }
         if (i==0)
-            fp << "0:" << std::endl;
+            fprintf(fp, "0:\n");
         else
-            fp << ":" << std::endl;
+            fprintf(fp, ":\n");
         
-        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" << std::endl;
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:\n");
         
         globalLogger__.debug("ScriptHandler :: prepared GCF_LyapunovCyl file "+fname);
-        fp.close();
+        fclose(fp);
         return true;
     }
     globalLogger__.error("ScriptHandler :: cannot prepare GCF_LyapunovCyl file");
@@ -262,34 +264,33 @@ bool prepareGcf_LyapunovR2( std::string fname, P4POLYNOM2 f, int precision, int 
 
     //f = VFResults.gcf;
 
-    std::ofstream fp(std::string(fname+".mpl").c_str(),std::ios::trunc);
+    FILE *fp = fopen(std::string(fname+".mpl").c_str(),"w");
 
-    if (fp.is_open()) {
-        fp << "restart;" << std::endl;
-        fp << "read( \"" + std::string(P4_BINDIR) << "p4gcf.m" << "\" ):" << std::endl;
-        fp << "user_file := \"" + fname+"_gcf.tab" << "\":" << std::endl;
-        fp << "user_numpoints := " + std::to_string(numpoints) << ":" << std::endl;
-        fp << "user_x1 := 0.0:" << std::endl;
-        fp << "user_x2 := 1.0:" << std::endl;
-        fp << "user_y1 := 0.0:" << std::endl;
-        fp << "user_y2 := " << std::to_string(TWOPI) << ":" << std::endl;
-        fp << "u := x*cos(y):" << std::endl;
-        fp << "v := y*sin(y):" << std::endl;
-        fp << "user_f := ";
-
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read( \"%s\" ):\n",  std::string(std::string(P4_BINDIR)+std::string("p4gcf.m")).c_str());
+        fprintf(fp, "user_file := \"%s\":\n", std::string(fname+"_gcf.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n", numpoints);
+        fprintf(fp, "user_x1 := 0.0:");
+        fprintf(fp, "user_x2 := 1.0:");
+        fprintf(fp, "user_y1 := 0.0:");
+        fprintf(fp, "user_y2 := %g:\n", TWOPI);
+        fprintf(fp, "u := x*cos(y):");
+        fprintf(fp, "v := y*sin(y):");
+        fprintf(fp, "user_f := ");
         for( i = 0; f != nullptr; i++ ) {
-            fp << printterm2( buf, f, (i==0) ? true : false, "U", "V" );
+            fprintf(fp, "%s", printterm2( buf, f, (i==0) ? true : false, "U", "V" ));
             f = f->next_term2;
         }
         if( i == 0 )
-            fp << "0:" << std::endl;
+            fprintf(fp, "0:\n");
         else
-            fp <<":" << std::endl;
+            fprintf(fp, ":\n");
     
-        fp << "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:" << std::endl;
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then `quit`(0); else `quit(1)` end if: end try:");
 
         globalLogger__.debug("ScriptHandler :: prepared GCF_LyapunovR2 file "+fname);
-        fp.close();
+        fclose(fp);
         return true;
     }
     globalLogger__.error("ScriptHandler :: cannot prepare GCF_LyapunovR2 file");    

@@ -106,7 +106,7 @@ bool prepareMapleFile(std::string fname, mapleParamsStruct& prms);
  * 
  * Called from prepareMapleFile()
  */
-void fillMapleScript(std::ofstream& f, mapleParamsStruct prms);
+void fillMapleScript(FILE *f, mapleParamsStruct prms);
 /**
  * Evaluate a Maple script
  * 

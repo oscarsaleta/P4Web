@@ -27,8 +27,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
-#include <fstream>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -508,7 +506,7 @@ void HomeLeft::prepareSaveFile()
         return;
     }
 
-    std::ofstream saveFile;
+    //std::ofstream saveFile;
 
     if (fileUploadName_.empty()) {
         if (saveFileName_.empty()) {
