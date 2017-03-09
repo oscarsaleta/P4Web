@@ -20,7 +20,11 @@
 
 /*!
  * @brief This file contains the RegistrationView class
- * @author Oscar Saleta
+ * @file RegistrationView.h
+ *
+ * This is the widget that allows a user to register. The user
+ * is stored in a SQlite3 database. This will be disabled in final
+ * releases.
  */
 
 #include <Wt/Auth/RegistrationWidget>

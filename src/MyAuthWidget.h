@@ -20,7 +20,10 @@
 
 /*!
  * @brief This file contains the MyAuthWidget class definition
- * @author Oscar Saleta
+ * @file MyAuthWidget.h
+ *
+ * This widget allows users to log in or register, which opens
+ * several hidden functionalities of the program.
  */
 
 #include <Wt/Auth/AuthWidget>

@@ -20,7 +20,12 @@
 
 /*!
  * @brief This file contains the class UserDetailsModel
- * @author Oscar Saleta
+ * @file UserDetailsModel.h
+ *
+ * This class implements a WFormModel used to customise
+ * the information required from a user at registration.
+ * This class is not actually needed for the moment, but
+ * this may change in the future.
  */
 
 #include <Wt/WFormModel>

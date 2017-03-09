@@ -212,21 +212,21 @@ private:
 
     Wt::WTabWidget          *tabWidget_;
 
-    Wt::WContainerWidget *outputContainer_;
-    Wt::WTextArea *outputTextArea_;
-    Wt::WString outputTextAreaContent_;
-    Wt::WToolBar *outputButtonsToolbar_;
-    Wt::WPushButton *fullResButton_;
-    Wt::WPushButton *finResButton_;
-    Wt::WPushButton *infResButton_;
-    Wt::WPushButton *clearOutputButton_;
+    Wt::WContainerWidget    *outputContainer_;
+    Wt::WTextArea           *outputTextArea_;
+    Wt::WString             outputTextAreaContent_;
+    Wt::WToolBar            *outputButtonsToolbar_;
+    Wt::WPushButton         *fullResButton_;
+    Wt::WPushButton         *finResButton_;
+    Wt::WPushButton         *infResButton_;
+    Wt::WPushButton         *clearOutputButton_;
 
     std::string             fileName_;
     std::string             fullResults_;
     std::string             finResults_;
     std::string             infResults_;
 
-    WSphere              *sphere_;
+    WSphere                 *sphere_;
 
     Wt::WContainerWidget    *plotContainer_;
     Wt::WText               *plotCaption_;

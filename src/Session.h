@@ -20,7 +20,9 @@
 
 /*!
  * @brief File that contains the Session class
- * @author Oscar Saleta
+ * @file Session.h
+ * 
+ * The Session class handles the user session for logged in users.
  */
 
 #include "User.h"

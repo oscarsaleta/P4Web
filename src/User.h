@@ -20,7 +20,10 @@
 
 /*!
  * @brief File that contains the User class
- * @author Oscar Saleta
+ * @file User.h
+ *
+ * This class defines what a user looks like (what fields
+ * are registered in the database)
  */
 
 #include <Wt/Dbo/Types>

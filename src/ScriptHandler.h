@@ -1,3 +1,33 @@
+/*  This file is part of WP4 (http://github.com/oscarsaleta/WP4)
+ *
+ *  Copyright (C) 2016  O. Saleta
+ *
+ *  WP4 is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU Lesser General Public License as published
+ *  by the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+#ifndef SCRIPTHANDLER_H
+#define SCRIPTHANDLER_H
+
+/*!
+ * @brief This file implements file/script creation and execution
+ * @file ScriptHandler.h
+ *
+ * The ScriptHandler.h functions are implemented as global methods
+ * for creating files with random names and forking processes that
+ * execute the Maple scripts, as well as handling the file filling
+ * in some casses.
+ */
+
 #include "file_tab.h"
 
 #ifdef ANTZ
@@ -142,3 +172,5 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1, doub
  * and the fact that the x and y intervals are [0,1] and [0,2Pi] resp.
  */
 bool prepareGcf_LyapunovR2( std::string fname, P4POLYNOM2 f, int precision, int numpoints );
+
+#endif
