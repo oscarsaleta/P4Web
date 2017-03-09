@@ -138,8 +138,7 @@ public:
      * text of the caption widget to the caption WString (member of 
      * the WSphere *study_ object).
      * 
-     * @param e WMouseEvent (needed to connect the function to the event,
-     * although it's not used here)
+     * @param caption string to write as caption
      */
     void mouseMovedEvent( Wt::WString caption );
 
@@ -189,6 +188,17 @@ public:
      */
     void onReset ( int dummy );
 
+    /**
+     * React to the GCF evaluation signal
+     *
+     * Set GCF variables in sphere (npoints, precision and dashes)
+     * and call for an update on the widget.
+     * 
+     * @param fname     name of file used in first maple evaluation
+     * @param pointdash plot points (0) or dashes (1) for gcf
+     * @param npoints   number of points to plot
+     * @param prec      precision of computations for zeros of gcf
+     */
     void onGcfEval(std::string fname, int pointdash, int npoints, int prec);
 
 

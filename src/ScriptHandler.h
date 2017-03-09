@@ -14,40 +14,40 @@
  * Struct that stores all the Maple execution parameters for WP4
  */
 struct mapleParamsStruct {
-    std::string str_bindir;
-    std::string str_p4m;
-    std::string str_tmpdir;
-    std::string str_lypexe;
-    std::string str_sepexe;
-    std::string str_exeprefix;
-    std::string str_platform;
-    std::string str_sumtablepath;
-    std::string str_removecmd;
-    std::string str_simplify;
-    std::string str_simplifycmd;
-    std::string str_critpoints;
-    std::string str_saveall;
-    std::string str_vectable;
-    std::string str_fintab;
-    std::string str_finres;
-    std::string str_inftab;
-    std::string str_infres;
-    std::string str_xeq;
-    std::string str_yeq;
-    std::string str_userf;
-    std::string str_gcf;
-    std::string str_numeric;
-    std::string str_epsilon;
-    std::string str_testsep;
-    std::string str_precision;
-    std::string str_precision0;
-    std::string str_taylor;
-    std::string str_numericlevel;
-    std::string str_maxlevel;
-    std::string str_weaklevel;
-    std::string str_userp;
-    std::string str_userq;
-    std::string time_limit;
+    std::string str_bindir;         ///< directory where maple scripts are located
+    std::string str_p4m;            ///< name of p4.m script
+    std::string str_tmpdir;         ///< path to temporary directory for storing text files
+    std::string str_lypexe;         ///< path to lyapunov C++ executable
+    std::string str_sepexe;         ///< path to separatrice C++ executable
+    std::string str_exeprefix;      ///< prefix to executable files
+    std::string str_platform;       ///< platform where the software runs
+    std::string str_sumtablepath;   ///< path to sumtable folder
+    std::string str_removecmd;      ///< remove command in this specific platform
+    std::string str_simplify;       ///< flag to use custom simplify command
+    std::string str_simplifycmd;    ///< custom simplify command
+    std::string str_critpoints;     ///< which critical points are to be studied
+    std::string str_saveall;        ///< turn on/off save all feature
+    std::string str_vectable;       ///< name of vec.tab file
+    std::string str_fintab;         ///< name of fin.tab file
+    std::string str_finres;         ///< name of fin.res file
+    std::string str_inftab;         ///< name of inf.tab file
+    std::string str_infres;         ///< name of inf.res file
+    std::string str_xeq;            ///< x' polynomial
+    std::string str_yeq;            ///< y' polynomial
+    std::string str_userf;          ///< vector field [x',y']
+    std::string str_gcf;            ///< gcf polynomial
+    std::string str_numeric;        ///< turn numeric mode on/off
+    std::string str_epsilon;        ///< epsilon setting
+    std::string str_testsep;        ///< turn separatrice testing on/off
+    std::string str_precision;      ///< accuracy setting
+    std::string str_precision0;     ///< precision setting
+    std::string str_taylor;         ///< taylor order for separatrice testing
+    std::string str_numericlevel;   ///< start working numerically from this order
+    std::string str_maxlevel;       ///< max taylor order
+    std::string str_weaklevel;      ///< weakness level for Lyapunov constants
+    std::string str_userp;          ///< PL weight
+    std::string str_userq;          ///< PL weight
+    std::string time_limit;         ///< time limit for Maple execution
 };
 
 /**

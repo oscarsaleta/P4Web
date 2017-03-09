@@ -57,23 +57,23 @@
 #include <Wt/WPointF>
 #include <Wt/WPaintedWidget>
 
-#define EVAL_GCF_NONE               0
-#define EVAL_GCF_R2                 1
-#define EVAL_GCF_U1                 2
-#define EVAL_GCF_U2                 3
-#define EVAL_GCF_V1                 4
-#define EVAL_GCF_V2                 5
-#define EVAL_GCF_FINISHPOINCARE     6
-#define EVAL_GCF_LYP_R2             7
-#define EVAL_GCF_CYL1               8
-#define EVAL_GCF_CYL2               9
-#define EVAL_GCF_CYL3               10
-#define EVAL_GCF_CYL4               11
-#define EVAL_GCF_FINISHLYAPUNOV     12
+#define EVAL_GCF_NONE               0   ///< no gcf evaluation
+#define EVAL_GCF_R2                 1   ///< gcf evaluation in R^2
+#define EVAL_GCF_U1                 2   ///< gcf evaluation in U1
+#define EVAL_GCF_U2                 3   ///< gcf evaluation in U2
+#define EVAL_GCF_V1                 4   ///< gcf evaluation in V1
+#define EVAL_GCF_V2                 5   ///< gcf evaluation in V2
+#define EVAL_GCF_FINISHPOINCARE     6   ///< finish gcf evaluation in sphere
+#define EVAL_GCF_LYP_R2             7   ///< gcf evaluation in R^2 with PL weights
+#define EVAL_GCF_CYL1               8   ///< gcf evaluation in the cylinder
+#define EVAL_GCF_CYL2               9   ///< gcf evaluation in the cylinder
+#define EVAL_GCF_CYL3               10  ///< gcf evaluation in the cylinder
+#define EVAL_GCF_CYL4               11  ///< gcf evaluation in the cylinder
+#define EVAL_GCF_FINISHLYAPUNOV     12  ///< finish gcf evaluation with PL weights
 
-#define GCF_DASHES 1
-#define GCF_POINTS 80
-#define GCF_PRECIS 12
+#define GCF_DASHES 1                    ///< gcf dashes is 1 by default
+#define GCF_POINTS 40                   ///< gcf npoints is 40 by default
+#define GCF_PRECIS 12                   ///< gcf precision is 12 by default
 
 //#define SELECTINGPOINTSTEPS         5
 //#define SELECTINGPOINTSPEED         150
@@ -415,12 +415,12 @@ public:
                                             and compiling units (even from outside the
                                             object) */
 
-    bool plotDone_; ///< flag used to not replot every time we just want to update something
-    bool gcfEval_;  ///< flag used to make the sphere compute gcf
-    std::string gcfFname_;
-    int gcfNPoints_;
-    int gcfPrec_;
-    int gcfDashes_;
+    bool plotDone_;         ///< flag used to not replot every time we just want to update something
+    bool gcfEval_;          ///< flag used to make the sphere compute gcf
+    std::string gcfFname_;  ///< name of Maple script from first execution, to be reused for gcf
+    int gcfNPoints_;        ///< number of points for gcf
+    int gcfPrec_;           ///< precision of zeros for gcf
+    int gcfDashes_;         ///< points (0) or dashes (1) for gcf plot
     
 
 protected:

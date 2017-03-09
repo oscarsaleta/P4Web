@@ -80,7 +80,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent) :
     mplParams.str_platform = "LINUX";
     mplParams.str_sumtablepath = "/usr/local/p4/sumtables/";
     mplParams.str_removecmd = "rm";
-    mplParams.str_simplify = "false";
+    mplParams.str_simplify = "true";
     mplParams.str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
 
     globalLogger__.debug("HomeLeft :: created correctly");

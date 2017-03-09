@@ -21,39 +21,39 @@
 
 #include "ScriptHandler.h"
 
-#define ACCURACY_MIN        1
-#define ACCURACY_MAX        14
-#define ACCURACY_DEFAULT    8
-#define PRECISION_MIN       0
-#define PRECISION_MAX       15
-#define PRECISION_DEFAULT   0
-#define EPSILON_MIN         0.01
-#define EPSILON_MAX         0.3
-#define EPSILON_DEFAULT     0.01
-#define APPROX_MIN          1
-#define APPROX_MAX          10
-#define APPROX_DEFAULT      6
-#define NUMERIC_MIN         5
-#define NUMERIC_MAX         15
-#define NUMERIC_DEFAULT     10
-#define MAXIMUM_MIN         15
-#define MAXIMUM_MAX         25
-#define MAXIMUM_DEFAULT     20
-#define WEAKNESS_MIN        0
-#define WEAKNESS_MAX        8
-#define WEAKNESS_DEFAULT    4
-#define PQ_MIN              1
-#define PQ_MAX              10
-#define PQ_DEFAULT          1
+#define ACCURACY_MIN        1       ///< Minimum value for accuracy setting
+#define ACCURACY_MAX        14      ///< Maximum value for accuracy setting
+#define ACCURACY_DEFAULT    8       ///< Default value for accuracy setting
+#define PRECISION_MIN       0       ///< Minimum value for precision setting
+#define PRECISION_MAX       15      ///< Maximum value for precision setting
+#define PRECISION_DEFAULT   0       ///< Default value for precision setting
+#define EPSILON_MIN         0.01    ///< Minimum value for epsilon setting
+#define EPSILON_MAX         0.3     ///< Maximum value for epsilon setting
+#define EPSILON_DEFAULT     0.01    ///< Default value for epsilon setting
+#define APPROX_MIN          1       ///< Minimum value for level of approximation setting
+#define APPROX_MAX          10      ///< Maximum value for level of approximation setting
+#define APPROX_DEFAULT      6       ///< Default value for level of approximation setting
+#define NUMERIC_MIN         5       ///< Minimum value for level of numeric level setting
+#define NUMERIC_MAX         15      ///< Maximum value for level of numeric level setting
+#define NUMERIC_DEFAULT     10      ///< Default value for level of numeric level setting
+#define MAXIMUM_MIN         15      ///< Minimum value for level of max Taylor order setting
+#define MAXIMUM_MAX         25      ///< Maximum value for level of max Taylor order setting
+#define MAXIMUM_DEFAULT     20      ///< Default value for level of max Taylor order setting
+#define WEAKNESS_MIN        0       ///< Minimum value for level of weakness level setting
+#define WEAKNESS_MAX        8       ///< Maximum value for level of weakness level setting
+#define WEAKNESS_DEFAULT    4       ///< Default value for level of weakness level setting
+#define PQ_MIN              1       ///< Minimum value for level of Poincaré-Lyapunov weights setting
+#define PQ_MAX              10      ///< Maximum value for level of Poincaré-Lyapunov weights setting
+#define PQ_DEFAULT          1       ///< Default value for level of Poincaré-Lyapunov weights setting
 
-#define PROJECTION_DEFAULT  -1
+#define PROJECTION_DEFAULT  -1      ///< Default projection setting for sphere plot
 
-#define GCF_NP_MIN          1
-#define GCF_NP_MAX          99
-#define GCF_NP_DEFAULT      40
-#define GCF_PREC_MIN        8
-#define GCF_PREC_MAX        16
-#define GCF_PREC_DEFAULT    12
+#define GCF_NP_MIN          1       ///< Minimum value for number of points in gcf
+#define GCF_NP_MAX          99      ///< Maximum value for number of points in gcf
+#define GCF_NP_DEFAULT      40      ///< Default value for number of points in gcf
+#define GCF_PREC_MIN        8       ///< Minimum value for zero precision in gcf
+#define GCF_PREC_MAX        16      ///< Maximum value for zero precision in gcf
+#define GCF_PREC_DEFAULT    12      ///< Default value for zero precision in gcf
 
 /*!
  * @brief Left side of UI
@@ -163,7 +163,7 @@ public:
     Wt::Signal<std::string,int,int,int>& gcfSignal() { return gcfSignal_; }
 
     /* MAPLE FILE PARAMETERS */
-    mapleParamsStruct mplParams; 
+    mapleParamsStruct mplParams;    ///< struct where all the Maple settings are stored
 
 private:
     bool evaluated_;
