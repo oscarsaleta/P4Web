@@ -92,13 +92,13 @@ std::string randomFileName(std::string prefix, std::string suffix);
 /**
  * Prepare Maple script for evaluation
  *
- * @param fname name of file
+ * @param fname name of file, can be empty and the function will set it
  * @param prms  struct containing all the parameters for Maple evaluation
  * @return      @c true if file was successfully created, @c false otherwise
  *
  * Opens file and fills it (through calling fillMapleScript())
  */
-bool prepareMapleFile(std::string fname, mapleParamsStruct &prms);
+bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms);
 /**
  * Fill a Maple script with the parameters and commands for evaluation
  *

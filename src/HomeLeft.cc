@@ -366,13 +366,13 @@ void HomeLeft::parseInputFile()
             globalLogger__.error(
                 "HomeLeft :: EOF while reading input file uploaded with name " +
                 fileUploadName_);
-            fileUploadName_ = "";
+            fileUploadName_ = std::string();
         } else if (f.bad()) {
             errorSignal_.emit("Invalid input file.");
             globalLogger__.error("HomeLeft :: I/O error while reading input "
                                  "file uploaded with name " +
                                  fileUploadName_);
-            fileUploadName_ = "";
+            fileUploadName_ = std::string();
         } else {
             // prepareSaveFile();
             errorSignal_.emit(

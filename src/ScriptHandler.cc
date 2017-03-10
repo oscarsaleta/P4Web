@@ -37,8 +37,9 @@ std::string randomFileName(std::string prefix, std::string suffix)
     return prefix;
 }
 
-bool prepareMapleFile(std::string fname, mapleParamsStruct &prms)
+bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms)
 {
+    globalLogger__.debug("ScriptHandler :: received order to prepare script "+fname);
     FILE *mplFile;
 
     if (fname.empty())
@@ -120,6 +121,7 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms)
 
 int evaluateMapleScript(std::string fname)
 {
+    globalLogger__.debug("ScriptHandler :: Will fork Maple process for script " + fname);
     pid_t pid = fork();
     if (pid < 0) {
         globalLogger__.error("HomeLeft :: error forking Maple thread.");
