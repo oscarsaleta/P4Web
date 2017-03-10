@@ -92,10 +92,6 @@ bool WSphere::evalGcfContinue(std::string fname, int points, int prec)
 bool WSphere::evalGcfFinish(void) // return false in case an error occured
 {
     if (gcfTask_ != EVAL_GCF_NONE) {
-        // TODO: aqui vol pintar ja....
-        /*GcfSphere->prepareDrawing();
-        draw_gcf( GcfSphere, VFResults.gcf_points, CSING, 1 );
-        GcfSphere->finishDrawing();*/
 
         gcfTask_ = EVAL_GCF_NONE;
 
@@ -111,6 +107,9 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
 {
     bool value;
     // std::string fname = randomFileName(TMP_DIR,"_gcf.tab");
+
+    globalLogger__.debug("WSphere :: will run GCF task=" +
+                         std::to_string(task) + " using file=" + fname);
 
     switch (task) {
     case EVAL_GCF_R2:
@@ -158,10 +157,11 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
         return -1;
 }
 
-// TODO: posar a winsphere.h
 bool WSphere::readTaskResults(std::string fname,
                               int task) // , int points, int prec, int memory )
 {
+    globalLogger__.debug("WSphere :: called readTaskResults with fname=" +
+                         fname + " and task=" + std::to_string(task));
     bool value;
 
     switch (task) {
@@ -239,6 +239,7 @@ void WVFStudy::insert_gcf_point(double x0, double y0, double z0, int dashes)
 bool WSphere::read_gcf(std::string fname,
                        void (WVFStudy::*chart)(double, double, double *))
 {
+
     int t;
     int k;
     FILE *fp;
@@ -246,10 +247,12 @@ bool WSphere::read_gcf(std::string fname,
     double pcoord[3];
     int d, c;
 
-    // TODO: change name of file, el reb la funció?
     fp = fopen(std::string(fname + "_gcf.tab").c_str(), "r");
-    if (fp == nullptr)
+    if (fp == nullptr) {
+        globalLogger__.debug("WSphere :: cannot open file " +
+                             std::string(fname + "_gcf.tab") + " for reading");
         return false;
+    }
 
     k = 0;
     while (1) {

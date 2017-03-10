@@ -39,7 +39,8 @@ std::string randomFileName(std::string prefix, std::string suffix)
 
 bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms)
 {
-    globalLogger__.debug("ScriptHandler :: received order to prepare script "+fname);
+    globalLogger__.debug("ScriptHandler :: received order to prepare script " +
+                         fname);
     FILE *mplFile;
 
     if (fname.empty())
@@ -121,7 +122,8 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms)
 
 int evaluateMapleScript(std::string fname)
 {
-    globalLogger__.debug("ScriptHandler :: Will fork Maple process for script " + fname);
+    globalLogger__.debug(
+        "ScriptHandler :: Will fork Maple process for script " + fname);
     pid_t pid = fork();
     if (pid < 0) {
         globalLogger__.error("HomeLeft :: error forking Maple thread.");
@@ -199,7 +201,9 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2,
     FILE *fp = fopen(std::string(fname + ".mpl").c_str(), "w");
     if (fp != nullptr) {
         fprintf(fp, "restart;\n");
-        fprintf(fp, "read( \"%s\" ):\n", P4_BINDIR);
+        fprintf(fp, "read( \"%s\" ):\n",
+                std::string(std::string(P4_BINDIR) + std::string("p4gcf.m"))
+                    .c_str());
         fprintf(fp, "user_file := \"%s\":\n",
                 std::string(fname + "_gcf.tab").c_str());
         fprintf(fp, "user_numpoints := %d:\n", numpoints);
