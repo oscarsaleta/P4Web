@@ -1,6 +1,6 @@
 /*  WP4 (Web - Polynomial Planar Phase Portraits) SOURCE CODE
  *  Software to study polynomial planar differential systems and represent
- *  their phase portrait in several spaces, such as Poincaré sphere. 
+ *  their phase portrait in several spaces, such as Poincaré sphere.
  *  URL: http://github.com/oscarsaleta/WP4
  *
  *  Copyright (C) 2016  O. Saleta
@@ -20,27 +20,34 @@
  */
 
 /*!
- * @mainpage P4 web version, a Wt-based C++ web application for computing planar polynomial phase portraits.
+ * @mainpage P4 web version, a Wt-based C++ web application for computing planar
+ * polynomial phase portraits.
  * @author Oscar Saleta Reig
  *
  * This is a WIP. Main planned features are:
  * * Basic UI for introducing a vector field and viewing computed results (DONE)
  * * Interface for uploading scripts saved from P4 (DONE)
  * * Functionality for saving the vector field in a P4-friendly script (DONE)
- * * Basic plotting functionality: circle at infinity, singularities and separatrices (DONE)
+ * * Basic plotting functionality: circle at infinity, singularities and
+ * separatrices (DONE)
  * * Full doxygen documentation
  * * Authentication framework (WIP)
  * * Advanced and unlocked settings for logged-in users
- * * Further functionality from P4: Poincaré-Lyapunov sphere, orbit integration, etc.
+ * * Further functionality from P4: Poincaré-Lyapunov sphere, orbit integration,
+ * etc.
  *
- * The mathematical code of this application is based on the Qt-based C++ code of P4.
- * That said, the code has been heavily modified because this application uses <b>NO Qt</b>
- * classes or functions. The UI and backend elements have been build from zero using the
- * <b>Wt library</b> (<a href="https://www.webtoolkit.eu/wt">https://www.webtoolkit.eu/wt</a>),
- * because it is highly convenient for creating web applications based on existing
+ * The mathematical code of this application is based on the Qt-based C++ code
+ * of P4.
+ * That said, the code has been heavily modified because this application uses
+ * <b>NO Qt</b>
+ * classes or functions. The UI and backend elements have been build from zero
+ * using the
+ * <b>Wt library</b> (<a
+ * href="https://www.webtoolkit.eu/wt">https://www.webtoolkit.eu/wt</a>),
+ * because it is highly convenient for creating web applications based on
+ * existing
  * C++ code.
  */
-
 
 #include "MyApplication.h"
 #include "Session.h"
@@ -54,20 +61,22 @@ WApplication *createApplication(const WEnvironment &env)
     return new MyApplication(env);
 }
 
-int main (int argc, char **argv)
+int main(int argc, char **argv)
 {
 
     try {
         WServer server(argc, argv, WTHTTP_CONFIGURATION);
 #ifdef ANTZ
-        server.addEntryPoint(Wt::Application,createApplication,"/WP4.wt","favicon.ico");
+        server.addEntryPoint(Wt::Application, createApplication, "/WP4.wt",
+                             "favicon.ico");
 #else
-        server.addEntryPoint(Wt::Application,createApplication,std::string(),"favicon.ico");
+        server.addEntryPoint(Wt::Application, createApplication, std::string(),
+                             "favicon.ico");
 #endif
         Session::configureAuth();
         server.run();
 
-    } catch (Wt::WServer::Exception& e) {
+    } catch (Wt::WServer::Exception &e) {
         std::cerr << e.what() << std::endl;
     } catch (Wt::Dbo::Exception &e) {
         std::cerr << "Dbo exception: " << e.what() << std::endl;

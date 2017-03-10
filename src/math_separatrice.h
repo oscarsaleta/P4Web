@@ -42,9 +42,8 @@
  * @file math_separatrice.h
  */
 
-#include "file_tab.h"
 #include "WSphere.h"
-
+#include "file_tab.h"
 
 /*extern void (*change_epsilon)( WSphere *, double );
 extern void (*start_plot_sep)( WSphere * );
@@ -74,7 +73,7 @@ void change_epsilon_de( WSphere * spherewnd, double e );*/
  * Compute all separatrices for all singularities
  * @param spherewnd sphere object where the study and plot are stored
  */
-void plot_all_sep( WSphere * spherewnd );
+void plot_all_sep(WSphere *spherewnd);
 /**
  * Draw separatrice
  * @param spherewnd sphere object
@@ -82,7 +81,7 @@ void plot_all_sep( WSphere * spherewnd );
  *
  * This function draws a separatrice with its default color
  */
-void draw_sep( WSphere * spherewnd, orbits_points *sep );
+void draw_sep(WSphere *spherewnd, orbits_points *sep);
 /**
  * Draw separatrice with specified color
  * @param spherewnd sphere object
@@ -91,7 +90,7 @@ void draw_sep( WSphere * spherewnd, orbits_points *sep );
  *
  * Same as draw_sep() but with a custom color
  */
-void draw_selected_sep( WSphere * spherewnd, orbits_points *sep, int color);
+void draw_selected_sep(WSphere *spherewnd, orbits_points *sep, int color);
 
 /**
  * Find color for a P4POLYNOM2 of a given type at a given point
@@ -126,7 +125,8 @@ int change_type(int type);
  * @param  a12       transformation matrix
  * @param  a21       transformation matrix
  * @param  a22       transformation matrix
- * @param  epsilon   radius for boundary around singularity where to start integration
+ * @param  epsilon   radius for boundary around singularity where to start
+ * integration
  * @param  sep1      Taylor approximation of invariant manifold of singularity
  * @param  orbit     linked list where integrated separatrice is stored
  * @param  chart     chart in which integration is performed
@@ -134,15 +134,18 @@ int change_type(int type);
  *                           the integrated separatrice
  *
  * When the singularity is a saddle or saddle-node, first we use the Taylor
- * approximation of the invariant manifold until we meet the boundary of a 
+ * approximation of the invariant manifold until we meet the boundary of a
  * circle of radius epsilon.
  *
- * Then we integrate using WVFStudy::rk78() (calling WVFStudy::integrate_poincare_sep()
- * or WVFStudy::integrate_lyapunov_sep() depending on which sphere are we working on).
+ * Then we integrate using WVFStudy::rk78() (calling
+ * WVFStudy::integrate_poincare_sep()
+ * or WVFStudy::integrate_lyapunov_sep() depending on which sphere are we
+ * working on).
  */
-orbits_points * plot_separatrice(WSphere * spherewnd, double x0, double y0,double a11, double a12,
-                                        double a21, double a22, double epsilon, sep * sep1,
-                                        orbits_points ** orbit, short int chart);
+orbits_points *plot_separatrice(WSphere *spherewnd, double x0, double y0,
+                                double a11, double a12, double a21, double a22,
+                                double epsilon, sep *sep1,
+                                orbits_points **orbit, short int chart);
 
 /**
  * Apply a list of transformations to a point
@@ -151,7 +154,7 @@ orbits_points * plot_separatrice(WSphere * spherewnd, double x0, double y0,doubl
  * @param y0    initial coordinates
  * @param point array for storing final coordinates
  */
-void make_transformations(transformations * trans, double x0, double y0, double * point);
-
+void make_transformations(transformations *trans, double x0, double y0,
+                          double *point);
 
 #endif // MATH_SEPARATRICE_H

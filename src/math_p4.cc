@@ -37,10 +37,9 @@
 
 #include <cmath>
 
-void copy_x_into_y( double * x, double * y )
+void copy_x_into_y(double *x, double *y)
 {
     y[0] = x[0];
     y[1] = x[1];
     y[2] = x[2];
 }
-

@@ -44,28 +44,28 @@
 
 #include "file_tab.h"
 
-#define MIN_FLOAT   -1.0E32     ///< minimum single precision floating point
-#define MAX_FLOAT   1.0E32      ///< maximum single precision floating point
+#define MIN_FLOAT -1.0E32 ///< minimum single precision floating point
+#define MAX_FLOAT 1.0E32  ///< maximum single precision floating point
 
-#define p4_finite std::isfinite /**< macro for accessing the standard function
-                                that checks if a number is finite */
+#define p4_finite                                                              \
+    std::isfinite /**< macro for accessing the standard function               \
+                  that checks if a number is finite */
 
-#define PI 3.1415926535897932384626433832   ///< Pi
-#define PI_DIV2 (PI/2.)                     ///< Pi/2
-#define PI_DIV4 (PI/4.)                     ///< Pi/4
-#define TWOPI (2.0*PI)                      ///< 2*Pi
+#define PI 3.1415926535897932384626433832 ///< Pi
+#define PI_DIV2 (PI / 2.)                 ///< Pi/2
+#define PI_DIV4 (PI / 4.)                 ///< Pi/4
+#define TWOPI (2.0 * PI)                  ///< 2*Pi
 
-#define __minus_one_to_q    pow(-1.0,double_q)  ///< (-1)^q
-#define __minus_one_to_p    pow(-1.0,double_p)  ///< (-1)^p
-#define __one_over_p        (1.0/double_p)      ///< 1/p
-#define __one_over_q        (1.0/double_q)      ///< 1/q
+#define __minus_one_to_q pow(-1.0, double_q) ///< (-1)^q
+#define __minus_one_to_p pow(-1.0, double_p) ///< (-1)^p
+#define __one_over_p (1.0 / double_p)        ///< 1/p
+#define __one_over_q (1.0 / double_q)        ///< 1/q
 
 /**
  * Copy a length 3 array into another
  * @param x input array
  * @param y copy array
  */
-void copy_x_into_y( double * x, double * y );
-
+void copy_x_into_y(double *x, double *y);
 
 #endif /* MATH_P4_H */

@@ -22,17 +22,18 @@
 
 using namespace Wt;
 
-RegistrationView::RegistrationView(Session& session, Auth::AuthWidget *authWidget)
-    :   Auth::RegistrationWidget(authWidget), session_(session)
+RegistrationView::RegistrationView(Session &session,
+                                   Auth::AuthWidget *authWidget)
+    : Auth::RegistrationWidget(authWidget), session_(session)
 {
-    //setTemplateText(tr("Wt.Auth.template.registration"));
-    detailsModel_ = new UserDetailsModel(session_,this);
+    // setTemplateText(tr("Wt.Auth.template.registration"));
+    detailsModel_ = new UserDetailsModel(session_, this);
     updateView(detailsModel_);
 }
 
 WFormWidget *RegistrationView::createFormWidget(WFormModel::Field field)
 {
-    return (WFormWidget*) Auth::RegistrationWidget::createFormWidget(field);
+    return (WFormWidget *)Auth::RegistrationWidget::createFormWidget(field);
 }
 
 bool RegistrationView::validate()
@@ -46,7 +47,7 @@ bool RegistrationView::validate()
     return result;
 }
 
-void RegistrationView::registerUserDetails(Auth::User& user)
+void RegistrationView::registerUserDetails(Auth::User &user)
 {
     detailsModel_->save(user);
 }

@@ -21,39 +21,44 @@
 
 #include "ScriptHandler.h"
 
-#define ACCURACY_MIN        1       ///< Minimum value for accuracy setting
-#define ACCURACY_MAX        14      ///< Maximum value for accuracy setting
-#define ACCURACY_DEFAULT    8       ///< Default value for accuracy setting
-#define PRECISION_MIN       0       ///< Minimum value for precision setting
-#define PRECISION_MAX       15      ///< Maximum value for precision setting
-#define PRECISION_DEFAULT   0       ///< Default value for precision setting
-#define EPSILON_MIN         0.01    ///< Minimum value for epsilon setting
-#define EPSILON_MAX         0.3     ///< Maximum value for epsilon setting
-#define EPSILON_DEFAULT     0.01    ///< Default value for epsilon setting
-#define APPROX_MIN          1       ///< Minimum value for level of approximation setting
-#define APPROX_MAX          10      ///< Maximum value for level of approximation setting
-#define APPROX_DEFAULT      6       ///< Default value for level of approximation setting
-#define NUMERIC_MIN         5       ///< Minimum value for level of numeric level setting
-#define NUMERIC_MAX         15      ///< Maximum value for level of numeric level setting
-#define NUMERIC_DEFAULT     10      ///< Default value for level of numeric level setting
-#define MAXIMUM_MIN         15      ///< Minimum value for level of max Taylor order setting
-#define MAXIMUM_MAX         25      ///< Maximum value for level of max Taylor order setting
-#define MAXIMUM_DEFAULT     20      ///< Default value for level of max Taylor order setting
-#define WEAKNESS_MIN        0       ///< Minimum value for level of weakness level setting
-#define WEAKNESS_MAX        8       ///< Maximum value for level of weakness level setting
-#define WEAKNESS_DEFAULT    4       ///< Default value for level of weakness level setting
-#define PQ_MIN              1       ///< Minimum value for level of Poincaré-Lyapunov weights setting
-#define PQ_MAX              10      ///< Maximum value for level of Poincaré-Lyapunov weights setting
-#define PQ_DEFAULT          1       ///< Default value for level of Poincaré-Lyapunov weights setting
+#define ACCURACY_MIN 1       ///< Minimum value for accuracy setting
+#define ACCURACY_MAX 14      ///< Maximum value for accuracy setting
+#define ACCURACY_DEFAULT 8   ///< Default value for accuracy setting
+#define PRECISION_MIN 0      ///< Minimum value for precision setting
+#define PRECISION_MAX 15     ///< Maximum value for precision setting
+#define PRECISION_DEFAULT 0  ///< Default value for precision setting
+#define EPSILON_MIN 0.01     ///< Minimum value for epsilon setting
+#define EPSILON_MAX 0.3      ///< Maximum value for epsilon setting
+#define EPSILON_DEFAULT 0.01 ///< Default value for epsilon setting
+#define APPROX_MIN 1       ///< Minimum value for level of approximation setting
+#define APPROX_MAX 10      ///< Maximum value for level of approximation setting
+#define APPROX_DEFAULT 6   ///< Default value for level of approximation setting
+#define NUMERIC_MIN 5      ///< Minimum value for level of numeric level setting
+#define NUMERIC_MAX 15     ///< Maximum value for level of numeric level setting
+#define NUMERIC_DEFAULT 10 ///< Default value for level of numeric level setting
+#define MAXIMUM_MIN 15 ///< Minimum value for level of max Taylor order setting
+#define MAXIMUM_MAX 25 ///< Maximum value for level of max Taylor order setting
+#define MAXIMUM_DEFAULT                                                        \
+    20                 ///< Default value for level of max Taylor order setting
+#define WEAKNESS_MIN 0 ///< Minimum value for level of weakness level setting
+#define WEAKNESS_MAX 8 ///< Maximum value for level of weakness level setting
+#define WEAKNESS_DEFAULT                                                       \
+    4 ///< Default value for level of weakness level setting
+#define PQ_MIN                                                                 \
+    1 ///< Minimum value for level of Poincaré-Lyapunov weights setting
+#define PQ_MAX                                                                 \
+    10 ///< Maximum value for level of Poincaré-Lyapunov weights setting
+#define PQ_DEFAULT                                                             \
+    1 ///< Default value for level of Poincaré-Lyapunov weights setting
 
-#define PROJECTION_DEFAULT  -1      ///< Default projection setting for sphere plot
+#define PROJECTION_DEFAULT -1 ///< Default projection setting for sphere plot
 
-#define GCF_NP_MIN          1       ///< Minimum value for number of points in gcf
-#define GCF_NP_MAX          99      ///< Maximum value for number of points in gcf
-#define GCF_NP_DEFAULT      40      ///< Default value for number of points in gcf
-#define GCF_PREC_MIN        8       ///< Minimum value for zero precision in gcf
-#define GCF_PREC_MAX        16      ///< Maximum value for zero precision in gcf
-#define GCF_PREC_DEFAULT    12      ///< Default value for zero precision in gcf
+#define GCF_NP_MIN 1        ///< Minimum value for number of points in gcf
+#define GCF_NP_MAX 99       ///< Maximum value for number of points in gcf
+#define GCF_NP_DEFAULT 40   ///< Default value for number of points in gcf
+#define GCF_PREC_MIN 8      ///< Minimum value for zero precision in gcf
+#define GCF_PREC_MAX 16     ///< Maximum value for zero precision in gcf
+#define GCF_PREC_DEFAULT 12 ///< Default value for zero precision in gcf
 
 /*!
  * @brief Left side of UI
@@ -62,14 +67,13 @@
  */
 #include <Wt/WContainerWidget>
 
-
 #include <Wt/WSignal>
 
-/** 
+/**
  * This class holds the UI from the left side of the website
- * 
+ *
  * @class HomeLeft
- * 
+ *
  * This class derives from a WContainerWidget, and it serves as a container
  * for several elements, including an upload widget, two input forms for
  * entering the vector field (x' and y'), and three buttons (evaluate,
@@ -81,13 +85,13 @@
  */
 class HomeLeft : public Wt::WContainerWidget
 {
-public:
-    /** 
+  public:
+    /**
      * Constructor method for HomeLeft
      * @param parent Parent container widget
      */
     HomeLeft(Wt::WContainerWidget *parent = 0);
-    /** 
+    /**
      * Destructor method for HomeLeft
      */
     ~HomeLeft();
@@ -106,46 +110,60 @@ public:
      *
      * Additionally, fill x0 and y0 forms with the coordinates for the
      * point, if these are valid coordinates for the current view.
-     * 
+     *
      * @param clickValid @c true if coords are valid, @c false otherwise
      * @param x          x coordinate
      * @param y          y coordinate
      */
-    void showOrbitsDialog( bool clickValid, double x, double y );
+    void showOrbitsDialog(bool clickValid, double x, double y);
 
     /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
-    Wt::Signal<std::string>& evaluatedSignal() {  return evaluatedSignal_; }
+    Wt::Signal<std::string> &evaluatedSignal() { return evaluatedSignal_; }
     /**
-     * Method that sends a signal to print some message in the output text area from #HomeRight
+     * Method that sends a signal to print some message in the output text area
+     * from #HomeRight
      */
-    Wt::Signal<std::string>& errorSignal() { return errorSignal_; }
+    Wt::Signal<std::string> &errorSignal() { return errorSignal_; }
     /**
-     * Method that sends a signal when the plot button is pressed in order to display a plot
+     * Method that sends a signal when the plot button is pressed in order to
+     * display a plot
      *
      * This specific signal is sent when a sphere plot is issued
      */
-    Wt::Signal<std::string,double>& onPlotSphereSignal() { return onPlotSphereSignal_; }
+    Wt::Signal<std::string, double> &onPlotSphereSignal()
+    {
+        return onPlotSphereSignal_;
+    }
     /**
-     * Method that sends a signal when the plot button is pressed in order to display a plot
+     * Method that sends a signal when the plot button is pressed in order to
+     * display a plot
      *
      * This specific signal is sent when a plane or chart plot is issued
      */
-    Wt::Signal<std::string,int,double,double,double,double>& onPlotPlaneSignal() { return onPlotPlaneSignal_; }
+    Wt::Signal<std::string, int, double, double, double, double> &
+    onPlotPlaneSignal()
+    {
+        return onPlotPlaneSignal_;
+    }
     /**
      * Orbit integration signal
      *
-     * The int can be -1 (backwards), 0 (continue) or 1 (forwards). The doubles are the
+     * The int can be -1 (backwards), 0 (continue) or 1 (forwards). The doubles
+     * are the
      * coordinates
      */
-    Wt::Signal<int,double,double>& orbitIntegrateSignal() { return orbitIntegrateSignal_; }
+    Wt::Signal<int, double, double> &orbitIntegrateSignal()
+    {
+        return orbitIntegrateSignal_;
+    }
     /**
      * Signal to delete orbits
      *
      * The int can be 1 (delete last) or 0 (delete all)
      */
-    Wt::Signal<int>& orbitDeleteSignal() { return orbitDeleteSignal_; }
+    Wt::Signal<int> &orbitDeleteSignal() { return orbitDeleteSignal_; }
     /**
      * Signal to reset everything
      *
@@ -153,91 +171,92 @@ public:
      * The int is just a dummy value because we cannot sent empty
      * signals for some reason.
      */
-    Wt::Signal<int>& resetSignal() { return resetSignal_; }
+    Wt::Signal<int> &resetSignal() { return resetSignal_; }
     /**
      * Signal to compute gcf
      *
-     * Only sent if there is a gcf. Makes HomeRight call the 
+     * Only sent if there is a gcf. Makes HomeRight call the
      * needed functions of the sphere to compute the gcf
      */
-    Wt::Signal<std::string,int,int,int>& gcfSignal() { return gcfSignal_; }
+    Wt::Signal<std::string, int, int, int> &gcfSignal() { return gcfSignal_; }
 
     /* MAPLE FILE PARAMETERS */
-    mapleParamsStruct mplParams;    ///< struct where all the Maple settings are stored
+    mapleParamsStruct
+        mplParams; ///< struct where all the Maple settings are stored
 
-private:
+  private:
     bool evaluated_;
 
     /* PUBLIC UI (no need to log in) */
-    Wt::WGroupBox       *equationsBox_;
-    Wt::WFileUpload     *fileUploadWidget_;
-    std::string         fileUploadName_;
-    Wt::WLineEdit       *xEquationInput_;
-    Wt::WLineEdit       *yEquationInput_;
-    Wt::WLineEdit       *gcfEquationInput_;
-    Wt::WPushButton     *evalButton_;
-    Wt::WPushButton     *plotButton_;
-    Wt::WPushButton     *prepSaveButton_;
-    Wt::WPushButton     *resetButton_;
+    Wt::WGroupBox *equationsBox_;
+    Wt::WFileUpload *fileUploadWidget_;
+    std::string fileUploadName_;
+    Wt::WLineEdit *xEquationInput_;
+    Wt::WLineEdit *yEquationInput_;
+    Wt::WLineEdit *gcfEquationInput_;
+    Wt::WPushButton *evalButton_;
+    Wt::WPushButton *plotButton_;
+    Wt::WPushButton *prepSaveButton_;
+    Wt::WPushButton *resetButton_;
 
-    Wt::WAnchor         *saveAnchor_;
-    std::string         saveFileName_;
-    Wt::WFileResource   *saveFileResource_;
+    Wt::WAnchor *saveAnchor_;
+    std::string saveFileName_;
+    Wt::WFileResource *saveFileResource_;
 
-    Wt::WTabWidget      *tabs_;
+    Wt::WTabWidget *tabs_;
 
     /* PRIVATE UI (log in needed) */
     // evaluation parameters
-    Wt::WContainerWidget    *settingsContainer_;
-    Wt::WButtonGroup        *calculationsBtnGroup_;
-    enum Calculations       { Algebraic = 0, Numeric = 1 };
-    Wt::WButtonGroup        *separatricesBtnGroup_;
-    enum Separatrices       { Yes = 0, No = 1 };
-    Wt::WSpinBox            *accuracySpinBox_;
-    Wt::WSpinBox            *precisionSpinBox_;
-    Wt::WDoubleSpinBox      *epsilonSpinBox_;
-    Wt::WSpinBox            *levAppSpinBox_;
-    Wt::WSpinBox            *numericLevelSpinBox_;
-    Wt::WSpinBox            *maxLevelSpinBox_;
-    Wt::WSpinBox            *maxWeakLevelSpinBox_;
-    Wt::WSpinBox            *PLWeightPSpinBox_;
-    Wt::WSpinBox            *PLWeightQSpinBox_;
+    Wt::WContainerWidget *settingsContainer_;
+    Wt::WButtonGroup *calculationsBtnGroup_;
+    enum Calculations { Algebraic = 0, Numeric = 1 };
+    Wt::WButtonGroup *separatricesBtnGroup_;
+    enum Separatrices { Yes = 0, No = 1 };
+    Wt::WSpinBox *accuracySpinBox_;
+    Wt::WSpinBox *precisionSpinBox_;
+    Wt::WDoubleSpinBox *epsilonSpinBox_;
+    Wt::WSpinBox *levAppSpinBox_;
+    Wt::WSpinBox *numericLevelSpinBox_;
+    Wt::WSpinBox *maxLevelSpinBox_;
+    Wt::WSpinBox *maxWeakLevelSpinBox_;
+    Wt::WSpinBox *PLWeightPSpinBox_;
+    Wt::WSpinBox *PLWeightQSpinBox_;
     // view settings
-    Wt::WContainerWidget    *viewContainer_;
-    Wt::WComboBox           *viewComboBox_;
-    Wt::WLineEdit           *viewProjection_;
-    Wt::WLineEdit           *viewMinX_;
-    Wt::WLineEdit           *viewMinY_;
-    Wt::WLineEdit           *viewMaxX_;
-    Wt::WLineEdit           *viewMaxY_;
+    Wt::WContainerWidget *viewContainer_;
+    Wt::WComboBox *viewComboBox_;
+    Wt::WLineEdit *viewProjection_;
+    Wt::WLineEdit *viewMinX_;
+    Wt::WLineEdit *viewMinY_;
+    Wt::WLineEdit *viewMaxX_;
+    Wt::WLineEdit *viewMaxY_;
     // orbits dialog
-    Wt::WContainerWidget    *orbitsContainer_;
-    Wt::WLineEdit           *orbitsXLineEdit_;
-    Wt::WLineEdit           *orbitsYLineEdit_;
-    Wt::WPushButton         *orbitsForwardsBtn_;
-    Wt::WPushButton         *orbitsContinueBtn_;
-    Wt::WPushButton         *orbitsBackwardsBtn_;
-    Wt::WPushButton         *orbitsDeleteOneBtn_;
-    Wt::WPushButton         *orbitsDeleteAllBtn_;
-    bool                    orbitsStartSelected_;
+    Wt::WContainerWidget *orbitsContainer_;
+    Wt::WLineEdit *orbitsXLineEdit_;
+    Wt::WLineEdit *orbitsYLineEdit_;
+    Wt::WPushButton *orbitsForwardsBtn_;
+    Wt::WPushButton *orbitsContinueBtn_;
+    Wt::WPushButton *orbitsBackwardsBtn_;
+    Wt::WPushButton *orbitsDeleteOneBtn_;
+    Wt::WPushButton *orbitsDeleteAllBtn_;
+    bool orbitsStartSelected_;
     // gcf dialog
-    Wt::WContainerWidget    *gcfContainer_;
-    Wt::WButtonGroup        *gcfAppearanceBtnGrp_;
-    enum Appearance         { Dots = 0, Dashes = 1 };
-    Wt::WSpinBox            *gcfNPointsSpinBox_;
-    Wt::WSpinBox            *gcfPrecisionSpinBox_;
-    Wt::WPushButton         *gcfPlotBtn_;
-
+    Wt::WContainerWidget *gcfContainer_;
+    Wt::WButtonGroup *gcfAppearanceBtnGrp_;
+    enum Appearance { Dots = 0, Dashes = 1 };
+    Wt::WSpinBox *gcfNPointsSpinBox_;
+    Wt::WSpinBox *gcfPrecisionSpinBox_;
+    Wt::WPushButton *gcfPlotBtn_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
     Wt::Signal<std::string> errorSignal_;
-    Wt::Signal<std::string,double> onPlotSphereSignal_;
-    Wt::Signal<std::string,int,double,double,double,double> onPlotPlaneSignal_;
-    Wt::Signal<int,double,double> orbitIntegrateSignal_;
+    Wt::Signal<std::string, double> onPlotSphereSignal_;
+    Wt::Signal<std::string, int, double, double, double, double>
+        onPlotPlaneSignal_;
+    Wt::Signal<int, double, double> orbitIntegrateSignal_;
     Wt::Signal<int> orbitDeleteSignal_;
     Wt::Signal<int> resetSignal_;
-    Wt::Signal<std::string,int,int,int> gcfSignal_;
+    Wt::Signal<std::string, int, int, int> gcfSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -271,7 +290,6 @@ private:
     void onPlotGcfBtn();
 
     bool loggedIn_;
-
 };
 
 #endif // HOMELEFT_H

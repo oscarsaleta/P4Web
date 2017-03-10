@@ -21,7 +21,7 @@
 /*!
  * @brief File that contains the Session class
  * @file Session.h
- * 
+ *
  * The Session class handles the user session for logged in users.
  */
 
@@ -29,12 +29,13 @@
 
 #include <Wt/Auth/Login>
 #include <Wt/Dbo/Session>
-#include <Wt/Dbo/ptr>
 #include <Wt/Dbo/backend/Sqlite3>
+#include <Wt/Dbo/ptr>
 
 namespace dbo = Wt::Dbo;
 
-typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase; ///< database of users
+typedef Wt::Auth::Dbo::UserDatabase<AuthInfo>
+    UserDatabase; ///< database of users
 
 /**
  * Class that holds all the authentication information of every session
@@ -46,7 +47,7 @@ typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase; ///< database of use
  */
 class Session
 {
-public:
+  public:
     /**
      * Configures the authentication service options
      */
@@ -64,11 +65,11 @@ public:
     /**
      * Returns a reference to the user database
      */
-    Wt::Auth::AbstractUserDatabase& users();
+    Wt::Auth::AbstractUserDatabase &users();
     /**
      * Returns the login information
      */
-    Wt::Auth::Login& login() { return login_; }
+    Wt::Auth::Login &login() { return login_; }
 
     /**
      * Access information about the current logged in user
@@ -77,7 +78,7 @@ public:
     /**
      * Access information about a specific user
      */
-    dbo::ptr<User> user(const Wt::Auth::User& authUser);
+    dbo::ptr<User> user(const Wt::Auth::User &authUser);
     /**
      * Get the user name of the current logged in user
      * @return The user name as a string
@@ -87,19 +88,19 @@ public:
     /**
      * Returns the auth service object
      */
-    static const Wt::Auth::AuthService& auth();
+    static const Wt::Auth::AuthService &auth();
     /**
      * Returns the password service object
      */
-    static const Wt::Auth::AbstractPasswordService& passwordAuth();
+    static const Wt::Auth::AbstractPasswordService &passwordAuth();
     /**
      * Returns the oAuth services vector
      *
      * In our case, this does nothing because we don't use oAuth for now
      */
-    static const std::vector<const Wt::Auth::OAuthService *>& oAuth();
+    static const std::vector<const Wt::Auth::OAuthService *> &oAuth();
 
-private:
+  private:
     dbo::backend::Sqlite3 sqlite3_;
     mutable dbo::Session session_;
     UserDatabase *users_;

@@ -32,7 +32,8 @@
 namespace dbo = Wt::Dbo;
 
 class User;
-typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo; ///< authentication info for a user
+typedef Wt::Auth::Dbo::AuthInfo<User>
+    AuthInfo; ///< authentication info for a user
 
 /**
  * User class
@@ -42,14 +43,14 @@ typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo; ///< authentication info for a u
  * then calls Wt::Dbo to create the database and tables
  * if they don't exist.
  */
-class User {
-public:
-    dbo::weak_ptr<AuthInfo> authInfo;   ///< auth info of the user
-    /**
-     * Make an action on the database for this user
-     */
-    template<class Action>
-    void persist(Action &a)
+class User
+{
+  public:
+    dbo::weak_ptr<AuthInfo> authInfo; ///< auth info of the user
+                                      /**
+                                       * Make an action on the database for this user
+                                       */
+    template <class Action> void persist(Action &a)
     {
         dbo::hasOne(a, authInfo, "user");
     }

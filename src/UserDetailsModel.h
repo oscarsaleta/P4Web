@@ -45,22 +45,22 @@ class Session;
  */
 class UserDetailsModel : public Wt::WFormModel
 {
-public:
+  public:
     /**
      * Constructor method
      * @param session A #Session object, which contains the information
      * about the current session
      * @param parent The object that created this form model
      */
-    UserDetailsModel(Session& session, Wt::WObject *parent = 0);
+    UserDetailsModel(Session &session, Wt::WObject *parent = 0);
 
     /**
      * Save user to database
      * @param user User info to save in database
      */
-    void save(const Wt::Auth::User& user);
+    void save(const Wt::Auth::User &user);
 
-private:
+  private:
     Session &session_;
 };
 

@@ -38,7 +38,7 @@
  */
 class MyLogger : public Wt::WLogger
 {
-public:
+  public:
     /**
      * Creator method
      * @param fname Name of log file
@@ -96,10 +96,10 @@ public:
      */
     void fatal(std::string message);
 
-private:
+  private:
     void log(std::string type, std::string message);
 };
 
 extern MyLogger globalLogger__; ///< Global logger object
 
-#endif // MYLOGGER_H 
+#endif // MYLOGGER_H

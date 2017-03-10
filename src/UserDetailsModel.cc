@@ -16,16 +16,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "UserDetailsModel.h"
-#include "User.h"
 #include "Session.h"
+#include "User.h"
 
-
-UserDetailsModel::UserDetailsModel(Session& session, Wt::WObject *parent)
-    :   Wt::WFormModel(parent), session_(session)
+UserDetailsModel::UserDetailsModel(Session &session, Wt::WObject *parent)
+    : Wt::WFormModel(parent), session_(session)
 {
 }
 
-void UserDetailsModel::save(const Wt::Auth::User& authUser)
+void UserDetailsModel::save(const Wt::Auth::User &authUser)
 {
     Wt::Dbo::ptr<User> user = session_.user(authUser);
 }

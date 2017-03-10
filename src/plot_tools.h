@@ -47,11 +47,11 @@
 /**
  * Pointer to a function that plots a line in the sphere
  */
-extern void (*plot_l)( WSphere *, double *, double *, int );
+extern void (*plot_l)(WSphere *, double *, double *, int);
 /**
  * Pointer to a function that plots a point in the sphere
  */
-extern void (*plot_p)( WSphere *, double *, int );
+extern void (*plot_p)(WSphere *, double *, int);
 
 /**
  * Plot a line in the sphere
@@ -60,17 +60,17 @@ extern void (*plot_p)( WSphere *, double *, int );
  * @param p2    Line is given by two points (which are 2 element arrays)
  * @param color Color of the line (given by codes from color.h)
  */
-void spherePlotLine( WSphere * sp, double * p1, double * p2, int color );
+void spherePlotLine(WSphere *sp, double *p1, double *p2, int color);
 /**
  * Plot a point in the sphere
  * @param sp    Sphere
  * @param p     Point to plot (2 element array)
  * @param color Color (given by codes from color.h)
  */
-void spherePlotPoint( WSphere * sp, double * p, int color );
+void spherePlotPoint(WSphere *sp, double *p, int color);
 
-//void spherePrintLine( WSphere * sp, double * p1, double * p2, int color );
-//void spherePrintPoint( WSphere * sp, double * p, int color );
+// void spherePrintLine( WSphere * sp, double * p1, double * p2, int color );
+// void spherePrintPoint( WSphere * sp, double * p, int color );
 
 /**
  * Intersects a line with a rectangle
@@ -87,8 +87,7 @@ void spherePlotPoint( WSphere * sp, double * p, int color );
  * Changes the coordinates so that both endpoints are the endpoints
  * of the visible part of the line. Returns false if there is no visible part.
  */
-bool lineRectangleIntersect( double &x1, double &y1, double &x2, double &y2,
-                                        double xmin, double xmax, double ymin, double ymax );
-
+bool lineRectangleIntersect(double &x1, double &y1, double &x2, double &y2,
+                            double xmin, double xmax, double ymin, double ymax);
 
 #endif // PLOT_TOOLS_H

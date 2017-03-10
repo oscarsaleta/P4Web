@@ -31,53 +31,54 @@
 #include "file_tab.h"
 
 #ifdef ANTZ
-#define MAPLE_PATH "/usr/share/maple11/bin/maple"   ///< path to Maple executable
-#define P4_BINDIR "/home/p4/p4/bin/"                ///< path to P4 Maple scripts
-#define TMP_DIR "/home/p4/tmp/"                     ///< path to tmp folder
+#define MAPLE_PATH "/usr/share/maple11/bin/maple" ///< path to Maple executable
+#define P4_BINDIR "/home/p4/p4/bin/"              ///< path to P4 Maple scripts
+#define TMP_DIR "/home/p4/tmp/"                   ///< path to tmp folder
 #else
-#define MAPLE_PATH "/home/osr/maple2015/bin/maple"  ///< path to Maple executable
-#define P4_BINDIR "/usr/local/p4/bin/"              ///< path to P4 Maple scripts
-#define TMP_DIR "/tmp/"                             ///< path to tmp folder
+#define MAPLE_PATH "/home/osr/maple2015/bin/maple" ///< path to Maple executable
+#define P4_BINDIR "/usr/local/p4/bin/"             ///< path to P4 Maple scripts
+#define TMP_DIR "/tmp/"                            ///< path to tmp folder
 #endif
 
 /**
  * Struct that stores all the Maple execution parameters for WP4
  */
 struct mapleParamsStruct {
-    std::string str_bindir;         ///< directory where maple scripts are located
-    std::string str_p4m;            ///< name of p4.m script
-    std::string str_tmpdir;         ///< path to temporary directory for storing text files
-    std::string str_lypexe;         ///< path to lyapunov C++ executable
-    std::string str_sepexe;         ///< path to separatrice C++ executable
-    std::string str_exeprefix;      ///< prefix to executable files
-    std::string str_platform;       ///< platform where the software runs
-    std::string str_sumtablepath;   ///< path to sumtable folder
-    std::string str_removecmd;      ///< remove command in this specific platform
-    std::string str_simplify;       ///< flag to use custom simplify command
-    std::string str_simplifycmd;    ///< custom simplify command
-    std::string str_critpoints;     ///< which critical points are to be studied
-    std::string str_saveall;        ///< turn on/off save all feature
-    std::string str_vectable;       ///< name of vec.tab file
-    std::string str_fintab;         ///< name of fin.tab file
-    std::string str_finres;         ///< name of fin.res file
-    std::string str_inftab;         ///< name of inf.tab file
-    std::string str_infres;         ///< name of inf.res file
-    std::string str_xeq;            ///< x' polynomial
-    std::string str_yeq;            ///< y' polynomial
-    std::string str_userf;          ///< vector field [x',y']
-    std::string str_gcf;            ///< gcf polynomial
-    std::string str_numeric;        ///< turn numeric mode on/off
-    std::string str_epsilon;        ///< epsilon setting
-    std::string str_testsep;        ///< turn separatrice testing on/off
-    std::string str_precision;      ///< accuracy setting
-    std::string str_precision0;     ///< precision setting
-    std::string str_taylor;         ///< taylor order for separatrice testing
-    std::string str_numericlevel;   ///< start working numerically from this order
-    std::string str_maxlevel;       ///< max taylor order
-    std::string str_weaklevel;      ///< weakness level for Lyapunov constants
-    std::string str_userp;          ///< PL weight
-    std::string str_userq;          ///< PL weight
-    std::string time_limit;         ///< time limit for Maple execution
+    std::string str_bindir; ///< directory where maple scripts are located
+    std::string str_p4m;    ///< name of p4.m script
+    std::string
+        str_tmpdir; ///< path to temporary directory for storing text files
+    std::string str_lypexe;       ///< path to lyapunov C++ executable
+    std::string str_sepexe;       ///< path to separatrice C++ executable
+    std::string str_exeprefix;    ///< prefix to executable files
+    std::string str_platform;     ///< platform where the software runs
+    std::string str_sumtablepath; ///< path to sumtable folder
+    std::string str_removecmd;    ///< remove command in this specific platform
+    std::string str_simplify;     ///< flag to use custom simplify command
+    std::string str_simplifycmd;  ///< custom simplify command
+    std::string str_critpoints;   ///< which critical points are to be studied
+    std::string str_saveall;      ///< turn on/off save all feature
+    std::string str_vectable;     ///< name of vec.tab file
+    std::string str_fintab;       ///< name of fin.tab file
+    std::string str_finres;       ///< name of fin.res file
+    std::string str_inftab;       ///< name of inf.tab file
+    std::string str_infres;       ///< name of inf.res file
+    std::string str_xeq;          ///< x' polynomial
+    std::string str_yeq;          ///< y' polynomial
+    std::string str_userf;        ///< vector field [x',y']
+    std::string str_gcf;          ///< gcf polynomial
+    std::string str_numeric;      ///< turn numeric mode on/off
+    std::string str_epsilon;      ///< epsilon setting
+    std::string str_testsep;      ///< turn separatrice testing on/off
+    std::string str_precision;    ///< accuracy setting
+    std::string str_precision0;   ///< precision setting
+    std::string str_taylor;       ///< taylor order for separatrice testing
+    std::string str_numericlevel; ///< start working numerically from this order
+    std::string str_maxlevel;     ///< max taylor order
+    std::string str_weaklevel;    ///< weakness level for Lyapunov constants
+    std::string str_userp;        ///< PL weight
+    std::string str_userq;        ///< PL weight
+    std::string time_limit;       ///< time limit for Maple execution
 };
 
 /**
@@ -90,26 +91,26 @@ struct mapleParamsStruct {
 std::string randomFileName(std::string prefix, std::string suffix);
 /**
  * Prepare Maple script for evaluation
- * 
+ *
  * @param fname name of file
  * @param prms  struct containing all the parameters for Maple evaluation
  * @return      @c true if file was successfully created, @c false otherwise
- * 
+ *
  * Opens file and fills it (through calling fillMapleScript())
  */
-bool prepareMapleFile(std::string fname, mapleParamsStruct& prms);
+bool prepareMapleFile(std::string fname, mapleParamsStruct &prms);
 /**
  * Fill a Maple script with the parameters and commands for evaluation
- * 
+ *
  * @param f     file stream to write to
  * @param prms  struct containing all the parameters of the script
- * 
+ *
  * Called from prepareMapleFile()
  */
 void fillMapleScript(FILE *f, mapleParamsStruct prms);
 /**
  * Evaluate a Maple script
- * 
+ *
  * @param fname filename of Maple script
  * @return      return status of the forked process
  *
@@ -122,41 +123,47 @@ int evaluateMapleScript(std::string fname);
  * @param fname filename of temp file to serve to client
  * @param prms  struct that contains the current parameters of execution
  * @return      @c true if file was successfully created, @c false otherwise
- * 
- * This format is compatible with P4. If a user is not logged in, every parameter
+ *
+ * This format is compatible with P4. If a user is not logged in, every
+ * parameter
  * will be saved as the default parameters.
  */
 bool fillSaveFile(std::string fname, mapleParamsStruct prms);
 
-//TODO copiar codi de file_vf.cpp i adaptar
+// TODO copiar codi de file_vf.cpp i adaptar
 /**
  * Prepare files in case of calculating GCF in plane/U1/U2 charts.
- * 
+ *
  * @param fname     name of file where to write
  * @param f         terms of GCF
  * @param y1        y coord of point 1
  * @param y2        y coord of point 2
  * @param precision precision of integration
  * @param numpoints number of points to compute
- * @return          @c true if file was successfully prepared, @c false otherwise
+ * @return          @c true if file was successfully prepared, @c false
+ * otherwise
  *
  * This is only called in case of Poincare-compactification (weights p=q=1)
  */
-bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2, int precision, int numpoints );
+bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2,
+                int precision, int numpoints);
 /**
  * Prepare files in case of calculating GCF in charts near infinity.
- * 
+ *
  * @param fname     name of file where to write
  * @param f         terms of GCF
  * @param theta1    theta coord of point 1
  * @param theta2    theta coord of point 2
  * @param precision precision of integration
  * @param numpoints number of points to compute
- * @return          @c true if file was successfully prepared, @c false otherwise
- * 
- * This is only called in case of Poincare-Lyapunov compactification (weights (p,q) !=(1,1))
+ * @return          @c true if file was successfully prepared, @c false
+ * otherwise
+ *
+ * This is only called in case of Poincare-Lyapunov compactification (weights
+ * (p,q) !=(1,1))
  */
-bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1, double theta2, int precision, int numpoints );
+bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
+                            double theta2, int precision, int numpoints);
 /**
  * Prepare files in case of calculating GCF in charts near infinity.
  *
@@ -166,11 +173,13 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1, doub
  * @param numpoints number of points to compute
  * @return          @c true if file was successfully created, @c false otherwise
  *
- * This is only called in case of Poincare-Lyapunov compactification (weights (p,q) !=(1,1)).
+ * This is only called in case of Poincare-Lyapunov compactification (weights
+ * (p,q) !=(1,1)).
  * Same as preparegcf, except for the "u := " and "v := " assignments,
  * and the fact that one always refers to the same function VFResults.gcf,
  * and the fact that the x and y intervals are [0,1] and [0,2Pi] resp.
  */
-bool prepareGcf_LyapunovR2( std::string fname, P4POLYNOM2 f, int precision, int numpoints );
+bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
+                           int numpoints);
 
 #endif

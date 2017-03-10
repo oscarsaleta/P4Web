@@ -18,11 +18,11 @@
 
 #include "MainUI.h"
 
-#include "file_tab.h"
 #include "HomeLeft.h"
 #include "HomeRight.h"
 #include "MyAuthWidget.h"
 #include "MyLogger.h"
+#include "file_tab.h"
 
 #include <Wt/WAnchor>
 #include <Wt/WApplication>
@@ -41,15 +41,14 @@
 
 using namespace Wt;
 
-MainUI::MainUI(WContainerWidget *parent) :
-    WContainerWidget(parent)
+MainUI::MainUI(WContainerWidget *parent) : WContainerWidget(parent)
 {
-    session_.login().changed().connect(this,&MainUI::onAuthEvent);
+    session_.login().changed().connect(this, &MainUI::onAuthEvent);
 
     setupUI();
 
-    WApplication::instance()->internalPathChanged().connect(this, &MainUI::handlePathChange);
-    
+    WApplication::instance()->internalPathChanged().connect(
+        this, &MainUI::handlePathChange);
 }
 
 MainUI::~MainUI()
@@ -69,21 +68,21 @@ void MainUI::setupUI()
     loginMessageContainer_->setId("loginMessageContainer_");
     addWidget(loginMessageContainer_);
 
-    loginText_ = new WText(WString::tr("mainui.logintext-default"),loginMessageContainer_);
+    loginText_ = new WText(WString::tr("mainui.logintext-default"),
+                           loginMessageContainer_);
     loginText_->setInline(true);
     loginMessageContainer_->addWidget(loginText_);
 
-    logoutAnchor_ = new WAnchor("/login","Logout",loginMessageContainer_);
-    logoutAnchor_->setLink(WLink(WLink::InternalPath,"/login"));
+    logoutAnchor_ = new WAnchor("/login", "Logout", loginMessageContainer_);
+    logoutAnchor_->setLink(WLink(WLink::InternalPath, "/login"));
     logoutAnchor_->setInline(true);
     logoutAnchor_->hide();
     loginMessageContainer_->addWidget(logoutAnchor_);
 
-    loginAnchor_ = new WAnchor("/login","Login",loginMessageContainer_);
-    loginAnchor_->setLink(WLink(WLink::InternalPath,"/login"));
+    loginAnchor_ = new WAnchor("/login", "Login", loginMessageContainer_);
+    loginAnchor_->setLink(WLink(WLink::InternalPath, "/login"));
     loginAnchor_->setInline(true);
     loginMessageContainer_->addWidget(loginAnchor_);
-
 
     // title
     title_ = new WText(WString::tr("mainui.pagetitle"));
@@ -108,36 +107,46 @@ void MainUI::setupUI()
     pageContainer_ = new WContainerWidget(mainStack_);
     pageContainer_->setId("pageContainer_");
 
-    WTemplate *t = new WTemplate(WString::tr("template.mainui"),pageContainer_);
-    t->addFunction("id",WTemplate::Functions::id);
+    WTemplate *t =
+        new WTemplate(WString::tr("template.mainui"), pageContainer_);
+    t->addFunction("id", WTemplate::Functions::id);
 
     // left widget (file upload, input, buttons)
     globalLogger__.debug("MainUI :: creating HomeLeft...");
     leftContainer_ = new HomeLeft(pageContainer_);
     globalLogger__.debug("MainUI :: HomeLeft created");
-    t->bindWidget("left",leftContainer_);
+    t->bindWidget("left", leftContainer_);
 
     // right widget (output text area, plots, legend)
     globalLogger__.debug("MainUI :: creating HomeRight...");
     rightContainer_ = new HomeRight(pageContainer_);
     globalLogger__.debug("MainUI :: HomeRight created");
-    t->bindWidget("right",rightContainer_);
+    t->bindWidget("right", rightContainer_);
 
     // copyright
     WText *copyright = new WText(WString::tr("mainui.disclaimer-copyright"));
     copyright->setId("copyright");
     addWidget(copyright);
 
-    // connect signals sent from left to actions performed by right (and vice versa)
-    leftContainer_->evaluatedSignal().connect(rightContainer_,&HomeRight::readResults);
-    leftContainer_->errorSignal().connect(rightContainer_,&HomeRight::printError);
-    leftContainer_->resetSignal().connect(rightContainer_,&HomeRight::onReset);
-    leftContainer_->onPlotSphereSignal().connect(rightContainer_,&HomeRight::onSpherePlot);
-    leftContainer_->onPlotPlaneSignal().connect(rightContainer_,&HomeRight::onPlanePlot);
-    leftContainer_->orbitIntegrateSignal().connect(rightContainer_,&HomeRight::onOrbitsIntegrate);
-    leftContainer_->orbitDeleteSignal().connect(rightContainer_,&HomeRight::onOrbitsDelete);
-    leftContainer_->gcfSignal().connect(rightContainer_,&HomeRight::onGcfEval); // TODO: fer aquesta funcio
-    rightContainer_->sphereClickedSignal().connect(leftContainer_,&HomeLeft::showOrbitsDialog);
+    // connect signals sent from left to actions performed by right (and vice
+    // versa)
+    leftContainer_->evaluatedSignal().connect(rightContainer_,
+                                              &HomeRight::readResults);
+    leftContainer_->errorSignal().connect(rightContainer_,
+                                          &HomeRight::printError);
+    leftContainer_->resetSignal().connect(rightContainer_, &HomeRight::onReset);
+    leftContainer_->onPlotSphereSignal().connect(rightContainer_,
+                                                 &HomeRight::onSpherePlot);
+    leftContainer_->onPlotPlaneSignal().connect(rightContainer_,
+                                                &HomeRight::onPlanePlot);
+    leftContainer_->orbitIntegrateSignal().connect(
+        rightContainer_, &HomeRight::onOrbitsIntegrate);
+    leftContainer_->orbitDeleteSignal().connect(rightContainer_,
+                                                &HomeRight::onOrbitsDelete);
+    leftContainer_->gcfSignal().connect(
+        rightContainer_, &HomeRight::onGcfEval); // TODO: fer aquesta funcio
+    rightContainer_->sphereClickedSignal().connect(leftContainer_,
+                                                   &HomeLeft::showOrbitsDialog);
     globalLogger__.debug("MainUI :: signals connected");
 
     globalLogger__.debug("MainUI :: MainUI set up");
@@ -149,7 +158,8 @@ void MainUI::setupUI()
 void MainUI::onAuthEvent()
 {
     if (session_.login().loggedIn()) {
-        globalLogger__.info("Auth :: User "+session_.userName()+" logged in.");
+        globalLogger__.info("Auth :: User " + session_.userName() +
+                            " logged in.");
         setLoginIndicator(session_.userName());
         leftContainer_->showSettings();
     } else {
@@ -157,7 +167,7 @@ void MainUI::onAuthEvent()
         leftContainer_->hideSettings();
         setLogoutIndicator();
     }
-    WApplication::instance()->setInternalPath("/",true);
+    WApplication::instance()->setInternalPath("/", true);
 }
 
 void MainUI::handlePathChange()

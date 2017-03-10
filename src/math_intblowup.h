@@ -42,8 +42,8 @@
  * @file math_intblowup.h
  */
 
-#include "file_tab.h"
 #include "WSphere.h"
+#include "file_tab.h"
 
 /**
  * Integrate blowup separatrices for a non elementary singular point
@@ -57,8 +57,8 @@
  * @param  chart     chart in which to perform computations
  * @return           pointer to first orbit
  */
-orbits_points * integrate_blow_up( WSphere * spherewnd, double * pcoord2,
-                    blow_up_points * de_sep, double step, int dir, int type,
-                    orbits_points ** orbit, int chart );
+orbits_points *integrate_blow_up(WSphere *spherewnd, double *pcoord2,
+                                 blow_up_points *de_sep, double step, int dir,
+                                 int type, orbits_points **orbit, int chart);
 
 #endif // MATH_INTBLOWUP_H

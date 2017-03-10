@@ -17,13 +17,13 @@
  */
 #include "HomeRight.h"
 
-#include "file_tab.h"
 #include "MyLogger.h"
 #include "WSphere.h"
+#include "file_tab.h"
 //#include "math_orbits.h"
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 #include <Wt/WBreak>
@@ -37,12 +37,9 @@
 
 using namespace Wt;
 
-
-HomeRight::HomeRight(WContainerWidget *parent) :
-    WContainerWidget(parent),
-    plotCaption_(nullptr),
-    sphere_(nullptr),
-    orbitStarted_(false)
+HomeRight::HomeRight(WContainerWidget *parent)
+    : WContainerWidget(parent), plotCaption_(nullptr), sphere_(nullptr),
+      orbitStarted_(false)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
@@ -67,7 +64,7 @@ HomeRight::~HomeRight()
     delete outputButtonsToolbar_;
     delete outputTextArea_;
     delete outputContainer_;
-    
+
     // tab widget
     delete tabWidget_;
 
@@ -82,40 +79,44 @@ void HomeRight::setupUI()
     // output tab ----
     outputContainer_ = new WContainerWidget();
     outputContainer_->setId("outputContainer_");
-    tabWidget_->addTab(outputContainer_,WString::fromUTF8("Output"),WTabWidget::PreLoading);
+    tabWidget_->addTab(outputContainer_, WString::fromUTF8("Output"),
+                       WTabWidget::PreLoading);
 
     // text area where results are shown
     outputTextAreaContent_ = "";
     outputTextArea_ = new WTextArea(outputTextAreaContent_);
     outputTextArea_->setId("outputTextArea_");
     outputTextArea_->setReadOnly(true);
-    outputTextArea_->setMinimumSize(550,550);
-    outputTextArea_->resize(WLength::Auto,550);
-    outputTextArea_->setMargin(5,Top);
+    outputTextArea_->setMinimumSize(550, 550);
+    outputTextArea_->resize(WLength::Auto, 550);
+    outputTextArea_->setMargin(5, Top);
     outputContainer_->addWidget(outputTextArea_);
 
     // buttons menu for choosing output
     outputButtonsToolbar_ = new WToolBar(outputContainer_);
     outputButtonsToolbar_->setId("outputButtonsToolbar_");
-    outputButtonsToolbar_->setMargin(5,Top);
-    outputButtonsToolbar_->setMargin(5,Bottom);
+    outputButtonsToolbar_->setMargin(5, Top);
+    outputButtonsToolbar_->setMargin(5, Bottom);
 
     fullResButton_ = new WPushButton("Full output");
     fullResButton_->setId("fullResButton_");
     fullResButton_->setStyleClass("btn-default btn");
-    fullResButton_->setToolTip(WString::tr("tooltip.homeright-full-button"),XHTMLText);
+    fullResButton_->setToolTip(WString::tr("tooltip.homeright-full-button"),
+                               XHTMLText);
     outputButtonsToolbar_->addButton(fullResButton_);
 
     finResButton_ = new WPushButton("Finite");
     finResButton_->setId("finResButton_");
     finResButton_->setStyleClass("btn-default btn");
-    finResButton_->setToolTip(WString::tr("tooltip.homeright-finite-button"),XHTMLText);
+    finResButton_->setToolTip(WString::tr("tooltip.homeright-finite-button"),
+                              XHTMLText);
     outputButtonsToolbar_->addButton(finResButton_);
 
     infResButton_ = new WPushButton("Infinite");
     infResButton_->setId("infResButton_");
     infResButton_->setStyleClass("btn-default btn");
-    infResButton_->setToolTip(WString::tr("tooltip.homeright-infinite-button"),XHTMLText);
+    infResButton_->setToolTip(WString::tr("tooltip.homeright-infinite-button"),
+                              XHTMLText);
     outputButtonsToolbar_->addButton(infResButton_);
 
     outputButtonsToolbar_->addSeparator();
@@ -123,17 +124,17 @@ void HomeRight::setupUI()
     clearOutputButton_ = new WPushButton("Clear");
     clearOutputButton_->setId("clearOutputButton_");
     clearOutputButton_->setStyleClass("btn-warning btn");
-    clearOutputButton_->setToolTip(WString::tr("tooltip.homeright-clear-button"),XHTMLText);
+    clearOutputButton_->setToolTip(
+        WString::tr("tooltip.homeright-clear-button"), XHTMLText);
     outputButtonsToolbar_->addButton(clearOutputButton_);
 
-
     // plot tab ----
-    plotContainer_ =  new WContainerWidget();
+    plotContainer_ = new WContainerWidget();
     plotContainer_->setId("plotContainer_");
-    tabWidget_->addTab(plotContainer_,WString::fromUTF8("Plot"),WTabWidget::PreLoading);
+    tabWidget_->addTab(plotContainer_, WString::fromUTF8("Plot"),
+                       WTabWidget::PreLoading);
 
-
-    //TODO: add plot separatrices, orbits, etc buttons?
+    // TODO: add plot separatrices, orbits, etc buttons?
     /*plotButtonsToolbar_ = new WToolBar(plotContainer_);
     plotButtonsToolbar_->setId("plotButtonsToolbar_");
     plotButtonsToolbar_->setMargin(5,Top);
@@ -157,20 +158,17 @@ void HomeRight::setupUI()
     plotButtonsToolbar_->addButton(clearPlotButton_);
 
 */
-    
-    
 
     globalLogger__.debug("HomeRight :: UI set up");
-
 }
 
 void HomeRight::setupConnectors()
 {
     // output buttons
-    fullResButton_->clicked().connect(this,&HomeRight::fullResults);
-    finResButton_->clicked().connect(this,&HomeRight::showFinResults);
-    infResButton_->clicked().connect(this,&HomeRight::showInfResults);
-    clearOutputButton_->clicked().connect(this,&HomeRight::clearResults);
+    fullResButton_->clicked().connect(this, &HomeRight::fullResults);
+    finResButton_->clicked().connect(this, &HomeRight::showFinResults);
+    infResButton_->clicked().connect(this, &HomeRight::showInfResults);
+    clearOutputButton_->clicked().connect(this, &HomeRight::clearResults);
     // plot buttons
     /*plotPointsButton_->clicked().connect(this,&HomeRight::plotSingularPoints);
     plotSeparatricesButton_->clicked().connect(this,&HomeRight::plotSeparatrices);
@@ -182,7 +180,7 @@ void HomeRight::setupConnectors()
 void HomeRight::readResults(std::string fileName)
 {
     tabWidget_->setCurrentIndex(0);
-    
+
     std::ifstream resultsFile;
     std::string line;
 
@@ -190,28 +188,28 @@ void HomeRight::readResults(std::string fileName)
 
     // read full results
     fullResults_ = "";
-    resultsFile.open((fileName_+".res").c_str());
+    resultsFile.open((fileName_ + ".res").c_str());
     if (resultsFile.is_open()) {
-        while(getline(resultsFile,line))
+        while (getline(resultsFile, line))
             fullResults_ += line + "\n";
         resultsFile.close();
     }
 
     // read finite singular points results
     finResults_ = "";
-    resultsFile.open((fileName_+"_fin.res").c_str());
-    if(resultsFile.is_open()) {
-        while (getline(resultsFile,line))
+    resultsFile.open((fileName_ + "_fin.res").c_str());
+    if (resultsFile.is_open()) {
+        while (getline(resultsFile, line))
             finResults_ += line + "\n";
         resultsFile.close();
     }
-    
+
     // add title for infinite region (missing in inf.res)
     infResults_ = "AT INFINITY \n";
     // read infinite singular points results
-    resultsFile.open((fileName_+"_inf.res").c_str());
-    if(resultsFile.is_open()) {
-        while(getline(resultsFile,line))
+    resultsFile.open((fileName_ + "_inf.res").c_str());
+    if (resultsFile.is_open()) {
+        while (getline(resultsFile, line))
             infResults_ += line + "\n";
         resultsFile.close();
     }
@@ -220,7 +218,7 @@ void HomeRight::readResults(std::string fileName)
 }
 
 void HomeRight::printError(std::string error)
-{   
+{
     fullResults_ = error;
     fullResults();
 }
@@ -260,24 +258,26 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
         delete sphere_;
         sphere_ = nullptr;
     }
-    sphere_ = new WSphere(plotContainer_,550,550,basename,projection);
+    sphere_ = new WSphere(plotContainer_, 550, 550, basename, projection);
     setupSphereAndPlot();
 }
 
-void HomeRight::onPlanePlot(std::string basename, int type, double minx, double maxx, double miny, double maxy)
+void HomeRight::onPlanePlot(std::string basename, int type, double minx,
+                            double maxx, double miny, double maxy)
 {
     if (sphere_ != nullptr) {
         delete sphere_;
         sphere_ = nullptr;
     }
-    sphere_ = new WSphere(plotContainer_,550,550,basename,type,minx,maxx,miny,maxy);
+    sphere_ = new WSphere(plotContainer_, 550, 550, basename, type, minx, maxx,
+                          miny, maxy);
     setupSphereAndPlot();
 }
 
 void HomeRight::setupSphereAndPlot()
 {
     sphere_->setId("sphere_");
-    sphere_->setMargin(5,Top);
+    sphere_->setMargin(5, Top);
     plotContainer_->addWidget(sphere_);
 
     if (plotCaption_ != nullptr) {
@@ -288,26 +288,26 @@ void HomeRight::setupSphereAndPlot()
     plotCaption_->setId("plotCaption_");
     plotContainer_->addWidget(plotCaption_);
 
-    sphere_->hoverSignal().connect(this,&HomeRight::mouseMovedEvent);
-    sphere_->errorSignal().connect(this,&HomeRight::printError);
-    sphere_->clickedSignal().connect(this,&HomeRight::sphereClicked);
+    sphere_->hoverSignal().connect(this, &HomeRight::mouseMovedEvent);
+    sphere_->errorSignal().connect(this, &HomeRight::printError);
+    sphere_->clickedSignal().connect(this, &HomeRight::sphereClicked);
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
     globalLogger__.debug("HomeRight :: reacted to onPlot signal");
 }
 
-void HomeRight::mouseMovedEvent( WString caption )
+void HomeRight::mouseMovedEvent(WString caption)
 {
     plotCaption_->setText(caption);
 }
 
-void HomeRight::sphereClicked( bool clickValid, double x, double y )
+void HomeRight::sphereClicked(bool clickValid, double x, double y)
 {
-    sphereClickedSignal_.emit(clickValid,x,y);
+    sphereClickedSignal_.emit(clickValid, x, y);
 }
 
-void HomeRight::onReset( int dummy )
+void HomeRight::onReset(int dummy)
 {
     if (sphere_ != nullptr) {
         delete sphere_;
@@ -318,32 +318,30 @@ void HomeRight::onReset( int dummy )
     outputTextArea_->setText(outputTextAreaContent_);
 
     tabWidget_->setCurrentIndex(0);
-    
 }
 
-
-void HomeRight::onOrbitsIntegrate( int dir, double x0, double y0 )
+void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
 {
-    if (dir==1 || dir==-1)
-        orbitStarted_ = sphere_->startOrbit(x0,y0,true);
-    
-    globalLogger__.debug("HomeRight :: orbit started = "+std::to_string(orbitStarted_));
+    if (dir == 1 || dir == -1)
+        orbitStarted_ = sphere_->startOrbit(x0, y0, true);
+
+    globalLogger__.debug("HomeRight :: orbit started = " +
+                         std::to_string(orbitStarted_));
 
     sphere_->integrateOrbit(dir);
     globalLogger__.debug("HomeRight :: orbit integrated...");
-    // update with flag PaintUpdate so widget is not cleared before painting orbit
+    // update with flag PaintUpdate so widget is not cleared before painting
+    // orbit
     sphere_->update(PaintUpdate);
-    if (tabWidget_->currentIndex()!=1)
+    if (tabWidget_->currentIndex() != 1)
         tabWidget_->setCurrentIndex(1);
-
 }
 
 void HomeRight::onOrbitsDelete(int flag)
 {
-    if (sphere_ == nullptr
-        || sphere_->study_ == nullptr
-        || sphere_->study_->first_orbit == nullptr
-        || sphere_->study_->current_orbit == nullptr)
+    if (sphere_ == nullptr || sphere_->study_ == nullptr ||
+        sphere_->study_->first_orbit == nullptr ||
+        sphere_->study_->current_orbit == nullptr)
         return;
 
     if (flag == 0) {
@@ -354,17 +352,19 @@ void HomeRight::onOrbitsDelete(int flag)
 
     sphere_->plotDone_ = false;
     sphere_->update();
-    if (tabWidget_->currentIndex()!=1)
+    if (tabWidget_->currentIndex() != 1)
         tabWidget_->setCurrentIndex(1);
 }
 
 // FIXME:
-void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints, int prec)
+void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints,
+                          int prec)
 {
-    globalLogger__.debug("HomeRight :: received gcf signal with fname "+fname);
+    globalLogger__.debug("HomeRight :: received gcf signal with fname " +
+                         fname);
     if (sphere_ == nullptr)
         return;
-    
+
     sphere_->gcfEval_ = true;
     sphere_->gcfDashes_ = pointdash;
     sphere_->gcfFname_ = fname;
@@ -372,9 +372,8 @@ void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints, int pre
     sphere_->gcfPrec_ = prec;
     sphere_->plotDone_ = false;
     sphere_->update(PaintUpdate);
-    if (tabWidget_->currentIndex()!=1)
+    if (tabWidget_->currentIndex() != 1)
         tabWidget_->setCurrentIndex(1);
-
 }
 
 /*void HomeRight::clearPlot()

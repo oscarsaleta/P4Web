@@ -33,21 +33,21 @@ class HomeLeft;
 class HomeRight;
 class MyAuthWidget;
 
-/** 
+/**
  * Auxiliary class for organizing the different elements of the UI
- * 
+ *
  * @class MainUI
  *
  * MainUI is a class without a constructor. We only need to call its setupUI()
  * function from #MyApplication and we get the different UI elements connected
  * through this class.
- * 
+ *
  * This allows us to make some objects (#HomeRight) react to signals emitted by
  * others (#HomeLeft) without making everything global.
  */
 class MainUI : public Wt::WContainerWidget
 {
-public:
+  public:
     /**
      * Constructor
      * @param parent Root container widget
@@ -58,7 +58,7 @@ public:
      */
     ~MainUI();
 
-    /** 
+    /**
      * Sets up the UI of the web app from the root, to control every part of it
      *
      * This function is called from the constructor.
@@ -80,7 +80,7 @@ public:
      */
     void handlePathChange();
 
-private:
+  private:
     Session session_;
     MyAuthWidget *authWidget_;
 

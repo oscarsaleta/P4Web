@@ -50,14 +50,14 @@
  * @param  value Value t
  * @return       Result p(t)
  */
-double eval_term1( P4POLYNOM1 p, double value);
+double eval_term1(P4POLYNOM1 p, double value);
 /**
  * Calculates f(x,y) for a polynomial f and values x and y.
  * @param  f     Polynomial f
  * @param  value Array (x,y)
  * @return       Result f(x,y)
  */
-double eval_term2( P4POLYNOM2 f, double * value);
+double eval_term2(P4POLYNOM2 f, double *value);
 /**
  * Calculates F( r, cos(theta), sin(theta) ) for a polynomial F
  * and values of r and theta
@@ -65,23 +65,23 @@ double eval_term2( P4POLYNOM2 f, double * value);
  * @param  value Array (r,theta)
  * @return       Result F(r,cos(theta),sin(theta))
  */
-double eval_term3( P4POLYNOM3 F, double * value);
+double eval_term3(P4POLYNOM3 F, double *value);
 
 /**
  * Delete a one variable polynomial
  * @param p polynomial
  */
-void delete_term1( P4POLYNOM1 p );
+void delete_term1(P4POLYNOM1 p);
 /**
  * Delete a two variables polynomial
  * @param p polynomial
  */
-void delete_term2( P4POLYNOM2 p );
+void delete_term2(P4POLYNOM2 p);
 /**
  * Delete a three variables polynomial
  * @param p polynomial
  */
-void delete_term3( P4POLYNOM3 p );
+void delete_term3(P4POLYNOM3 p);
 
 /**
  * Used for creating GCF files
@@ -91,7 +91,8 @@ void delete_term3( P4POLYNOM3 p );
  * @param x         name of "x" variable
  * @param y         name of "y" variable
  */
-char * printterm2( char * buf, P4POLYNOM2 f, bool isfirst, const char * x, const char * y );
+char *printterm2(char *buf, P4POLYNOM2 f, bool isfirst, const char *x,
+                 const char *y);
 /**
  * Used for creating GCF files
  * @param buf string where result is stored
@@ -101,7 +102,7 @@ char * printterm2( char * buf, P4POLYNOM2 f, bool isfirst, const char * x, const
  * @param Co
  * @param Si
  */
-char * printterm3( char * buf, P4POLYNOM3 f, bool isfirst, const char * r, const char * Co, const char * Si );
-
+char *printterm3(char *buf, P4POLYNOM3 f, bool isfirst, const char *r,
+                 const char *Co, const char *Si);
 
 #endif // MATH_POLYNOM_H

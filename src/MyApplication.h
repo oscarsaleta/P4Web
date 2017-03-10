@@ -29,9 +29,9 @@
 
 class MainUI;
 
-/** 
+/**
  * Application class that links server and UI
- * 
+ *
  * @class MyApplication
  *
  * This class simply creates the application framework for
@@ -40,20 +40,20 @@ class MainUI;
  */
 class MyApplication : public Wt::WApplication
 {
-public:
-    /** 
+  public:
+    /**
      * Constructor for MyApplication
      *
      * Simply runs #MainUI::setupUI() to generate a UI object
      */
     MyApplication(const Wt::WEnvironment &env);
 
-    /** 
+    /**
      * Destructor for MyApplication
      */
     ~MyApplication();
-    
-private:
+
+  private:
     MainUI *mainUI_;
 
     void addAllStyleSheets();
