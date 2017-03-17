@@ -62,6 +62,11 @@ struct term1 {
     int exp;                  ///< exponent (i) */
     double coeff;             ///< coefficient (a) */
     struct term1 *next_term1; ///< next term1 (linked list) */
+
+    /**
+     * Constructor method
+     */
+    term1() : next_term1(nullptr){};
 };
 
 /**
@@ -77,6 +82,11 @@ struct term2 {
     int exp_y;                ///< y exponent (j)
     double coeff;             ///< coefficient (a)
     struct term2 *next_term2; ///< next term2 (linked list)
+
+    /**
+     * Constructor method
+     */
+    term2() : next_term2(nullptr){};
 };
 
 /**
@@ -93,6 +103,11 @@ struct term3 {
     int exp_Si;               ///< sin exponent (theta2) */
     double coeff;             ///< coefficient (a) */
     struct term3 *next_term3; ///< next term3 (linked list) */
+
+    /**
+     * Constructor method
+     */
+    term3() : next_term3(nullptr){};
 };
 
 /**
@@ -124,6 +139,11 @@ struct orbits_points {
 
     struct orbits_points
         *next_point; ///< pointer to next orbits_points (linked list) */
+
+    /**
+     * Constructor method
+     */
+    orbits_points() : next_point(nullptr){};
 };
 
 /**
@@ -144,6 +164,11 @@ struct orbits {
                                     the full orbit) */
     P4ORBIT current_f_orbits;  ///< current point
     struct orbits *next_orbit; ///< pointer to next orbits (linked lists)
+
+    /**
+     * Constructor method
+     */
+    orbits() : next_orbit(nullptr){};
 };
 
 // -----------------------------------------------------------------------
@@ -168,6 +193,11 @@ struct transformations {
     struct transformations
         *next_trans; /**< pointer to next transformations (linked
                         list) */
+
+    /**
+     * Constructor method
+     */
+    transformations() : next_trans(nullptr){};
 };
 
 /**
@@ -195,6 +225,13 @@ struct blow_up_points {
     struct orbits_points *last_sep_point;  ///< last separatrice point
     struct blow_up_points
         *next_blow_up_point; ///< pointer to next blow up point (linked list)
+
+    /**
+     * Constructor method
+     */
+    blow_up_points()
+        : trans(nullptr), sep(nullptr), first_sep_point(nullptr),
+          last_sep_point(nullptr){};
 };
 
 /**
@@ -212,6 +249,13 @@ struct sep {
                      through a symmetry) */
     struct term1 *separatrice; ///< if d=0 -> (t,f(t)), d=1 ->(f(t),t)
     struct sep *next_sep;      ///< pointer to next separatrice (linked list)
+
+    /**
+     * Constructor method
+     */
+    sep()
+        : first_sep_point(nullptr), last_sep_point(nullptr),
+          separatrice(nullptr), next_sep(nullptr){};
 };
 
 // -----------------------------------------------------------------------
@@ -228,6 +272,11 @@ struct genericsingularity {
     double y0;                       ///< y coordinate of singularity
     struct genericsingularity *next; ///< next singularity
     int chart;                       ///< chart where the singularity is located
+
+    /**
+     * Constructor method
+     */
+    genericsingularity() : next(nullptr){};
 };
 
 /**
@@ -251,6 +300,11 @@ struct saddle {
     double a12;                    ///< transformation matrix
     double a21;                    ///< transformation matrix
     double a22;                    ///< transformation matrix
+
+    /**
+     * Constructor method
+     */
+    saddle() : next_saddle(nullptr), separatrices(nullptr){};
 };
 
 /**
@@ -276,6 +330,11 @@ struct semi_elementary {
     double a22;                    ///< transformation matrix
 
     int type; ///< type of semi-elementary point
+
+    /**
+     * Constructor method
+     */
+    semi_elementary() : separatrices(nullptr){};
 };
 
 /**
@@ -295,6 +354,11 @@ struct degenerate {
 
     struct blow_up_points
         *blow_up; ///< blow up points for the degenerate singularity
+
+    /**
+     * Constructor method
+     */
+    degenerate() : next_de(nullptr), blow_up(nullptr){};
 };
 
 /**
@@ -307,6 +371,11 @@ struct node {
     int chart;              ///< chart where the singularity is located
 
     int stable; ///< flag that indicates if it is stable
+
+    /**
+     * Constructor method
+     */
+    node() : next_node(nullptr){};
 };
 
 /**
@@ -319,6 +388,11 @@ struct strong_focus {
     int chart;                    ///< chart where the singularity is located
 
     int stable; ///< flag that indicates it is stable
+
+    /**
+     * Constructor method
+     */
+    strong_focus() : next_sf(nullptr){};
 };
 
 /**
@@ -331,6 +405,11 @@ struct weak_focus {
     int chart;                  ///< chart where the singularity is located
 
     int type; ///< type of weak focus
+
+    /**
+     * Constructor method
+     */
+    weak_focus() : next_wf(nullptr){};
 };
 
 // -----------------------------------------------------------------------
