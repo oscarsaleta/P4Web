@@ -76,6 +76,7 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms)
     fprintf(f, "user_bindir := \"%s\":\n", prms.str_bindir.c_str());
     fprintf(f, "user_tmpdir := \"%s\":\n", prms.str_tmpdir.c_str());
     fprintf(f, "user_lypexe := \"%s\":\n", prms.str_lypexe.c_str());
+    fprintf(f, "user_lypexe_mpf := \"%s\":\n", prms.str_lypexe_mpf.c_str());
     fprintf(f, "user_sepexe := \"%s\":\n", prms.str_sepexe.c_str());
     fprintf(f, "user_exeprefix := \"%s\":\n", prms.str_exeprefix.c_str());
     fprintf(f, "user_platform := \"%s\":\n", prms.str_platform.c_str());

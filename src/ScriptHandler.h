@@ -47,7 +47,7 @@ struct mapleParamsStruct {
     /**
      * directory where maple scripts are located
      */
-    std::string str_bindir
+    std::string str_bindir;
     /**
      * name of p4.m script
      */
@@ -55,11 +55,15 @@ struct mapleParamsStruct {
     /**
      * path to temporary directory for storing text files
      */
-    std::string str_tmpdir
+    std::string str_tmpdir;
     /**
      * path to lyapunov C++ executable
      */
     std::string str_lypexe;
+    /**
+     * path to lyapunov C++ multiprecision executable
+     */
+    std::string str_lypexe_mpf;
     /**
      * path to separatrice C++ executable
      */
@@ -75,7 +79,7 @@ struct mapleParamsStruct {
     /**
      * path to sumtable folder
      */
-    std::string str_sumtablepath
+    std::string str_sumtablepath;
     /**
      * remove command in this specific platform
      */
@@ -159,7 +163,7 @@ struct mapleParamsStruct {
     /**
      * start working numerically from this order
      */
-    std::string str_numericlevel
+    std::string str_numericlevel;
     /**
      * max taylor order
      */
