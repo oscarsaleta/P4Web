@@ -185,8 +185,6 @@ void HomeLeft::setupUI()
         new WImage(WLink("resources/p4legend.png"), legendContainer);
     legend->setAlternateText("Plot legend");
     legend->setId("legend");
-    // legend->setMargin(5,Top);
-    // legendContainer->addWidget(legend);
     t->bindWidget("img", legend);
 
     globalLogger__.debug("HomeLeft :: UI set up");
@@ -214,15 +212,6 @@ void HomeLeft::setupConnectors()
 
     globalLogger__.debug("HomeLeft :: connectors set up");
 }
-
-/*void HomeLeft::tryUpload()
-{
-    fileUploadWidget_->upload();
-    if (fileUploadWidget_->empty()) {
-        WPushButton *btn = new WPushButton("Upload");
-
-    }
-}*/
 
 void HomeLeft::fileUploaded()
 {
@@ -421,6 +410,7 @@ void HomeLeft::setParams()
         dval = epsilonSpinBox_->value();
         if (dval < EPSILON_MIN || dval > EPSILON_MAX) {
             mplParams.str_epsilon = std::to_string(EPSILON_DEFAULT);
+            epsilonSpinBox_->setValue(EPSILON_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_epsilon out of bounds, "
                                    "setting to default value");
         } else {
@@ -431,6 +421,7 @@ void HomeLeft::setParams()
         ival = accuracySpinBox_->value();
         if (ival < ACCURACY_MIN || ival > ACCURACY_MAX) {
             mplParams.str_precision = std::to_string(ACCURACY_DEFAULT);
+            accuracySpinBox_->setValue(ACCURACY_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_precision out of bounds, "
                                    "setting to default value");
         } else {
@@ -439,6 +430,7 @@ void HomeLeft::setParams()
         ival = precisionSpinBox_->value();
         if (ival < PRECISION_MIN || ival > PRECISION_MAX) {
             mplParams.str_precision0 = std::to_string(PRECISION_DEFAULT);
+            precisionSpinBox_->setValue(PRECISION_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_precision0 out of bounds, "
                                    "setting to default value");
         } else {
@@ -447,6 +439,7 @@ void HomeLeft::setParams()
         ival = levAppSpinBox_->value();
         if (ival < APPROX_MIN || ival > APPROX_MAX) {
             mplParams.str_taylor = std::to_string(APPROX_DEFAULT);
+            levAppSpinBox_->setValue(APPROX_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_taylor out of bounds, "
                                    "setting to default value");
         } else {
@@ -455,6 +448,7 @@ void HomeLeft::setParams()
         ival = numericLevelSpinBox_->value();
         if (ival < NUMERIC_MIN || ival > NUMERIC_MAX) {
             mplParams.str_numericlevel = std::to_string(NUMERIC_DEFAULT);
+            numericLevelSpinBox_->setValue(NUMERIC_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_numericlevel out of "
                                    "bounds, setting to default value");
         } else {
@@ -463,6 +457,7 @@ void HomeLeft::setParams()
         ival = maxLevelSpinBox_->value();
         if (ival < MAXIMUM_MIN || ival > MAXIMUM_MAX) {
             mplParams.str_maxlevel = std::to_string(MAXIMUM_DEFAULT);
+            maxLevelSpinBox_->setValue(MAXIMUM_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_maxlevel out of bounds, "
                                    "setting to default value");
         } else {
@@ -471,6 +466,7 @@ void HomeLeft::setParams()
         ival = maxWeakLevelSpinBox_->value();
         if (ival < WEAKNESS_MIN || ival > WEAKNESS_MAX) {
             mplParams.str_weaklevel = std::to_string(WEAKNESS_DEFAULT);
+            maxWeakLevelSpinBox_->setValue(WEAKNESS_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_weaklevel out of bounds, "
                                    "setting to default value");
         } else {
@@ -479,6 +475,7 @@ void HomeLeft::setParams()
         ival = PLWeightPSpinBox_->value();
         if (ival < PQ_MIN || ival > PQ_MAX) {
             mplParams.str_userp = std::to_string(PQ_DEFAULT);
+            PLWeightPSpinBox_->setValue(PQ_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_userp out of bounds, "
                                    "setting to default value");
         } else {
@@ -487,6 +484,7 @@ void HomeLeft::setParams()
         ival = PLWeightQSpinBox_->value();
         if (ival < PQ_MIN || ival > PQ_MAX) {
             mplParams.str_userq = std::to_string(PQ_DEFAULT);
+            PLWeightQSpinBox_->setValue(PQ_DEFAULT);
             globalLogger__.warning("HomeLeft :: str_userq out of bounds, "
                                    "setting to default value");
         } else {
