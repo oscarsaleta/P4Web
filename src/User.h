@@ -32,8 +32,10 @@
 namespace dbo = Wt::Dbo;
 
 class User;
-typedef Wt::Auth::Dbo::AuthInfo<User>
-    AuthInfo; ///< authentication info for a user
+/**
+ * authentication info for a user
+ */
+typedef Wt::Auth::Dbo::AuthInfo<User> AuthInfo;
 
 /**
  * User class

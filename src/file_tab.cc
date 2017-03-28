@@ -36,21 +36,15 @@
 
 #include "file_tab.h"
 
-#include "math_p4.h"
-//#include "math_charts.h"
-#include "math_separatrice.h"
-//#include "math_changedir.h"
-//#include "math_orbits.h"
-#include "math_polynom.h"
-//#include "p4application.h"
 #include "MyLogger.h"
-
 #include "custom.h"
+#include "math_p4.h"
+#include "math_polynom.h"
+#include "math_separatrice.h"
+
 #include <string>
 
 using namespace Wt;
-
-// WVFStudy VFResults;
 
 /*
     This file contains the code to read the information from reduce/maple.
@@ -64,7 +58,6 @@ using namespace Wt;
 WVFStudy::WVFStudy(double projection) : config_projection(projection)
 {
     // initialize vector field structures:
-
     f_vec_field[0] = nullptr;
     f_vec_field[1] = nullptr;
     vec_field_U1[0] = nullptr;
@@ -79,7 +72,6 @@ WVFStudy::WVFStudy(double projection) : config_projection(projection)
     vec_field_C[1] = nullptr;
 
     // initialize singular points structures:
-
     first_saddle_point = nullptr;
     first_se_point = nullptr;
     first_node_point = nullptr;
@@ -88,7 +80,6 @@ WVFStudy::WVFStudy(double projection) : config_projection(projection)
     first_de_point = nullptr;
 
     // initialize GCF:
-
     gcf = nullptr;
     gcf_U1 = nullptr;
     gcf_U2 = nullptr;
@@ -99,13 +90,11 @@ WVFStudy::WVFStudy(double projection) : config_projection(projection)
     last_gcf_point = nullptr;
 
     // initialize limit cycles & orbits
-
     first_lim_cycle = nullptr;
     first_orbit = nullptr;
     current_orbit = nullptr;
 
     // initialize others
-
     xmin = -1.0;
     xmax = 1.0;
     ymin = -1.0;
@@ -117,21 +106,24 @@ WVFStudy::WVFStudy(double projection) : config_projection(projection)
     dir_vec_field = 1;
 
     // initialize parameters
-
-    config_lc_value =
-        DEFAULT_LCORBITS; // number of orbits in the limit cycle window
-    config_lc_numpoints =
-        DEFAULT_LCPOINTS;     // number of points in the limit cycle window
-    config_hma = DEFAULT_HMA; // maximum step size
-    config_hmi = DEFAULT_HMI; // minimum step size
-    config_step = DEFAULT_STEPSIZE; // step size
-    config_currentstep =
-        DEFAULT_STEPSIZE; // current step size (during integration)
-    config_tolerance = DEFAULT_TOLERANCE; // tolerance
-    // config_projection = DEFAULT_PROJECTION;     // projection in the case of
-    // Poincare sphere
-    config_intpoints = DEFAULT_INTPOINTS; // number of points to integrate
-    config_dashes = DEFAULT_LINESTYLE;    // line style (dashes or points)
+    // number of orbits in the limit cycle window
+    config_lc_value = DEFAULT_LCORBITS;
+    // number of points in the limit cycle window
+    config_lc_numpoints = DEFAULT_LCPOINTS;
+    // maximum step size
+    config_hma = DEFAULT_HMA;
+    // minimum step size
+    config_hmi = DEFAULT_HMI;
+    // step size
+    config_step = DEFAULT_STEPSIZE;
+    // current step size (during integration)
+    config_currentstep = DEFAULT_STEPSIZE;
+    // tolerance
+    config_tolerance = DEFAULT_TOLERANCE;
+    // number of points to integrate
+    config_intpoints = DEFAULT_INTPOINTS;
+    // line style (dashes or points)
+    config_dashes = DEFAULT_LINESTYLE;
     config_kindvf = DEFAULT_INTCONFIG;
 }
 
@@ -148,7 +140,6 @@ WVFStudy::~WVFStudy() { deleteVF(); }
 void WVFStudy::deleteVF()
 {
     // Delete Vector Field
-
     delete_term2(f_vec_field[0]);
     delete_term2(f_vec_field[1]);
     delete_term2(vec_field_U1[0]);
@@ -176,7 +167,6 @@ void WVFStudy::deleteVF()
     vec_field_C[1] = nullptr;
 
     // Delete singular points
-
     deleteSaddle(first_saddle_point);
     deleteSemiElementary(first_se_point);
     deleteNode(first_node_point);
@@ -192,7 +182,6 @@ void WVFStudy::deleteVF()
     first_de_point = nullptr;
 
     // Delete GCF:
-
     delete_term2(gcf);
     delete_term2(gcf_U1);
     delete_term2(gcf_U2);
@@ -210,18 +199,15 @@ void WVFStudy::deleteVF()
     gcf_points = nullptr;
 
     // Delete all orbits
-
     deleteOrbit(first_orbit);
     first_orbit = nullptr;
     current_orbit = nullptr;
 
     // Delete limit cycles
-
     deleteLimitCycle(first_lim_cycle);
     first_lim_cycle = nullptr;
 
     // reset others
-
     xmin = -1.0;
     xmax = 1.0;
     ymin = -1.0;

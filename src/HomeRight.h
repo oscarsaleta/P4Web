@@ -28,7 +28,6 @@
 #include <Wt/WContainerWidget>
 
 #include <Wt/WString>
-//#include <Wt/WMouseEvent>
 
 class WSphere;
 

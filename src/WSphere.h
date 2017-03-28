@@ -101,13 +101,6 @@
  */
 class WSphere : public Wt::WPaintedWidget
 {
-    /*static int numSpheres;          /**< spheres are constructed as a linked
-       list
-                                        and when a new sphere is created, this
-       counter
-                                        increases */
-    // static WSphere **SphereList; ///< linked list of spheres
-
   public:
     /**
      * Constructor method for a spherical plot
@@ -157,25 +150,24 @@ class WSphere : public Wt::WPaintedWidget
      * @param  x coordinate to transform
      * @return   tranformed coordinate
      */
-    int
-    coWinX(double x); // coordinate changes: from world to windows coordinates
-                      /**
-                       * Y Coordinate change: from world (double) to window (int) coordinates
-                       * @param  y coordinate to transform
-                       * @return   transformed coordinate
-                       */
+    int coWinX(double x);
+    /**
+    * Y Coordinate change: from world (double) to window (int) coordinates
+    * @param  y coordinate to transform
+    * @return   transformed coordinate
+    */
     int coWinY(double y);
     /**
      * X Coordinate change: from window (int) to world (double) coordinates
      * @param  x coordinate to transform
      * @return   tranformed coordinate
      */
-    double coWorldX(int x); // from windows to world coordinates
-                            /**
-                             * Y Coordinate change: from (int) to world (double) coordinates
-                             * @param  y coordinate to transform
-                             * @return   transformed coordinate
-                             */
+    double coWorldX(int x);
+    /**
+     * Y Coordinate change: from (int) to world (double) coordinates
+     * @param  y coordinate to transform
+     * @return   transformed coordinate
+     */
     double coWorldY(int y);
     /**
      * Horizontal distance tranformation: from world (double) to window (int)
@@ -210,12 +202,23 @@ class WSphere : public Wt::WPaintedWidget
                      we keep to smallest rectangle enclosing
                      all painted objects. */
 
-    Wt::WString chartString_; ///< string that identifies which chart we're in
-    Wt::WString
-        plotCaption_; ///< string that shows type of view and cursor coordinates
+    /**
+     * string that identifies which chart we're in
+     */
+    Wt::WString chartString_;
+    /**
+     * string that shows type of view and cursor coordinates
+     */
+    Wt::WString plotCaption_;
 
-    int spherebgcolor; ///< background color
-    WSphere *next;     ///< next WSphere (linked list)
+    /**
+     * background color
+     */
+    int spherebgcolor;
+    /**
+     * next WSphere (linked list)
+     */
+    WSphere *next;
     // int SelectingX, SelectingY, SelectingPointStep, SelectingPointRadius;
     // QTimer * SelectingTimer;
 
@@ -417,21 +420,41 @@ class WSphere : public Wt::WPaintedWidget
      */
     Wt::Signal<std::string> &errorSignal() { return errorSignal_; }
 
-    Wt::WPainter
-        *staticPainter; /**< pointer to a painter linked to a paint device
-                             created in a paint event. This makes possible
-                             to distribute painting to different functions
-                             and compiling units (even from outside the
-                             object) */
+    /**
+     * pointer to a painter linked to a paint device
+     * created in a paint event. This makes possible
+     * to distribute painting to different functions
+     * and compiling units (even from outside the
+     * object)
+     */
+    Wt::WPainter *staticPainter;
 
-    bool plotDone_; ///< flag used to not replot every time we just want to
-                    ///update something
-    bool gcfEval_;  ///< flag used to make the sphere compute gcf
-    std::string gcfFname_; ///< name of Maple script from first execution, to be
-                           ///reused for gcf
-    int gcfNPoints_;       ///< number of points for gcf
-    int gcfPrec_;          ///< precision of zeros for gcf
-    int gcfDashes_;        ///< points (0) or dashes (1) for gcf plot
+    /**
+     * flag used to not replot every time we just want to
+     * update something
+     */
+    bool plotDone_;
+    /**
+     * flag used to make the sphere compute gcf
+     */
+    bool gcfEval_;
+    /**
+     * name of Maple script from first execution, to be
+     * reused for gcf
+     */
+    std::string gcfFname_;
+    /**
+     * number of points for gcf
+     */
+    int gcfNPoints_;
+    /**
+     * precision of zeros for gcf
+     */
+    int gcfPrec_;
+    /**
+     * points (0) or dashes (1) for gcf plot
+     */
+    int gcfDashes_;
 
   protected:
     /**
@@ -452,22 +475,37 @@ class WSphere : public Wt::WPaintedWidget
     // signal emitted when there's an error while reading results from Maple
     Wt::Signal<std::string> errorSignal_;
 
-    Wt::WContainerWidget
-        *parentWnd;    /**< parent widget (stored from @c parent, argument
-                           passed to constructor) */
-    bool ReverseYaxis; /**< when calculating coordinates: this determines
-                           orientation of horizontal axis.  Normally false,
-                           only true when printing. */
+    /**
+     * parent widget (stored from @c parent, argument
+     * passed to constructor)
+     */
+    Wt::WContainerWidget *parentWnd;
+    /**
+     * when calculating coordinates: this determines orientation of horizontal
+     * axis.  Normally false, only true when printing.
+     */
+    bool ReverseYaxis;
+    /**
+     * linked list of lines that form the Poincaré circle
+     */
+    P4POLYLINES *CircleAtInfinity;
+    /**
+     * linked list of lines that form the Poincaré-Lyapunov circle
+     */
+    P4POLYLINES *PLCircle;
 
-    P4POLYLINES *CircleAtInfinity; ///< linked list of lines that form the
-                                   ///Poincaré circle
-    P4POLYLINES *PLCircle; /**< linked list of lines that form the Poincaré-
-                               Lyapunov circle */
-    // used for plot caption
+    /**
+     * used for plot caption
+     */
     void setChartString(int p, int q, bool isu1v1chart, bool negchart);
-    // used for not redoing plot when orbits or other objects are plotted over
-    // the original
+    /**
+     * used for not redoing plot when orbits or other objects are plotted over
+     * the original
+     */
     bool plotPrepared_;
+    /**
+     * used for plotting background the first time
+     */
     bool firstTimePlot_;
     // integrate orbit from a point and store the result as a linked list
     orbits_points *integrate_orbit(double pcoord[3], double step, int dir,

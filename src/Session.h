@@ -34,8 +34,10 @@
 
 namespace dbo = Wt::Dbo;
 
-typedef Wt::Auth::Dbo::UserDatabase<AuthInfo>
-    UserDatabase; ///< database of users
+/**
+ * database of users
+ */
+typedef Wt::Auth::Dbo::UserDatabase<AuthInfo> UserDatabase;
 
 /**
  * Class that holds all the authentication information of every session

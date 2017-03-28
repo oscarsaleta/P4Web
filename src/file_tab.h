@@ -59,9 +59,9 @@
  * Linked list of univariate terms a*x^i
  */
 struct term1 {
-    int exp;                  ///< exponent (i) */
-    double coeff;             ///< coefficient (a) */
-    struct term1 *next_term1; ///< next term1 (linked list) */
+    int exp;                  ///< exponent (i)
+    double coeff;             ///< coefficient (a)
+    struct term1 *next_term1; ///< next term1 (linked list)
 
     /**
      * Constructor method
@@ -98,11 +98,11 @@ typedef struct term2 *P4POLYNOM2;
  * Linked list of terms a*r^i*cos(theta1)^j*sin(theta2)^k
  */
 struct term3 {
-    int exp_r;                ///< r exponent (i) */
-    int exp_Co;               ///< cos exponent (theta1) */
-    int exp_Si;               ///< sin exponent (theta2) */
-    double coeff;             ///< coefficient (a) */
-    struct term3 *next_term3; ///< next term3 (linked list) */
+    int exp_r;                ///< r exponent (i)
+    int exp_Co;               ///< cos exponent (theta1)
+    int exp_Si;               ///< sin exponent (theta2)
+    double coeff;             ///< coefficient (a)
+    struct term3 *next_term3; ///< next term3 (linked list)
 
     /**
      * Constructor method
@@ -126,19 +126,18 @@ typedef struct term3 *P4POLYNOM3;
  * for plotting purposes.
  */
 struct orbits_points {
-    int color; ///< color of seperatrice */
+    int color; ///< color of seperatrice
 
     double pcoord[3]; /**< point on the poincare sphere -> p=(X,Y,Z)
-                       or
-                       on the poincare-lyapunov sphere
-                       -> p=(0,x,y) or p=(1,r,theta) */
+                       or on the poincare-lyapunov sphere -> p=(0,x,y)
+                       or p=(1,r,theta) */
     int dashes;       ///< indicates if the line is dashed or continuous
-    int dir;  ///< if we have a line of sing at infinity and have to change */
+    int dir;  ///< if we have a line of sing at infinity and have to change
     int type; /**< the direction if we integrate the orbit of separatrice
                and sometimes the type */
 
     struct orbits_points
-        *next_point; ///< pointer to next orbits_points (linked list) */
+        *next_point; ///< pointer to next orbits_points (linked list)
 
     /**
      * Constructor method
@@ -445,10 +444,14 @@ struct weak_focus {
 #define FOCUSTYPE_STABLE (-1)  ///< weak focus type stable
 #define FOCUSTYPE_CENTER 4     ///< weak focus type center
 
-#define SETYPE_SADDLENODE_UNSTABSEP                                            \
-    1 ///< semi-elementary saddle node unstable separatrice 1
-#define SETYPE_SADDLENODE_UNSTABSEP2                                           \
-    2 ///< semi-elementary saddle node unstable separatrice 2
+/**
+ * semi-elementary saddle node unstable separatrice 1
+ */
+#define SETYPE_SADDLENODE_UNSTABSEP 1
+/**
+ * semi-elementary saddle node unstable separatrice 2
+ */
+#define SETYPE_SADDLENODE_UNSTABSEP2 2
 
 #define OT_STABLE STYPE_STABLE             ///< orbit type stable
 #define OT_UNSTABLE STYPE_UNSTABLE         ///< orbit type unstable
@@ -473,8 +476,6 @@ struct weak_focus {
 class WVFStudy
 {
   public:
-    // class constructor and destructor methods
-
     /**
      * Constructor method
      */
@@ -774,20 +775,22 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    void deleteNode(node *n);                 /**
-                   * Delete the strong foci linked list
-                   *
-                   * @param sf linked list of strong foci to delete
-                   *
-                   * This function is called by deleteVF()
-                   */
-    void deleteStrongFocus(strong_focus *sf); /**
-   * Delete the weak foci linked list
-   *
-   * @param wf linked list of weak foci to delete
-   *
-   * This function is called by deleteVF()
-   */
+    void deleteNode(node *n);
+    /**
+     * Delete the strong foci linked list
+     *
+     * @param sf linked list of strong foci to delete
+     *
+     * This function is called by deleteVF()
+     */
+    void deleteStrongFocus(strong_focus *sf);
+    /**
+     * Delete the weak foci linked list
+     *
+     * @param wf linked list of weak foci to delete
+     *
+     * This function is called by deleteVF()
+     */
     void deleteWeakFocus(weak_focus *wf);
     /**
      * Delete the degenerate singularities linked list
@@ -822,7 +825,6 @@ class WVFStudy
      * This function is called by deleteVF()
      */
     void deleteBlowup(blow_up_points *b);
-
     /**
      * Delete the limit cycles (orbits) linked list
      *
@@ -937,7 +939,6 @@ class WVFStudy
      * functions.
      */
     bool readTerm3(FILE *fp, P4POLYNOM3 p, int N);
-
     /**
      * Read saddle singularities from file
      * @param  fp input file
@@ -1006,7 +1007,6 @@ class WVFStudy
      * This function is called by readBlowupPoints().
      */
     bool readTransformations(FILE *fp, transformations *trans, int n);
-
     /**
      * Setup coordinate transformations
      *
@@ -1016,8 +1016,6 @@ class WVFStudy
      * math_orbits.cc).
      */
     void setupCoordinateTransformations(void); // see math_p4.cpp
-
-    // void dump( Wt::WString basename, Wt::WString info="" );
 
     // -----------------------------------------------------------------------
     //                  IMPLEMENTATION OF THE POINCARE CHARTS
@@ -1253,9 +1251,6 @@ class WVFStudy
     void insert_gcf_point(double x0, double y0, double z0, int dashes);
 
   private:
-    // void dumpSeparatrices( Wt::WTextArea * m, sep * separ, int margin );
-    // void dumpSingularities( Wt::WTextArea * m, genericsingularity * p, const
-    // char * type, bool longversion );
     // -----------------------------------------------------------------------
     //                  IMPLEMENTATION OF THE POINCARE CHARTS
     // -----------------------------------------------------------------------

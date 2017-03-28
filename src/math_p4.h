@@ -44,12 +44,19 @@
 
 #include "file_tab.h"
 
-#define MIN_FLOAT -1.0E32 ///< minimum single precision floating point
-#define MAX_FLOAT 1.0E32  ///< maximum single precision floating point
-
-#define p4_finite                                                              \
-    std::isfinite /**< macro for accessing the standard function               \
-                  that checks if a number is finite */
+/**
+ * minimum single precision floating point
+ */
+#define MIN_FLOAT -1.0E32
+/**
+ * maximum single precision floating point
+ */
+#define MAX_FLOAT 1.0E32 
+/**
+ * macro for accessing the standard function
+ * that checks if a number is finite
+ */
+#define p4_finite std::isfinite
 
 #define PI 3.1415926535897932384626433832 ///< Pi
 #define PI_DIV2 (PI / 2.)                 ///< Pi/2

@@ -19,7 +19,6 @@
 
 P4RGBITEM XFigToRGB[NUMXFIGCOLORS] = {
     // 8 pure colours:
-
     {0, 0, 0},       // BLACK
     {0, 0, 255},     // BLUE
     {0, 255, 0},     // GREEN
@@ -30,7 +29,6 @@ P4RGBITEM XFigToRGB[NUMXFIGCOLORS] = {
     {255, 255, 255}, // WHITE
 
     // shaded colours (ordered from dark to light):
-
     {0, 0, 143},     // BLUE1
     {0, 0, 176},     // BLUE2
     {0, 0, 209},     // BLUE3
