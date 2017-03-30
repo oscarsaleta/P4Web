@@ -1,0 +1,6 @@
+resources/font-awesome/* linguist-vendored
+resources/jPlayer/* linguist-vendored
+resources/themes/* linguist-vendored
+resources/tiny_mce/* linguist-vendored
+resources/*.gif linguist-vendored
+resources/*.css linguist-vendored
