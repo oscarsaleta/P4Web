@@ -30,7 +30,7 @@
   <message id="mainui.disclaimer-copyright">
     <p style="float:left">This is a development version. Please report any problem <a href="https://github.com/oscarsaleta/WP4/issues/new">in GitHub</a>
     and <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send suggestions</a> for improving the site.</p>
-    <p style="float:right">&copy; 2017 Oscar Saleta.</p>
+    <p style="float:right">&copy; 2016-2017 Oscar Saleta.</p>
   </message>
 
   <message id="homeleft.equationboxtitle">
