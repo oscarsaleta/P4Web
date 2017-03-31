@@ -863,6 +863,11 @@ void HomeLeft::showSettings()
     orbitsYLineEdit_ = new WLineEdit(orbitsContainer_);
     t->bindWidget("y", orbitsYLineEdit_);
 
+    // reenable forward/backward and disable continue when point is modified
+    // manually
+    orbitsXLineEdit_->changed().connect(this, &HomeLeft::onOrbitsDialogChange);
+    orbitsYLineEdit_->changed().connect(this, &HomeLeft::onOrbitsDialogChange);
+
     orbitsForwardsBtn_ = new WPushButton("Forwards", orbitsContainer_);
     orbitsContinueBtn_ = new WPushButton("Continue", orbitsContainer_);
     orbitsContinueBtn_->disable();
@@ -993,6 +998,15 @@ void HomeLeft::showOrbitsDialog(bool clickValid, double x, double y)
         orbitsForwardsBtn_->enable();
         orbitsBackwardsBtn_->enable();
         orbitsContinueBtn_->disable();
+    }
+}
+
+void HomeLeft::onOrbitsDialogChange()
+{
+    if (orbitsXLineEdit_->changed() || orbitsYLineEdit_->changed()) {
+        orbitsContinueBtn_->disable();
+        orbitsForwardsBtn_->enable();
+        orbitsBackwardsBtn_->enable();
     }
 }
 
