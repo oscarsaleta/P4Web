@@ -371,6 +371,7 @@ class HomeLeft : public Wt::WContainerWidget
     // set default/widget evaluation parameters
     void setParams();
     // react to button presses in orbits tab
+    void onOrbitsDialogChange();
     void onOrbitsForwardsBtn();
     void onOrbitsBackwardsBtn();
     void onOrbitsContinueBtn();

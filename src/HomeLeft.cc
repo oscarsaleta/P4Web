@@ -1003,11 +1003,9 @@ void HomeLeft::showOrbitsDialog(bool clickValid, double x, double y)
 
 void HomeLeft::onOrbitsDialogChange()
 {
-    if (orbitsXLineEdit_->changed() || orbitsYLineEdit_->changed()) {
-        orbitsContinueBtn_->disable();
-        orbitsForwardsBtn_->enable();
-        orbitsBackwardsBtn_->enable();
-    }
+    orbitsContinueBtn_->disable();
+    orbitsForwardsBtn_->enable();
+    orbitsBackwardsBtn_->enable();
 }
 
 void HomeLeft::onOrbitsForwardsBtn()
@@ -1017,7 +1015,6 @@ void HomeLeft::onOrbitsForwardsBtn()
         return;
 
     orbitsStartSelected_ = true;
-    // if (orbitIntegrationStarted_)
 
     orbitsContinueBtn_->enable();
     orbitsDeleteOneBtn_->enable();
