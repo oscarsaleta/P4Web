@@ -47,7 +47,18 @@ endif ()
 
 add_subdirectory (src)
 
-configure_file(
-    "${PROJECT_SOURCE_DIR}/resources/xml/strings.xml.in"
-    "${PROJECT_SOURCE_DIR}/resources/xml/strings.xml"
+
+file (COPY "${PROJECT_SOURCE_DIR}/resources/"
+    DESTINATION "${PROJECT_BINARY_DIR}/src/resources/"
 )
+configure_file (
+    "${PROJECT_SOURCE_DIR}/resources/xml/strings.xml.in"
+    "${PROJECT_BINARY_DIR}/src/resources/xml/strings.xml"
+)
+file (COPY "${PROJECT_SOURCE_DIR}/favicon.ico"
+    DESTINATION "${PROJECT_BINARY_DIR}/src/"
+)
+file (COPY "${PROJECT_SOURCE_DIR}/wt_config.xml.example"
+    DESTINATION "${PROJECT_BINARY_DIR}/src/"
+)
+file (RENAME "${PROJECT_BINARY_DIR}/src/wt_config.xml.example" "${PROJECT_BINARY_DIR}/src/wt_config.xml")
