@@ -547,6 +547,7 @@ void HomeLeft::prepareSaveFile()
     } else
         saveFileName_ = fileUploadName_;
 
+    setParams();
     if (!fillSaveFile(saveFileName_, mplParams)) {
         globalLogger__.error("Cannot create save file " + saveFileName_);
         errorSignal_.emit("Could not create save file. You can notify this "
