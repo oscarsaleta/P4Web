@@ -1,8 +1,0 @@
-doxygen/
-build/
-log.txt
-*.bak
-wt_config.xml
-auth.db
-.vscode/
-wp4.sublime*
