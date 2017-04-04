@@ -53,6 +53,10 @@ This project would not be possible without the support of Joan Torregrossa, and 
 
 ![orbits.png](screenshots/orbits.png)
 
+### Vector field with common factor: GCF evaluation
+
+![gcf.png](screenshots/gcf.png)
+
 ## Want to try it locally?
 
 **Requirements:**
