@@ -46,3 +46,8 @@ else ()
 endif ()
 
 add_subdirectory (src)
+
+configure_file(
+    "${PROJECT_SOURCE_DIR}/resources/xml/strings.xml.in"
+    "${PROJECT_SOURCE_DIR}/resources/xml/strings.xml"
+)
