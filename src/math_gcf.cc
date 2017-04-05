@@ -152,7 +152,7 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
     }
 
     if (value)
-        return evaluateMapleScript(fname);
+        return evaluateMapleScript(fname).si_status;
     else
         return -1;
 }

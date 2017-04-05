@@ -12,8 +12,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string>
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <unistd.h>
 #include <vector>
 
@@ -121,14 +119,17 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms)
     globalLogger__.debug("ScriptHandler :: filled Maple file");
 }
 
-int evaluateMapleScript(std::string fname)
+siginfo_t evaluateMapleScript(std::string fname)
 {
     globalLogger__.debug(
         "ScriptHandler :: Will fork Maple process for script " + fname);
     pid_t pid = fork();
     if (pid < 0) {
         globalLogger__.error("HomeLeft :: error forking Maple thread.");
-        return pid;
+        siginfo_t pinfo;
+        pinfo.si_pid = -1;
+        pinfo.si_code = -1;
+        return pinfo;
     } else if (pid == 0) {
         // create vector of arguments for execvp
         std::vector<char *> commands;
@@ -152,13 +153,16 @@ int evaluateMapleScript(std::string fname)
         // execute command
         char **command = commands.data();
         int status = execvp(command[0], command);
-        return status; // NOTE needed?
+        // return status; // NOTE needed?
     } else {
         siginfo_t infop;
-        waitid(P_PID,pid, &infop, WEXITED|WSTOPPED);
+        infop.si_pid = 0;
+        do {
+            waitid(P_PID, pid, &infop, WEXITED | WSTOPPED | WNOHANG);
+        } while (infop.si_pid == 0);
         globalLogger__.debug(
             "ScriptHandler :: forked Maple execution finished");
-        return infop.si_status;
+        return infop;
     }
 }
 

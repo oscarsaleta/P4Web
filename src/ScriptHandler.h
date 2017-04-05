@@ -30,6 +30,9 @@
 
 #include "file_tab.h"
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 #ifdef ANTZ
 #define MAPLE_PATH "/usr/share/maple11/bin/maple" ///< path to Maple executable
 #define P4_BINDIR "/home/p4/p4/bin/"              ///< path to P4 Maple scripts
@@ -221,7 +224,7 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms);
  *
  * Forks a Maple process and waits for it to finish
  */
-int evaluateMapleScript(std::string fname);
+siginfo_t evaluateMapleScript(std::string fname);
 /**
  * Create a file that contains the execution parameters
  *

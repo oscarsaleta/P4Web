@@ -28,6 +28,8 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <vector>
 
 #include <Wt/WAnchor>
@@ -516,14 +518,22 @@ void HomeLeft::evaluate()
         return;
     }
 
-    int status = evaluateMapleScript(fileUploadName_);
-    if (status == 0) {
+    siginfo_t status = evaluateMapleScript(fileUploadName_);
+    if (status.si_status == 0) {
         evaluatedSignal_.emit(fileUploadName_);
-        globalLogger__.debug("HomeLeft :: Maple script successfully executed");
+        globalLogger__.debug("HomeLeft :: Maple script executed");
     } else {
-        errorSignal_.emit("Error during Maple script execution");
-        globalLogger__.error("HomeLeft :: Maple error: " +
-                             std::to_string(status));
+        if (status.si_code == CLD_EXITED) {
+            evaluatedSignal_.emit(fileUploadName_);
+            // errorSignal_.emit("Maple process terminated prematurely (.");
+            globalLogger__.error("HomeLeft :: Maple error");
+        } else if (status.si_code == CLD_KILLED) {
+            errorSignal_.emit("Maple process killed by system.");
+            globalLogger__.error("HomeLeft :: Maple process killed by system");
+        } else {
+            errorSignal_.emit("Unknown error when creating Maple process.");
+            globalLogger__.error("HomeLeft :: unkwnown error in Maple process");
+        }
     }
 }
 
