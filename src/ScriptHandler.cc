@@ -154,11 +154,11 @@ int evaluateMapleScript(std::string fname)
         int status = execvp(command[0], command);
         return status; // NOTE needed?
     } else {
-        int status;
-        waitpid(pid, &status, 0);
+        siginfo_t infop;
+        waitid(P_PID,pid, &infop, WEXITED|WSTOPPED);
         globalLogger__.debug(
             "ScriptHandler :: forked Maple execution finished");
-        return status;
+        return infop.si_status;
     }
 }
 
