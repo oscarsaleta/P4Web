@@ -219,12 +219,13 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms);
 /**
  * Evaluate a Maple script
  *
- * @param fname filename of Maple script
- * @return      return status of the forked process
+ * @param fname   filename of Maple script
+ * @param maxtime max number of seconds for execution
+ * @return        return status of the forked process
  *
  * Forks a Maple process and waits for it to finish
  */
-siginfo_t evaluateMapleScript(std::string fname);
+siginfo_t evaluateMapleScript(std::string fname, int maxtime);
 /**
  * Create a file that contains the execution parameters
  *
@@ -288,5 +289,7 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
  */
 bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
                            int numpoints);
+
+inline void delay(unsigned long ms);
 
 #endif

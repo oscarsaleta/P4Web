@@ -518,7 +518,8 @@ void HomeLeft::evaluate()
         return;
     }
 
-    siginfo_t status = evaluateMapleScript(fileUploadName_);
+    siginfo_t status =
+        evaluateMapleScript(fileUploadName_, stoi(mplParams.time_limit));
     if (status.si_status == 0) {
         evaluatedSignal_.emit(fileUploadName_);
         globalLogger__.debug("HomeLeft :: Maple script executed");
@@ -530,6 +531,9 @@ void HomeLeft::evaluate()
         } else if (status.si_code == CLD_KILLED) {
             errorSignal_.emit("Maple process killed by system.");
             globalLogger__.error("HomeLeft :: Maple process killed by system");
+        } else if (status.si_code == -2) {
+            errorSignal_.emit("Computation ran out of time");
+            globalLogger__.error("HomeLeft :: Maple computation ran out of time");
         } else {
             errorSignal_.emit("Unknown error when creating Maple process.");
             globalLogger__.error("HomeLeft :: unkwnown error in Maple process");

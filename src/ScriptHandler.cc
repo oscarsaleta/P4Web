@@ -119,7 +119,7 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms)
     globalLogger__.debug("ScriptHandler :: filled Maple file");
 }
 
-siginfo_t evaluateMapleScript(std::string fname)
+siginfo_t evaluateMapleScript(std::string fname, int maxtime)
 {
     globalLogger__.debug(
         "ScriptHandler :: Will fork Maple process for script " + fname);
@@ -157,11 +157,23 @@ siginfo_t evaluateMapleScript(std::string fname)
     } else {
         siginfo_t infop;
         infop.si_pid = 0;
-        do {
+        for (int tries=0; tries<maxtime; tries++) {
             waitid(P_PID, pid, &infop, WEXITED | WSTOPPED | WNOHANG);
-        } while (infop.si_pid == 0);
-        globalLogger__.debug(
-            "ScriptHandler :: forked Maple execution finished");
+            if (infop.si_pid != 0) {
+                globalLogger__.debug("ScriptHandler :: forked Maple execution finished");
+                return infop;
+            }
+            delay(1000);
+        }
+        char *aux = new char[128];
+        strcat(aux,"kill ");
+        strcat(aux,std::to_string(pid).c_str());
+        strcat(aux,"\0");
+        globalLogger__.error("ScriptHandler :: "+ std::string(aux));
+        system(aux);
+        globalLogger__.error("ScriptHandler :: Maple execution took too much time");
+        infop.si_status = -2;
+        infop.si_code = -2;
         return infop;
     }
 }
@@ -334,3 +346,18 @@ bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
     globalLogger__.error("ScriptHandler :: cannot prepare GCF_LyapunovR2 file");
     return false;
 }
+
+#if defined(__WIN32__) || defined(_WIN32) || defined(WIN32) ||                 \
+    defined(__WINDOWS__) || defined(__TOS_WIN__)
+
+#include <windows.h>
+
+inline void delay(unsigned long ms) { Sleep(ms); }
+
+#else /* presume POSIX */
+
+#include <unistd.h>
+
+inline void delay(unsigned long ms) { usleep(ms * 1000); }
+
+#endif
