@@ -10,6 +10,7 @@
 
 #include <cstdlib>
 #include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <string>
 #include <unistd.h>
@@ -157,21 +158,21 @@ siginfo_t evaluateMapleScript(std::string fname, int maxtime)
     } else {
         siginfo_t infop;
         infop.si_pid = 0;
-        for (int tries=0; tries<maxtime; tries++) {
+        for (int tries = 0; tries < maxtime; tries++) {
             waitid(P_PID, pid, &infop, WEXITED | WSTOPPED | WNOHANG);
             if (infop.si_pid != 0) {
-                globalLogger__.debug("ScriptHandler :: forked Maple execution finished");
+                globalLogger__.debug(
+                    "ScriptHandler :: forked Maple execution finished");
                 return infop;
             }
             delay(1000);
         }
-        char *aux = new char[128];
-        strcat(aux,"kill ");
-        strcat(aux,std::to_string(pid).c_str());
-        strcat(aux,"\0");
-        globalLogger__.error("ScriptHandler :: "+ std::string(aux));
-        system(aux);
-        globalLogger__.error("ScriptHandler :: Maple execution took too much time");
+        std::string aux("pkill -TERM -P " + std::to_string(pid));
+        globalLogger__.error("ScriptHandler :: " + aux);
+        system(aux.c_str());
+        kill(pid, SIGTERM);
+        globalLogger__.error(
+            "ScriptHandler :: Maple execution took too much time");
         infop.si_status = -2;
         infop.si_code = -2;
         return infop;
