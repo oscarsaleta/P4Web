@@ -226,9 +226,9 @@ void HomeLeft::fileUploaded()
     std::string extension = fileUploadWidget_->clientFileName().toUTF8().substr(
         fileUploadWidget_->clientFileName().toUTF8().find_last_of(".") + 1);
     if (extension != "inp") {
-        errorSignal_.emit("Filetype not accepted.");
         globalLogger__.warning(
             "HomeLeft :: client tried to upload a not supported file type");
+        errorSignal_.emit("Filetype not accepted.");
         return;
     }
 
@@ -260,9 +260,9 @@ void HomeLeft::fileUploaded()
 
 void HomeLeft::fileTooLarge()
 {
-    errorSignal_.emit("File too large.");
     globalLogger__.warning(
         "HomeLeft :: Client tried to upload file too large.");
+    errorSignal_.emit("File too large.");
 }
 
 void HomeLeft::parseInputFile()
@@ -355,23 +355,23 @@ void HomeLeft::parseInputFile()
             }
         }
         if (f.eof() && i < 12) {
-            errorSignal_.emit("Invalid input file.");
             globalLogger__.error(
                 "HomeLeft :: EOF while reading input file uploaded with name " +
                 fileUploadName_);
+            errorSignal_.emit("Invalid input file.");
             fileUploadName_ = std::string();
         } else if (f.bad()) {
-            errorSignal_.emit("Invalid input file.");
             globalLogger__.error("HomeLeft :: I/O error while reading input "
                                  "file uploaded with name " +
                                  fileUploadName_);
+            errorSignal_.emit("Invalid input file.");
             fileUploadName_ = std::string();
         } else {
             // prepareSaveFile();
-            errorSignal_.emit(
-                "File uploaded. Press the Evaluate button to start computing.");
             globalLogger__.debug("HomeLeft :: Input file uploaded with name " +
                                  fileUploadName_);
+            errorSignal_.emit(
+                "File uploaded. Press the Evaluate button to start computing.");
         }
         f.close();
     }
