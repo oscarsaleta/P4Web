@@ -228,7 +228,7 @@ void HomeRight::fullResults()
     outputTextAreaContent_ = fullResults_;
     outputTextArea_->setText(outputTextAreaContent_);
     tabWidget_->setCurrentIndex(0);
-    globalLogger__.debug("HomeRight :: showing full results");
+    globalLogger__.debug("HomeRight :: showing output panel");
 }
 
 void HomeRight::showFinResults()
@@ -249,7 +249,7 @@ void HomeRight::clearResults()
 {
     outputTextArea_->setText("");
     outputTextAreaContent_ = "";
-    globalLogger__.debug("HomeRight :: cleared results");
+    globalLogger__.debug("HomeRight :: cleared output panel");
 }
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
@@ -325,11 +325,15 @@ void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
     if (dir == 1 || dir == -1)
         orbitStarted_ = sphere_->startOrbit(x0, y0, true);
 
-    globalLogger__.debug("HomeRight :: orbit started = " +
-                         std::to_string(orbitStarted_));
+    if (dir == 1)
+        globalLogger__.debug("HomeRight :: integrating forwards...");
+    else if (dir == -1)
+        globalLogger__.debug("HomeRight :: integrating backwards...");
+    else
+        globalLogger__.debug("HomeRight :: continuing integration...");
 
     sphere_->integrateOrbit(dir);
-    globalLogger__.debug("HomeRight :: orbit integrated...");
+
     // update with flag PaintUpdate so widget is not cleared before painting
     // orbit
     sphere_->update(PaintUpdate);
@@ -356,7 +360,6 @@ void HomeRight::onOrbitsDelete(int flag)
         tabWidget_->setCurrentIndex(1);
 }
 
-// FIXME:
 void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints,
                           int prec)
 {
