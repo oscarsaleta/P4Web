@@ -54,6 +54,14 @@
   </message>
 
   <!-- Tooltips -->
+  
+  <message id="tooltip.vectorfield">
+    Enter your differential equations here. Use Maple syntax.  
+  </message>
+
+  <message id="tooltip.gcf">
+    (Optional field): enter the GCF of the vector field here, if present.
+  </message>
 
   <message id="tooltip.calculations" style="margin-left:5px">
     Let the symbolic manipulator work in algebraic or numeric mode.
@@ -159,10 +167,6 @@
 
   <message id="tooltip.view-maxy">
     Maximum coordinate on the vertical axis. Only relevant for plane or chart view.  
-  </message>
-
-  <message id="tooltip.vectorfield">
-    Enter your differential equations here. Use Maple syntax.  
   </message>
 
   <message id="tooltip.orbits-selected-point">

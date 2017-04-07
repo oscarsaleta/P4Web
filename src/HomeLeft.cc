@@ -125,6 +125,7 @@ void HomeLeft::setupUI()
     t->bindString("vf-tooltip", WString::tr("tooltip.vectorfield"));
     t->bindWidget("xeq", xEquationInput_);
     t->bindWidget("yeq", yEquationInput_);
+    t->bindString("gcf-tooltip", WString::tr("tooltip.gcf"));
     t->bindWidget("gcf", gcfEquationInput_);
 
     // eval button
@@ -533,7 +534,8 @@ void HomeLeft::evaluate()
             globalLogger__.error("HomeLeft :: Maple process killed by system");
         } else if (status.si_code == -2) {
             errorSignal_.emit("Computation ran out of time");
-            globalLogger__.error("HomeLeft :: Maple computation ran out of time");
+            globalLogger__.error(
+                "HomeLeft :: Maple computation ran out of time");
         } else {
             errorSignal_.emit("Unknown error when creating Maple process.");
             globalLogger__.error("HomeLeft :: unkwnown error in Maple process");
@@ -1055,7 +1057,10 @@ void HomeLeft::onOrbitsBackwardsBtn()
     orbitsDeleteOneBtn_->enable();
     orbitsDeleteAllBtn_->enable();
     orbitsBackwardsBtn_->disable();
-
+    
+    globalLogger__.debug("HomeLeft :: orbit start (" +
+                         orbitsXLineEdit_->text().toUTF8() + "," +
+                         orbitsYLineEdit_->text().toUTF8() + ")");
     orbitIntegrateSignal_.emit(-1, std::stod(orbitsXLineEdit_->text()),
                                std::stod(orbitsYLineEdit_->text()));
 }
@@ -1076,6 +1081,7 @@ void HomeLeft::onOrbitsDeleteOneBtn()
     // orbitsDeleteAllBtn_->disable();
     // orbitsDeleteOneBtn_->disable();
 
+    globalLogger__.debug("HomeLeft :: deleted last orbit");
     orbitDeleteSignal_.emit(1);
 }
 
@@ -1087,6 +1093,7 @@ void HomeLeft::onOrbitsDeleteAllBtn()
     orbitsForwardsBtn_->enable();
     orbitsBackwardsBtn_->enable();
 
+    globalLogger__.debug("HomeLeft :: deleted all orbits");
     orbitDeleteSignal_.emit(0);
 }
 
