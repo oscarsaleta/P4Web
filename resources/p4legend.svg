@@ -16,7 +16,7 @@
    inkscape:version="0.91 r13725"
    viewBox="0 0 800 600"
    sodipodi:docname="New document 3.2017_04_18_12_30_08.1.svg"
-   inkscape:export-filename="/home/osr/Escriptori/test"
+   inkscape:export-filename="/home/osr/Escriptori/p4legend.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -524,17 +524,17 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.76959038px;line-height:125%;font-family:'Anonymous Pro for Powerline';-inkscape-font-specification:'Anonymous Pro for Powerline';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="408.4996"
-       y="504.64105"
+       y="519.64404"
        id="text3519-9-9-8-0"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          x="408.4996"
-         y="504.64105"
+         y="519.64404"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.76959038px;font-family:'Anonymous Pro for Powerline';-inkscape-font-specification:'Anonymous Pro for Powerline'"
          id="tspan4857-4-3">Limit cycles:</tspan></text>
     <path
        style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:start;white-space:normal;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:#ff00ff;stroke-width:1.29730511px;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
-       d="m 409.63665,528.64865 0,0.7027 93.96891,0 0,-0.7027 -93.96891,0 z"
+       d="m 409.63665,538.64865 0,0.7027 93.96891,0 0,-0.7027 -93.96891,0 z"
        id="path4721-7-5-6"
        inkscape:connector-curvature="0" />
   </g>
