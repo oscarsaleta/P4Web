@@ -188,6 +188,7 @@ void HomeLeft::setupUI()
         new WImage(WLink("resources/p4legend.png"), legendContainer);
     legend->setAlternateText("Plot legend");
     legend->setId("legend");
+    legend->resize(400,300);
     t->bindWidget("img", legend);
 
     globalLogger__.debug("HomeLeft :: UI set up");
