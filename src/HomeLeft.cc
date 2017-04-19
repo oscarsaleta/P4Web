@@ -75,7 +75,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent)
     mplParams.str_sepexe = "separatrice";
     mplParams.str_exeprefix = "";
     mplParams.str_platform = "LINUX";
-    mplParams.str_sumtablepath = "/usr/local/p4/sumtables/";
+    mplParams.str_sumtablepath = mplParams.str_bindir+"../sumtables/";
     mplParams.str_removecmd = "rm";
     mplParams.str_simplify = "false";
     mplParams.str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
