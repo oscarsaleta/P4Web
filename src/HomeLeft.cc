@@ -75,7 +75,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent)
     mplParams.str_sepexe = "separatrice";
     mplParams.str_exeprefix = "";
     mplParams.str_platform = "LINUX";
-    mplParams.str_sumtablepath = mplParams.str_bindir+"../sumtables/";
+    mplParams.str_sumtablepath = mplParams.str_bindir + "../sumtables/";
     mplParams.str_removecmd = "rm";
     mplParams.str_simplify = "false";
     mplParams.str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
@@ -128,6 +128,7 @@ void HomeLeft::setupUI()
     t->bindString("gcf-tooltip", WString::tr("tooltip.gcf"));
     t->bindWidget("gcf", gcfEquationInput_);
 
+    /* Buttons */
     // eval button
     evalButton_ = new WPushButton("Evaluate", equationsBox_);
     evalButton_->setId("evalButton_");
@@ -188,7 +189,7 @@ void HomeLeft::setupUI()
         new WImage(WLink("resources/p4legend.png"), legendContainer);
     legend->setAlternateText("Plot legend");
     legend->setId("legend");
-    legend->resize(400,300);
+    legend->resize(400, 300);
     t->bindWidget("img", legend);
 
     globalLogger__.debug("HomeLeft :: UI set up");
@@ -406,7 +407,7 @@ void HomeLeft::setParams()
         // validators
         double dval;
         int ival;
-        // set parameters
+        // set options
         mplParams.str_critpoints = "0";
         mplParams.str_saveall = "false";
         mplParams.str_numeric =
@@ -500,7 +501,7 @@ void HomeLeft::setParams()
 
 void HomeLeft::evaluate()
 {
-    // validate parameters
+    // validate options
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
         errorSignal_.emit(
             "Cannot evaluate yet, insert a vector field in the input forms.");
@@ -669,13 +670,13 @@ void HomeLeft::showSettings()
     WDoubleValidator *validator;
     WTemplate *t;
 
-    /* evaluation parameters */
+    /* evaluation options */
     settingsContainer_ = new WContainerWidget(this);
     settingsContainer_->setId("settingsContainer_");
-    tabs_->addTab(settingsContainer_, WString("Evaluation parameters"),
+    tabs_->addTab(settingsContainer_, WString("Evaluation options"),
                   WTabWidget::PreLoading);
 
-    t = new WTemplate(WString::tr("template.homeleft-parameters"),
+    t = new WTemplate(WString::tr("template.homeleft-options"),
                       settingsContainer_);
     t->addFunction("id", WTemplate::Functions::id);
 
@@ -772,7 +773,7 @@ void HomeLeft::showSettings()
     PLWeightQSpinBox_->setValue(PQ_DEFAULT);
     t->bindWidget("q", PLWeightQSpinBox_);
 
-    // enable separatrice test parameters only if separatrice testing is on Yes
+    // enable separatrice test options only if separatrice testing is on Yes
     levAppSpinBox_->disable();
     numericLevelSpinBox_->disable();
     maxLevelSpinBox_->disable();

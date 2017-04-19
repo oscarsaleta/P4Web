@@ -113,9 +113,9 @@
   <message id="tooltip.homeleft-plot-button">
     Plot the evaluated vector field in the Poincaré sphere.  
   </message>
-
+  
   <message id="tooltip.homeleft-save-button">
-    Save the current vector field and evaluation parameters to a P4 compatible
+    Save the current vector field and evaluation options to a P4 compatible
       input file.  
   </message>
 

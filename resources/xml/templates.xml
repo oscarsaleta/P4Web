@@ -115,8 +115,8 @@
     </div>
   </message>
 
-  <!-- HomeLeft evaluation parameters template -->
-  <message id="template.homeleft-parameters">
+  <!-- HomeLeft evaluation options template -->
+  <message id="template.homeleft-options">
     <p></p>
     <form class="form-horizontal">
       <div class="form-group">

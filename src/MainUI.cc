@@ -128,8 +128,10 @@ void MainUI::setupUI()
     copyright->setId("copyright");
     addWidget(copyright);
 
-    // connect signals sent from left to actions performed by right (and vice
-    // versa)
+    /* Connect signals sent from left to actions performed by right (and vice
+     * versa)
+     */
+    // signals from HomeLeft
     leftContainer_->evaluatedSignal().connect(rightContainer_,
                                               &HomeRight::readResults);
     leftContainer_->errorSignal().connect(rightContainer_,
@@ -143,8 +145,9 @@ void MainUI::setupUI()
         rightContainer_, &HomeRight::onOrbitsIntegrate);
     leftContainer_->orbitDeleteSignal().connect(rightContainer_,
                                                 &HomeRight::onOrbitsDelete);
-    leftContainer_->gcfSignal().connect(
-        rightContainer_, &HomeRight::onGcfEval); // TODO: fer aquesta funcio
+    leftContainer_->gcfSignal().connect(rightContainer_, &HomeRight::onGcfEval);
+
+    // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,
                                                    &HomeLeft::showOrbitsDialog);
     globalLogger__.debug("MainUI :: signals connected");

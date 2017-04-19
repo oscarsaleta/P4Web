@@ -213,6 +213,8 @@ class HomeRight : public Wt::WContainerWidget
 
     Wt::WTabWidget *tabWidget_;
 
+    Wt::WContainerWidget *paramsContainer_;
+    Wt::WPushButton *addParamBtn_;
     Wt::WContainerWidget *outputContainer_;
     Wt::WTextArea *outputTextArea_;
     Wt::WString outputTextAreaContent_;

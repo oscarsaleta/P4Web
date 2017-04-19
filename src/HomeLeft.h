@@ -353,7 +353,7 @@ class HomeLeft : public Wt::WContainerWidget
     void setupUI();
     // sets up connectors for buttons, forms, etc
     void setupConnectors();
-    // resets all parameters
+    // resets all options and parameters
     void resetUI();
     // what to do when file is uploaded
     void fileUploaded();

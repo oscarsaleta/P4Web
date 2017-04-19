@@ -76,6 +76,15 @@ void HomeRight::setupUI()
     tabWidget_ = new WTabWidget(this);
     tabWidget_->setId("tabWidget_");
 
+    // parameters tab ------
+    paramsContainer_ = new WContainerWidget();
+    tabWidget_->addTab(paramsContainer_, WString::fromUTF8("Parameters"),
+                       WTabWidget::PreLoading);
+    addParamBtn_ = new WPushButton("Add parameter",paramsContainer_);
+    addParamBtn_->setId("addParamBtn_");
+    addParamBtn_->setStyleClass("btn btn-primary");
+    addParamBtn_->setMargin(10,Top);
+
     // output tab ----
     outputContainer_ = new WContainerWidget();
     outputContainer_->setId("outputContainer_");
