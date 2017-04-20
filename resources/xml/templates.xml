@@ -298,4 +298,14 @@
     </div>
   </message>
 
+  <!-- HomeRight parameters row template -->
+  <message id="template.params">
+    <p/>
+    <div class="row">
+      <div class="col-sm-4">${label}</div>
+      <label class="control-label col-sm-1">=</label>
+      <div class="col-sm-7">${value}</div>
+    </div>
+  </message>
+
 </messages>

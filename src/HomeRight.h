@@ -211,10 +211,21 @@ class HomeRight : public Wt::WContainerWidget
     double viewMinY_;
     double viewMaxY_;
 
+    /* OBJECTS */
+
     Wt::WTabWidget *tabWidget_;
 
+    // parameters tab
     Wt::WContainerWidget *paramsContainer_;
+    Wt::WScrollArea *paramsScrollArea_;
+    Wt::WContainerWidget *paramsScrollAreaContainer_;
     Wt::WPushButton *addParamBtn_;
+    Wt::WPushButton *delParamBtn_;
+    std::vector<Wt::WLineEdit *> *labelsVector_;
+    std::vector<Wt::WLineEdit *> *valuesVector_;
+    std::vector<Wt::WTemplate *> *templatesVector_;
+
+    // output tab
     Wt::WContainerWidget *outputContainer_;
     Wt::WTextArea *outputTextArea_;
     Wt::WString outputTextAreaContent_;
@@ -229,6 +240,7 @@ class HomeRight : public Wt::WContainerWidget
     std::string finResults_;
     std::string infResults_;
 
+    // plot tab
     WSphere *sphere_;
 
     Wt::WContainerWidget *plotContainer_;
@@ -238,14 +250,23 @@ class HomeRight : public Wt::WContainerWidget
     Wt::WPushButton         *plotPointsButton_;
     Wt::WPushButton         *plotSeparatricesButton_;*/
 
+
+    /* FUNCTIONS */
+
     void setupUI();
     void setupConnectors();
 
+    // parameters functions
+    void addParameter();
+    void delParameter();
+
+    // output functions
     void fullResults();
     void showFinResults();
     void showInfResults();
     void clearResults();
 
+    // plot functions
     void setupSphereAndPlot();
 
     void sphereClicked(Wt::WMouseEvent e);
@@ -253,6 +274,8 @@ class HomeRight : public Wt::WContainerWidget
     /*void plotSingularPoints();
     void plotSeparatrices();
     void clearPlot();*/
+
+    /* SIGNALS */
 
     Wt::Signal<bool, double, double> sphereClickedSignal_;
 };

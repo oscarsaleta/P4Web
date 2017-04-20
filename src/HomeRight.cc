@@ -30,9 +30,12 @@
 #include <Wt/WEvent>
 #include <Wt/WGroupBox>
 #include <Wt/WImage>
+#include <Wt/WLineEdit>
 #include <Wt/WMenuItem>
 #include <Wt/WPushButton>
+#include <Wt/WScrollArea>
 #include <Wt/WTabWidget>
+#include <Wt/WTemplate>
 #include <Wt/WToolBar>
 
 using namespace Wt;
@@ -50,6 +53,10 @@ HomeRight::HomeRight(WContainerWidget *parent)
     setupConnectors();
 
     tabWidget_->setCurrentIndex(0);
+
+    templatesVector_ = new std::vector<WTemplate *>();
+    labelsVector_ = new std::vector<WLineEdit *>();
+    valuesVector_ = new std::vector<WLineEdit *>();
 
     globalLogger__.debug("HomeRight :: created correctly");
 }
@@ -80,10 +87,23 @@ void HomeRight::setupUI()
     paramsContainer_ = new WContainerWidget();
     tabWidget_->addTab(paramsContainer_, WString::fromUTF8("Parameters"),
                        WTabWidget::PreLoading);
-    addParamBtn_ = new WPushButton("Add parameter",paramsContainer_);
+
+    paramsScrollArea_ = new WScrollArea(paramsContainer_);
+    paramsScrollAreaContainer_ = new WContainerWidget();
+    paramsScrollArea_->setWidget(paramsScrollAreaContainer_);
+    paramsScrollArea_->setHorizontalScrollBarPolicy(
+        WScrollArea::ScrollBarAlwaysOff);
+    paramsScrollArea_->setMinimumSize(550, 550);
+    paramsScrollArea_->resize(WLength::Auto, 550);
+    addParamBtn_ = new WPushButton("Add parameter", paramsContainer_);
     addParamBtn_->setId("addParamBtn_");
     addParamBtn_->setStyleClass("btn btn-primary");
-    addParamBtn_->setMargin(10,Top);
+    addParamBtn_->setMargin(15, Top);
+    delParamBtn_ = new WPushButton("Remove parameter", paramsContainer_);
+    delParamBtn_->setId("delParamBtn_");
+    delParamBtn_->setStyleClass("btn btn-danger");
+    delParamBtn_->setMargin(15,Top);
+    delParamBtn_->setMargin(10,Left);
 
     // output tab ----
     outputContainer_ = new WContainerWidget();
@@ -173,6 +193,9 @@ void HomeRight::setupUI()
 
 void HomeRight::setupConnectors()
 {
+    // parameters buttons
+    addParamBtn_->clicked().connect(this, &HomeRight::addParameter);
+    delParamBtn_->clicked().connect(this, &HomeRight::delParameter);
     // output buttons
     fullResButton_->clicked().connect(this, &HomeRight::fullResults);
     finResButton_->clicked().connect(this, &HomeRight::showFinResults);
@@ -402,3 +425,50 @@ void HomeRight::plotSeparatrices()
 {
     return;
 }*/
+
+void HomeRight::addParameter()
+{
+    // TODO: necessitem
+    // 2 vectors de lineedits (un per labels i un per values)
+    // 2 vectors de strings (un per labels i un per values) ??
+
+    WTemplate *t = new WTemplate(WString::tr("template.params"),
+                                 paramsScrollAreaContainer_);
+    t->addFunction("id", WTemplate::Functions::id);
+    templatesVector_->push_back(t);
+
+    WLineEdit *label = new WLineEdit(paramsScrollAreaContainer_);
+    labelsVector_->push_back(label);
+    t->bindWidget("label", label);
+    WLineEdit *value = new WLineEdit(paramsScrollAreaContainer_);
+    valuesVector_->push_back(value);
+    t->bindWidget("value", value);
+}
+
+void HomeRight::delParameter()
+{
+    if (!labelsVector_->empty()) {
+        WLineEdit *label = labelsVector_->back();
+        if (label != nullptr) {
+            delete label;
+            label = nullptr;
+            labelsVector_->pop_back();
+        }
+    }
+    if (!valuesVector_->empty()) {
+        WLineEdit *value = valuesVector_->back();
+        if (value != nullptr) {
+            delete value;
+            value = nullptr;
+            valuesVector_->pop_back();
+        }
+    }
+    if (!templatesVector_->empty()) {
+        WTemplate *t = templatesVector_->back();
+        if (t != nullptr) {
+            delete t;
+            t = nullptr;
+            templatesVector_->pop_back();
+        }
+    }
+}
