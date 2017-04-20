@@ -88,6 +88,21 @@ void HomeRight::setupUI()
     tabWidget_->addTab(paramsContainer_, WString::fromUTF8("Parameters"),
                        WTabWidget::PreLoading);
 
+    addParamBtn_ = new WPushButton("Add", paramsContainer_);
+    addParamBtn_->setId("addParamBtn_");
+    addParamBtn_->setStyleClass("btn btn-primary");
+    addParamBtn_->setMargin(15, Top);
+    addParamBtn_->setMargin(15, Bottom);
+    addParamBtn_->setToolTip(WString::tr("tooltip.homeright-addparam-button"));
+
+    delParamBtn_ = new WPushButton("Remove", paramsContainer_);
+    delParamBtn_->setId("delParamBtn_");
+    delParamBtn_->setStyleClass("btn btn-danger");
+    delParamBtn_->setToolTip(WString::tr("tooltip.homeright-delparam-button"));
+    delParamBtn_->setMargin(15, Top);
+    delParamBtn_->setMargin(15, Bottom);
+    delParamBtn_->setMargin(10, Left);
+
     paramsScrollArea_ = new WScrollArea(paramsContainer_);
     paramsScrollAreaContainer_ = new WContainerWidget();
     paramsScrollArea_->setWidget(paramsScrollAreaContainer_);
@@ -95,15 +110,6 @@ void HomeRight::setupUI()
         WScrollArea::ScrollBarAlwaysOff);
     paramsScrollArea_->setMinimumSize(550, 550);
     paramsScrollArea_->resize(WLength::Auto, 550);
-    addParamBtn_ = new WPushButton("Add parameter", paramsContainer_);
-    addParamBtn_->setId("addParamBtn_");
-    addParamBtn_->setStyleClass("btn btn-primary");
-    addParamBtn_->setMargin(15, Top);
-    delParamBtn_ = new WPushButton("Remove parameter", paramsContainer_);
-    delParamBtn_->setId("delParamBtn_");
-    delParamBtn_->setStyleClass("btn btn-danger");
-    delParamBtn_->setMargin(15,Top);
-    delParamBtn_->setMargin(10,Left);
 
     // output tab ----
     outputContainer_ = new WContainerWidget();
@@ -130,22 +136,19 @@ void HomeRight::setupUI()
     fullResButton_ = new WPushButton("Full output");
     fullResButton_->setId("fullResButton_");
     fullResButton_->setStyleClass("btn-default btn");
-    fullResButton_->setToolTip(WString::tr("tooltip.homeright-full-button"),
-                               XHTMLText);
+    fullResButton_->setToolTip(WString::tr("tooltip.homeright-full-button"));
     outputButtonsToolbar_->addButton(fullResButton_);
 
     finResButton_ = new WPushButton("Finite");
     finResButton_->setId("finResButton_");
     finResButton_->setStyleClass("btn-default btn");
-    finResButton_->setToolTip(WString::tr("tooltip.homeright-finite-button"),
-                              XHTMLText);
+    finResButton_->setToolTip(WString::tr("tooltip.homeright-finite-button"));
     outputButtonsToolbar_->addButton(finResButton_);
 
     infResButton_ = new WPushButton("Infinite");
     infResButton_->setId("infResButton_");
     infResButton_->setStyleClass("btn-default btn");
-    infResButton_->setToolTip(WString::tr("tooltip.homeright-infinite-button"),
-                              XHTMLText);
+    infResButton_->setToolTip(WString::tr("tooltip.homeright-infinite-button"));
     outputButtonsToolbar_->addButton(infResButton_);
 
     outputButtonsToolbar_->addSeparator();
@@ -154,7 +157,7 @@ void HomeRight::setupUI()
     clearOutputButton_->setId("clearOutputButton_");
     clearOutputButton_->setStyleClass("btn-warning btn");
     clearOutputButton_->setToolTip(
-        WString::tr("tooltip.homeright-clear-button"), XHTMLText);
+        WString::tr("tooltip.homeright-clear-button"));
     outputButtonsToolbar_->addButton(clearOutputButton_);
 
     // plot tab ----
