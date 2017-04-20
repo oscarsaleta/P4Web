@@ -123,6 +123,14 @@
     Clear the x' and y' input fields.  
   </message>
 
+  <message id="tooltip.homeright-addparam-button">
+    Add a parameter definition.
+  </message>
+
+  <message id="tooltip.homeright-delparam-button">
+    Remove a parameter from the list of parameter definitions.
+  </message>
+
   <message id="tooltip.homeright-full-button">
     Show the full Maple output for the currently evaluated vector field.  
   </message>
