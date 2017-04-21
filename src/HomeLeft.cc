@@ -272,6 +272,8 @@ void HomeLeft::parseInputFile()
     // read file and fill xEquationInput and yEquationInput
     std::ifstream f;
     std::string line;
+    bool hasParams = false;
+
     f.open(fileUploadName_.c_str());
 
     if (f.is_open()) {
@@ -376,6 +378,7 @@ void HomeLeft::parseInputFile()
                             break;
                         }
                         addParameterToList(label, value);
+                        hasParams = true;
                     }
                     break;
                 default:
@@ -415,8 +418,10 @@ void HomeLeft::parseInputFile()
             // prepareSaveFile();
             globalLogger__.debug("HomeLeft :: Input file uploaded with name " +
                                  fileUploadName_);
-            errorSignal_.emit(
-                "File uploaded. Press the Evaluate button to start computing.");
+            if (!hasParams) {
+                errorSignal_.emit("File uploaded. Press the Evaluate button to "
+                                  "start computing.");
+            }
         }
         f.close();
     }

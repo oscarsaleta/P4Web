@@ -42,7 +42,7 @@ using namespace Wt;
 
 HomeRight::HomeRight(WContainerWidget *parent)
     : WContainerWidget(parent), plotCaption_(nullptr), sphere_(nullptr),
-      orbitStarted_(false)
+      orbitStarted_(false), loggedIn_(false)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
@@ -52,7 +52,7 @@ HomeRight::HomeRight(WContainerWidget *parent)
     globalLogger__.debug("HomeRight :: setting up connectors...");
     setupConnectors();
 
-    tabWidget_->setCurrentIndex(0);
+    //tabWidget_->setCurrentIndex(0);
 
     templatesVector_ = new std::vector<WTemplate *>();
     labelsVector_ = new std::vector<WLineEdit *>();
@@ -82,34 +82,6 @@ void HomeRight::setupUI()
 {
     tabWidget_ = new WTabWidget(this);
     tabWidget_->setId("tabWidget_");
-
-    // parameters tab ------
-    paramsContainer_ = new WContainerWidget();
-    tabWidget_->addTab(paramsContainer_, WString::fromUTF8("Parameters"),
-                       WTabWidget::PreLoading);
-
-    addParamBtn_ = new WPushButton("Add", paramsContainer_);
-    addParamBtn_->setId("addParamBtn_");
-    addParamBtn_->setStyleClass("btn btn-primary");
-    addParamBtn_->setMargin(15, Top);
-    addParamBtn_->setMargin(15, Bottom);
-    addParamBtn_->setToolTip(WString::tr("tooltip.homeright-addparam-button"));
-
-    delParamBtn_ = new WPushButton("Remove", paramsContainer_);
-    delParamBtn_->setId("delParamBtn_");
-    delParamBtn_->setStyleClass("btn btn-danger");
-    delParamBtn_->setToolTip(WString::tr("tooltip.homeright-delparam-button"));
-    delParamBtn_->setMargin(15, Top);
-    delParamBtn_->setMargin(15, Bottom);
-    delParamBtn_->setMargin(10, Left);
-
-    paramsScrollArea_ = new WScrollArea(paramsContainer_);
-    paramsScrollAreaContainer_ = new WContainerWidget();
-    paramsScrollArea_->setWidget(paramsScrollAreaContainer_);
-    paramsScrollArea_->setHorizontalScrollBarPolicy(
-        WScrollArea::ScrollBarAlwaysOff);
-    paramsScrollArea_->setMinimumSize(550, 550);
-    paramsScrollArea_->resize(WLength::Auto, 550);
 
     // output tab ----
     outputContainer_ = new WContainerWidget();
@@ -191,6 +163,37 @@ void HomeRight::setupUI()
 
 */
 
+    // parameters tab ------
+    paramsContainer_ = new WContainerWidget();
+    tabWidget_->addTab(paramsContainer_, WString::fromUTF8("Parameters"),
+                       WTabWidget::LazyLoading);
+
+    addParamBtn_ = new WPushButton("Add", paramsContainer_);
+    addParamBtn_->setId("addParamBtn_");
+    addParamBtn_->setStyleClass("btn btn-primary");
+    addParamBtn_->setMargin(15, Top);
+    addParamBtn_->setMargin(15, Bottom);
+    addParamBtn_->setToolTip(WString::tr("tooltip.homeright-addparam-button"));
+
+    delParamBtn_ = new WPushButton("Remove", paramsContainer_);
+    delParamBtn_->setId("delParamBtn_");
+    delParamBtn_->setStyleClass("btn btn-danger");
+    delParamBtn_->setToolTip(WString::tr("tooltip.homeright-delparam-button"));
+    delParamBtn_->setMargin(15, Top);
+    delParamBtn_->setMargin(15, Bottom);
+    delParamBtn_->setMargin(10, Left);
+
+    paramsScrollArea_ = new WScrollArea(paramsContainer_);
+    paramsScrollAreaContainer_ = new WContainerWidget();
+    paramsScrollArea_->setWidget(paramsScrollAreaContainer_);
+    paramsScrollArea_->setHorizontalScrollBarPolicy(
+        WScrollArea::ScrollBarAlwaysOff);
+    paramsScrollArea_->setMinimumSize(550, 550);
+    paramsScrollArea_->resize(WLength::Auto, 550);
+
+
+    tabWidget_->setCurrentIndex(0);
+    tabWidget_->setTabHidden(2,true);
     globalLogger__.debug("HomeRight :: UI set up");
 }
 
@@ -352,7 +355,10 @@ void HomeRight::onReset(int dummy)
     outputTextAreaContent_ = std::string();
     outputTextArea_->setText(outputTextAreaContent_);
 
-    tabWidget_->setCurrentIndex(0);
+    if (loggedIn_)
+        tabWidget_->setCurrentIndex(2);
+    else
+        tabWidget_->setCurrentIndex(0);
 }
 
 void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
@@ -448,6 +454,26 @@ void HomeRight::addParameter()
     t->bindWidget("value", value);
 }
 
+void HomeRight::addParameterWithValue(std::string strlabel, std::string strvalue)
+{
+    WTemplate *t = new WTemplate(WString::tr("template.params"),
+                                 paramsScrollAreaContainer_);
+    t->addFunction("id", WTemplate::Functions::id);
+    templatesVector_->push_back(t);
+
+    WLineEdit *label = new WLineEdit(paramsScrollAreaContainer_);
+    label->setText(strlabel);
+    labelsVector_->push_back(label);
+    t->bindWidget("label", label);
+    WLineEdit *value = new WLineEdit(paramsScrollAreaContainer_);
+    value->setText(strvalue);
+    valuesVector_->push_back(value);
+    t->bindWidget("value", value);
+
+    if (tabWidget_->currentIndex() != 2)
+        tabWidget_->setCurrentIndex(2);
+}
+
 void HomeRight::delParameter()
 {
     if (!labelsVector_->empty()) {
@@ -474,4 +500,20 @@ void HomeRight::delParameter()
             templatesVector_->pop_back();
         }
     }
+}
+
+void HomeRight::showParamsTab()
+{
+    loggedIn_ = true;
+    tabWidget_->setTabHidden(2,false);
+    if (tabWidget_->currentIndex() != 2)
+        tabWidget_->setCurrentIndex(2);
+}
+
+void HomeRight::hideParamsTab()
+{
+    loggedIn_ = false;
+    tabWidget_->setTabHidden(2,true);
+    if (tabWidget_->currentIndex() != 2)
+        tabWidget_->setCurrentIndex(2);
 }

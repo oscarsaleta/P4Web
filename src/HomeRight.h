@@ -203,7 +203,28 @@ class HomeRight : public Wt::WContainerWidget
      */
     void onGcfEval(std::string fname, int pointdash, int npoints, int prec);
 
+    /**
+     * Add a parameter to the list and fill the label and value
+     *
+     * This function will be called from HomeLeft when reading an input
+     * file with parameters.
+     *
+     * @param label name of the parameter
+     * @param value value of the parameter
+     */
+    void addParameterWithValue(std::string label, std::string value);
+
+    /**
+     * Set loggedIn_ = true and show parameters tab
+     */
+    void showParamsTab();
+    /**
+     * Set loggedIn_ = false and hide parameters tab
+     */
+    void hideParamsTab();
+
   private:
+    bool loggedIn_;
     bool orbitStarted_;
     int projection_;
     double viewMinX_;
@@ -249,7 +270,6 @@ class HomeRight : public Wt::WContainerWidget
     Wt::WPushButton         *clearPlotButton_;
     Wt::WPushButton         *plotPointsButton_;
     Wt::WPushButton         *plotSeparatricesButton_;*/
-
 
     /* FUNCTIONS */
 
