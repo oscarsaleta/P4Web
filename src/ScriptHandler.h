@@ -187,6 +187,9 @@ struct mapleParamsStruct {
      * time limit for Maple execution
      */
     std::string time_limit;
+    // TODO: ficar aqui els vectors de strings de label,value pels parametres
+    //std::vector<std::string> param_labels;
+    //std::vector<std::string> param_values;
 };
 
 /**
