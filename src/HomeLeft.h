@@ -22,6 +22,10 @@
 #include "ScriptHandler.h"
 
 /**
+ * Maximum number of parameters
+ */
+#define PARAMS_MAX 99
+/**
  * Minimum value for accuracy setting
  */
 #define ACCURACY_MIN 1
@@ -267,6 +271,15 @@ class HomeLeft : public Wt::WContainerWidget
      * needed functions of the sphere to compute the gcf
      */
     Wt::Signal<std::string, int, int, int> &gcfSignal() { return gcfSignal_; }
+    /**
+     * Signal to add a pair (label,value) to the parameters list
+     * 
+     * The parameters list is held in HomeRight
+     */
+    Wt::Signal<std::string, std::string> &addParameterSignal()
+    {
+        return addParameterSignal_;
+    }
 
     /* MAPLE FILE PARAMETERS */
     /**
@@ -276,6 +289,7 @@ class HomeLeft : public Wt::WContainerWidget
 
   private:
     bool evaluated_;
+    int nParams_;
 
     /* PUBLIC UI (no need to log in) */
     Wt::WGroupBox *equationsBox_;
@@ -347,6 +361,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<int> orbitDeleteSignal_;
     Wt::Signal<int> resetSignal_;
     Wt::Signal<std::string, int, int, int> gcfSignal_;
+    Wt::Signal<std::string, std::string> addParameterSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -361,6 +376,8 @@ class HomeLeft : public Wt::WContainerWidget
     void fileTooLarge();
     // read uploaded file
     void parseInputFile();
+    // add parameter to homeright list
+    void addParameterToList(std::string label, std::string value);
     // run maple on the script
     void evaluate();
     // write a tmp save file in server for download
@@ -369,7 +386,7 @@ class HomeLeft : public Wt::WContainerWidget
     // what to do when plot button is pressed
     void onPlot();
     // set default/widget evaluation parameters
-    void setParams();
+    void setOptions();
     // react to button presses in orbits tab
     void onOrbitsDialogChange();
     void onOrbitsForwardsBtn();

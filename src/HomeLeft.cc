@@ -277,8 +277,19 @@ void HomeLeft::parseInputFile()
     if (f.is_open()) {
         int i = 0;
         if (loggedIn_) {
-            while (std::getline(f, line)) {
+            // while (std::getline(f, line)) {
+            for (i = 0; i < 15; i++) {
+                std::getline(f, line);
+                if (line.empty()) {
+                    globalLogger__.error(
+                        "HomeLeft :: error reading input file, "
+                        "expected more lines.");
+                    break;
+                }
                 switch (i) {
+                case 0:
+                    // what is line 0?
+                    break;
                 case 1:
                     if (line == "0")
                         calculationsBtnGroup_->setCheckedButton(
@@ -342,10 +353,42 @@ void HomeLeft::parseInputFile()
                     break;
                 case 13:
                     gcfEquationInput_->setText(line);
+                case 14:
+                    if (stoi(line) > 0 && stoi(line) < PARAMS_MAX) {
+                        nParams_ = stoi(line);
+                    } else {
+                        nParams_ = 0;
+                    }
+                    for (int j = 0; j < nParams_; j++) {
+                        std::string label, value;
+                        std::getline(f, label);
+                        if (label.empty()) {
+                            globalLogger__.error("HomeLeft :: error reading "
+                                                 "input file, wrong number of "
+                                                 "parameters.");
+                            break;
+                        }
+                        std::getline(f, value);
+                        if (value.empty()) {
+                            globalLogger__.error("HomeLeft :: error reading "
+                                                 "input file, wrong number of "
+                                                 "parameters.");
+                            break;
+                        }
+                        addParameterToList(label, value);
+                    }
+                    break;
+                default:
+                    break;
+                    // TODO: llegir parametres i posarlos a la llista
+                    // 14: nparams
+                    // posteriors: paramlabel \ paramvalue, en diferents linies,
+                    // de 2 en 2
                 }
-                i++;
+                // i++;
             }
         } else {
+            int i = 0;
             while (std::getline(f, line)) {
                 if (i == 11)
                     xEquationInput_->setText(WString::fromUTF8(line));
@@ -379,7 +422,7 @@ void HomeLeft::parseInputFile()
     }
 }
 
-void HomeLeft::setParams()
+void HomeLeft::setOptions()
 {
     mplParams.str_xeq = xEquationInput_->text().toUTF8();
     mplParams.str_yeq = yEquationInput_->text().toUTF8();
@@ -510,7 +553,7 @@ void HomeLeft::evaluate()
 
     evaluated_ = true;
 
-    setParams();
+    setOptions();
 
     if (prepareMapleFile(fileUploadName_, mplParams)) {
         globalLogger__.debug("HomeLeft :: filled Maple script " +
@@ -565,7 +608,7 @@ void HomeLeft::prepareSaveFile()
     } else
         saveFileName_ = fileUploadName_;
 
-    setParams();
+    setOptions();
     if (!fillSaveFile(saveFileName_, mplParams)) {
         globalLogger__.error("Cannot create save file " + saveFileName_);
         errorSignal_.emit("Could not create save file. You can notify this "
@@ -1128,4 +1171,9 @@ void HomeLeft::onPlotGcfBtn()
         gcfSignal_.emit(fileUploadName_, gcfAppearanceBtnGrp_->checkedId(),
                         npoints, prec);
     }
+}
+
+void HomeLeft::addParameterToList(std::string label, std::string value)
+{
+    addParameterSignal_.emit(label, value);
 }
