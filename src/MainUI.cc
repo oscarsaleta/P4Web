@@ -146,6 +146,8 @@ void MainUI::setupUI()
     leftContainer_->orbitDeleteSignal().connect(rightContainer_,
                                                 &HomeRight::onOrbitsDelete);
     leftContainer_->gcfSignal().connect(rightContainer_, &HomeRight::onGcfEval);
+    leftContainer_->addParameterSignal().connect(
+        rightContainer_, &HomeRight::addParameterWithValue);
 
     // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,
@@ -165,9 +167,11 @@ void MainUI::onAuthEvent()
                             " logged in.");
         setLoginIndicator(session_.userName());
         leftContainer_->showSettings();
+        rightContainer_->showParamsTab();
     } else {
         globalLogger__.info("Auth :: User logged out.");
         leftContainer_->hideSettings();
+        rightContainer_->hideParamsTab();
         setLogoutIndicator();
     }
     WApplication::instance()->setInternalPath("/", true);
