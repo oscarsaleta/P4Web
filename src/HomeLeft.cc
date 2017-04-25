@@ -19,6 +19,7 @@
 
 #include "HomeLeft.h"
 
+#include "delete_pointer.h"
 #include "MyLogger.h"
 #include "custom.h"
 
@@ -85,12 +86,27 @@ HomeLeft::HomeLeft(WContainerWidget *parent)
 
 HomeLeft::~HomeLeft()
 {
-    delete fileUploadWidget_;
-    delete xEquationInput_;
-    delete yEquationInput_;
-    delete evalButton_;
-    delete plotButton_;
-    delete equationsBox_;
+    // main widget 
+
+    delete_pointer(fileUploadWidget_);
+
+    delete_pointer(xEquationInput_);
+    delete_pointer(yEquationInput_);
+    delete_pointer(gcfEquationInput_);
+
+    delete_pointer(evalButton_);
+    delete_pointer(plotButton_);
+    delete_pointer(prepSaveButton_);
+    delete_pointer(saveAnchor_);
+    delete_pointer(resetButton_);
+
+    delete_pointer(equationsBox_);
+
+    // tab widget
+
+    if (loggedIn_)
+        hideSettings();
+    delete_pointer(tabs_);
 
     globalLogger__.debug("HomeLeft :: deleted correctly");
 }
@@ -355,6 +371,7 @@ void HomeLeft::parseInputFile()
                     break;
                 case 13:
                     gcfEquationInput_->setText(line);
+                    break;
                 case 14:
                     if (stoi(line) > 0 && stoi(line) < PARAMS_MAX) {
                         nParams_ = stoi(line);
@@ -383,15 +400,10 @@ void HomeLeft::parseInputFile()
                     break;
                 default:
                     break;
-                    // TODO: llegir parametres i posarlos a la llista
-                    // 14: nparams
-                    // posteriors: paramlabel \ paramvalue, en diferents linies,
-                    // de 2 en 2
                 }
-                // i++;
             }
         } else {
-            int i = 0;
+            i = 0;
             while (std::getline(f, line)) {
                 if (i == 11)
                     xEquationInput_->setText(WString::fromUTF8(line));
@@ -427,8 +439,11 @@ void HomeLeft::parseInputFile()
     }
 }
 
+// TODO: posar aquí la captació de paràmetres de homeright?
 void HomeLeft::setOptions()
 {
+    parent_->getMapleParams();
+
     mplParams.str_xeq = xEquationInput_->text().toUTF8();
     mplParams.str_yeq = yEquationInput_->text().toUTF8();
     mplParams.str_gcf = gcfEquationInput_->text().empty()
@@ -559,8 +574,9 @@ void HomeLeft::evaluate()
     evaluated_ = true;
 
     setOptions();
-
-    if (prepareMapleFile(fileUploadName_, mplParams)) {
+    // TODO: agafar vectors de homeright abans de cridar a preparemaplefile
+    if (prepareMapleFile(fileUploadName_, mplParams, parent_->paramLabels_,
+                         parent_->paramValues_)) {
         globalLogger__.debug("HomeLeft :: filled Maple script " +
                              fileUploadName_);
     } else {
@@ -705,14 +721,8 @@ void HomeLeft::onPlot()
 void HomeLeft::showSettings()
 {
     loggedIn_ = true;
-    if (settingsContainer_ != nullptr) {
-        delete settingsContainer_;
-        settingsContainer_ = nullptr;
-    }
-    if (viewContainer_ != nullptr) {
-        delete viewContainer_;
-        viewContainer_ = nullptr;
-    }
+    delete_pointer(settingsContainer_);
+    delete_pointer(viewContainer_);
 
     WRadioButton *button;
     WDoubleValidator *validator;
