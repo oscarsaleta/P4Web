@@ -187,9 +187,6 @@ struct mapleParamsStruct {
      * time limit for Maple execution
      */
     std::string time_limit;
-    // TODO: ficar aqui els vectors de strings de label,value pels parametres
-    //std::vector<std::string> param_labels;
-    //std::vector<std::string> param_values;
 };
 
 /**
@@ -209,7 +206,9 @@ std::string randomFileName(std::string prefix, std::string suffix);
  *
  * Opens file and fills it (through calling fillMapleScript())
  */
-bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms);
+bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
+                      std::vector<std::string> &prmLabels,
+                      std::vector<std::string> &prmValues);
 /**
  * Fill a Maple script with the parameters and commands for evaluation
  *
@@ -218,7 +217,9 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms);
  *
  * Called from prepareMapleFile()
  */
-void fillMapleScript(FILE *f, mapleParamsStruct prms);
+void fillMapleScript(FILE *f, mapleParamsStruct prms,
+                     std::vector<std::string> &prmLabels,
+                     std::vector<std::string> &prmValues);
 /**
  * Evaluate a Maple script
  *

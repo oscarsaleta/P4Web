@@ -36,7 +36,9 @@ std::string randomFileName(std::string prefix, std::string suffix)
     return prefix;
 }
 
-bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms)
+bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
+                      std::vector<std::string> &prmLabels,
+                      std::vector<std::string> &prmValues)
 {
     globalLogger__.debug("ScriptHandler :: received order to prepare script " +
                          fname);
@@ -58,7 +60,7 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms)
     prms.str_infres = fname + "_inf.res";
 
     if (mplFile != nullptr) {
-        fillMapleScript(mplFile, prms);
+        fillMapleScript(mplFile, prms, prmLabels, prmValues);
         fclose(mplFile);
         globalLogger__.debug("ScriptHandler :: prepared Maple file " + fname);
         return true;
@@ -68,7 +70,9 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms)
     }
 }
 
-void fillMapleScript(FILE *f, mapleParamsStruct prms)
+void fillMapleScript(FILE *f, mapleParamsStruct prms,
+                     std::vector<std::string> &prmLabels,
+                     std::vector<std::string> &prmValues)
 {
     fprintf(f, "restart;\n");
     fprintf(f, "read( \"%s\" ):\n", prms.str_p4m.c_str());
@@ -99,6 +103,19 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms)
     fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", prms.str_gcf.c_str());
     fprintf(f, "  user_gcf := %s:\n", prms.str_gcf.c_str());
     fprintf(f, "else `quit(1)` end if:\n");
+
+    std::vector<std::string>::iterator it1;
+    std::vector<std::string>::iterator it2;
+    for (it1 = prmLabels.begin(), it2 = prmValues.begin();
+         it1 < prmLabels.end(), it2 < prmValues.end();
+         ++it1, ++it2) {
+        fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", it1->c_str());
+        fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n", it2->c_str());
+        fprintf(f, "    %s := %s:\n", it1->c_str(), it2->c_str());
+        fprintf(f, "  else `quit(1)` end if:\n");
+        fprintf(f, "else `quit(1)` end if:\n");        
+    }
+
     fprintf(f, "user_numeric := %s:\n", prms.str_numeric.c_str());
     fprintf(f, "epsilon := %s:\n", prms.str_epsilon.c_str());
     fprintf(f, "test_sep := %s:\n", prms.str_testsep.c_str());
