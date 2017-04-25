@@ -29,6 +29,8 @@
 
 #include <Wt/WString>
 
+#include <boost/shared_ptr.hpp>
+
 class WSphere;
 
 /**
@@ -223,6 +225,10 @@ class HomeRight : public Wt::WContainerWidget
      */
     void hideParamsTab();
 
+    void refreshParamStringVectors();
+    std::vector<std::string> paramLabels_;
+    std::vector<std::string> paramValues_;
+
   private:
     bool loggedIn_;
     bool orbitStarted_;
@@ -242,9 +248,9 @@ class HomeRight : public Wt::WContainerWidget
     Wt::WContainerWidget *paramsScrollAreaContainer_;
     Wt::WPushButton *addParamBtn_;
     Wt::WPushButton *delParamBtn_;
-    std::vector<Wt::WLineEdit *> *labelsVector_;
-    std::vector<Wt::WLineEdit *> *valuesVector_;
-    std::vector<Wt::WTemplate *> *templatesVector_;
+    std::vector<boost::shared_ptr<Wt::WLineEdit>> leLabelsVector_;
+    std::vector<boost::shared_ptr<Wt::WLineEdit>> leValuesVector_;
+    std::vector<boost::shared_ptr<Wt::WTemplate>> templatesVector_;
 
     // output tab
     Wt::WContainerWidget *outputContainer_;
