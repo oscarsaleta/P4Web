@@ -37,6 +37,7 @@
 #include "WSphere.h"
 
 #include "custom.h"
+#include "delete_pointer.h"
 #include "file_tab.h"
 #include "math_p4.h"
 //#include "math_findpoint.h"
@@ -143,26 +144,19 @@ WSphere::WSphere(WContainerWidget *parent, int width, int height,
 
 WSphere::~WSphere()
 {
-    int i;
-
     struct P4POLYLINES *t;
     while (CircleAtInfinity != nullptr) {
         t = CircleAtInfinity;
         CircleAtInfinity = t->next;
-        delete t;
-        t = nullptr;
+        delete_pointer(t);
     }
     while (PLCircle != nullptr) {
         t = PLCircle;
         PLCircle = t->next;
-        delete t;
-        t = nullptr;
+        delete_pointer(t);
     }
 
-    if (study_ != nullptr) {
-        delete study_;
-        study_ = nullptr;
-    }
+    delete_pointer(study_);
 }
 
 bool WSphere::setupPlot(void)
@@ -230,13 +224,13 @@ bool WSphere::setupPlot(void)
     while (CircleAtInfinity != nullptr) {
         t = CircleAtInfinity;
         CircleAtInfinity = t->next;
-        delete t; // free( t );
+        delete t;
         t = nullptr;
     }
     while (PLCircle != nullptr) {
         t = PLCircle;
         PLCircle = t->next;
-        delete t; // free( t );
+        delete t;
         t = nullptr;
     }
 
