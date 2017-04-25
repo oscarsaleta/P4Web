@@ -114,6 +114,7 @@ void MainUI::setupUI()
     // left widget (file upload, input, buttons)
     globalLogger__.debug("MainUI :: creating HomeLeft...");
     leftContainer_ = new HomeLeft(pageContainer_);
+    leftContainer_->parent_ = this;
     globalLogger__.debug("MainUI :: HomeLeft created");
     t->bindWidget("left", leftContainer_);
 
@@ -206,4 +207,11 @@ void MainUI::setLogoutIndicator()
     loginText_->setText(WString::tr("mainui.logintext-default"));
     logoutAnchor_->hide();
     loginAnchor_->show();
+}
+
+void MainUI::getMapleParams()
+{
+    rightContainer_->refreshParamStringVectors();
+    paramLabels_ = rightContainer_->paramLabels_;
+    paramValues_ = rightContainer_->paramValues_;
 }
