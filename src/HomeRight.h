@@ -225,8 +225,19 @@ class HomeRight : public Wt::WContainerWidget
      */
     void hideParamsTab();
 
+    /**
+     * Create string vectors from parameter WLineEdits
+     */
     void refreshParamStringVectors();
+
+    /**
+     * Vector of strings for labels
+     */
     std::vector<std::string> paramLabels_;
+
+    /**
+     * Vector of strings for values
+     */
     std::vector<std::string> paramValues_;
 
   private:
