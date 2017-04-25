@@ -17,10 +17,10 @@
  */
 #include "HomeRight.h"
 
+#include "delete_pointer.h"
+#include "file_tab.h"
 #include "MyLogger.h"
 #include "WSphere.h"
-#include "file_tab.h"
-//#include "math_orbits.h"
 
 #include <fstream>
 #include <iostream>
@@ -65,16 +65,32 @@ HomeRight::HomeRight(WContainerWidget *parent)
 HomeRight::~HomeRight()
 {
     // output tab
-    delete fullResButton_;
-    delete finResButton_;
-    delete infResButton_;
-    delete clearOutputButton_;
-    delete outputButtonsToolbar_;
-    delete outputTextArea_;
-    delete outputContainer_;
+    delete_pointer(fullResButton_);
+    delete_pointer(finResButton_);
+    delete_pointer(infResButton_);
+    delete_pointer(clearOutputButton_);
+    delete_pointer(outputButtonsToolbar_);
+    delete_pointer(outputTextArea_);
+    delete_pointer(outputContainer_);
+
+    // plot tab
+    delete_pointer(sphere_);
+    delete_pointer(plotCaption_);
+    delete_pointer(plotContainer_);
+
+    // parameters tab
+    delete_pointer(addParamBtn_);
+    delete_pointer(delParamBtn_);
+    std::vector<std::string>().swap(paramLabels_);
+    std::vector<std::string>().swap(paramValues_);
+    leLabelsVector_.clear();
+    leValuesVector_.clear();
+    templatesVector_.clear();
+    delete_pointer(paramsScrollArea_);
 
     // tab widget
-    delete tabWidget_;
+    delete_pointer(tabWidget_);
+
 
     globalLogger__.debug("HomeRight :: deleted correctly");
 }
@@ -292,10 +308,8 @@ void HomeRight::clearResults()
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
 {
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
-    }
+    delete_pointer(sphere_);
+
     sphere_ = new WSphere(plotContainer_, 550, 550, basename, projection);
     setupSphereAndPlot();
 }
@@ -303,10 +317,8 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
 void HomeRight::onPlanePlot(std::string basename, int type, double minx,
                             double maxx, double miny, double maxy)
 {
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
-    }
+    delete_pointer(sphere_);
+
     sphere_ = new WSphere(plotContainer_, 550, 550, basename, type, minx, maxx,
                           miny, maxy);
     setupSphereAndPlot();
@@ -318,10 +330,8 @@ void HomeRight::setupSphereAndPlot()
     sphere_->setMargin(5, Top);
     plotContainer_->addWidget(sphere_);
 
-    if (plotCaption_ != nullptr) {
-        delete plotCaption_;
-        plotCaption_ = nullptr;
-    }
+    delete_pointer(plotCaption_);
+
     plotCaption_ = new WText(plotContainer_);
     plotCaption_->setId("plotCaption_");
     plotContainer_->addWidget(plotCaption_);
@@ -347,10 +357,7 @@ void HomeRight::sphereClicked(bool clickValid, double x, double y)
 
 void HomeRight::onReset(int dummy)
 {
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
-    }
+    delete_pointer(sphere_);
 
     outputTextAreaContent_ = std::string();
     outputTextArea_->setText(outputTextAreaContent_);
@@ -477,7 +484,6 @@ void HomeRight::delParameter()
         boost::shared_ptr<WLineEdit> label = leLabelsVector_.back();
         if (label != nullptr) {
             label.reset();
-            //label = nullptr;
             leLabelsVector_.pop_back();
         }
     }
@@ -485,7 +491,6 @@ void HomeRight::delParameter()
         boost::shared_ptr<WLineEdit> value = leValuesVector_.back();
         if (value != nullptr) {
             value.reset();
-            //value = nullptr;
             leValuesVector_.pop_back();
         }
     }
@@ -493,7 +498,6 @@ void HomeRight::delParameter()
         boost::shared_ptr<WTemplate> t = templatesVector_.back();
         if (t != nullptr) {
             t.reset();
-            //t = nullptr;
             templatesVector_.pop_back();
         }
     }
