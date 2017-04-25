@@ -19,7 +19,17 @@
 #ifndef HOMELEFT_H
 #define HOMELEFT_H
 
+/*!
+ * @brief Left side of UI
+ * @file HomeLeft.h
+ * @author Oscar Saleta
+ */
+
 #include "ScriptHandler.h"
+#include "MainUI.h"
+
+#include <Wt/WContainerWidget>
+#include <Wt/WSignal>
 
 /**
  * Maximum number of parameters
@@ -152,14 +162,6 @@
  */
 #define GCF_PREC_DEFAULT 12
 
-/*!
- * @brief Left side of UI
- * @file HomeLeft.h
- * @author Oscar Saleta
- */
-#include <Wt/WContainerWidget>
-
-#include <Wt/WSignal>
 
 /**
  * This class holds the UI from the left side of the website
@@ -286,6 +288,9 @@ class HomeLeft : public Wt::WContainerWidget
      * struct where all the Maple settings are stored
      */
     mapleParamsStruct mplParams;
+
+    /* MainUI parent */
+    MainUI *parent_;
 
   private:
     bool evaluated_;
