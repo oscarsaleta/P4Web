@@ -197,6 +197,7 @@ struct mapleParamsStruct {
  * @return       a string containing the name generated
  */
 std::string randomFileName(std::string prefix, std::string suffix);
+
 /**
  * Prepare Maple script for evaluation
  *
@@ -209,6 +210,7 @@ std::string randomFileName(std::string prefix, std::string suffix);
 bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
                       std::vector<std::string> &prmLabels,
                       std::vector<std::string> &prmValues);
+
 /**
  * Fill a Maple script with the parameters and commands for evaluation
  *
@@ -217,9 +219,10 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
  *
  * Called from prepareMapleFile()
  */
-void fillMapleScript(FILE *f, mapleParamsStruct prms,
+void fillMapleScript(FILE *f, mapleParamsStruct &prms,
                      std::vector<std::string> &prmLabels,
                      std::vector<std::string> &prmValues);
+
 /**
  * Evaluate a Maple script
  *
@@ -230,6 +233,7 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms,
  * Forks a Maple process and waits for it to finish
  */
 siginfo_t evaluateMapleScript(std::string fname, int maxtime);
+
 /**
  * Create a file that contains the execution parameters
  *
@@ -259,6 +263,7 @@ bool fillSaveFile(std::string fname, mapleParamsStruct prms);
  */
 bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2,
                 int precision, int numpoints);
+
 /**
  * Prepare files in case of calculating GCF in charts near infinity.
  *
@@ -276,6 +281,7 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2,
  */
 bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
                             double theta2, int precision, int numpoints);
+
 /**
  * Prepare files in case of calculating GCF in charts near infinity.
  *
@@ -294,6 +300,60 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
 bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
                            int numpoints);
 
+/**
+ * Wait for a certain amount of milliseconds, pausing the program
+ *
+ * @param ms number of milliseconds to pause execution for
+ *
+ * The implementation depends on wether the system is Windows or Linux, and
+ * although this program is thought for Linux, we implemented both, just in
+ * case.
+ */
 inline void delay(unsigned long ms);
+
+/**
+ * Change name of parameters from "something" to "something_", to avoid conflict
+ *
+ * @param labels vector of strings containing the labels of the parameters
+ * @param values vector of strings containing the values of the parameters
+ * @param xeq    string that contains x'
+ * @param yeq    string that contains y'
+ * @param gcf    string that contains the GCF
+ *
+ * The change has to be done recurrently (substitute every label in the values
+ * vector), and also to x', y', and the GCF.
+ */
+void changeParameterNames(std::vector<std::string> &labels,
+                          std::vector<std::string> &values, std::string &xeq,
+                          std::string &yeq, std::string &gcf);
+/**
+ * Add a _ to the end of all labels present in target
+ *
+ * @param labels vector of strings containing the labels to look for
+ * @param target string to be modified
+ *
+ * @returns the modified string
+ *
+ * If the labels vector is {a,b,c} and the target is a*b*2, then
+ * this function returns a_*b_*2
+ */
+std::string convertLabelsFromString(std::vector<std::string> labels,
+                                    std::string target);
+
+/**
+ * Find a word in a target string and make sure it is the full word
+ *
+ * @param target string to look for word in
+ * @param word   word to find as substring
+ * @param start  index where to start looking
+ *
+ * @return the first index where we found a match
+ *
+ * If we find word in target, we need to check if it is preceded by
+ * a mathematical operator (i.e., not a digit, letter or underscore)
+ * and followed by a mathematical operator (same as before).
+ */
+int findIndexOfWordInTarget(std::string target, std::string word,
+                            int start = 0);
 
 #endif

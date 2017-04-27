@@ -8,6 +8,7 @@
 #include "math_p4.h"
 #include "math_polynom.h"
 
+#include <cctype>
 #include <cstdlib>
 #include <fcntl.h>
 #include <signal.h>
@@ -60,6 +61,7 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
     prms.str_infres = fname + "_inf.res";
 
     if (mplFile != nullptr) {
+        // TODO: transformar noms i valors de paràmetres
         fillMapleScript(mplFile, prms, prmLabels, prmValues);
         fclose(mplFile);
         globalLogger__.debug("ScriptHandler :: prepared Maple file " + fname);
@@ -70,10 +72,16 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
     }
 }
 
-void fillMapleScript(FILE *f, mapleParamsStruct prms,
+void fillMapleScript(FILE *f, mapleParamsStruct &prms,
                      std::vector<std::string> &prmLabels,
                      std::vector<std::string> &prmValues)
 {
+    if (!prmLabels.empty()) {
+        changeParameterNames(prmLabels, prmValues, prms.str_xeq, prms.str_yeq,
+                             prms.str_gcf);
+        prms.str_userf = "[" + prms.str_xeq + "," + prms.str_yeq + "]";
+    }
+
     fprintf(f, "restart;\n");
     fprintf(f, "read( \"%s\" ):\n", prms.str_p4m.c_str());
     fprintf(f, "user_bindir := \"%s\":\n", prms.str_bindir.c_str());
@@ -104,16 +112,18 @@ void fillMapleScript(FILE *f, mapleParamsStruct prms,
     fprintf(f, "  user_gcf := %s:\n", prms.str_gcf.c_str());
     fprintf(f, "else `quit(1)` end if:\n");
 
-    std::vector<std::string>::iterator it1;
-    std::vector<std::string>::iterator it2;
-    for (it1 = prmLabels.begin(), it2 = prmValues.begin();
-         it1 < prmLabels.end(), it2 < prmValues.end();
-         ++it1, ++it2) {
-        fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", it1->c_str());
-        fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n", it2->c_str());
-        fprintf(f, "    %s := %s:\n", it1->c_str(), it2->c_str());
-        fprintf(f, "  else `quit(1)` end if:\n");
-        fprintf(f, "else `quit(1)` end if:\n");        
+    if (!prmLabels.empty()) {
+        std::vector<std::string>::iterator it1;
+        std::vector<std::string>::iterator it2;
+        for (it1 = prmLabels.begin(), it2 = prmValues.begin();
+             it1 < prmLabels.end(), it2 < prmValues.end(); ++it1, ++it2) {
+            fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", it1->c_str());
+            fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n",
+                    it2->c_str());
+            fprintf(f, "    %s := %s:\n", it1->c_str(), it2->c_str());
+            fprintf(f, "  else `quit(1)` end if:\n");
+            fprintf(f, "else `quit(1)` end if:\n");
+        }
     }
 
     fprintf(f, "user_numeric := %s:\n", prms.str_numeric.c_str());
@@ -195,8 +205,10 @@ siginfo_t evaluateMapleScript(std::string fname, int maxtime)
         return infop;
     }
 }
-
-bool fillSaveFile(std::string fname, mapleParamsStruct prms)
+// TODO: guardar parametres a script
+bool fillSaveFile(std::string fname, mapleParamsStruct prms,
+                  std::vector<std::string> labels,
+                  std::vector<std::string> values)
 {
     FILE *fp = fopen(fname.c_str(), "w");
 
@@ -219,7 +231,17 @@ bool fillSaveFile(std::string fname, mapleParamsStruct prms)
         fprintf(fp, "%s\n", prms.str_xeq.c_str());          // x'
         fprintf(fp, "%s\n", prms.str_yeq.c_str());          // y'
         fprintf(fp, "%s\n", prms.str_gcf.c_str());          // gcf
-        fprintf(fp, "0\n");                                 // numparams
+        if (labels.empty()) {
+            fprintf(fp, "0\n");                             // numparams
+        } else {
+            fprintf(fp, "%d\n", labels.length());           // numparams
+            std::vector<std::string>::iterator it1, it2;
+            for (it1 = labels.begin(), it2 = values.begin();
+                 it1 != labels.end(), it2 != labels.end(); it1++, it2++) {
+                fprintf(fp, "%s\n", *it1);
+                fprintf(fp, "%s\n", *it2);
+            }
+        }
 
         fclose(fp);
         return true;
@@ -379,3 +401,80 @@ inline void delay(unsigned long ms) { Sleep(ms); }
 inline void delay(unsigned long ms) { usleep(ms * 1000); }
 
 #endif
+
+void changeParameterNames(std::vector<std::string> &labels,
+                          std::vector<std::string> &values, std::string &xeq,
+                          std::string &yeq, std::string &gcf)
+{
+    xeq = convertLabelsFromString(labels, xeq);
+    yeq = convertLabelsFromString(labels, yeq);
+    gcf = convertLabelsFromString(labels, gcf);
+
+    std::vector<std::string>::iterator it;
+    for (it = values.begin(); it != values.end(); it++) {
+        *it = convertLabelsFromString(labels, *it);
+    }
+    for (it = labels.begin(); it != labels.end(); it++) {
+        *it = convertLabelsFromString(labels, *it);
+    }
+    return;
+}
+
+std::string convertLabelsFromString(std::vector<std::string> labels,
+                                    std::string target)
+{
+    std::string aux;
+    std::string currentLabel, newLabel;
+    int i, j;
+
+    std::vector<std::string>::iterator it;
+    for (it = labels.begin(); it != labels.end(); it++) {
+        currentLabel = *it;
+        newLabel = currentLabel + "_";
+        if (currentLabel.empty())
+            continue;
+        globalLogger__.debug("ScriptHandler :: looking for word " +
+                             currentLabel + " in " + target);
+        while ((i = findIndexOfWordInTarget(target, currentLabel, 0)) != -1) {
+            aux = target.substr(0, i);
+            aux += newLabel;
+            aux += target.substr(i + currentLabel.length());
+            target = aux;
+        }
+    }
+    return target;
+}
+
+int findIndexOfWordInTarget(std::string target, std::string word, int start)
+{
+    int i, j;
+    // search for first occurrence of substring word in target
+    while ((i = target.find(word, start)) != std::string::npos) {
+        // next time we will search from this point if needed
+        start = i + 1;
+        // check if substring is the beginning of a word
+        // if the char before our occurrence is not a mathematical operator,
+        // the word is a substring from a bigger one
+        j = i;
+        if (j > 0) {
+            globalLogger__.debug("char is " + std::string(&target[j - 1]));
+            if (isdigit(target[j - 1]) || isalpha(target[j - 1]) ||
+                target[j - 1] == '_') {
+                continue;
+            }
+        }
+        // check if substring is end of a word
+        j += word.length();
+        if (j < target.length()) {
+            globalLogger__.debug("char is " + std::string(&target[j]));
+            if (isdigit(target[j]) || isalpha(target[j]) || target[j] == '_') {
+                continue;
+            }
+        }
+        // if we get through, we found a case
+        break;
+    }
+    if (i == std::string::npos)
+        return -1;
+    return i;
+}
