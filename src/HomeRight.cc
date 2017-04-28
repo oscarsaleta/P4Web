@@ -17,10 +17,9 @@
  */
 #include "HomeRight.h"
 
-#include "delete_pointer.h"
-#include "file_tab.h"
 #include "MyLogger.h"
 #include "WSphere.h"
+#include "file_tab.h"
 
 #include <fstream>
 #include <iostream>
@@ -51,46 +50,79 @@ HomeRight::HomeRight(WContainerWidget *parent)
     setupUI();
     globalLogger__.debug("HomeRight :: setting up connectors...");
     setupConnectors();
-
-    // tabWidget_->setCurrentIndex(0);
-
-    /* vectors for parameters */
-    /*templatesVector_ = new std::vector<WTemplate *>();
-    leLabelsVector_ = new std::vector<WLineEdit *>();
-    leValuesVector_ = new std::vector<WLineEdit *>();*/
-
     globalLogger__.debug("HomeRight :: created correctly");
 }
 
 HomeRight::~HomeRight()
 {
     // output tab
-    delete_pointer(fullResButton_);
-    delete_pointer(finResButton_);
-    delete_pointer(infResButton_);
-    delete_pointer(clearOutputButton_);
-    delete_pointer(outputButtonsToolbar_);
-    delete_pointer(outputTextArea_);
-    delete_pointer(outputContainer_);
+    if (fullResButton_!=nullptr){
+        delete fullResButton_;
+        fullResButton_=nullptr;
+        }
+    if (finResButton_!=nullptr){
+        delete finResButton_;
+        finResButton_=nullptr;
+        }
+    if (infResButton_!=nullptr){
+        delete infResButton_;
+        infResButton_=nullptr;
+        }
+    if (clearOutputButton_!=nullptr){
+        delete clearOutputButton_;
+        clearOutputButton_=nullptr;
+        }
+    if (outputButtonsToolbar_!=nullptr){
+        delete outputButtonsToolbar_;
+        outputButtonsToolbar_=nullptr;
+        }
+    if (outputTextArea_!=nullptr){
+        delete outputTextArea_;
+        outputTextArea_=nullptr;
+        }
+    if (outputContainer_!=nullptr){
+        delete outputContainer_;
+        outputContainer_=nullptr;
+        }
 
     // plot tab
-    delete_pointer(sphere_);
-    delete_pointer(plotCaption_);
-    delete_pointer(plotContainer_);
+    if (sphere_!=nullptr){
+        delete sphere_;
+        sphere_=nullptr;
+        }
+    if (plotCaption_!=nullptr){
+        delete plotCaption_;
+        plotCaption_=nullptr;
+        }
+    if (plotContainer_!=nullptr){
+        delete plotContainer_;
+        plotContainer_=nullptr;
+        }
 
     // parameters tab
-    delete_pointer(addParamBtn_);
-    delete_pointer(delParamBtn_);
+    if (addParamBtn_!=nullptr){
+        delete addParamBtn_;
+        addParamBtn_=nullptr;
+        }
+    if (delParamBtn_!=nullptr){
+        delete delParamBtn_;
+        delParamBtn_=nullptr;
+        }
     std::vector<std::string>().swap(paramLabels_);
     std::vector<std::string>().swap(paramValues_);
     leLabelsVector_.clear();
     leValuesVector_.clear();
     templatesVector_.clear();
-    delete_pointer(paramsScrollArea_);
+    if (paramsScrollArea_!=nullptr){
+        delete paramsScrollArea_;
+        paramsScrollArea_=nullptr;
+        }
 
     // tab widget
-    delete_pointer(tabWidget_);
-
+    if (tabWidget_!=nullptr){
+        delete tabWidget_;
+        tabWidget_=nullptr;
+        }
 
     globalLogger__.debug("HomeRight :: deleted correctly");
 }
@@ -248,7 +280,6 @@ void HomeRight::readResults(std::string fileName)
             fullResults_ += line + "\n";
         resultsFile.close();
     }
-
     // read finite singular points results
     finResults_ = "";
     resultsFile.open((fileName_ + "_fin.res").c_str());
@@ -257,7 +288,6 @@ void HomeRight::readResults(std::string fileName)
             finResults_ += line + "\n";
         resultsFile.close();
     }
-
     // add title for infinite region (missing in inf.res)
     infResults_ = "AT INFINITY \n";
     // read infinite singular points results
@@ -308,7 +338,10 @@ void HomeRight::clearResults()
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
 {
-    delete_pointer(sphere_);
+    if (sphere_!=nullptr){
+        delete sphere_;
+        sphere_=nullptr;
+        }
 
     sphere_ = new WSphere(plotContainer_, 550, 550, basename, projection);
     setupSphereAndPlot();
@@ -317,7 +350,10 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
 void HomeRight::onPlanePlot(std::string basename, int type, double minx,
                             double maxx, double miny, double maxy)
 {
-    delete_pointer(sphere_);
+    if (sphere_!=nullptr){
+        delete sphere_;
+        sphere_=nullptr;
+        }
 
     sphere_ = new WSphere(plotContainer_, 550, 550, basename, type, minx, maxx,
                           miny, maxy);
@@ -330,7 +366,10 @@ void HomeRight::setupSphereAndPlot()
     sphere_->setMargin(5, Top);
     plotContainer_->addWidget(sphere_);
 
-    delete_pointer(plotCaption_);
+    if (plotCaption_!=nullptr){
+        delete plotCaption_;
+        plotCaption_=nullptr;
+        }
 
     plotCaption_ = new WText(plotContainer_);
     plotCaption_->setId("plotCaption_");
@@ -357,15 +396,21 @@ void HomeRight::sphereClicked(bool clickValid, double x, double y)
 
 void HomeRight::onReset(int dummy)
 {
-    delete_pointer(sphere_);
+    if (sphere_!=nullptr){
+        delete sphere_;
+        sphere_=nullptr;
+        }
 
     outputTextAreaContent_ = std::string();
     outputTextArea_->setText(outputTextAreaContent_);
 
-    if (loggedIn_)
+    if (loggedIn_) {
+        hideParamsTab();
+        showParamsTab();
         tabWidget_->setCurrentIndex(2);
-    else
+    } else {
         tabWidget_->setCurrentIndex(0);
+    }
 }
 
 void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
@@ -511,9 +556,21 @@ void HomeRight::showParamsTab()
         tabWidget_->setCurrentIndex(2);
 }
 
-void HomeRight::hideParamsTab()
+void HomeRight::hideParamsTab(bool logout)
 {
-    loggedIn_ = false;
+    if (logout)
+        loggedIn_ = false;
+    /* in case there are parameters defined, remove them */
+    if (paramLabels_.size() != 0) {
+        std::vector<std::string>().swap(paramLabels_);
+    }
+    if (paramValues_.size() != 0) {
+        std::vector<std::string>().swap(paramValues_);
+    }
+    while (!leLabelsVector_.empty() && !leValuesVector_.empty() &&
+           !templatesVector_.empty()) {
+        delParameter();
+    }
     tabWidget_->setTabHidden(2, true);
     if (tabWidget_->currentIndex() != 2)
         tabWidget_->setCurrentIndex(2);
