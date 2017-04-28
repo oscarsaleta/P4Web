@@ -26,16 +26,10 @@
 
 #include <Wt/WAnchor>
 #include <Wt/WApplication>
-#include <Wt/WGroupBox>
 #include <Wt/WLink>
-#include <Wt/WMenu>
-#include <Wt/WMenuItem>
-#include <Wt/WMessageBox>
-#include <Wt/WPopupMenu>
 #include <Wt/WStackedWidget>
 #include <Wt/WString>
 #include <Wt/WText>
-#include <Wt/WVBoxLayout>
 
 #include <Wt/Dbo/Transaction>
 
