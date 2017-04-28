@@ -25,8 +25,8 @@
  * @author Oscar Saleta
  */
 
-#include "ScriptHandler.h"
 #include "MainUI.h"
+#include "ScriptHandler.h"
 
 #include <Wt/WContainerWidget>
 #include <Wt/WSignal>
@@ -162,7 +162,6 @@
  */
 #define GCF_PREC_DEFAULT 12
 
-
 /**
  * This class holds the UI from the left side of the website
  *
@@ -275,14 +274,14 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<std::string, int, int, int> &gcfSignal() { return gcfSignal_; }
     /**
      * Signal to add a pair (label,value) to the parameters list
-     * 
+     *
      * The parameters list is held in HomeRight
      */
     Wt::Signal<std::string, std::string> &addParameterSignal()
     {
         return addParameterSignal_;
     }
-
+    
     /* MAPLE FILE PARAMETERS */
     /**
      * struct where all the Maple settings are stored
