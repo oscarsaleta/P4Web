@@ -221,9 +221,13 @@ class HomeRight : public Wt::WContainerWidget
      */
     void showParamsTab();
     /**
-     * Set loggedIn_ = false and hide parameters tab
+     * Delete all parameters and hide the tab
+     *
+     * Also, if @c logout = @c true, set @c loggedIn_ to false
+     *
+     * @param logout boolean flag to set the login status to false if needed
      */
-    void hideParamsTab();
+    void hideParamsTab(bool logout = false);
 
     /**
      * Create string vectors from parameter WLineEdits
