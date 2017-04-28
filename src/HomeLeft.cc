@@ -285,7 +285,7 @@ void HomeLeft::fileUploaded()
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
 #ifdef ANTZ
-    globalLogger__.debug("[ANTZ] :: copying uploaded file to " +
+    globalLogger__.debug("HomeLeft :: [ANTZ] copying uploaded file to " +
                          std::string(TMP_DIR));
 
     try {
