@@ -56,73 +56,73 @@ HomeRight::HomeRight(WContainerWidget *parent)
 HomeRight::~HomeRight()
 {
     // output tab
-    if (fullResButton_!=nullptr){
+    if (fullResButton_ != nullptr) {
         delete fullResButton_;
-        fullResButton_=nullptr;
-        }
-    if (finResButton_!=nullptr){
+        fullResButton_ = nullptr;
+    }
+    if (finResButton_ != nullptr) {
         delete finResButton_;
-        finResButton_=nullptr;
-        }
-    if (infResButton_!=nullptr){
+        finResButton_ = nullptr;
+    }
+    if (infResButton_ != nullptr) {
         delete infResButton_;
-        infResButton_=nullptr;
-        }
-    if (clearOutputButton_!=nullptr){
+        infResButton_ = nullptr;
+    }
+    if (clearOutputButton_ != nullptr) {
         delete clearOutputButton_;
-        clearOutputButton_=nullptr;
-        }
-    if (outputButtonsToolbar_!=nullptr){
+        clearOutputButton_ = nullptr;
+    }
+    if (outputButtonsToolbar_ != nullptr) {
         delete outputButtonsToolbar_;
-        outputButtonsToolbar_=nullptr;
-        }
-    if (outputTextArea_!=nullptr){
+        outputButtonsToolbar_ = nullptr;
+    }
+    if (outputTextArea_ != nullptr) {
         delete outputTextArea_;
-        outputTextArea_=nullptr;
-        }
-    if (outputContainer_!=nullptr){
+        outputTextArea_ = nullptr;
+    }
+    if (outputContainer_ != nullptr) {
         delete outputContainer_;
-        outputContainer_=nullptr;
-        }
+        outputContainer_ = nullptr;
+    }
 
     // plot tab
-    if (sphere_!=nullptr){
+    if (sphere_ != nullptr) {
         delete sphere_;
-        sphere_=nullptr;
-        }
-    if (plotCaption_!=nullptr){
+        sphere_ = nullptr;
+    }
+    if (plotCaption_ != nullptr) {
         delete plotCaption_;
-        plotCaption_=nullptr;
-        }
-    if (plotContainer_!=nullptr){
+        plotCaption_ = nullptr;
+    }
+    if (plotContainer_ != nullptr) {
         delete plotContainer_;
-        plotContainer_=nullptr;
-        }
+        plotContainer_ = nullptr;
+    }
 
     // parameters tab
-    if (addParamBtn_!=nullptr){
+    if (addParamBtn_ != nullptr) {
         delete addParamBtn_;
-        addParamBtn_=nullptr;
-        }
-    if (delParamBtn_!=nullptr){
+        addParamBtn_ = nullptr;
+    }
+    if (delParamBtn_ != nullptr) {
         delete delParamBtn_;
-        delParamBtn_=nullptr;
-        }
+        delParamBtn_ = nullptr;
+    }
     std::vector<std::string>().swap(paramLabels_);
     std::vector<std::string>().swap(paramValues_);
     leLabelsVector_.clear();
     leValuesVector_.clear();
     templatesVector_.clear();
-    if (paramsScrollArea_!=nullptr){
+    if (paramsScrollArea_ != nullptr) {
         delete paramsScrollArea_;
-        paramsScrollArea_=nullptr;
-        }
+        paramsScrollArea_ = nullptr;
+    }
 
     // tab widget
-    if (tabWidget_!=nullptr){
+    if (tabWidget_ != nullptr) {
         delete tabWidget_;
-        tabWidget_=nullptr;
-        }
+        tabWidget_ = nullptr;
+    }
 
     globalLogger__.debug("HomeRight :: deleted correctly");
 }
@@ -338,10 +338,10 @@ void HomeRight::clearResults()
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
 {
-    if (sphere_!=nullptr){
+    if (sphere_ != nullptr) {
         delete sphere_;
-        sphere_=nullptr;
-        }
+        sphere_ = nullptr;
+    }
 
     sphere_ = new WSphere(plotContainer_, 550, 550, basename, projection);
     setupSphereAndPlot();
@@ -350,10 +350,10 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
 void HomeRight::onPlanePlot(std::string basename, int type, double minx,
                             double maxx, double miny, double maxy)
 {
-    if (sphere_!=nullptr){
+    if (sphere_ != nullptr) {
         delete sphere_;
-        sphere_=nullptr;
-        }
+        sphere_ = nullptr;
+    }
 
     sphere_ = new WSphere(plotContainer_, 550, 550, basename, type, minx, maxx,
                           miny, maxy);
@@ -366,10 +366,10 @@ void HomeRight::setupSphereAndPlot()
     sphere_->setMargin(5, Top);
     plotContainer_->addWidget(sphere_);
 
-    if (plotCaption_!=nullptr){
+    if (plotCaption_ != nullptr) {
         delete plotCaption_;
-        plotCaption_=nullptr;
-        }
+        plotCaption_ = nullptr;
+    }
 
     plotCaption_ = new WText(plotContainer_);
     plotCaption_->setId("plotCaption_");
@@ -396,10 +396,10 @@ void HomeRight::sphereClicked(bool clickValid, double x, double y)
 
 void HomeRight::onReset(int dummy)
 {
-    if (sphere_!=nullptr){
+    if (sphere_ != nullptr) {
         delete sphere_;
-        sphere_=nullptr;
-        }
+        sphere_ = nullptr;
+    }
 
     outputTextAreaContent_ = std::string();
     outputTextArea_->setText(outputTextAreaContent_);
@@ -561,16 +561,15 @@ void HomeRight::hideParamsTab(bool logout)
     if (logout)
         loggedIn_ = false;
     /* in case there are parameters defined, remove them */
-    if (paramLabels_.size() != 0) {
+    if (!paramLabels_.empty()) {
         std::vector<std::string>().swap(paramLabels_);
     }
-    if (paramValues_.size() != 0) {
+    if (!paramValues_.empty()) {
         std::vector<std::string>().swap(paramValues_);
     }
-    while (!leLabelsVector_.empty() && !leValuesVector_.empty() &&
-           !templatesVector_.empty()) {
-        delParameter();
-    }
+    leLabelsVector_.clear();
+    leValuesVector_.clear();
+    templatesVector_.clear();
     tabWidget_->setTabHidden(2, true);
     if (tabWidget_->currentIndex() != 2)
         tabWidget_->setCurrentIndex(2);
@@ -583,10 +582,10 @@ void HomeRight::refreshParamStringVectors()
 
     // correctly delete and free all memory from these vectors
     // if they are not empty
-    if (paramLabels_.size() != 0) {
+    if (!paramLabels_.empty()) {
         std::vector<std::string>().swap(paramLabels_);
     }
-    if (paramValues_.size() != 0) {
+    if (!paramValues_.empty()) {
         std::vector<std::string>().swap(paramValues_);
     }
 
