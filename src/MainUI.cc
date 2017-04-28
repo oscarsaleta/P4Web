@@ -53,7 +53,30 @@ MainUI::MainUI(WContainerWidget *parent) : WContainerWidget(parent)
 
 MainUI::~MainUI()
 {
-    // TODO: completar destructor
+    if (loginText_ != nullptr) {
+        delete loginText_;
+        loginText_ = nullptr;
+    }
+    if (logoutAnchor_ != nullptr) {
+        delete logoutAnchor_;
+        logoutAnchor_ = nullptr;
+    }
+    if (loginAnchor_ != nullptr) {
+        delete loginAnchor_;
+        loginAnchor_ = nullptr;
+    }
+    if (loginMessageContainer_ != nullptr) {
+        delete loginMessageContainer_;
+        loginMessageContainer_ = nullptr;
+    }
+    if (title_ != nullptr) {
+        delete title_;
+        title_ = nullptr;
+    }
+    if (authWidget_ != nullptr) {
+        delete authWidget_;
+        authWidget_ = nullptr;
+    }
     if (leftContainer_ != nullptr) {
         delete leftContainer_;
         leftContainer_ = nullptr;
@@ -62,9 +85,13 @@ MainUI::~MainUI()
         delete rightContainer_;
         rightContainer_ = nullptr;
     }
-    if (authWidget_ != nullptr) {
-        delete authWidget_;
-        authWidget_ = nullptr;
+    if (pageContainer_ != nullptr) {
+        delete pageContainer_;
+        pageContainer_ = nullptr;
+    }
+    if (mainStack_ != nullptr) {
+        delete mainStack_;
+        mainStack_ = nullptr;
     }
 }
 
