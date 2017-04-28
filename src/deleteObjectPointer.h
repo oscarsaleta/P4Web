@@ -1,5 +1,5 @@
 template<typename T>
-void delete_pointer (T *obj)
+void deleteObjectPointer (T *obj)
 {
     if (obj != nullptr) {
         delete obj;
