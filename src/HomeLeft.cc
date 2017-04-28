@@ -19,7 +19,6 @@
 
 #include "HomeLeft.h"
 
-#include "delete_pointer.h"
 #include "MyLogger.h"
 #include "custom.h"
 
@@ -86,27 +85,60 @@ HomeLeft::HomeLeft(WContainerWidget *parent)
 
 HomeLeft::~HomeLeft()
 {
-    // main widget 
+    // main widget
 
-    delete_pointer(fileUploadWidget_);
+    if (fileUploadWidget_ != nullptr) {
+        delete fileUploadWidget_;
+        fileUploadWidget_ = nullptr;
+    }
 
-    delete_pointer(xEquationInput_);
-    delete_pointer(yEquationInput_);
-    delete_pointer(gcfEquationInput_);
+    if (xEquationInput_ != nullptr) {
+        delete xEquationInput_;
+        xEquationInput_ = nullptr;
+    }
+    if (yEquationInput_ != nullptr) {
+        delete yEquationInput_;
+        yEquationInput_ = nullptr;
+    }
+    if (gcfEquationInput_ != nullptr) {
+        delete gcfEquationInput_;
+        gcfEquationInput_ = nullptr;
+    }
 
-    delete_pointer(evalButton_);
-    delete_pointer(plotButton_);
-    delete_pointer(prepSaveButton_);
-    delete_pointer(saveAnchor_);
-    delete_pointer(resetButton_);
+    if (evalButton_ != nullptr) {
+        delete evalButton_;
+        evalButton_ = nullptr;
+    }
+    if (plotButton_ != nullptr) {
+        delete plotButton_;
+        plotButton_ = nullptr;
+    }
+    if (prepSaveButton_ != nullptr) {
+        delete prepSaveButton_;
+        prepSaveButton_ = nullptr;
+    }
+    if (saveAnchor_ != nullptr) {
+        delete saveAnchor_;
+        saveAnchor_ = nullptr;
+    }
+    if (resetButton_ != nullptr) {
+        delete resetButton_;
+        resetButton_ = nullptr;
+    }
 
-    delete_pointer(equationsBox_);
+    if (equationsBox_ != nullptr) {
+        delete equationsBox_;
+        equationsBox_ = nullptr;
+    }
 
     // tab widget
 
     if (loggedIn_)
         hideSettings();
-    delete_pointer(tabs_);
+    if (tabs_ != nullptr) {
+        delete tabs_;
+        tabs_ = nullptr;
+    }
 
     globalLogger__.debug("HomeLeft :: deleted correctly");
 }
@@ -237,9 +269,9 @@ void HomeLeft::setupConnectors()
 void HomeLeft::fileUploaded()
 {
     globalLogger__.debug("HomeLeft :: input file uploaded");
+    globalLogger__.debug("HomeLeft :: resetting UI before parsing file");
 
-    xEquationInput_->setText(std::string());
-    yEquationInput_->setText(std::string());
+    resetUI();
     // input validation
     std::string extension = fileUploadWidget_->clientFileName().toUTF8().substr(
         fileUploadWidget_->clientFileName().toUTF8().find_last_of(".") + 1);
@@ -439,7 +471,6 @@ void HomeLeft::parseInputFile()
     }
 }
 
-// TODO: posar aquí la captació de paràmetres de homeright?
 void HomeLeft::setOptions()
 {
     parent_->getMapleParams();
@@ -574,7 +605,6 @@ void HomeLeft::evaluate()
     evaluated_ = true;
 
     setOptions();
-    // TODO: agafar vectors de homeright abans de cridar a preparemaplefile
     if (prepareMapleFile(fileUploadName_, mplParams, parent_->paramLabels_,
                          parent_->paramValues_)) {
         globalLogger__.debug("HomeLeft :: filled Maple script " +
@@ -630,7 +660,8 @@ void HomeLeft::prepareSaveFile()
         saveFileName_ = fileUploadName_;
 
     setOptions();
-    if (!fillSaveFile(saveFileName_, mplParams)) {
+    if (!fillSaveFile(saveFileName_, mplParams, parent_->paramLabels_,
+                      parent_->paramValues_)) {
         globalLogger__.error("Cannot create save file " + saveFileName_);
         errorSignal_.emit("Could not create save file. You can notify this "
                           "error at osr@mat.uab.cat, sorry for the "
@@ -721,8 +752,14 @@ void HomeLeft::onPlot()
 void HomeLeft::showSettings()
 {
     loggedIn_ = true;
-    delete_pointer(settingsContainer_);
-    delete_pointer(viewContainer_);
+    if (settingsContainer_ != nullptr) {
+        delete settingsContainer_;
+        settingsContainer_ = nullptr;
+    }
+    if (viewContainer_ != nullptr) {
+        delete viewContainer_;
+        viewContainer_ = nullptr;
+    }
 
     WRadioButton *button;
     WDoubleValidator *validator;
