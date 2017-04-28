@@ -61,7 +61,6 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
     prms.str_infres = fname + "_inf.res";
 
     if (mplFile != nullptr) {
-        // TODO: transformar noms i valors de paràmetres
         fillMapleScript(mplFile, prms, prmLabels, prmValues);
         fclose(mplFile);
         globalLogger__.debug("ScriptHandler :: prepared Maple file " + fname);
@@ -205,11 +204,12 @@ siginfo_t evaluateMapleScript(std::string fname, int maxtime)
         return infop;
     }
 }
-// TODO: guardar parametres a script
+
 bool fillSaveFile(std::string fname, mapleParamsStruct prms,
                   std::vector<std::string> labels,
                   std::vector<std::string> values)
 {
+    globalLlogger__.debug("ScriptHandler :: filling save file...");
     FILE *fp = fopen(fname.c_str(), "w");
 
     if (fp != nullptr) {
@@ -232,14 +232,15 @@ bool fillSaveFile(std::string fname, mapleParamsStruct prms,
         fprintf(fp, "%s\n", prms.str_yeq.c_str());          // y'
         fprintf(fp, "%s\n", prms.str_gcf.c_str());          // gcf
         if (labels.empty()) {
-            fprintf(fp, "0\n");                             // numparams
+            fprintf(fp, "0\n"); // numparams
         } else {
-            fprintf(fp, "%d\n", labels.length());           // numparams
-            std::vector<std::string>::iterator it1, it2;
+            fprintf(fp, "%lu\n", labels.size()); // numparams
+            std::vector<std::string>::iterator it1;
+            std::vector<std::string>::iterator it2;
             for (it1 = labels.begin(), it2 = values.begin();
-                 it1 != labels.end(), it2 != labels.end(); it1++, it2++) {
-                fprintf(fp, "%s\n", *it1);
-                fprintf(fp, "%s\n", *it2);
+                 it1 != labels.end(), it2 != values.end(); it1++, it2++) {
+                fprintf(fp, "%s\n", (*it1).c_str());
+                fprintf(fp, "%s\n", (*it2).c_str());
             }
         }
 

@@ -237,15 +237,18 @@ siginfo_t evaluateMapleScript(std::string fname, int maxtime);
 /**
  * Create a file that contains the execution parameters
  *
- * @param fname filename of temp file to serve to client
- * @param prms  struct that contains the current parameters of execution
- * @return      @c true if file was successfully created, @c false otherwise
+ * @param fname  filename of temp file to serve to client
+ * @param prms   struct that contains the current parameters of execution
+ * @param labels string vector of parameter labels
+ * @param values string vector of parameter values
+ * @return       @c true if file was successfully created, @c false otherwise
  *
  * This format is compatible with P4. If a user is not logged in, every
- * parameter
- * will be saved as the default parameters.
+ * option will be saved as the default options.
  */
-bool fillSaveFile(std::string fname, mapleParamsStruct prms);
+bool fillSaveFile(std::string fname, mapleParamsStruct prms,
+                  std::vector<std::string> labels,
+                  std::vector<std::string> values);
 
 /**
  * Prepare files in case of calculating GCF in plane/U1/U2 charts.
@@ -331,8 +334,7 @@ void changeParameterNames(std::vector<std::string> &labels,
  *
  * @param labels vector of strings containing the labels to look for
  * @param target string to be modified
- *
- * @returns the modified string
+ * @return       the modified string
  *
  * If the labels vector is {a,b,c} and the target is a*b*2, then
  * this function returns a_*b_*2
@@ -346,8 +348,7 @@ std::string convertLabelsFromString(std::vector<std::string> labels,
  * @param target string to look for word in
  * @param word   word to find as substring
  * @param start  index where to start looking
- *
- * @return the first index where we found a match
+ * @return       the first index where we found a match
  *
  * If we find word in target, we need to check if it is preceded by
  * a mathematical operator (i.e., not a digit, letter or underscore)
