@@ -37,7 +37,6 @@
 #include "WSphere.h"
 
 #include "custom.h"
-#include "delete_pointer.h"
 #include "file_tab.h"
 #include "math_p4.h"
 //#include "math_findpoint.h"
@@ -148,15 +147,24 @@ WSphere::~WSphere()
     while (CircleAtInfinity != nullptr) {
         t = CircleAtInfinity;
         CircleAtInfinity = t->next;
-        delete_pointer(t);
+        if (t != nullptr) {
+            delete t;
+            t = nullptr;
+        }
     }
     while (PLCircle != nullptr) {
         t = PLCircle;
         PLCircle = t->next;
-        delete_pointer(t);
+        if (t != nullptr) {
+            delete t;
+            t = nullptr;
+        }
     }
 
-    delete_pointer(study_);
+    if (study_ != nullptr) {
+        delete study_;
+        study_ = nullptr;
+    }
 }
 
 bool WSphere::setupPlot(void)

@@ -476,8 +476,7 @@ class WSphere : public Wt::WPaintedWidget
     Wt::Signal<std::string> errorSignal_;
 
     /**
-     * parent widget (stored from @c parent, argument
-     * passed to constructor)
+     * parent widget (stored from @c parent, argument passed to constructor)
      */
     Wt::WContainerWidget *parentWnd;
     /**
