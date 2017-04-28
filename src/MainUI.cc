@@ -53,9 +53,19 @@ MainUI::MainUI(WContainerWidget *parent) : WContainerWidget(parent)
 
 MainUI::~MainUI()
 {
-    delete leftContainer_;
-    delete rightContainer_;
-    delete authWidget_;
+    // TODO: completar destructor
+    if (leftContainer_ != nullptr) {
+        delete leftContainer_;
+        leftContainer_ = nullptr;
+    }
+    if (rightContainer_ != nullptr) {
+        delete rightContainer_;
+        rightContainer_ = nullptr;
+    }
+    if (authWidget_ != nullptr) {
+        delete authWidget_;
+        authWidget_ = nullptr;
+    }
 }
 
 void MainUI::setupUI()
@@ -172,7 +182,7 @@ void MainUI::onAuthEvent()
     } else {
         globalLogger__.info("Auth :: User logged out.");
         leftContainer_->hideSettings();
-        rightContainer_->hideParamsTab();
+        rightContainer_->hideParamsTab(true);
         setLogoutIndicator();
     }
     WApplication::instance()->setInternalPath("/", true);
