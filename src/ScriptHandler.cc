@@ -209,7 +209,7 @@ bool fillSaveFile(std::string fname, mapleParamsStruct prms,
                   std::vector<std::string> labels,
                   std::vector<std::string> values)
 {
-    globalLlogger__.debug("ScriptHandler :: filling save file...");
+    globalLogger__.debug("ScriptHandler :: filling save file...");
     FILE *fp = fopen(fname.c_str(), "w");
 
     if (fp != nullptr) {
