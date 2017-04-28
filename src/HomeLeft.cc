@@ -353,8 +353,10 @@ void HomeLeft::parseInputFile()
                         (stoi(line) > 0) ? stoi(line) : ACCURACY_DEFAULT);
                     break;
                 case 3:
+                    if (line[0] == '.')
+                        line = "0"+line;
                     epsilonSpinBox_->setValue(
-                        (stoi(line) > 0) ? stoi(line) : EPSILON_DEFAULT);
+                        (stod(line) > 0) ? stod(line) : EPSILON_DEFAULT);
                     break;
                 case 4:
                     if (line == "0") {
