@@ -141,61 +141,58 @@ void WVFStudy::deleteVF()
 {
     // Delete Vector Field
     delete_term2(f_vec_field[0]);
-    delete_term2(f_vec_field[1]);
-    delete_term2(vec_field_U1[0]);
-    delete_term2(vec_field_U1[1]);
-    delete_term2(vec_field_U2[0]);
-    delete_term2(vec_field_U2[1]);
-    delete_term2(vec_field_V1[0]);
-    delete_term2(vec_field_V1[1]);
-    delete_term2(vec_field_V2[0]);
-    delete_term2(vec_field_V2[1]);
-    delete_term3(vec_field_C[0]);
-    delete_term3(vec_field_C[1]);
-
     f_vec_field[0] = nullptr;
+    delete_term2(f_vec_field[1]);
     f_vec_field[1] = nullptr;
+    delete_term2(vec_field_U1[0]);
     vec_field_U1[0] = nullptr;
+    delete_term2(vec_field_U1[1]);
     vec_field_U1[1] = nullptr;
+    delete_term2(vec_field_U2[0]);
     vec_field_U2[0] = nullptr;
+    delete_term2(vec_field_U2[1]);
     vec_field_U2[1] = nullptr;
+    delete_term2(vec_field_V1[0]);
     vec_field_V1[0] = nullptr;
+    delete_term2(vec_field_V1[1]);
     vec_field_V1[1] = nullptr;
+    delete_term2(vec_field_V2[0]);
     vec_field_V2[0] = nullptr;
+    delete_term2(vec_field_V2[1]);
     vec_field_V2[1] = nullptr;
+    delete_term3(vec_field_C[0]);
     vec_field_C[0] = nullptr;
+    delete_term3(vec_field_C[1]);
     vec_field_C[1] = nullptr;
 
     // Delete singular points
     deleteSaddle(first_saddle_point);
-    deleteSemiElementary(first_se_point);
-    deleteNode(first_node_point);
-    deleteDegenerate(first_de_point);
-    deleteStrongFocus(first_sf_point);
-    deleteWeakFocus(first_wf_point);
-
     first_saddle_point = nullptr;
+    deleteSemiElementary(first_se_point);
     first_se_point = nullptr;
+    deleteNode(first_node_point);
     first_node_point = nullptr;
+    deleteDegenerate(first_de_point);
     first_sf_point = nullptr;
+    deleteStrongFocus(first_sf_point);
     first_wf_point = nullptr;
+    deleteWeakFocus(first_wf_point);
     first_de_point = nullptr;
 
     // Delete GCF:
     delete_term2(gcf);
-    delete_term2(gcf_U1);
-    delete_term2(gcf_U2);
-    delete_term2(gcf_V1);
-    delete_term2(gcf_V2);
-    delete_term3(gcf_C);
-    deleteOrbitPoint(gcf_points);
-
     gcf = nullptr;
+    delete_term2(gcf_U1);
     gcf_U1 = nullptr;
+    delete_term2(gcf_U2);
     gcf_U2 = nullptr;
+    delete_term2(gcf_V1);
     gcf_V1 = nullptr;
+    delete_term2(gcf_V2);
     gcf_V2 = nullptr;
+    delete_term3(gcf_C);
     gcf_C = nullptr;
+    deleteOrbitPoint(gcf_points);
     gcf_points = nullptr;
 
     // Delete all orbits
@@ -206,19 +203,6 @@ void WVFStudy::deleteVF()
     // Delete limit cycles
     deleteLimitCycle(first_lim_cycle);
     first_lim_cycle = nullptr;
-
-    // reset others
-    xmin = -1.0;
-    xmax = 1.0;
-    ymin = -1.0;
-    ymax = 1.0;
-    p = 1;
-    q = 1;
-    typeofstudy = TYPEOFSTUDY_ALL;
-    singinf = false;
-    dir_vec_field = 1;
-
-    lasterror = "";
 }
 
 // -----------------------------------------------------------------------

@@ -100,7 +100,7 @@ class Session
      *
      * In our case, this does nothing because we don't use oAuth for now
      */
-    static const std::vector<const Wt::Auth::OAuthService *> &oAuth();
+    //static const std::vector<const Wt::Auth::OAuthService *> &oAuth();
 
   private:
     dbo::backend::Sqlite3 sqlite3_;

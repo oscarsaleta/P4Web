@@ -45,6 +45,7 @@
 #include "file_tab.h"
 
 #include <cmath>
+#include <string.h>
 
 using namespace Wt;
 

@@ -131,7 +131,7 @@ void MainUI::setupUI()
     authWidget_ = new MyAuthWidget(session_, mainStack_);
     authWidget_->setId("authWidget_");
     authWidget_->model()->addPasswordAuth(&Session::passwordAuth());
-    authWidget_->model()->addOAuth(Session::oAuth());
+    //authWidget_->model()->addOAuth(Session::oAuth());
     authWidget_->setRegistrationEnabled(true);
 
     // this holds the main page content

@@ -49,7 +49,6 @@
 #include "custom.h"
 
 #include <Wt/WString>
-#include <Wt/WTextArea>
 
 // -----------------------------------------------------------------------
 //                      General polynomial expressions

@@ -24,8 +24,7 @@
 #include <Wt/Auth/AuthService>
 #include <Wt/Auth/Dbo/AuthInfo>
 #include <Wt/Auth/Dbo/UserDatabase>
-#include <Wt/Auth/FacebookService>
-#include <Wt/Auth/GoogleService>
+#include <Wt/Auth/Identity>
 #include <Wt/Auth/HashFunction>
 #include <Wt/Auth/PasswordService>
 #include <Wt/Auth/PasswordStrengthValidator>
@@ -35,7 +34,7 @@ using namespace Wt;
 
 namespace
 {
-class MyOAuth : public std::vector<const Auth::OAuthService *>
+/*class MyOAuth : public std::vector<const Auth::OAuthService *>
 {
   public:
     ~MyOAuth()
@@ -43,11 +42,11 @@ class MyOAuth : public std::vector<const Auth::OAuthService *>
         for (unsigned i = 0; i < size(); ++i)
             delete (*this)[i];
     }
-};
+};*/
 
 Auth::AuthService myAuthService;
 Auth::PasswordService myPasswordService(myAuthService);
-MyOAuth myOAuthServices;
+//MyOAuth myOAuthServices;
 }
 
 void Session::configureAuth()
@@ -64,13 +63,8 @@ void Session::configureAuth()
         new Auth::PasswordStrengthValidator());
     myPasswordService.setAttemptThrottlingEnabled(true);
 
-    /*if (Auth::GoogleService::configured())
-        myOAuthServices.push_back(new Auth::GoogleService(myAuthService));
-    if (Auth::FacebookService::configured())
-        myOAuthServices.push_back(new Auth::FacebookService(myAuthService));*/
-
-    for (unsigned i = 0; i < myOAuthServices.size(); ++i)
-        myOAuthServices[i]->generateRedirectEndpoint();
+    //for (unsigned i = 0; i < myOAuthServices.size(); ++i)
+    //    myOAuthServices[i]->generateRedirectEndpoint();
 }
 
 Session::Session() : sqlite3_(WApplication::instance()->appRoot() + "auth.db")
@@ -133,7 +127,7 @@ const Auth::AbstractPasswordService &Session::passwordAuth()
     return myPasswordService;
 }
 
-const std::vector<const Auth::OAuthService *> &Session::oAuth()
+/*const std::vector<const Auth::OAuthService *> &Session::oAuth()
 {
     return myOAuthServices;
-}
+}*/

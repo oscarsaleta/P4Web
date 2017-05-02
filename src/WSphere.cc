@@ -41,10 +41,8 @@
 #include "math_p4.h"
 //#include "math_findpoint.h"
 //#include "math_limitcycles.h"
-//#include "math_orbits.h"
 #include "MyLogger.h"
 #include "math_separatrice.h"
-//#include "math_gcf.h"
 #include "plot_points.h"
 #include "plot_tools.h"
 
@@ -53,9 +51,6 @@
 #include <cmath>
 
 using namespace Wt;
-
-// int WSphere::numSpheres = 0;
-// WSphere * * WSphere::SphereList = nullptr;
 
 /*
     Coordinates on the sphere:
@@ -81,13 +76,6 @@ WSphere::WSphere(WContainerWidget *parent, int width, int height,
     study_ = new WVFStudy(projection);
 
     ReverseYaxis = false;
-
-    /*SphereList = (WSphere * *)realloc( SphereList, sizeof(WSphere *) *
-    (numSpheres+1) );
-    SphereList[numSpheres++] = this;
-    if( numSpheres > 1 ) {
-        SphereList[numSpheres-2]->next = this;
-    }*/
 
     resize(width_, height_);
 
@@ -116,13 +104,6 @@ WSphere::WSphere(WContainerWidget *parent, int width, int height,
     study_ = new WVFStudy();
 
     ReverseYaxis = false;
-
-    /*SphereList = (WSphere * *)realloc( SphereList, sizeof(WSphere *) *
-    (numSpheres+1) );
-    SphereList[numSpheres++] = this;
-    if( numSpheres > 1 ) {
-        SphereList[numSpheres-2]->next = this;
-    }*/
 
     resize(width_, height_);
 
@@ -223,12 +204,6 @@ bool WSphere::setupPlot(void)
     }
 
     struct P4POLYLINES *t;
-    /*QPalette palette;
-
-    spherebgcolor=CBACKGROUND;
-    palette.setColor(backgroundRole(), QXFIGCOLOR(spherebgcolor) );
-    setPalette(palette);*/
-
     while (CircleAtInfinity != nullptr) {
         t = CircleAtInfinity;
         CircleAtInfinity = t->next;
@@ -975,19 +950,12 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
     d = false;
     doton = true;
 
-    //  FILE * fp;
-    //  fp = fopen( "C:\\test.txt", "wt" );
-
     while (theta < TWOPI) {
-        //        fprintf( fp, "%f\n", (float)theta );
-        //        fflush(fp);
         c = (x0 - cx) / a;
         if (c > -1.0 && c < 1.0) {
             t1 = acos(c);
             t2 = TWOPI - t1;
             if (theta >= t1 && theta < t2) {
-                //                fprintf( fp, "A EXCL [%f %f]\n", (float)t1,
-                //                (float)t2 );
                 theta = t2 + e / 4;
                 d = false;
                 continue;
@@ -998,15 +966,11 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
             t1 = acos(c);
             t2 = TWOPI - t1;
             if (theta < t1) {
-                //                fprintf( fp, "B EXCL [-infinity %f]\n",
-                //                (float)t1 );
                 theta = t1 + e / 4;
                 d = false;
                 continue;
             }
             if (theta >= t2) {
-                //                fprintf( fp, "C EXCL [%f, infinity]\n",
-                //                (float)t2 );
                 theta = TWOPI + e / 4;
                 d = false;
                 break;
@@ -1020,23 +984,17 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
                 t2 = t1 + TWOPI;
                 t1 = PI - t1;
                 if (theta >= t1 && theta < t2) {
-                    //                    fprintf( fp, "D EXCL [%f %f]\n",
-                    //                    (float)t1, (float)t2 );
                     theta = t2 + e / 4;
                     d = false;
                     continue;
                 }
             } else {
                 if (theta < t1) {
-                    //                    fprintf( fp, "E EXCL [-infinity
-                    //                    %f]\n", (float)t1 );
                     theta = t1 + e / 4;
                     d = false;
                     continue;
                 }
                 if (theta >= t2) {
-                    //                    fprintf( fp, "F EXCL [%f,
-                    //                    infinity]\n",  (float)t2 );
                     theta = TWOPI + e / 4;
                     d = false;
                     break;
@@ -1051,23 +1009,17 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
                 t2 = t1 + TWOPI;
                 t1 = PI - t1;
                 if (theta < t1) {
-                    //                    fprintf( fp, "G EXCL [-infinity
-                    //                    %f]\n", (float)t1 );
                     theta = t1 + e / 4;
                     d = false;
                     continue;
                 }
                 if (theta >= t2) {
-                    //                    fprintf( fp, "H EXCL [%f,
-                    //                    infinity]\n",  (float)t2 );
                     theta = TWOPI;
                     d = false;
                     break;
                 }
             } else {
                 if (theta >= t1 && theta < t2) {
-                    //                    fprintf( fp, "I EXCL [%f %f]\n",
-                    //                    (float)t1, (float)t2 );
                     theta = t2 + e / 4;
                     d = false;
                     continue;
@@ -1121,7 +1073,6 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
             }
         }
     }
-    //  fclose(fp);
     return first;
 }
 
@@ -1151,8 +1102,6 @@ void WSphere::plotPoincareLyapunovSphere(void)
     while (p != nullptr) {
         path->moveTo(coWinX(p->x1), coWinY(p->y1));
         path->lineTo(coWinX(p->x2), coWinY(p->y2));
-        // staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2),
-        // coWinY(p->y2) );
         p = p->next;
     }
     path->closeSubPath();
@@ -1166,8 +1115,6 @@ void WSphere::plotPoincareLyapunovSphere(void)
     while (p != nullptr) {
         path->moveTo(coWinX(p->x1), coWinY(p->y1));
         path->lineTo(coWinX(p->x2), coWinY(p->y2));
-        // staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2),
-        // coWinY(p->y2) );
         p = p->next;
     }
     path->closeSubPath();
@@ -1212,7 +1159,6 @@ void WSphere::drawLine(double _x1, double _y1, double _x2, double _y2,
 
             if (_x2 >= x0 && _x2 <= x1 && _y2 >= y0 && _y2 <= y1) {
                 // both points are visible in the window
-
                 wx2 = coWinX(_x2);
                 wy2 = coWinY(_y2);
 
@@ -1237,7 +1183,6 @@ void WSphere::drawLine(double _x1, double _y1, double _x2, double _y2,
                 staticPainter->drawLine(wx1, wy1, wx2, wy2);
             } else {
                 // only (_x2,_y2) is not visible
-
                 if (lineRectangleIntersect(_x1, _y1, _x2, _y2, x0, x1, y0,
                                            y1)) {
                     wx1 = coWinX(_x1);
@@ -1269,7 +1214,6 @@ void WSphere::drawLine(double _x1, double _y1, double _x2, double _y2,
         } else {
             if (_x2 >= x0 && _x2 <= x1 && _y2 >= y0 && _y2 <= y1) {
                 // only (_x2,_y2) is visible
-
                 if (lineRectangleIntersect(_x1, _y1, _x2, _y2, x0, x1, y0,
                                            y1)) {
                     wx1 = coWinX(_x1);
@@ -1299,7 +1243,6 @@ void WSphere::drawLine(double _x1, double _y1, double _x2, double _y2,
                 }
             } else {
                 // both end points are invisible
-
                 if (lineRectangleIntersect(_x1, _y1, _x2, _y2, x0, x1, y0,
                                            y1)) {
                     wx1 = coWinX(_x1);

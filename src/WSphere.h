@@ -421,38 +421,35 @@ class WSphere : public Wt::WPaintedWidget
     Wt::Signal<std::string> &errorSignal() { return errorSignal_; }
 
     /**
-     * pointer to a painter linked to a paint device
-     * created in a paint event. This makes possible
-     * to distribute painting to different functions
-     * and compiling units (even from outside the
-     * object)
+     * Pointer to a painter linked to a paint device created in a paint event.
+     * This makes possible to distribute painting to different functions and
+     * compiling units (even from outside the object)
      */
     Wt::WPainter *staticPainter;
 
     /**
-     * flag used to not replot every time we just want to
-     * update something
+     * Flag used to not replot every time we just want to update something
      */
     bool plotDone_;
     /**
-     * flag used to make the sphere compute gcf
+     * Flag used to make the sphere compute gcf
      */
     bool gcfEval_;
     /**
-     * name of Maple script from first execution, to be
+     * Name of Maple script from first execution, to be
      * reused for gcf
      */
     std::string gcfFname_;
     /**
-     * number of points for gcf
+     * Number of points for gcf
      */
     int gcfNPoints_;
     /**
-     * precision of zeros for gcf
+     * Precision of zeros for gcf
      */
     int gcfPrec_;
     /**
-     * points (0) or dashes (1) for gcf plot
+     * Points (0) or dashes (1) for gcf plot
      */
     int gcfDashes_;
 

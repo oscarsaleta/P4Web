@@ -22,19 +22,13 @@
 #include "file_tab.h"
 
 #include <fstream>
-#include <iostream>
-#include <string>
 
-#include <Wt/WBreak>
-#include <Wt/WEvent>
-#include <Wt/WGroupBox>
-#include <Wt/WImage>
 #include <Wt/WLineEdit>
-#include <Wt/WMenuItem>
 #include <Wt/WPushButton>
 #include <Wt/WScrollArea>
 #include <Wt/WTabWidget>
 #include <Wt/WTemplate>
+#include <Wt/WTextArea>
 #include <Wt/WToolBar>
 
 using namespace Wt;

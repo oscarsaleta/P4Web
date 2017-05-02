@@ -40,7 +40,6 @@
 #include "math_polynom.h"
 #include "math_separatrice.h"
 #include "plot_tools.h"
-//#include "math_numerics.h"
 
 // static global variables
 /* To get rid of this, we would have to change the interface of

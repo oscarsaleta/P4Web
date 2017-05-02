@@ -103,31 +103,6 @@ void spherePlotPoint(WSphere *sp, double *p, int color)
     }
 }
 
-/*void spherePrintLine( WSphere * sp, double * p1, double * p2, int color )
-{
-    double ucoord1[2];
-    double ucoord2[2];
-    double ucoord3[2];
-    double ucoord4[2];
-
-    if(
-((sp->study_)->*(sp->study_->sphere_to_viewcoordpair))(p1,p2,ucoord1,ucoord2,ucoord3,ucoord4)
-) {
-        sp->printLine( ucoord1[0], ucoord1[1], ucoord2[0], ucoord2[1], color );
-    } else {
-        sp->printLine( ucoord1[0], ucoord1[1], ucoord2[0], ucoord2[1], color );
-        sp->printLine( ucoord3[0], ucoord3[1], ucoord4[0], ucoord4[1], color );
-    }
-}*/
-
-/*void spherePrintPoint( WSphere * sp, double * p, int color )
-{
-    double ucoord[2];
-
-    ((sp->study_)->*(sp->study_->sphere_to_viewcoord))(p[0],p[1],p[2],ucoord);
-
-    sp->printPoint( ucoord[0], ucoord[1], color );
-}*/
 
 // Intersects a line with a rectangle.  Changes the coordinates so that both
 // endpoints

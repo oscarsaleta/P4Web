@@ -33,7 +33,6 @@
 #include <vector>
 
 #include <Wt/WAnchor>
-#include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WButtonGroup>
 #include <Wt/WComboBox>
@@ -44,7 +43,6 @@
 #include <Wt/WGroupBox>
 #include <Wt/WImage>
 #include <Wt/WLabel>
-#include <Wt/WLength>
 #include <Wt/WLineEdit>
 #include <Wt/WPushButton>
 #include <Wt/WRadioButton>
