@@ -40,11 +40,6 @@ bool WSphere::evalGcfStart(std::string fname, int dashes, int points,
                            int precis)
 {
     if (study_->gcf_points != nullptr) {
-        /* here we just paint in black over the previous gcf,
-           we can simply reset the plot or something */
-        // sp->prepareDrawing();
-        // draw_gcf( sp, study_->gcf_points, CBACKGROUND, GcfDashes );
-        // sp->finishDrawing();
         study_->deleteOrbitPoint(study_->gcf_points);
         study_->gcf_points = nullptr;
     }
@@ -55,7 +50,6 @@ bool WSphere::evalGcfStart(std::string fname, int dashes, int points,
         gcfTask_ = EVAL_GCF_R2;
 
     gcfError_ = false;
-    // GcfSphere = sp;
     GcfDashes = dashes;
     if (runTask(fname, gcfTask_, points, precis) < 0)
         return false;
@@ -106,7 +100,6 @@ bool WSphere::evalGcfFinish(void) // return false in case an error occured
 int WSphere::runTask(std::string fname, int task, int points, int prec)
 {
     bool value;
-    // std::string fname = randomFileName(TMP_DIR,"_gcf.tab");
 
     globalLogger__.debug("WSphere :: will run GCF task=" +
                          std::to_string(task) + " using file=" + fname);
@@ -239,7 +232,6 @@ void WVFStudy::insert_gcf_point(double x0, double y0, double z0, int dashes)
 bool WSphere::read_gcf(std::string fname,
                        void (WVFStudy::*chart)(double, double, double *))
 {
-
     int t;
     int k;
     FILE *fp;
