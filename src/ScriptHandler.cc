@@ -205,6 +205,37 @@ siginfo_t evaluateMapleScript(std::string fname, int maxtime)
     }
 }
 
+/*
+    Structure of .inp file:
+
+    - integer 0,1,2,3  (type of singularities: all, finite, ...)
+    - parameters:
+        * integer 0,1 symbolic/numeric
+        * integer precision
+        * string epsilon
+        * integer testsep
+        * integer taylorlevel
+        * integer numericlevel
+        * integer maxlevel
+        * integer weakness
+        * only if type of singularity is ONE:
+            + string x0
+            + string y0
+        * otherwhise:
+            + integer P
+            + integer Q
+
+    - vector field:
+        * string xdot
+        * string ydot
+        * string gcf
+        * integer numparams
+        * for each parameter:
+            + string label
+            + string value
+
+    - optional: integer precision0
+*/
 bool fillSaveFile(std::string fname, mapleParamsStruct prms,
                   std::vector<std::string> labels,
                   std::vector<std::string> values)
