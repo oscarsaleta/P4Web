@@ -170,6 +170,56 @@ struct orbits {
 };
 
 // -----------------------------------------------------------------------
+//                      Curves and isoclines
+// -----------------------------------------------------------------------
+
+/**
+ * Curves struct
+ *
+ * Not a linked list because we will use a vector
+ */
+struct curves {
+    P4POLYNOM2 r2;  ///< points in the plane
+    P4POLYNOM2 u1;  ///< points in U1 chart
+    P4POLYNOM2 u2;  ///< points in U2 chart
+    P4POLYNOM2 v1;  ///< points in V1 chart
+    P4POLYNOM2 v2;  ///< points in V2 chart
+    P4POLYNOM3 c;   ///< points in cylinder
+    P4ORBIT points; ///< points structure for plotting
+
+    /**
+     * Constructor method
+     */
+    curves()
+        : r2(nullptr), u1(nullptr), u2(nullptr), v1(nullptr), v2(nullptr),
+          c(nullptr), points(nullptr){};
+};
+
+/**
+ * Isoclines struct
+ *
+ * Not a linked list because we will use a vector. It is like the curves
+ * struct but with a color field
+ */
+struct isoclines {
+    P4POLYNOM2 r2;  ///< points in the plane
+    P4POLYNOM2 u1;  ///< points in U1 chart
+    P4POLYNOM2 u2;  ///< points in U2 chart
+    P4POLYNOM2 v1;  ///< points in V1 chart
+    P4POLYNOM2 v2;  ///< points in V2 chart
+    P4POLYNOM3 c;   ///< points in cylinder
+    P4ORBIT points; ///< points structure for plotting
+    int color;      ///< color of this isocline
+
+    /**
+     * Constructor method
+     */
+    isoclines()
+        : r2(nullptr), u1(nullptr), u2(nullptr), v1(nullptr), v2(nullptr),
+          c(nullptr), points(nullptr){};
+};
+
+// -----------------------------------------------------------------------
 //                      Blow up structure
 // -----------------------------------------------------------------------
 
@@ -486,90 +536,93 @@ class WVFStudy
 
     // general information
 
-    int typeofstudy;        ///< type of study for these results
-    TYPEOFVIEWS typeofview; /**< type of view of the plot. Can be
+    int typeofstudy_;        ///< type of study for these results
+    TYPEOFVIEWS typeofview_; /**< type of view of the plot. Can be
                                 TYPEOFVIEW_PLANE or TYPEOFVIEW_SPHERE */
-    int p;                  ///< Lyapunov weight
-    int q;                  ///< Lyapunov weight
-    bool plweights;         ///< true if p!=1 or q!=1; false if p=q=1
+    int p_;                  ///< Lyapunov weight
+    int q_;                  ///< Lyapunov weight
+    bool plweights_;         ///< true if p!=1 or q!=1; false if p=q=1
 
-    double double_p;         ///< shortcut: (double)p
-    double double_q;         ///< shortcut: (double)q
-    double double_p_plus_q;  ///< shortcut: (double)(p+q)
-    double double_p_minus_1; ///< shortcut: (double)(p-1)
-    double double_q_minus_1; ///< shortcut: (double)(q-1)
-    double double_q_minus_p; ///< shortcut: (double)(q-p)
+    double double_p_;         ///< shortcut: (double)p
+    double double_q_;         ///< shortcut: (double)q
+    double double_p_plus_q_;  ///< shortcut: (double)(p+q)
+    double double_p_minus_1_; ///< shortcut: (double)(p-1)
+    double double_q_minus_1_; ///< shortcut: (double)(q-1)
+    double double_q_minus_p_; ///< shortcut: (double)(q-p)
 
-    double xmin;       ///< in case of local study
-    double xmax;       ///< in case of local study
-    double ymin;       ///< in case of local study
-    double ymax;       ///< in case of local study
-    bool singinf;      ///< flag for looking for singularities at infinity
-    int dir_vec_field; ///< direction of vector field
+    double xmin_;       ///< in case of local study
+    double xmax_;       ///< in case of local study
+    double ymin_;       ///< in case of local study
+    double ymax_;       ///< in case of local study
+    bool singinf_;      ///< flag for looking for singularities at infinity
+    int dir_vec_field_; ///< direction of vector field
 
-    Wt::WString lasterror; ///< last error emitted
+    Wt::WString lasterror_; ///< last error emitted
 
     // vector field in various charts
 
-    P4POLYNOM2 f_vec_field[2];  ///< vector field in R2
-    P4POLYNOM2 vec_field_U1[2]; ///< vectori field in U1
-    P4POLYNOM2 vec_field_U2[2]; ///< vectori field in U2
-    P4POLYNOM2 vec_field_V1[2]; ///< vectori field in V1
-    P4POLYNOM2 vec_field_V2[2]; ///< vectori field in V2
-    P4POLYNOM3 vec_field_C[2];  ///< vectori field in C
+    P4POLYNOM2 f_vec_field_[2];  ///< vector field in R2
+    P4POLYNOM2 vec_field_U1_[2]; ///< vectori field in U1
+    P4POLYNOM2 vec_field_U2_[2]; ///< vectori field in U2
+    P4POLYNOM2 vec_field_V1_[2]; ///< vectori field in V1
+    P4POLYNOM2 vec_field_V2_[2]; ///< vectori field in V2
+    P4POLYNOM3 vec_field_C_[2];  ///< vectori field in C
 
     // singular points and their properties:
 
-    saddle *first_saddle_point;      ///< linked list of saddles
-    semi_elementary *first_se_point; ///< linked list of semi-elementaries
-    node *first_node_point;          ///< linked list of nodes
-    strong_focus *first_sf_point;    ///< linked list of strong foci
-    weak_focus *first_wf_point;      ///< linked list of weak foci
-    degenerate *first_de_point;      ///< linked list of degenerates
+    saddle *first_saddle_point_;      ///< linked list of saddles
+    semi_elementary *first_se_point_; ///< linked list of semi-elementaries
+    node *first_node_point_;          ///< linked list of nodes
+    strong_focus *first_sf_point_;    ///< linked list of strong foci
+    weak_focus *first_wf_point_;      ///< linked list of weak foci
+    degenerate *first_de_point_;      ///< linked list of degenerates
 
     // Greatest common factor if present:
 
-    P4POLYNOM2 gcf;    ///< gcf in R
-    P4POLYNOM2 gcf_U1; ///< gcf in chart U1
-    P4POLYNOM2 gcf_U2; ///< gcf in chart U2
-    P4POLYNOM2 gcf_V1; ///< gcf in chart V1
-    P4POLYNOM2 gcf_V2; ///< gcf in chart V2
-    P4POLYNOM3 gcf_C;  ///< gcf in C
+    P4POLYNOM2 gcf_;                ///< gcf in R
+    P4POLYNOM2 gcf_U1_;             ///< gcf in chart U1
+    P4POLYNOM2 gcf_U2_;             ///< gcf in chart U2
+    P4POLYNOM2 gcf_V1_;             ///< gcf in chart V1
+    P4POLYNOM2 gcf_V2_;             ///< gcf in chart V2
+    P4POLYNOM3 gcf_C_;              ///< gcf in C
+    orbits_points *gcf_points_;     ///< orbits points of the gcf
+    orbits_points *last_gcf_point_; ///< last gcf point
 
-    orbits_points *gcf_points;     ///< orbits points of the gcf
-    orbits_points *last_gcf_point; ///< last gcf point
+    std::vector<curves> curve_vector_;       ///< curves vector
+    std::vector<isoclines> isocline_vector_; ///< isoclines vector
 
     // limit cycles
 
-    orbits *first_lim_cycle; ///< linked list of limit cycles
-    orbits *first_orbit;     ///< linked list of orbits
+    orbits *first_lim_cycle_; ///< linked list of limit cycles
+    orbits *first_orbit_;     ///< linked list of orbits
 
     // ------ Configuration
 
-    int config_lc_value;       ///< orbits in limit cycle window
-    double config_hma;         ///< maximum step size
-    double config_hmi;         ///< minimum step size
-    double config_step;        ///< step size
-    double config_currentstep; ///< current step size (during integration)
-    double config_tolerance;   ///< tolerance
-    double config_projection;  ///< projection in the case of Poincaré sphere
-    int config_intpoints;      ///< number of points to integrate
-    int config_lc_numpoints;   ///< number of points in the limit cycle window
-    bool config_dashes;        ///< line style (dashes or points)
-    bool config_kindvf;        ///< true for original VF, false for reduced
+    int config_lc_value_;       ///< orbits in limit cycle window
+    double config_hma_;         ///< maximum step size
+    double config_hmi_;         ///< minimum step size
+    double config_step_;        ///< step size
+    double config_currentstep_; ///< current step size (during integration)
+    double config_tolerance_;   ///< tolerance
+    double config_projection_;  ///< projection in the case of Poincaré sphere
+    int config_intpoints_;      ///< number of points to integrate
+    int config_lc_numpoints_;   ///< number of points in the limit cycle window
+    bool config_dashes_;        ///< line style (dashes or points)
+    bool config_kindvf_;        ///< true for original VF, false for reduced
 
     // run-time when plotting
 
-    orbits *current_orbit;     ///< current orbit for plotting
-    orbits *current_lim_cycle; ///< current limit cycle for plotting
+    orbits *current_orbit_;     ///< current orbit for plotting
+    orbits *current_lim_cycle_; ///< current limit cycle for plotting
 
-    double selected_ucoord[2];          ///< selected coordinate (plotting)
-    saddle *selected_saddle_point;      ///< selected saddle (plotting)
-    semi_elementary *selected_se_point; ///< selected semi-elementary (plotting)
-    degenerate *selected_de_point;      ///< selected degenerate (plotting)
-    sep *selected_sep;                  ///< selected separatrice (plotting)
+    double selected_ucoord_[2];     ///< selected coordinate (plotting)
+    saddle *selected_saddle_point_; ///< selected saddle (plotting)
+    semi_elementary
+        *selected_se_point_;        ///< selected semi-elementary (plotting)
+    degenerate *selected_de_point_; ///< selected degenerate (plotting)
+    sep *selected_sep_;             ///< selected separatrice (plotting)
     blow_up_points
-        *selected_de_sep; ///< selected blowup for degenerate (plotting)
+        *selected_de_sep_; ///< selected blowup for degenerate (plotting)
 
     // coordinate transformation routines, set up when starting the plot
 
@@ -1041,7 +1094,7 @@ class WVFStudy
      * @param Z      coordinate 3 of Poincaré sphere
      * @param ucoord length 2 vector where R2 coordinates will be stored
      *
-     * Results depend on the config_projection value
+     * Results depend on the config_projection_ value
      */
     void psphere_ucircle(double X, double Y, double Z, double *ucoord);
     /**
@@ -1050,7 +1103,7 @@ class WVFStudy
      * @param v      coordinate 2 of Poincaré sphere
      * @param pcoord length 3 vector where sphere coordinates will be stored
      *
-     * Results depend on the config_projection value
+     * Results depend on the config_projection_ value
      */
     void ucircle_psphere(double u, double v, double *pcoord);
     /**
@@ -1059,7 +1112,7 @@ class WVFStudy
      * @param y      coordinate 2 of plane
      * @param ucoord length 2 vector where circle coordinates will be stored
      *
-     * Results depend on the config_projection value
+     * Results depend on the config_projection_ value
      */
     void finite_ucircle(double x, double y, double *ucoord);
     /**

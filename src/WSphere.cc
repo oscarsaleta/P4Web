@@ -161,43 +161,43 @@ bool WSphere::setupPlot(void)
     } else {
         switch (typeOfView_) {
         case 0:
-            study_->typeofview = TYPEOFVIEW_SPHERE;
-            study_->config_projection = projection_;
+            study_->typeofview_ = TYPEOFVIEW_SPHERE;
+            study_->config_projection_ = projection_;
             break;
         case 1:
-            study_->typeofview = TYPEOFVIEW_PLANE;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_PLANE;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         case 2:
-            study_->typeofview = TYPEOFVIEW_U1;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_U1;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         case 3:
-            study_->typeofview = TYPEOFVIEW_V1;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_V1;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         case 4:
-            study_->typeofview = TYPEOFVIEW_U2;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_U2;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         case 5:
-            study_->typeofview = TYPEOFVIEW_V2;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_V2;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         }
         study_->setupCoordinateTransformations();
@@ -217,16 +217,16 @@ bool WSphere::setupPlot(void)
         t = nullptr;
     }
 
-    switch (study_->typeofview) {
+    switch (study_->typeofview_) {
     case TYPEOFVIEW_PLANE:
     case TYPEOFVIEW_U1:
     case TYPEOFVIEW_U2:
     case TYPEOFVIEW_V1:
     case TYPEOFVIEW_V2:
-        x0 = study_->xmin;
-        y0 = study_->ymin;
-        x1 = study_->xmax;
-        y1 = study_->ymax;
+        x0 = study_->xmin_;
+        y0 = study_->ymin_;
+        x1 = study_->xmax_;
+        y1 = study_->ymax_;
         break;
     case TYPEOFVIEW_SPHERE:
         x0 = -1.1;
@@ -239,29 +239,29 @@ bool WSphere::setupPlot(void)
     dx = x1 - x0;
     dy = y1 - y0;
 
-    switch (study_->typeofview) {
+    switch (study_->typeofview_) {
     case TYPEOFVIEW_PLANE:
     case TYPEOFVIEW_SPHERE:
         chartString_ = "";
         break;
     case TYPEOFVIEW_U1:
-        setChartString(study_->p, study_->q, true, false);
+        setChartString(study_->p_, study_->q_, true, false);
         break;
     case TYPEOFVIEW_U2:
-        setChartString(study_->p, study_->q, false, false);
+        setChartString(study_->p_, study_->q_, false, false);
         break;
     case TYPEOFVIEW_V1:
-        setChartString(study_->p, study_->q, true, true);
+        setChartString(study_->p_, study_->q_, true, true);
         break;
     case TYPEOFVIEW_V2:
-        setChartString(study_->p, study_->q, false, true);
+        setChartString(study_->p_, study_->q_, false, true);
         break;
     }
 
-    if (study_->typeofview == TYPEOFVIEW_SPHERE) {
+    if (study_->typeofview_ == TYPEOFVIEW_SPHERE) {
         CircleAtInfinity =
             produceEllipse(0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0));
-        if (study_->plweights)
+        if (study_->plweights_)
             PLCircle = produceEllipse(0.0, 0.0, RADIUS, RADIUS, true,
                                       coWinH(RADIUS), coWinV(RADIUS));
     }
@@ -283,9 +283,9 @@ void WSphere::paintEvent(WPaintDevice *p)
     if (!plotDone_) {
         paint.fillRect(0., 0., width_, height_,
                        WBrush(QXFIGCOLOR(CBACKGROUND)));
-        if (study_->typeofview != TYPEOFVIEW_PLANE) {
-            if (study_->typeofview == TYPEOFVIEW_SPHERE) {
-                if (study_->plweights) {
+        if (study_->typeofview_ != TYPEOFVIEW_PLANE) {
+            if (study_->typeofview_ == TYPEOFVIEW_SPHERE) {
+                if (study_->plweights_) {
                     plotPoincareLyapunovSphere();
                 } else {
                     plotPoincareSphere();
@@ -393,9 +393,9 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
 
     double pcoord[3];
     if ((study_->*(study_->is_valid_viewcoord))(wx, wy, pcoord)) {
-        switch (study_->typeofview) {
+        switch (study_->typeofview_) {
         case TYPEOFVIEW_PLANE:
-            if (study_->typeofstudy == TYPEOFSTUDY_ONE) {
+            if (study_->typeofstudy_ == TYPEOFSTUDY_ONE) {
                 buf = WString("Local study  (x,y) = ({1},{2})")
                           .arg(std::to_string(wx))
                           .arg(std::to_string(wy));
@@ -408,15 +408,15 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
         case TYPEOFVIEW_SPHERE:
             (study_->*(study_->sphere_to_R2))(pcoord[0], pcoord[1], pcoord[2],
                                               ucoord);
-            if (study_->p == 1 && study_->q == 1) {
+            if (study_->p_ == 1 && study_->q_ == 1) {
                 buf = WString("The Poincare sphere (x,y) = ({1},{2})")
                           .arg(std::to_string(ucoord[0]))
                           .arg(std::to_string(ucoord[1]));
             } else {
                 buf = WString(
                           "The P-L sphere of type ({1},{2})  (x,y) = ({3},{4})")
-                          .arg(study_->p)
-                          .arg(study_->q)
+                          .arg(study_->p_)
+                          .arg(study_->q_)
                           .arg(std::to_string(ucoord[0]))
                           .arg(std::to_string(ucoord[1]));
             }
@@ -433,7 +433,7 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
         case TYPEOFVIEW_V1:
             (study_->*(study_->sphere_to_V1))(pcoord[0], pcoord[1], pcoord[2],
                                               ucoord);
-            if (!study_->plweights) {
+            if (!study_->plweights_) {
                 ucoord[0] = -ucoord[0];
                 ucoord[1] = -ucoord[1];
             }
@@ -455,7 +455,7 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
         case TYPEOFVIEW_V2:
             (study_->*(study_->sphere_to_V2))(pcoord[0], pcoord[1], pcoord[2],
                                               ucoord);
-            if (!study_->plweights) {
+            if (!study_->plweights_) {
                 ucoord[0] = -ucoord[0];
                 ucoord[1] = -ucoord[1];
             }
@@ -467,20 +467,20 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
             break;
         }
     } else {
-        switch (study_->typeofview) {
+        switch (study_->typeofview_) {
         case TYPEOFVIEW_PLANE:
-            if (study_->typeofstudy == TYPEOFSTUDY_ONE)
+            if (study_->typeofstudy_ == TYPEOFSTUDY_ONE)
                 buf = "Local study";
             else
                 buf = "Planar view";
             break;
         case TYPEOFVIEW_SPHERE:
-            if (study_->p == 1 && study_->q == 1)
+            if (study_->p_ == 1 && study_->q_ == 1)
                 buf = "The Poincare sphere";
             else {
                 buf = WString("The P-L sphere of type ({1},{2})")
-                          .arg(study_->p)
-                          .arg(study_->q);
+                          .arg(study_->p_)
+                          .arg(study_->q_);
             }
             break;
         case TYPEOFVIEW_U1:
@@ -857,17 +857,17 @@ void WSphere::plotPoints(void)
     struct semi_elementary *sep;
     struct degenerate *dp;
 
-    for (sp = study_->first_saddle_point; sp != nullptr; sp = sp->next_saddle)
+    for (sp = study_->first_saddle_point_; sp != nullptr; sp = sp->next_saddle)
         plotPoint(sp);
-    for (np = study_->first_node_point; np != nullptr; np = np->next_node)
+    for (np = study_->first_node_point_; np != nullptr; np = np->next_node)
         plotPoint(np);
-    for (wfp = study_->first_wf_point; wfp != nullptr; wfp = wfp->next_wf)
+    for (wfp = study_->first_wf_point_; wfp != nullptr; wfp = wfp->next_wf)
         plotPoint(wfp);
-    for (sfp = study_->first_sf_point; sfp != nullptr; sfp = sfp->next_sf)
+    for (sfp = study_->first_sf_point_; sfp != nullptr; sfp = sfp->next_sf)
         plotPoint(sfp);
-    for (sep = study_->first_se_point; sep != nullptr; sep = sep->next_se)
+    for (sep = study_->first_se_point_; sep != nullptr; sep = sep->next_se)
         plotPoint(sep);
-    for (dp = study_->first_de_point; dp != nullptr; dp = dp->next_de)
+    for (dp = study_->first_de_point_; dp != nullptr; dp = dp->next_de)
         plotPoint(dp);
 }
 
@@ -905,15 +905,15 @@ void WSphere::plotSeparatrices(void)
     struct semi_elementary *sep;
     struct degenerate *dp;
 
-    for (sp = study_->first_saddle_point; sp != nullptr; sp = sp->next_saddle)
+    for (sp = study_->first_saddle_point_; sp != nullptr; sp = sp->next_saddle)
         plotPointSeparatrices(sp);
-    for (sep = study_->first_se_point; sep != nullptr; sep = sep->next_se)
+    for (sep = study_->first_se_point_; sep != nullptr; sep = sep->next_se)
         plotPointSeparatrices(sep);
-    for (dp = study_->first_de_point; dp != nullptr; dp = dp->next_de)
+    for (dp = study_->first_de_point_; dp != nullptr; dp = dp->next_de)
         plotPointSeparatrices(dp);
 }
 
-void WSphere::plotGcf(void) { draw_gcf(study_->gcf_points, CSING, 1); }
+void WSphere::plotGcf(void) { draw_gcf(study_->gcf_points_, CSING, 1); }
 
 // -----------------------------------------------------------------------
 //                          PLOT TOOLS
@@ -1081,7 +1081,7 @@ void WSphere::plotPoincareSphere(void)
     int color;
     WPainterPath path;
     P4POLYLINES *circlePoint = CircleAtInfinity;
-    color = study_->singinf ? CSING : CLINEATINFINITY;
+    color = study_->singinf_ ? CSING : CLINEATINFINITY;
     staticPainter->setPen(QXFIGCOLOR(color));
     while (circlePoint != nullptr) {
         path.moveTo(coWinX(circlePoint->x1), coWinY(circlePoint->y1));
@@ -1097,7 +1097,7 @@ void WSphere::plotPoincareLyapunovSphere(void)
     int color;
     WPainterPath *path = new WPainterPath();
     P4POLYLINES *p = CircleAtInfinity;
-    color = study_->singinf ? CSING : CLINEATINFINITY;
+    color = study_->singinf_ ? CSING : CLINEATINFINITY;
     staticPainter->setPen(QXFIGCOLOR(color));
     while (p != nullptr) {
         path->moveTo(coWinX(p->x1), coWinY(p->y1));
@@ -1124,7 +1124,7 @@ void WSphere::plotPoincareLyapunovSphere(void)
 
 void WSphere::plotLineAtInfinity(void)
 {
-    switch (study_->typeofview) {
+    switch (study_->typeofview_) {
     case TYPEOFVIEW_U1:
     case TYPEOFVIEW_V1:
         if (x0 < 0.0 && x1 > 0.0) {

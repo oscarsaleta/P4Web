@@ -63,10 +63,10 @@
 #define PI_DIV4 (PI / 4.)                 ///< Pi/4
 #define TWOPI (2.0 * PI)                  ///< 2*Pi
 
-#define __minus_one_to_q pow(-1.0, double_q) ///< (-1)^q
-#define __minus_one_to_p pow(-1.0, double_p) ///< (-1)^p
-#define __one_over_p (1.0 / double_p)        ///< 1/p
-#define __one_over_q (1.0 / double_q)        ///< 1/q
+#define __minus_one_to_q pow(-1.0, double_q_) ///< (-1)^q
+#define __minus_one_to_p pow(-1.0, double_p_) ///< (-1)^p
+#define __one_over_p (1.0 / double_p_)        ///< 1/p
+#define __one_over_q (1.0 / double_q_)        ///< 1/q
 
 /**
  * Copy a length 3 array into another

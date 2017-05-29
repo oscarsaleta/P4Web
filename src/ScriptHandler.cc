@@ -262,7 +262,7 @@ bool fillSaveFile(std::string fname, mapleParamsStruct prms,
     FILE *fp = fopen(fname.c_str(), "w");
 
     if (fp != nullptr) {
-        fprintf(fp, "0\n"); // typeofstudy
+        fprintf(fp, "0\n"); // typeofstudy_
         fprintf(
             fp, "%s\n",
             (prms.str_numeric == std::string("true") ? "1" : "0")); // numeric
@@ -348,7 +348,7 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
     char buf[100];
     int i;
 
-    /*f = VFResults.gcf_C;*/
+    /*f = VFResults.gcf_C_;*/
 
     FILE *fp = fopen(std::string(fname + ".mpl").c_str(), "w");
 

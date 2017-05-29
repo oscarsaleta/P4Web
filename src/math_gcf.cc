@@ -39,12 +39,12 @@ void WVFStudy::rplane_plsphere0(double x, double y, double *pcoord)
 bool WSphere::evalGcfStart(std::string fname, int dashes, int points,
                            int precis)
 {
-    if (study_->gcf_points != nullptr) {
-        study_->deleteOrbitPoint(study_->gcf_points);
-        study_->gcf_points = nullptr;
+    if (study_->gcf_points_ != nullptr) {
+        study_->deleteOrbitPoint(study_->gcf_points_);
+        study_->gcf_points_ = nullptr;
     }
 
-    if (study_->plweights)
+    if (study_->plweights_)
         gcfTask_ = EVAL_GCF_LYP_R2;
     else
         gcfTask_ = EVAL_GCF_R2;
@@ -106,37 +106,37 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
 
     switch (task) {
     case EVAL_GCF_R2:
-        value = prepareGcf(fname, study_->gcf, -1, 1, prec, points);
+        value = prepareGcf(fname, study_->gcf_, -1, 1, prec, points);
         break;
     case EVAL_GCF_U1:
-        value = prepareGcf(fname, study_->gcf_U1, 0, 1, prec, points);
+        value = prepareGcf(fname, study_->gcf_U1_, 0, 1, prec, points);
         break;
     case EVAL_GCF_V1:
-        value = prepareGcf(fname, study_->gcf_U1, -1, 0, prec, points);
+        value = prepareGcf(fname, study_->gcf_U1_, -1, 0, prec, points);
         break;
     case EVAL_GCF_U2:
-        value = prepareGcf(fname, study_->gcf_U2, 0, 1, prec, points);
+        value = prepareGcf(fname, study_->gcf_U2_, 0, 1, prec, points);
         break;
     case EVAL_GCF_V2:
-        value = prepareGcf(fname, study_->gcf_U2, -1, 0, prec, points);
+        value = prepareGcf(fname, study_->gcf_U2_, -1, 0, prec, points);
         break;
     case EVAL_GCF_LYP_R2:
-        value = prepareGcf_LyapunovR2(fname, study_->gcf, prec, points);
+        value = prepareGcf_LyapunovR2(fname, study_->gcf_, prec, points);
         break;
     case EVAL_GCF_CYL1:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C, -PI_DIV4, PI_DIV4,
+        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C_, -PI_DIV4, PI_DIV4,
                                        prec, points);
         break;
     case EVAL_GCF_CYL2:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C, PI_DIV4,
+        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C_, PI_DIV4,
                                        PI - PI_DIV4, prec, points);
         break;
     case EVAL_GCF_CYL3:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C, PI - PI_DIV4,
+        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C_, PI - PI_DIV4,
                                        PI + PI_DIV4, prec, points);
         break;
     case EVAL_GCF_CYL4:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C, -PI + PI_DIV4,
+        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C_, -PI + PI_DIV4,
                                        -PI_DIV4, prec, points);
         break;
     default:
@@ -212,21 +212,21 @@ void WSphere::draw_gcf(orbits_points *sep, int color, int dashes)
 
 void WVFStudy::insert_gcf_point(double x0, double y0, double z0, int dashes)
 {
-    if (gcf_points != nullptr) {
-        last_gcf_point->next_point = new orbits_points;
-        last_gcf_point = last_gcf_point->next_point;
+    if (gcf_points_ != nullptr) {
+        last_gcf_point_->next_point = new orbits_points;
+        last_gcf_point_ = last_gcf_point_->next_point;
     } else {
-        last_gcf_point = new orbits_points;
-        gcf_points = last_gcf_point;
+        last_gcf_point_ = new orbits_points;
+        gcf_points_ = last_gcf_point_;
     }
 
-    last_gcf_point->pcoord[0] = x0;
-    last_gcf_point->pcoord[1] = y0;
-    last_gcf_point->pcoord[2] = z0;
+    last_gcf_point_->pcoord[0] = x0;
+    last_gcf_point_->pcoord[1] = y0;
+    last_gcf_point_->pcoord[2] = z0;
 
-    last_gcf_point->dashes = dashes;
-    last_gcf_point->color = CSING;
-    last_gcf_point->next_point = nullptr;
+    last_gcf_point_->dashes = dashes;
+    last_gcf_point_->color = CSING;
+    last_gcf_point_->next_point = nullptr;
 }
 
 bool WSphere::read_gcf(std::string fname,
