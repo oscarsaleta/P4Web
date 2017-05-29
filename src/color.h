@@ -90,9 +90,9 @@
 /**
  * Macro for defining a color
  * @param  x int (color code as defined in this file)
- * @return   object of class Wt::WColor with rgb as given by XFigToRGB
+ * @return   object of class Wt::WColor with rgb as given by g_XFigToRGB
  */
-#define QXFIGCOLOR(x) Wt::WColor(XFigToRGB[x].r, XFigToRGB[x].g, XFigToRGB[x].b)
+#define QXFIGCOLOR(x) Wt::WColor(g_XFigToRGB[x].r, g_XFigToRGB[x].g, g_XFigToRGB[x].b)
 
 /**
  * Struct that holds the RGB value of a color
@@ -106,6 +106,6 @@ struct P4RGBITEM {
 /**
  * Global struct array (one for each color defined in this file)
  */
-extern P4RGBITEM XFigToRGB[NUMXFIGCOLORS];
+extern P4RGBITEM g_XFigToRGB[NUMXFIGCOLORS];
 
 #endif /* COLOR_H */

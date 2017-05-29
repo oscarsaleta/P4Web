@@ -40,11 +40,11 @@ HomeRight::HomeRight(WContainerWidget *parent)
     setId("HomeRight");
     setStyleClass("half-box-right");
 
-    globalLogger__.debug("HomeRight :: setting up UI...");
+    g_globalLogger.debug("HomeRight :: setting up UI...");
     setupUI();
-    globalLogger__.debug("HomeRight :: setting up connectors...");
+    g_globalLogger.debug("HomeRight :: setting up connectors...");
     setupConnectors();
-    globalLogger__.debug("HomeRight :: created correctly");
+    g_globalLogger.debug("HomeRight :: created correctly");
 }
 
 HomeRight::~HomeRight()
@@ -118,7 +118,7 @@ HomeRight::~HomeRight()
         tabWidget_ = nullptr;
     }
 
-    globalLogger__.debug("HomeRight :: deleted correctly");
+    g_globalLogger.debug("HomeRight :: deleted correctly");
 }
 
 void HomeRight::setupUI()
@@ -236,7 +236,7 @@ void HomeRight::setupUI()
 
     tabWidget_->setCurrentIndex(0);
     tabWidget_->setTabHidden(2, true);
-    globalLogger__.debug("HomeRight :: UI set up");
+    g_globalLogger.debug("HomeRight :: UI set up");
 }
 
 void HomeRight::setupConnectors()
@@ -254,7 +254,7 @@ void HomeRight::setupConnectors()
     plotSeparatricesButton_->clicked().connect(this,&HomeRight::plotSeparatrices);
     clearPlotButton_->clicked().connect(this,&HomeRight::clearPlot);*/
 
-    globalLogger__.debug("HomeRight :: connectors set up");
+    g_globalLogger.debug("HomeRight :: connectors set up");
 }
 
 void HomeRight::readResults(std::string fileName)
@@ -306,28 +306,28 @@ void HomeRight::fullResults()
     outputTextAreaContent_ = fullResults_;
     outputTextArea_->setText(outputTextAreaContent_);
     tabWidget_->setCurrentIndex(0);
-    globalLogger__.debug("HomeRight :: showing output panel");
+    g_globalLogger.debug("HomeRight :: showing output panel");
 }
 
 void HomeRight::showFinResults()
 {
     outputTextAreaContent_ = finResults_;
     outputTextArea_->setText(outputTextAreaContent_);
-    globalLogger__.debug("HomeRight :: showing finite results");
+    g_globalLogger.debug("HomeRight :: showing finite results");
 }
 
 void HomeRight::showInfResults()
 {
     outputTextAreaContent_ = infResults_;
     outputTextArea_->setText(outputTextAreaContent_);
-    globalLogger__.debug("HomeRight :: showing infinite results");
+    g_globalLogger.debug("HomeRight :: showing infinite results");
 }
 
 void HomeRight::clearResults()
 {
     outputTextArea_->setText("");
     outputTextAreaContent_ = "";
-    globalLogger__.debug("HomeRight :: cleared output panel");
+    g_globalLogger.debug("HomeRight :: cleared output panel");
 }
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
@@ -375,7 +375,7 @@ void HomeRight::setupSphereAndPlot()
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
-    globalLogger__.debug("HomeRight :: reacted to onPlot signal");
+    g_globalLogger.debug("HomeRight :: reacted to onPlot signal");
 }
 
 void HomeRight::mouseMovedEvent(WString caption)
@@ -413,11 +413,11 @@ void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
         orbitStarted_ = sphere_->startOrbit(x0, y0, true);
 
     if (dir == 1)
-        globalLogger__.debug("HomeRight :: integrating forwards...");
+        g_globalLogger.debug("HomeRight :: integrating forwards...");
     else if (dir == -1)
-        globalLogger__.debug("HomeRight :: integrating backwards...");
+        g_globalLogger.debug("HomeRight :: integrating backwards...");
     else
-        globalLogger__.debug("HomeRight :: continuing integration...");
+        g_globalLogger.debug("HomeRight :: continuing integration...");
 
     sphere_->integrateOrbit(dir);
 
@@ -450,7 +450,7 @@ void HomeRight::onOrbitsDelete(int flag)
 void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints,
                           int prec)
 {
-    globalLogger__.debug("HomeRight :: received gcf signal with fname " +
+    g_globalLogger.debug("HomeRight :: received gcf signal with fname " +
                          fname);
     if (sphere_ == nullptr)
         return;

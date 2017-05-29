@@ -50,7 +50,7 @@ std::string randomFileName(std::string prefix, std::string suffix)
         close(fd);
     }
 
-    globalLogger__.debug("ScriptHandler :: created temp file " + fullname);
+    g_globalLogger.debug("ScriptHandler :: created temp file " + fullname);
 
     return prefix;
 }
@@ -59,7 +59,7 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
                       std::vector<std::string> &prmLabels,
                       std::vector<std::string> &prmValues)
 {
-    globalLogger__.debug("ScriptHandler :: received order to prepare script " +
+    g_globalLogger.debug("ScriptHandler :: received order to prepare script " +
                          fname);
     FILE *mplFile;
 
@@ -81,10 +81,10 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
     if (mplFile != nullptr) {
         fillMapleScript(mplFile, prms, prmLabels, prmValues);
         fclose(mplFile);
-        globalLogger__.debug("ScriptHandler :: prepared Maple file " + fname);
+        g_globalLogger.debug("ScriptHandler :: prepared Maple file " + fname);
         return true;
     } else {
-        globalLogger__.error("ScriptHandler :: cannot prepare Maple file");
+        g_globalLogger.error("ScriptHandler :: cannot prepare Maple file");
         return false;
     }
 }
@@ -161,16 +161,16 @@ void fillMapleScript(FILE *f, mapleParamsStruct &prms,
     fprintf(
         f, "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n");
 
-    globalLogger__.debug("ScriptHandler :: filled Maple file");
+    g_globalLogger.debug("ScriptHandler :: filled Maple file");
 }
 
 siginfo_t evaluateMapleScript(std::string fname, int maxtime)
 {
-    globalLogger__.debug(
+    g_globalLogger.debug(
         "ScriptHandler :: Will fork Maple process for script " + fname);
     pid_t pid = fork();
     if (pid < 0) {
-        globalLogger__.error("HomeLeft :: error forking Maple thread.");
+        g_globalLogger.error("HomeLeft :: error forking Maple thread.");
         siginfo_t pinfo;
         pinfo.si_pid = -1;
         pinfo.si_code = -1;
@@ -205,17 +205,17 @@ siginfo_t evaluateMapleScript(std::string fname, int maxtime)
         for (int tries = 0; tries < maxtime; tries++) {
             waitid(P_PID, pid, &infop, WEXITED | WSTOPPED | WNOHANG);
             if (infop.si_pid != 0) {
-                globalLogger__.debug(
+                g_globalLogger.debug(
                     "ScriptHandler :: forked Maple execution finished");
                 return infop;
             }
             delay(1000);
         }
         std::string aux("pkill -TERM -P " + std::to_string(pid));
-        globalLogger__.error("ScriptHandler :: " + aux);
+        g_globalLogger.error("ScriptHandler :: " + aux);
         system(aux.c_str());
         kill(pid, SIGTERM);
-        globalLogger__.error(
+        g_globalLogger.error(
             "ScriptHandler :: Maple execution took too much time");
         infop.si_status = -2;
         infop.si_code = -2;
@@ -258,7 +258,7 @@ bool fillSaveFile(std::string fname, mapleParamsStruct prms,
                   std::vector<std::string> labels,
                   std::vector<std::string> values)
 {
-    globalLogger__.debug("ScriptHandler :: filling save file...");
+    g_globalLogger.debug("ScriptHandler :: filling save file...");
     FILE *fp = fopen(fname.c_str(), "w");
 
     if (fp != nullptr) {
@@ -334,11 +334,11 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
-        globalLogger__.debug("ScriptHandler :: prepared GCF file " + fname);
+        g_globalLogger.debug("ScriptHandler :: prepared GCF file " + fname);
         fclose(fp);
         return true;
     }
-    globalLogger__.error("ScriptHandler :: cannot prepare GCF file");
+    g_globalLogger.error("ScriptHandler :: cannot prepare GCF file");
     return false;
 }
 
@@ -380,12 +380,12 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
-        globalLogger__.debug("ScriptHandler :: prepared GCF_LyapunovCyl file " +
+        g_globalLogger.debug("ScriptHandler :: prepared GCF_LyapunovCyl file " +
                              fname);
         fclose(fp);
         return true;
     }
-    globalLogger__.error(
+    g_globalLogger.error(
         "ScriptHandler :: cannot prepare GCF_LyapunovCyl file");
     return false;
 }
@@ -428,12 +428,12 @@ bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:");
 
-        globalLogger__.debug("ScriptHandler :: prepared GCF_LyapunovR2 file " +
+        g_globalLogger.debug("ScriptHandler :: prepared GCF_LyapunovR2 file " +
                              fname);
         fclose(fp);
         return true;
     }
-    globalLogger__.error("ScriptHandler :: cannot prepare GCF_LyapunovR2 file");
+    g_globalLogger.error("ScriptHandler :: cannot prepare GCF_LyapunovR2 file");
     return false;
 }
 
@@ -483,7 +483,7 @@ std::string convertLabelsFromString(std::vector<std::string> labels,
         newLabel = currentLabel + "_";
         if (currentLabel.empty())
             continue;
-        globalLogger__.debug("ScriptHandler :: looking for word " +
+        g_globalLogger.debug("ScriptHandler :: looking for word " +
                              currentLabel + " in " + target);
         while ((i = findIndexOfWordInTarget(target, currentLabel, 0)) != -1) {
             aux = target.substr(0, i);
@@ -507,7 +507,7 @@ int findIndexOfWordInTarget(std::string target, std::string word, int start)
         // the word is a substring from a bigger one
         j = i;
         if (j > 0) {
-            globalLogger__.debug("char is " + std::string(&target[j - 1]));
+            g_globalLogger.debug("char is " + std::string(&target[j - 1]));
             if (isdigit(target[j - 1]) || isalpha(target[j - 1]) ||
                 target[j - 1] == '_') {
                 continue;
@@ -516,7 +516,7 @@ int findIndexOfWordInTarget(std::string target, std::string word, int start)
         // check if substring is end of a word
         j += word.length();
         if (j < target.length()) {
-            globalLogger__.debug("char is " + std::string(&target[j]));
+            g_globalLogger.debug("char is " + std::string(&target[j]));
             if (isdigit(target[j]) || isalpha(target[j]) || target[j] == '_') {
                 continue;
             }

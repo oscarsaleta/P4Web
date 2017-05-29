@@ -43,13 +43,13 @@ MyApplication::MyApplication(const WEnvironment &env) : WApplication(env)
 
     mainUI_ = new MainUI(root());
 
-    globalLogger__.debug("MyApplication :: created correctly");
+    g_globalLogger.debug("MyApplication :: created correctly");
 }
 
 MyApplication::~MyApplication()
 {
     delete mainUI_;
-    globalLogger__.debug("MyApplication :: deleted correctly");
+    g_globalLogger.debug("MyApplication :: deleted correctly");
 }
 
 void MyApplication::addAllStyleSheets()

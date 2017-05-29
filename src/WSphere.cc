@@ -297,14 +297,14 @@ void WSphere::paintEvent(WPaintDevice *p)
             int result =
                 evalGcfStart(gcfFname_, gcfDashes_, gcfNPoints_, gcfPrec_);
             if (!result) {
-                globalLogger__.error("WSphere :: cannot compute Gcf");
+                g_globalLogger.error("WSphere :: cannot compute Gcf");
             } else {
                 // this calls evalGcfContinue at least once
                 int i = 0;
                 do {
                     result = evalGcfContinue(gcfFname_, GCF_POINTS, GCF_PRECIS);
                     if (gcfError_) {
-                        globalLogger__.error("WSphere :: error while computing "
+                        g_globalLogger.error("WSphere :: error while computing "
                                              "evalGcfContinue at step: " +
                                              std::to_string(i));
                         break;
@@ -314,10 +314,10 @@ void WSphere::paintEvent(WPaintDevice *p)
                 // finish evaluation
                 result = evalGcfFinish();
                 if (!result) {
-                    globalLogger__.error(
+                    g_globalLogger.error(
                         "WSphere :: error while computing evalGcfFinish");
                 } else {
-                    globalLogger__.debug("WSphere :: computed Gcf");
+                    g_globalLogger.debug("WSphere :: computed Gcf");
                 }
             }
             plotGcf();

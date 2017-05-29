@@ -78,7 +78,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent)
     mplParams.str_simplify = "false";
     mplParams.str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
 
-    globalLogger__.debug("HomeLeft :: created correctly");
+    g_globalLogger.debug("HomeLeft :: created correctly");
 }
 
 HomeLeft::~HomeLeft()
@@ -138,7 +138,7 @@ HomeLeft::~HomeLeft()
         tabs_ = nullptr;
     }
 
-    globalLogger__.debug("HomeLeft :: deleted correctly");
+    g_globalLogger.debug("HomeLeft :: deleted correctly");
 }
 
 void HomeLeft::setupUI()
@@ -238,7 +238,7 @@ void HomeLeft::setupUI()
     legend->resize(400, 300);
     t->bindWidget("img", legend);
 
-    globalLogger__.debug("HomeLeft :: UI set up");
+    g_globalLogger.debug("HomeLeft :: UI set up");
 }
 
 void HomeLeft::setupConnectors()
@@ -261,20 +261,20 @@ void HomeLeft::setupConnectors()
         delete saveFileResource_;
     }));
 
-    globalLogger__.debug("HomeLeft :: connectors set up");
+    g_globalLogger.debug("HomeLeft :: connectors set up");
 }
 
 void HomeLeft::fileUploaded()
 {
-    globalLogger__.debug("HomeLeft :: input file uploaded");
-    globalLogger__.debug("HomeLeft :: resetting UI before parsing file");
+    g_globalLogger.debug("HomeLeft :: input file uploaded");
+    g_globalLogger.debug("HomeLeft :: resetting UI before parsing file");
 
     resetUI();
     // input validation
     std::string extension = fileUploadWidget_->clientFileName().toUTF8().substr(
         fileUploadWidget_->clientFileName().toUTF8().find_last_of(".") + 1);
     if (extension != "inp") {
-        globalLogger__.warning(
+        g_globalLogger.warning(
             "HomeLeft :: client tried to upload a not supported file type");
         errorSignal_.emit("Filetype not accepted.");
         return;
@@ -283,7 +283,7 @@ void HomeLeft::fileUploaded()
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
 #ifdef ANTZ
-    globalLogger__.debug("HomeLeft :: [ANTZ] copying uploaded file to " +
+    g_globalLogger.debug("HomeLeft :: [ANTZ] copying uploaded file to " +
                          std::string(TMP_DIR));
 
     try {
@@ -303,12 +303,12 @@ void HomeLeft::fileUploaded()
     if (loggedIn_)
         tabs_->setCurrentWidget(settingsContainer_);
 
-    globalLogger__.debug("HomeLeft :: file read correctly.");
+    g_globalLogger.debug("HomeLeft :: file read correctly.");
 }
 
 void HomeLeft::fileTooLarge()
 {
-    globalLogger__.warning(
+    g_globalLogger.warning(
         "HomeLeft :: Client tried to upload file too large.");
     errorSignal_.emit("File too large.");
 }
@@ -329,7 +329,7 @@ void HomeLeft::parseInputFile()
             for (i = 0; i < 15; i++) {
                 std::getline(f, line);
                 if (line.empty()) {
-                    globalLogger__.error(
+                    g_globalLogger.error(
                         "HomeLeft :: error reading input file, "
                         "expected more lines.");
                     break;
@@ -414,14 +414,14 @@ void HomeLeft::parseInputFile()
                         std::string label, value;
                         std::getline(f, label);
                         if (label.empty()) {
-                            globalLogger__.error("HomeLeft :: error reading "
+                            g_globalLogger.error("HomeLeft :: error reading "
                                                  "input file, wrong number of "
                                                  "parameters.");
                             break;
                         }
                         std::getline(f, value);
                         if (value.empty()) {
-                            globalLogger__.error("HomeLeft :: error reading "
+                            g_globalLogger.error("HomeLeft :: error reading "
                                                  "input file, wrong number of "
                                                  "parameters.");
                             break;
@@ -447,20 +447,20 @@ void HomeLeft::parseInputFile()
             }
         }
         if (f.eof() && i < 12) {
-            globalLogger__.error(
+            g_globalLogger.error(
                 "HomeLeft :: EOF while reading input file uploaded with name " +
                 fileUploadName_);
             errorSignal_.emit("Invalid input file.");
             fileUploadName_ = std::string();
         } else if (f.bad()) {
-            globalLogger__.error("HomeLeft :: I/O error while reading input "
+            g_globalLogger.error("HomeLeft :: I/O error while reading input "
                                  "file uploaded with name " +
                                  fileUploadName_);
             errorSignal_.emit("Invalid input file.");
             fileUploadName_ = std::string();
         } else {
             // prepareSaveFile();
-            globalLogger__.debug("HomeLeft :: Input file uploaded with name " +
+            g_globalLogger.debug("HomeLeft :: Input file uploaded with name " +
                                  fileUploadName_);
             if (!hasParams) {
                 errorSignal_.emit("File uploaded. Press the Evaluate button to "
@@ -509,7 +509,7 @@ void HomeLeft::setOptions()
         dval = epsilonSpinBox_->value();
         if (dval < EPSILON_MIN || dval > EPSILON_MAX) {
             mplParams.str_epsilon = std::to_string(EPSILON_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_epsilon out of bounds, "
+            g_globalLogger.warning("HomeLeft :: str_epsilon out of bounds, "
                                    "setting to default value");
             epsilonSpinBox_->setValue(EPSILON_DEFAULT);
         } else {
@@ -520,7 +520,7 @@ void HomeLeft::setOptions()
         ival = accuracySpinBox_->value();
         if (ival < ACCURACY_MIN || ival > ACCURACY_MAX) {
             mplParams.str_precision = std::to_string(ACCURACY_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_precision out of bounds, "
+            g_globalLogger.warning("HomeLeft :: str_precision out of bounds, "
                                    "setting to default value");
             accuracySpinBox_->setValue(ACCURACY_DEFAULT);
         } else {
@@ -529,7 +529,7 @@ void HomeLeft::setOptions()
         ival = precisionSpinBox_->value();
         if (ival < PRECISION_MIN || ival > PRECISION_MAX) {
             mplParams.str_precision0 = std::to_string(PRECISION_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_precision0 out of bounds, "
+            g_globalLogger.warning("HomeLeft :: str_precision0 out of bounds, "
                                    "setting to default value");
             precisionSpinBox_->setValue(PRECISION_DEFAULT);
         } else {
@@ -538,7 +538,7 @@ void HomeLeft::setOptions()
         ival = levAppSpinBox_->value();
         if (ival < APPROX_MIN || ival > APPROX_MAX) {
             mplParams.str_taylor = std::to_string(APPROX_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_taylor out of bounds, "
+            g_globalLogger.warning("HomeLeft :: str_taylor out of bounds, "
                                    "setting to default value");
             levAppSpinBox_->setValue(APPROX_DEFAULT);
         } else {
@@ -547,7 +547,7 @@ void HomeLeft::setOptions()
         ival = numericLevelSpinBox_->value();
         if (ival < NUMERIC_MIN || ival > NUMERIC_MAX) {
             mplParams.str_numericlevel = std::to_string(NUMERIC_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_numericlevel out of "
+            g_globalLogger.warning("HomeLeft :: str_numericlevel out of "
                                    "bounds, setting to default value");
             numericLevelSpinBox_->setValue(NUMERIC_DEFAULT);
         } else {
@@ -556,7 +556,7 @@ void HomeLeft::setOptions()
         ival = maxLevelSpinBox_->value();
         if (ival < MAXIMUM_MIN || ival > MAXIMUM_MAX) {
             mplParams.str_maxlevel = std::to_string(MAXIMUM_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_maxlevel out of bounds, "
+            g_globalLogger.warning("HomeLeft :: str_maxlevel out of bounds, "
                                    "setting to default value");
             maxLevelSpinBox_->setValue(MAXIMUM_DEFAULT);
         } else {
@@ -565,7 +565,7 @@ void HomeLeft::setOptions()
         ival = maxWeakLevelSpinBox_->value();
         if (ival < WEAKNESS_MIN || ival > WEAKNESS_MAX) {
             mplParams.str_weaklevel = std::to_string(WEAKNESS_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_weaklevel out of bounds, "
+            g_globalLogger.warning("HomeLeft :: str_weaklevel out of bounds, "
                                    "setting to default value");
             maxWeakLevelSpinBox_->setValue(WEAKNESS_DEFAULT);
         } else {
@@ -574,7 +574,7 @@ void HomeLeft::setOptions()
         ival = PLWeightPSpinBox_->value();
         if (ival < PQ_MIN || ival > PQ_MAX) {
             mplParams.str_userp = std::to_string(PQ_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_userp out of bounds, "
+            g_globalLogger.warning("HomeLeft :: str_userp out of bounds, "
                                    "setting to default value");
             PLWeightPSpinBox_->setValue(PQ_DEFAULT);
         } else {
@@ -583,7 +583,7 @@ void HomeLeft::setOptions()
         ival = PLWeightQSpinBox_->value();
         if (ival < PQ_MIN || ival > PQ_MAX) {
             mplParams.str_userq = std::to_string(PQ_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_userq out of bounds, "
+            g_globalLogger.warning("HomeLeft :: str_userq out of bounds, "
                                    "setting to default value");
             PLWeightQSpinBox_->setValue(PQ_DEFAULT);
         } else {
@@ -607,10 +607,10 @@ void HomeLeft::evaluate()
     setOptions();
     if (prepareMapleFile(fileUploadName_, mplParams, parent_->paramLabels_,
                          parent_->paramValues_)) {
-        globalLogger__.debug("HomeLeft :: filled Maple script " +
+        g_globalLogger.debug("HomeLeft :: filled Maple script " +
                              fileUploadName_);
     } else {
-        globalLogger__.error("HomeLeft :: Error creating Maple script.");
+        g_globalLogger.error("HomeLeft :: Error creating Maple script.");
         errorSignal_.emit("Error creating Maple script.");
         return;
     }
@@ -618,22 +618,22 @@ void HomeLeft::evaluate()
     siginfo_t status =
         evaluateMapleScript(fileUploadName_, stoi(mplParams.time_limit));
     if (status.si_status == 0) {
-        globalLogger__.debug("HomeLeft :: Maple script executed");
+        g_globalLogger.debug("HomeLeft :: Maple script executed");
         evaluatedSignal_.emit(fileUploadName_);
     } else {
         if (status.si_code == CLD_EXITED) {
-            globalLogger__.error("HomeLeft :: Maple error");
+            g_globalLogger.error("HomeLeft :: Maple error");
             evaluatedSignal_.emit(fileUploadName_);
             // errorSignal_.emit("Maple process terminated prematurely (.");
         } else if (status.si_code == CLD_KILLED) {
-            globalLogger__.error("HomeLeft :: Maple process killed by system");
+            g_globalLogger.error("HomeLeft :: Maple process killed by system");
             errorSignal_.emit("Maple process killed by system.");
         } else if (status.si_code == -2) {
-            globalLogger__.error(
+            g_globalLogger.error(
                 "HomeLeft :: Maple computation ran out of time");
             errorSignal_.emit("Computation ran out of time");
         } else {
-            globalLogger__.error("HomeLeft :: unkwnown error in Maple process");
+            g_globalLogger.error("HomeLeft :: unkwnown error in Maple process");
             errorSignal_.emit("Unknown error when creating Maple process.");
         }
     }
@@ -644,7 +644,7 @@ void HomeLeft::prepareSaveFile()
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
         errorSignal_.emit("Cannot prepare a Maple script without introducing a "
                           "vector field first.");
-        globalLogger__.error(
+        g_globalLogger.error(
             "HomeLeft :: tried to save without entering a vector field");
         return;
     }
@@ -662,7 +662,7 @@ void HomeLeft::prepareSaveFile()
     setOptions();
     if (!fillSaveFile(saveFileName_, mplParams, parent_->paramLabels_,
                       parent_->paramValues_)) {
-        globalLogger__.error("Cannot create save file " + saveFileName_);
+        g_globalLogger.error("Cannot create save file " + saveFileName_);
         errorSignal_.emit("Could not create save file. You can notify this "
                           "error at osr@mat.uab.cat, sorry for the "
                           "inconvenience.");
@@ -690,7 +690,7 @@ void HomeLeft::onPlot()
         errorSignal_.emit(
             "Cannot read results, evaluate a vector field first.\n");
     } else {
-        globalLogger__.debug("HomeLeft :: sending onPlot signal");
+        g_globalLogger.debug("HomeLeft :: sending onPlot signal");
         if (!loggedIn_)
             onPlotSphereSignal_.emit(fileUploadName_, -1);
         else {
@@ -702,7 +702,7 @@ void HomeLeft::onPlot()
                     proj = PROJECTION_DEFAULT;
                     viewProjection_->setText(
                         std::to_string(PROJECTION_DEFAULT));
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
                                            "setting to default value");
                 }
                 onPlotSphereSignal_.emit(fileUploadName_, proj);
@@ -713,7 +713,7 @@ void HomeLeft::onPlot()
                 } catch (...) {
                     minx = -1;
                     viewMinX_->setText("-1");
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
                                            "setting to default value");
                 }
                 try {
@@ -721,7 +721,7 @@ void HomeLeft::onPlot()
                 } catch (...) {
                     maxx = 1;
                     viewMaxX_->setText("1");
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
                                            "setting to default value");
                 }
                 try {
@@ -729,7 +729,7 @@ void HomeLeft::onPlot()
                 } catch (...) {
                     miny = -1;
                     viewMinY_->setText("-1");
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
                                            "setting to default value");
                 }
                 try {
@@ -737,7 +737,7 @@ void HomeLeft::onPlot()
                 } catch (...) {
                     maxy = 1;
                     viewMaxY_->setText("1");
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
                                            "setting to default value");
                 }
                 onPlotPlaneSignal_.emit(fileUploadName_,
@@ -1135,7 +1135,7 @@ void HomeLeft::onOrbitsForwardsBtn()
     orbitsDeleteAllBtn_->enable();
     orbitsForwardsBtn_->disable();
 
-    globalLogger__.debug("HomeLeft :: orbit start (" +
+    g_globalLogger.debug("HomeLeft :: orbit start (" +
                          orbitsXLineEdit_->text().toUTF8() + "," +
                          orbitsYLineEdit_->text().toUTF8() + ")");
     orbitIntegrateSignal_.emit(1, std::stod(orbitsXLineEdit_->text()),
@@ -1155,7 +1155,7 @@ void HomeLeft::onOrbitsBackwardsBtn()
     orbitsDeleteAllBtn_->enable();
     orbitsBackwardsBtn_->disable();
 
-    globalLogger__.debug("HomeLeft :: orbit start (" +
+    g_globalLogger.debug("HomeLeft :: orbit start (" +
                          orbitsXLineEdit_->text().toUTF8() + "," +
                          orbitsYLineEdit_->text().toUTF8() + ")");
     orbitIntegrateSignal_.emit(-1, std::stod(orbitsXLineEdit_->text()),
@@ -1178,7 +1178,7 @@ void HomeLeft::onOrbitsDeleteOneBtn()
     // orbitsDeleteAllBtn_->disable();
     // orbitsDeleteOneBtn_->disable();
 
-    globalLogger__.debug("HomeLeft :: deleting last orbit");
+    g_globalLogger.debug("HomeLeft :: deleting last orbit");
     orbitDeleteSignal_.emit(1);
 }
 
@@ -1190,19 +1190,19 @@ void HomeLeft::onOrbitsDeleteAllBtn()
     orbitsForwardsBtn_->enable();
     orbitsBackwardsBtn_->enable();
 
-    globalLogger__.debug("HomeLeft :: deleting all orbits");
+    g_globalLogger.debug("HomeLeft :: deleting all orbits");
     orbitDeleteSignal_.emit(0);
 }
 
 void HomeLeft::onPlotGcfBtn()
 {
     if (!evaluated_) {
-        globalLogger__.warning(
+        g_globalLogger.warning(
             "HomeLeft :: user tried to plot GCF for an un-evaluated VF");
         errorSignal_.emit("Introduce and evaluate a vector field with a common "
                           "factor first.");
     } else if (mplParams.str_gcf == "0") {
-        globalLogger__.warning(
+        g_globalLogger.warning(
             "HomeLeft :: user tried to plot a nonexistent GCF");
         errorSignal_.emit(
             "The current vector field has no specified common factor.");
@@ -1210,16 +1210,16 @@ void HomeLeft::onPlotGcfBtn()
         int npoints = gcfNPointsSpinBox_->value();
         if (npoints < GCF_NP_MIN || npoints > GCF_NP_MAX) {
             npoints = GCF_NP_DEFAULT;
-            globalLogger__.warning("HomeLeft :: gcf npoints out of bounds, "
+            g_globalLogger.warning("HomeLeft :: gcf npoints out of bounds, "
                                    "setting to default value");
         }
         int prec = gcfPrecisionSpinBox_->value();
         if (prec < GCF_NP_MIN || prec > GCF_NP_MAX) {
             prec = GCF_PREC_DEFAULT;
-            globalLogger__.warning("HomeLeft :: gcf precision out of bounds, "
+            g_globalLogger.warning("HomeLeft :: gcf precision out of bounds, "
                                    "setting to default value");
         }
-        globalLogger__.debug("HomeLeft :: sent signal for GCF evaluation");
+        g_globalLogger.debug("HomeLeft :: sent signal for GCF evaluation");
         gcfSignal_.emit(fileUploadName_, gcfAppearanceBtnGrp_->checkedId(),
                         npoints, prec);
     }

@@ -21,7 +21,7 @@
 
 using namespace Wt;
 
-MyLogger globalLogger__("log.txt");
+MyLogger g_globalLogger("log.txt");
 
 MyLogger::MyLogger(std::string fname)
 {
@@ -37,7 +37,7 @@ MyLogger::~MyLogger() {}
 
 void MyLogger::log(std::string type, std::string message)
 {
-    WLogEntry entry = globalLogger__.entry(type);
+    WLogEntry entry = g_globalLogger.entry(type);
     entry << WLogger::timestamp << WLogger::sep << '['
           << WApplication::instance()->sessionId() << ']' << WLogger::sep << '['
           << type << ']' << WLogger::sep << message;

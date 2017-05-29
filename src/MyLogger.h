@@ -100,6 +100,6 @@ class MyLogger : public Wt::WLogger
     void log(std::string type, std::string message);
 };
 
-extern MyLogger globalLogger__; ///< Global logger object
+extern MyLogger g_globalLogger; ///< Global logger object
 
 #endif // MYLOGGER_H

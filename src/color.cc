@@ -17,7 +17,7 @@
  */
 #include "color.h"
 
-P4RGBITEM XFigToRGB[NUMXFIGCOLORS] = {
+P4RGBITEM g_XFigToRGB[NUMXFIGCOLORS] = {
     // 8 pure colours:
     {0, 0, 0},       // BLACK
     {0, 0, 255},     // BLUE

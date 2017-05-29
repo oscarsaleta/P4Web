@@ -65,7 +65,7 @@ bool WSphere::evalGcfContinue(std::string fname, int points, int prec)
 
     if (!readTaskResults(fname, gcfTask_)) {
         gcfError_ = true;
-        globalLogger__.error("WSphere :: error at gcf readTaskResults");
+        g_globalLogger.error("WSphere :: error at gcf readTaskResults");
         return true;
     }
     gcfTask_++;
@@ -76,7 +76,7 @@ bool WSphere::evalGcfContinue(std::string fname, int points, int prec)
 
     if (runTask(fname, gcfTask_, points, prec) < 0) {
         gcfError_ = true;
-        globalLogger__.error("WSphere :: error at gcf runTask");
+        g_globalLogger.error("WSphere :: error at gcf runTask");
         return true;
     }
 
@@ -101,7 +101,7 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
 {
     bool value;
 
-    globalLogger__.debug("WSphere :: will run GCF task=" +
+    g_globalLogger.debug("WSphere :: will run GCF task=" +
                          std::to_string(task) + " using file=" + fname);
 
     switch (task) {
@@ -153,7 +153,7 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
 bool WSphere::readTaskResults(std::string fname,
                               int task) // , int points, int prec, int memory )
 {
-    globalLogger__.debug("WSphere :: called readTaskResults with fname=" +
+    g_globalLogger.debug("WSphere :: called readTaskResults with fname=" +
                          fname + " and task=" + std::to_string(task));
     bool value;
 
@@ -241,7 +241,7 @@ bool WSphere::read_gcf(std::string fname,
 
     fp = fopen(std::string(fname + "_gcf.tab").c_str(), "r");
     if (fp == nullptr) {
-        globalLogger__.debug("WSphere :: cannot open file " +
+        g_globalLogger.debug("WSphere :: cannot open file " +
                              std::string(fname + "_gcf.tab") + " for reading");
         return false;
     }
