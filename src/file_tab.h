@@ -923,10 +923,30 @@ class WVFStudy
     bool readTables(std::string basename);
     /**
      * Read the GCF for the vector field if there is one
+     *
      * @param  fp file where GCF info is stored
      * @return    @c true if no error or @c false if error
      */
     bool readGCF(FILE *fp);
+    /**
+     * Read the curve that was previously computed
+     *
+     * @param basename base name of the P4 input file
+     * @return         @c true if no error or @false if error
+     *
+     * Based on readGCF.
+     */
+    bool readCurve(QString basename);
+    /**
+     * Read the curve that was previously computed
+     *
+     * @param basename base name of the P4 input file
+     * @return         @c true if no error or @false if error
+     *
+     * Works same as readCurve but stores results in isoclines
+     * vector.
+     */
+    bool readIsoclines(QString basename);
     /**
      * Read vector field from a file
      *

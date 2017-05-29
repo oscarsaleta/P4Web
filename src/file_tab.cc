@@ -682,6 +682,166 @@ bool WVFStudy::readGCF(FILE *fp)
 }
 
 // -----------------------------------------------------------------------
+//                      WVFStudy::ReadCurve
+// -----------------------------------------------------------------------
+bool WVFStudy::readCurve(std::string basename)
+{
+    int N, degree_curve;
+    FILE *fp = nullptr;
+
+    fp = fopen((basename + "_veccurve.tab").c_str(), "rt");
+    if (fp == nullptr) {
+        g_globalLogger.error("Cannot open file " + basename + "_veccurve.tab");
+        return false;
+    }
+
+    curves new_curve;
+    if (fscanf(fp, "%d", &degree_curve) != 1)
+        return false;
+
+    if (degree_curve > 0) {
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_curve.r2 = new term2;
+        new_curve.r2->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_curve.r2, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_curve.u1 = new term2;
+        new_curve.u1->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_curve.u1, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_curve.u2 = new term2;
+        new_curve.u2->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_curve.u2, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_curve.v1 = new term2;
+        new_curve.v1->next_term2 = nullptr;
+        if (!readTerm2(fp, new_curve.v1, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+        new_curve.v2 = new term2;
+        new_curve.v2->next_term2 = nullptr;
+        if (!readTerm2(fp, new_curve.v2, N))
+            return false;
+
+        if (p_ != 1 || q_ != 1) {
+            if (fscanf(fp, "%d", &N) != 1)
+                return false;
+
+            new_curve.c = new term3;
+            new_curve.c->next_term3 = nullptr;
+            if (!readTerm3(fp, new_curve.c, N))
+                return false;
+        }
+    } else {
+        return false; 
+    }
+
+    curve_vector_.push_back(new_curve);
+    return true;
+}
+
+// -----------------------------------------------------------------------
+//                      WVFStudy::ReadIsoclines
+// -----------------------------------------------------------------------
+bool WVFStudy::readIsoclines(std::string basename)
+{
+    int N, degree_curve;
+    FILE *fp = nullptr;
+
+    fp = fopen((basename + "_vecisoclines.tab").c_str(), "rt");
+    if (fp == nullptr) {
+        g_globalLogger.error("Cannot open file " + basename + "_vecisoclines.tab");
+        return false;
+    }
+
+    isoclines new_isocline;
+    if (fscanf(fp, "%d", &degree_curve) != 1)
+        return false;
+
+    if (degree_curve > 0) {
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        // prepare a new isocline and link it to the list
+
+        new_isocline.r2 = new term2;
+        new_isocline.r2->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_isocline.r2, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_isocline.u1 = new term2;
+        new_isocline.u1->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_isocline.u1, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_isocline.u2 = new term2;
+        new_isocline.u2->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_isocline.u2, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_isocline.v1 = new term2;
+        new_isocline.v1->next_term2 = nullptr;
+        if (!readTerm2(fp, new_isocline.v1, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+        new_isocline.v2 = new term2;
+        new_isocline.v2->next_term2 = nullptr;
+        if (!readTerm2(fp, new_isocline.v2, N))
+            return false;
+
+        if (p_ != 1 || q_ != 1) {
+            if (fscanf(fp, "%d", &N) != 1)
+                return false;
+
+            new_isocline.c = new term3;
+            new_isocline.c->next_term3 = nullptr;
+            if (!readTerm3(fp, new_isocline.c, N))
+                return false;
+        } else {
+            new_isocline.c = nullptr;
+        }
+    } else {
+        return false;
+    }
+
+    isocline_vector_.push_back(new_isocline);
+    return true;
+}
+
+// -----------------------------------------------------------------------
 //                      WVFStudy::ReadVectorField
 // -----------------------------------------------------------------------
 
