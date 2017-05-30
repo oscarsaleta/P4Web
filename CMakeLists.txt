@@ -18,7 +18,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 project(WP4)
-set (WP4_VERSION_MAJOR 2)
+set (WP4_VERSION_MAJOR 3)
 set (WP4_VERSION_MINOR 0)
 set (WP4_VERSION_PATCH 0)
 
