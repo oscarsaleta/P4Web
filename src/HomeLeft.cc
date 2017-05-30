@@ -352,7 +352,7 @@ void HomeLeft::parseInputFile()
                     break;
                 case 3:
                     if (line[0] == '.')
-                        line = "0"+line;
+                        line = "0" + line;
                     epsilonSpinBox_->setValue(
                         (stod(line) > 0) ? stod(line) : EPSILON_DEFAULT);
                     break;
@@ -765,10 +765,13 @@ void HomeLeft::showSettings()
     WDoubleValidator *validator;
     WTemplate *t;
 
-    /* evaluation options */
+    /*
+     * evaluation options
+     */
     settingsContainer_ = new WContainerWidget(this);
     settingsContainer_->setId("settingsContainer_");
-    tabs_->addTab(settingsContainer_, WString("Evaluation options"),
+    tabs_->addTab(settingsContainer_,
+                  WString::tr("homeleft.evaluation-options"),
                   WTabWidget::PreLoading);
 
     t = new WTemplate(WString::tr("template.homeleft-options"),
@@ -884,7 +887,9 @@ void HomeLeft::showSettings()
         }
     }));
 
-    /* view settings */
+    /*
+     * view settings
+     */
     viewContainer_ = new WContainerWidget(this);
     viewContainer_->setId("viewContainer_");
     tabs_->addTab(viewContainer_, WString::fromUTF8("View settings"),
@@ -962,7 +967,9 @@ void HomeLeft::showSettings()
         }
     }));
 
-    /* orbits integration */
+    /*
+     * orbits integration
+     */
     orbitsContainer_ = new WContainerWidget(this);
     orbitsContainer_->setId("orbitsContainer_");
     tabs_->addTab(orbitsContainer_, "Orbits");
@@ -1011,7 +1018,9 @@ void HomeLeft::showSettings()
     orbitsDeleteAllBtn_->clicked().connect(this,
                                            &HomeLeft::onOrbitsDeleteAllBtn);
 
-    /* gcf settings */
+    /*
+     * gcf settings
+     */
     gcfContainer_ = new WContainerWidget(this);
     gcfContainer_->setId("gcfContainer_");
     tabs_->addTab(gcfContainer_, "Gcf");
@@ -1024,8 +1033,7 @@ void HomeLeft::showSettings()
     button = new WRadioButton("Dots", gcfContainer_);
     button->setInline(true);
     t->bindWidget("gcf-dots", button);
-    t->bindString("gcf-tooltip-dots",
-                  WString::tr("tooltip.gcf-appearance-dots"));
+    t->bindString("gcf-tooltip-dots", WString::tr("tooltip.appearance-dots"));
     gcfAppearanceBtnGrp_->addButton(button, Dots);
     button = new WRadioButton("Dashes", gcfContainer_);
     button->setInline(true);
@@ -1034,14 +1042,14 @@ void HomeLeft::showSettings()
         gcfAppearanceBtnGrp_->button(Dashes));
     t->bindWidget("gcf-dashes", button);
     t->bindString("gcf-tooltip-dashes",
-                  WString::tr("tooltip.gcf-appearance-dashes"));
+                  WString::tr("tooltip.appearance-dashes"));
 
     // n points
     gcfNPointsSpinBox_ = new WSpinBox(gcfContainer_);
     gcfNPointsSpinBox_->setRange(GCF_NP_MIN, GCF_NP_MAX);
     gcfNPointsSpinBox_->setValue(GCF_NP_DEFAULT);
     t->bindWidget("nps", gcfNPointsSpinBox_);
-    t->bindString("gcf-tooltip-nps", WString::tr("tooltip.gcf-npoints"));
+    t->bindString("gcf-tooltip-nps", WString::tr("tooltip.npoints"));
 
     // precision
     gcfPrecisionSpinBox_ = new WSpinBox(gcfContainer_);
@@ -1056,6 +1064,84 @@ void HomeLeft::showSettings()
 
     // connect gcf plot button to function
     gcfPlotBtn_->clicked().connect(this, &HomeLeft::onPlotGcfBtn);
+
+    /*
+     * Curves
+     */
+    curvesContainer_ = new WContainerWidget(this);
+    curvesContainer_->setId("curvesContainer_");
+    tabs_->addTab(curvesContainer_, "Curves");
+
+    t = new WTemplate(WString::tr("template.homeleft-curves"),
+                      curvesContainer_);
+    t->addFunction("id", WTemplate::Functions::id);
+
+    // curve equation
+    curvesLineEdit_ = new WLineEdit(curvesContainer_);
+    t->bindWidget("curve-eqn", curvesLineEdit_);
+    t->bindString("curve-tooltip-eqn", WString::tr("tooltip.curve-eqn"));
+
+    // appearance
+    curvesAppearanceBtnGrp_ = new WButtonGroup(curvesContainer_);
+    t->bindString("curve-tooltip-appearance",
+                  WString::tr("tooltip.appearance"));
+    button = new WRadioButton("Dots", curvesContainer_);
+    button->setInline(true);
+    t->bindWidget("curve-dots", button);
+    t->bindString("curve-tooltip-dots", WString::tr("tooltip.appearance-dots"));
+    curvesAppearanceBtnGrp_->addButton(button, Dots);
+    button = new WRadioButton("Dashes", curvesContainer_);
+    button->setInline(true);
+    curvesAppearanceBtnGrp_->addButton(button, Dashes);
+    curvesAppearanceBtnGrp_->setCheckedButton(
+        curvesAppearanceBtnGrp_->button(Dashes));
+    t->bindWidget("curve-dashes", button);
+    t->bindString("curve-tooltip-dashes",
+                  WString::tr("tooltip.appearance-dashes"));
+
+    // n points
+    curvesNPointsSpinBox_ = new WSpinBox(curvesContainer_);
+    curvesNPointsSpinBox_->setRange(CURVES_NP_MIN, CURVES_NP_MAX);
+    curvesNPointsSpinBox_->setValue(CURVES_NP_DEFAULT);
+    t->bindWidget("nps", curvesNPointsSpinBox_);
+    t->bindString("curve-tooltip-nps", WString::tr("tooltip.npoints"));
+
+    // precision
+    curvesPrecisionSpinBox_ = new WSpinBox(curvesContainer_);
+    curvesPrecisionSpinBox_->setRange(CURVES_PREC_MIN, CURVES_PREC_MAX);
+    curvesPrecisionSpinBox_->setValue(CURVES_PREC_DEFAULT);
+    t->bindWidget("curve-prc", curvesPrecisionSpinBox_);
+    t->bindString("curve-tooltip-prc", WString::tr("tooltip.prc"));
+
+    // eval curve button
+    curvesEvalBtn_ = new WPushButton("Evaluate", curvesContainer_);
+    t->bindWidget("curve-btn-evaluate", curvesEvalBtn_);
+    t->bindString("curve-tooltip-evaluate", WString::tr("tooltip.curve-eval"));
+
+    // plot curve button
+    curvesPlotBtn_ = new WPushButton("Plot", curvesContainer_);
+    t->bindWidget("curve-btn-plot", curvesPlotBtn_);
+    t->bindString("curve-tooltip-plot", WString::tr("tooltip.curve-plot"));
+
+    // delete one button
+    curvesDelOneBtn_ = new WPushButton("Delete last curve", curvesContainer_);
+    curvesDelOneBtn_->setStyleClass("btn btn-warning");
+    t->bindWidget("curve-btn-del-one", curvesDelOneBtn_);
+    t->bindString("curve-tooltip-del-one",
+                  WString::tr("tooltip.curve-del-one"));
+
+    // delete all button
+    curvesDelAllBtn_ = new WPushButton("Delete all curves", curvesContainer_);
+    curvesDelAllBtn_->setStyleClass("btn btn-danger");
+    t->bindWidget("curve-btn-del-all", curvesDelAllBtn_);
+    t->bindString("curve-tooltip-del-all",
+                  WString::tr("tooltip.curve-del-all"));
+
+    // connect buttons to functions
+    // curvesEvalBtn_->clicked().connect(this, &HomeLeft::onEvalCurvesBtn);
+    // curvesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotCurvesBtn);
+    // curvesDelOneBtn_->clicked().connect(this, &HomeLeft::onDelOneCurvesBtn);
+    // curvesDelAllBtn_->clicked().connect(this, &HomeLeft::onDelAllCurvesBtn);
 
     tabs_->setCurrentWidget(settingsContainer_);
 }

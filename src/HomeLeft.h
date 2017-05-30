@@ -140,11 +140,11 @@
 /**
  * Minimum value for number of points in gcf
  */
-#define GCF_NP_MIN 1
+#define GCF_NP_MIN 40
 /**
  * Maximum value for number of points in gcf
  */
-#define GCF_NP_MAX 99
+#define GCF_NP_MAX 40000
 /**
  * Default value for number of points in gcf
  */
@@ -161,6 +161,32 @@
  * Default value for zero precision in gcf
  */
 #define GCF_PREC_DEFAULT 12
+
+/**
+ * Minimum value for number of points in curves
+ */
+#define CURVES_NP_MIN 40
+/**
+ * Maximum value for number of points in curves
+ */
+#define CURVES_NP_MAX 40000
+/**
+ * Default value for number of points in curves
+ */
+#define CURVES_NP_DEFAULT 400
+/**
+ * Minimum value for zero precision in curves
+ */
+#define CURVES_PREC_MIN 8
+/**
+ * Maximum value for zero precision in curves
+ */
+#define CURVES_PREC_MAX 16
+/**
+ * Default value for zero precision in curves
+ */
+#define CURVES_PREC_DEFAULT 12
+
 
 /**
  * This class holds the UI from the left side of the website
@@ -281,7 +307,7 @@ class HomeLeft : public Wt::WContainerWidget
     {
         return addParameterSignal_;
     }
-    
+
     /* MAPLE FILE PARAMETERS */
     /**
      * struct where all the Maple settings are stored
@@ -314,7 +340,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WTabWidget *tabs_;
 
     /* PRIVATE UI (log in needed) */
-    // evaluation parameters
+    // evaluation parameters tab
     Wt::WContainerWidget *settingsContainer_;
     Wt::WButtonGroup *calculationsBtnGroup_;
     enum Calculations { Algebraic = 0, Numeric = 1 };
@@ -329,7 +355,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WSpinBox *maxWeakLevelSpinBox_;
     Wt::WSpinBox *PLWeightPSpinBox_;
     Wt::WSpinBox *PLWeightQSpinBox_;
-    // view settings
+    // view settings tab
     Wt::WContainerWidget *viewContainer_;
     Wt::WComboBox *viewComboBox_;
     Wt::WLineEdit *viewProjection_;
@@ -337,7 +363,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WLineEdit *viewMinY_;
     Wt::WLineEdit *viewMaxX_;
     Wt::WLineEdit *viewMaxY_;
-    // orbits dialog
+    // orbits tab
     Wt::WContainerWidget *orbitsContainer_;
     Wt::WLineEdit *orbitsXLineEdit_;
     Wt::WLineEdit *orbitsYLineEdit_;
@@ -347,13 +373,23 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WPushButton *orbitsDeleteOneBtn_;
     Wt::WPushButton *orbitsDeleteAllBtn_;
     bool orbitsStartSelected_;
-    // gcf dialog
+    // gcf tab
     Wt::WContainerWidget *gcfContainer_;
     Wt::WButtonGroup *gcfAppearanceBtnGrp_;
     enum Appearance { Dots = 0, Dashes = 1 };
     Wt::WSpinBox *gcfNPointsSpinBox_;
     Wt::WSpinBox *gcfPrecisionSpinBox_;
     Wt::WPushButton *gcfPlotBtn_;
+    // curves tab
+    Wt::WContainerWidget *curvesContainer_;
+    Wt::WLineEdit *curvesLineEdit_;
+    Wt::WButtonGroup *curvesAppearanceBtnGrp_;
+    Wt::WSpinBox *curvesNPointsSpinBox_;
+    Wt::WSpinBox *curvesPrecisionSpinBox_;
+    Wt::WPushButton *curvesEvalBtn_;
+    Wt::WPushButton *curvesPlotBtn_;
+    Wt::WPushButton *curvesDelOneBtn_;
+    Wt::WPushButton *curvesDelAllBtn_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
