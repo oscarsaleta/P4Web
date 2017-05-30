@@ -248,54 +248,6 @@ void WVFStudy::deleteSemiElementary(semi_elementary *p)
 }
 
 // -----------------------------------------------------------------------
-//                          WVFStudy::DeleteNode
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteNode(node *p)
-{
-    node *q;
-
-    while (p != nullptr) {
-        q = p;
-        p = p->next_node;
-        delete q;
-        q = nullptr;
-    }
-}
-
-// -----------------------------------------------------------------------
-//                      WVFStudy::DeleteStrongFocus
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteStrongFocus(strong_focus *p)
-{
-    strong_focus *q;
-
-    while (p != nullptr) {
-        q = p;
-        p = p->next_sf;
-        delete q;
-        q = nullptr;
-    }
-}
-
-// -----------------------------------------------------------------------
-//                          WVFStudy::DeleteWeakFocus
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteWeakFocus(weak_focus *p)
-{
-    weak_focus *q;
-
-    while (p != nullptr) {
-        q = p;
-        p = p->next_wf;
-        delete q;
-        q = nullptr;
-    }
-}
-
-// -----------------------------------------------------------------------
 //                      WVFStudy::DeleteDegenerate
 // -----------------------------------------------------------------------
 
@@ -335,22 +287,6 @@ void WVFStudy::deleteSeparatrices(sep *p)
 }
 
 // -----------------------------------------------------------------------
-//                      WVFStudy::DeleteTransformations
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteTransformations(transformations *t)
-{
-    transformations *u;
-
-    while (t != nullptr) {
-        u = t;
-        t = t->next_trans;
-        delete u;
-        u = nullptr;
-    }
-}
-
-// -----------------------------------------------------------------------
 //                      WVFStudy::DeleteBlowup
 // -----------------------------------------------------------------------
 
@@ -378,23 +314,6 @@ void WVFStudy::deleteBlowup(blow_up_points *b)
 void WVFStudy::deleteLimitCycle(orbits *p)
 {
     deleteOrbit(p); // limit cycle is implemented as orbit.
-}
-
-// -----------------------------------------------------------------------
-//                  WVFStudy::DeleteOrbitPoint
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteOrbitPoint(P4ORBIT p)
-{
-    P4ORBIT q;
-
-    while (p != nullptr) {
-        q = p;
-        p = p->next_point;
-
-        delete q;
-        q = nullptr;
-    }
 }
 
 // -----------------------------------------------------------------------

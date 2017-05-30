@@ -827,7 +827,17 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    void deleteNode(node *n);
+    inline void deleteNode(node *n)
+    {
+        node *q;
+
+        while (p != nullptr) {
+            q = p;
+            p = p->next_node;
+            delete q;
+            q = nullptr;
+        }
+    }
     /**
      * Delete the strong foci linked list
      *
@@ -835,7 +845,17 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    void deleteStrongFocus(strong_focus *sf);
+    inline void deleteStrongFocus(strong_focus *sf)
+    {
+        strong_focus *q;
+
+        while (p != nullptr) {
+            q = p;
+            p = p->next_sf;
+            delete q;
+            q = nullptr;
+        }
+    }
     /**
      * Delete the weak foci linked list
      *
@@ -843,7 +863,17 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    void deleteWeakFocus(weak_focus *wf);
+    inline void deleteWeakFocus(weak_focus *wf)
+    {
+        weak_focus *q;
+
+        while (p != nullptr) {
+            q = p;
+            p = p->next_wf;
+            delete q;
+            q = nullptr;
+        }
+    }
     /**
      * Delete the degenerate singularities linked list
      *
@@ -868,7 +898,17 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    void deleteTransformations(transformations *t);
+    inline void deleteTransformations(transformations *t)
+    {
+        transformations *u;
+
+        while (t != nullptr) {
+            u = t;
+            t = t->next_trans;
+            delete u;
+            u = nullptr;
+        }
+    }
     /**
      * Delete the blowup linked list
      *
@@ -893,7 +933,18 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    void deleteOrbitPoint(P4ORBIT p);
+    inline void deleteOrbitPoint(P4ORBIT p)
+    {
+        P4ORBIT q;
+
+        while (p != nullptr) {
+            q = p;
+            p = p->next_point;
+
+            delete q;
+            q = nullptr;
+        }
+    }
     /**
      * Delete the orbits linked list
      *
