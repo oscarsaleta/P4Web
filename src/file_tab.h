@@ -831,9 +831,9 @@ class WVFStudy
     {
         node *q;
 
-        while (p != nullptr) {
-            q = p;
-            p = p->next_node;
+        while (n != nullptr) {
+            q = n;
+            n = n->next_node;
             delete q;
             q = nullptr;
         }
@@ -849,9 +849,9 @@ class WVFStudy
     {
         strong_focus *q;
 
-        while (p != nullptr) {
-            q = p;
-            p = p->next_sf;
+        while (sf != nullptr) {
+            q = sf;
+            sf = sf->next_sf;
             delete q;
             q = nullptr;
         }
@@ -867,9 +867,9 @@ class WVFStudy
     {
         weak_focus *q;
 
-        while (p != nullptr) {
-            q = p;
-            p = p->next_wf;
+        while (wf != nullptr) {
+            q = wf;
+            wf = wf->next_wf;
             delete q;
             q = nullptr;
         }
@@ -987,7 +987,7 @@ class WVFStudy
      *
      * Based on readGCF.
      */
-    bool readCurve(QString basename);
+    bool readCurve(std::string basename);
     /**
      * Read the curve that was previously computed
      *
@@ -997,7 +997,7 @@ class WVFStudy
      * Works same as readCurve but stores results in isoclines
      * vector.
      */
-    bool readIsoclines(QString basename);
+    bool readIsoclines(std::string basename);
     /**
      * Read vector field from a file
      *
