@@ -187,7 +187,6 @@
  */
 #define CURVES_PREC_DEFAULT 12
 
-
 /**
  * This class holds the UI from the left side of the website
  *
@@ -209,7 +208,8 @@ class HomeLeft : public Wt::WContainerWidget
      * Constructor method for HomeLeft
      * @param parent Parent container widget
      */
-    HomeLeft(Wt::WContainerWidget *parent = 0);
+    HomeLeft(Wt::WContainerWidget *parent = 0,
+             ScriptHandler *scriptHandler = 0);
     /**
      * Destructor method for HomeLeft
      */
@@ -308,18 +308,16 @@ class HomeLeft : public Wt::WContainerWidget
         return addParameterSignal_;
     }
 
-    /* MAPLE FILE PARAMETERS */
-    /**
-     * struct where all the Maple settings are stored
-     */
-    mapleParamsStruct mplParams;
-
     /* MainUI parent */
     MainUI *parent_;
 
   private:
+    bool loggedIn_;
     bool evaluated_;
     int nParams_;
+
+    /* Script Handler */
+    ScriptHandler *scriptHandler_;
 
     /* PUBLIC UI (no need to log in) */
     Wt::WGroupBox *equationsBox_;
@@ -436,8 +434,8 @@ class HomeLeft : public Wt::WContainerWidget
     void onOrbitsDeleteAllBtn();
     // react to button presses in gcf tab
     void onPlotGcfBtn();
-
-    bool loggedIn_;
+    // show an error message box
+    void showErrorBox(Wt::WString message);
 };
 
 #endif // HOMELEFT_H
