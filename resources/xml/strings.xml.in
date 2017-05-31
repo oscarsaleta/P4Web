@@ -221,6 +221,14 @@
     Equation of the curve to plot (must be a polynomial). You can use the defined parameters in the equation.
   </message>
 
+  <message id="tooltip.curve-eval">
+    Evaluate the curve.
+  </message>
+
+  <message id="tooltip.curve-plot">
+    Plot the curve.
+  </message>
+
   <message id="tooltip.curve-del-one">
     Delete last plotted curve.
   </message>
