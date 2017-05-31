@@ -244,7 +244,7 @@ class HomeLeft : public Wt::WContainerWidget
      * Method that sends a signal to print some message in the output text area
      * from #HomeRight
      */
-    Wt::Signal<std::string> &errorSignal() { return errorSignal_; }
+    Wt::Signal<std::string> &textSignal() { return textSignal_; }
     /**
      * Method that sends a signal when the plot button is pressed in order to
      * display a plot
@@ -391,7 +391,7 @@ class HomeLeft : public Wt::WContainerWidget
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
-    Wt::Signal<std::string> errorSignal_;
+    Wt::Signal<std::string> textSignal_;
     Wt::Signal<std::string, double> onPlotSphereSignal_;
     Wt::Signal<std::string, int, double, double, double, double>
         onPlotPlaneSignal_;

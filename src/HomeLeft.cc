@@ -452,8 +452,8 @@ void HomeLeft::parseInputFile()
             g_globalLogger.debug("HomeLeft :: Input file uploaded with name " +
                                  fileUploadName_);
             if (!hasParams) {
-                showErrorBox("File uploaded. Press the Evaluate button to "
-                             "start computing.");
+                textSignal_.emit("File uploaded. Press the Evaluate button to "
+                                 "start computing.");
             }
         }
         f.close();
