@@ -69,11 +69,12 @@ using namespace Wt;
 
 WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
                  int height, std::string basename, double projection)
-    : scriptHandler_(s), width_(width), height_(height), basename_(basename),
-      parentWnd(parent), typeOfView_(0), projection_(projection),
-      plotPrepared_(false), plotDone_(false)
+    : width_(width), height_(height), basename_(basename), parentWnd(parent),
+      typeOfView_(0), projection_(projection), plotPrepared_(false),
+      plotDone_(false)
 {
     study_ = new WVFStudy(projection);
+    scriptHandler_ = s;
 
     ReverseYaxis = false;
 
@@ -97,11 +98,12 @@ WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
 WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
                  int height, std::string basename, int type, double minx,
                  double maxx, double miny, double maxy)
-    : scriptHandler_(s), width_(width), height_(height), basename_(basename),
-      parentWnd(parent), typeOfView_(type), viewMinX_(minx), viewMaxX_(maxx),
-      viewMinY_(miny), viewMaxY_(maxy), plotPrepared_(false), plotDone_(false)
+    : width_(width), height_(height), basename_(basename), parentWnd(parent),
+      typeOfView_(type), viewMinX_(minx), viewMaxX_(maxx), viewMinY_(miny),
+      viewMaxY_(maxy), plotPrepared_(false), plotDone_(false)
 {
     study_ = new WVFStudy();
+    scriptHandler_ = s;
 
     ReverseYaxis = false;
 

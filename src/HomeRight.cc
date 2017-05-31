@@ -34,11 +34,13 @@
 using namespace Wt;
 
 HomeRight::HomeRight(WContainerWidget *parent, ScriptHandler *s)
-    : WContainerWidget(parent), scriptHandler_(s), plotCaption_(nullptr),
-      sphere_(nullptr), orbitStarted_(false), loggedIn_(false)
+    : WContainerWidget(parent), plotCaption_(nullptr), sphere_(nullptr),
+      orbitStarted_(false), loggedIn_(false)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
+
+    scriptHandler_ = s;
 
     g_globalLogger.debug("HomeRight :: setting up UI...");
     setupUI();
