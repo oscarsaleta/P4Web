@@ -26,27 +26,19 @@
       <p>${tr:Wt.Auth.login-form-info}</p>
 
       <div class="form-horizontal" id="login-forms">
-        ${
-        <if:passwords>
-          }
+        ${<if:passwords>}
           ${block:Wt.Auth.field2 user-name user-name-label}
           ${block:Wt.Auth.field password}
           ${block:Wt.Auth.field remember-me}
-          ${
-        </if:passwords>
-        }
+        ${</if:passwords>}
 
-        ${
-        <if:oauth>
-          }
+        ${<if:oauth>}
           <div class="control-group">
             <div class="controls">
               Or use ${icons}
             </div>
           </div>
-          ${
-        </if:oauth>
-        }
+        ${</if:oauth>}
 
         <div class="form-actions">
           <p>
