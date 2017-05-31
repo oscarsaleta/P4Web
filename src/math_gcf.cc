@@ -106,38 +106,44 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
 
     switch (task) {
     case EVAL_GCF_R2:
-        value = prepareGcf(fname, study_->gcf_, -1, 1, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_, -1, 1, prec,
+                                           points);
         break;
     case EVAL_GCF_U1:
-        value = prepareGcf(fname, study_->gcf_U1_, 0, 1, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_U1_, 0, 1, prec,
+                                           points);
         break;
     case EVAL_GCF_V1:
-        value = prepareGcf(fname, study_->gcf_U1_, -1, 0, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_U1_, -1, 0, prec,
+                                           points);
         break;
     case EVAL_GCF_U2:
-        value = prepareGcf(fname, study_->gcf_U2_, 0, 1, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_U2_, 0, 1, prec,
+                                           points);
         break;
     case EVAL_GCF_V2:
-        value = prepareGcf(fname, study_->gcf_U2_, -1, 0, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_U2_, -1, 0, prec,
+                                           points);
         break;
     case EVAL_GCF_LYP_R2:
-        value = prepareGcf_LyapunovR2(fname, study_->gcf_, prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovR2(fname, study_->gcf_, prec,
+                                                      points);
         break;
     case EVAL_GCF_CYL1:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C_, -PI_DIV4, PI_DIV4,
-                                       prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovCyl(
+            fname, study_->gcf_C_, -PI_DIV4, PI_DIV4, prec, points);
         break;
     case EVAL_GCF_CYL2:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C_, PI_DIV4,
-                                       PI - PI_DIV4, prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovCyl(
+            fname, study_->gcf_C_, PI_DIV4, PI - PI_DIV4, prec, points);
         break;
     case EVAL_GCF_CYL3:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C_, PI - PI_DIV4,
-                                       PI + PI_DIV4, prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovCyl(
+            fname, study_->gcf_C_, PI - PI_DIV4, PI + PI_DIV4, prec, points);
         break;
     case EVAL_GCF_CYL4:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C_, -PI + PI_DIV4,
-                                       -PI_DIV4, prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovCyl(
+            fname, study_->gcf_C_, -PI + PI_DIV4, -PI_DIV4, prec, points);
         break;
     default:
         value = false;
@@ -145,7 +151,7 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
     }
 
     if (value)
-        return evaluateMapleScript(fname,60).si_status;
+        return scriptHandler_->evaluateMapleScript(fname, 60).si_status;
     else
         return -1;
 }

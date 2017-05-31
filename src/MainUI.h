@@ -27,11 +27,12 @@
 
 #include <Wt/WContainerWidget>
 
+#include "HomeRight.h"
+#include "MyAuthWidget.h"
+#include "ScriptHandler.h"
 #include "Session.h"
 
 class HomeLeft;
-class HomeRight;
-class MyAuthWidget;
 
 /**
  * Auxiliary class for organizing the different elements of the UI
@@ -96,6 +97,8 @@ class MainUI : public Wt::WContainerWidget
 
     Wt::WStackedWidget *mainStack_;
     Wt::WContainerWidget *pageContainer_;
+
+    ScriptHandler *scriptHandler_;
 
     HomeLeft *leftContainer_;
     HomeRight *rightContainer_;

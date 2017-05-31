@@ -33,9 +33,9 @@
 
 using namespace Wt;
 
-HomeRight::HomeRight(WContainerWidget *parent)
-    : WContainerWidget(parent), plotCaption_(nullptr), sphere_(nullptr),
-      orbitStarted_(false), loggedIn_(false)
+HomeRight::HomeRight(WContainerWidget *parent, ScriptHandler *s)
+    : WContainerWidget(parent), scriptHandler_(s), plotCaption_(nullptr),
+      sphere_(nullptr), orbitStarted_(false), loggedIn_(false)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
@@ -337,7 +337,8 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
         sphere_ = nullptr;
     }
 
-    sphere_ = new WSphere(plotContainer_, 550, 550, basename, projection);
+    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550, basename,
+                          projection);
     setupSphereAndPlot();
 }
 
@@ -349,8 +350,8 @@ void HomeRight::onPlanePlot(std::string basename, int type, double minx,
         sphere_ = nullptr;
     }
 
-    sphere_ = new WSphere(plotContainer_, 550, 550, basename, type, minx, maxx,
-                          miny, maxy);
+    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550, basename,
+                          type, minx, maxx, miny, maxy);
     setupSphereAndPlot();
 }
 

@@ -48,6 +48,7 @@
  * projection.
  */
 
+#include "ScriptHandler.h"
 #include "custom.h"
 #include "file_tab.h"
 
@@ -111,8 +112,9 @@ class WSphere : public Wt::WPaintedWidget
      * current vector field
      * @param projection    projection for the sphere
      */
-    WSphere(Wt::WContainerWidget *parent = 0, int width = 255, int height = 255,
-            std::string basename = "", double projection = -1.0);
+    WSphere(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0,
+            int width = 255, int height = 255, std::string basename = "",
+            double projection = -1.0);
     /**
      * Constructor method for a planar (or chart) plot
      * @param *parent   container widget which created the sphere
@@ -126,9 +128,10 @@ class WSphere : public Wt::WPaintedWidget
      * @param miny      minimum y for plot
      * @param maxy      maximum y for plot
      */
-    WSphere(Wt::WContainerWidget *parent = 0, int width = 255, int height = 255,
-            std::string basename = "", int type = 1, double minx = -1,
-            double maxx = 1, double miny = -1, double maxy = 1);
+    WSphere(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0,
+            int width = 255, int height = 255, std::string basename = "",
+            int type = 1, double minx = -1, double maxx = 1, double miny = -1,
+            double maxy = 1);
     /**
      * Destructor method
      */
@@ -524,6 +527,9 @@ class WSphere : public Wt::WPaintedWidget
     bool read_gcf(std::string fname,
                   void (WVFStudy::*chart)(double, double, double *));
     bool readTaskResults(std::string fname, int task);
+
+    // script handler
+    ScriptHandler *scriptHandler_;
 };
 
 #endif /* WIN_SPHERE_H */

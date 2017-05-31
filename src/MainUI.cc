@@ -20,8 +20,8 @@
 
 #include "HomeLeft.h"
 #include "HomeRight.h"
-#include "MyAuthWidget.h"
 #include "MyLogger.h"
+#include "ScriptHandler.h"
 #include "file_tab.h"
 
 #include <Wt/WAnchor>
@@ -32,6 +32,8 @@
 #include <Wt/WText>
 
 #include <Wt/Dbo/Transaction>
+
+class MyAuthWidget;
 
 using namespace Wt;
 
@@ -131,7 +133,7 @@ void MainUI::setupUI()
     authWidget_ = new MyAuthWidget(session_, mainStack_);
     authWidget_->setId("authWidget_");
     authWidget_->model()->addPasswordAuth(&Session::passwordAuth());
-    //authWidget_->model()->addOAuth(Session::oAuth());
+    // authWidget_->model()->addOAuth(Session::oAuth());
     authWidget_->setRegistrationEnabled(true);
 
     // this holds the main page content
@@ -142,16 +144,19 @@ void MainUI::setupUI()
         new WTemplate(WString::tr("template.mainui"), pageContainer_);
     t->addFunction("id", WTemplate::Functions::id);
 
+    // create "global" script handler for both left and right containers
+    scriptHandler_ = new ScriptHandler();
+
     // left widget (file upload, input, buttons)
     g_globalLogger.debug("MainUI :: creating HomeLeft...");
-    leftContainer_ = new HomeLeft(pageContainer_);
+    leftContainer_ = new HomeLeft(pageContainer_, scriptHandler_);
     leftContainer_->parent_ = this;
     g_globalLogger.debug("MainUI :: HomeLeft created");
     t->bindWidget("left", leftContainer_);
 
     // right widget (output text area, plots, legend)
     g_globalLogger.debug("MainUI :: creating HomeRight...");
-    rightContainer_ = new HomeRight(pageContainer_);
+    rightContainer_ = new HomeRight(pageContainer_, scriptHandler_);
     g_globalLogger.debug("MainUI :: HomeRight created");
     t->bindWidget("right", rightContainer_);
 
@@ -166,8 +171,8 @@ void MainUI::setupUI()
     // signals from HomeLeft
     leftContainer_->evaluatedSignal().connect(rightContainer_,
                                               &HomeRight::readResults);
-    leftContainer_->errorSignal().connect(rightContainer_,
-                                          &HomeRight::printError);
+    leftContainer_->textSignal().connect(rightContainer_,
+                                         &HomeRight::printError);
     leftContainer_->resetSignal().connect(rightContainer_, &HomeRight::onReset);
     leftContainer_->onPlotSphereSignal().connect(rightContainer_,
                                                  &HomeRight::onSpherePlot);

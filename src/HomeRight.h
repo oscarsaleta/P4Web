@@ -24,8 +24,9 @@
  * @file HomeRight.h
  * @author Oscar Saleta
  */
-
 #include <Wt/WContainerWidget>
+
+#include "ScriptHandler.h"
 
 #include <Wt/WString>
 
@@ -70,7 +71,7 @@ class HomeRight : public Wt::WContainerWidget
     /**
      * Constructor method for HomeRight
      */
-    HomeRight(Wt::WContainerWidget *parent = 0);
+    HomeRight(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0);
     /**
      * Destructor method for HomeRight
      */
@@ -245,6 +246,9 @@ class HomeRight : public Wt::WContainerWidget
     std::vector<std::string> paramValues_;
 
   private:
+    /* script handler */
+    ScriptHandler *scriptHandler_;
+
     bool loggedIn_;
     bool orbitStarted_;
     int projection_;

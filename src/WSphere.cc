@@ -67,11 +67,11 @@ using namespace Wt;
 
 // parameters _x1,... are irrelevant if isZoom is false
 
-WSphere::WSphere(WContainerWidget *parent, int width, int height,
-                 std::string basename, double projection)
-    : width_(width), height_(height), basename_(basename), parentWnd(parent),
-      typeOfView_(0), projection_(projection), plotPrepared_(false),
-      plotDone_(false)
+WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
+                 int height, std::string basename, double projection)
+    : scriptHandler_(s), width_(width), height_(height), basename_(basename),
+      parentWnd(parent), typeOfView_(0), projection_(projection),
+      plotPrepared_(false), plotDone_(false)
 {
     study_ = new WVFStudy(projection);
 
@@ -94,12 +94,12 @@ WSphere::WSphere(WContainerWidget *parent, int width, int height,
     clicked().connect(this, &WSphere::mouseClickEvent);
 }
 
-WSphere::WSphere(WContainerWidget *parent, int width, int height,
-                 std::string basename, int type, double minx, double maxx,
-                 double miny, double maxy)
-    : width_(width), height_(height), basename_(basename), parentWnd(parent),
-      typeOfView_(type), viewMinX_(minx), viewMaxX_(maxx), viewMinY_(miny),
-      viewMaxY_(maxy), plotPrepared_(false), plotDone_(false)
+WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
+                 int height, std::string basename, int type, double minx,
+                 double maxx, double miny, double maxy)
+    : scriptHandler_(s), width_(width), height_(height), basename_(basename),
+      parentWnd(parent), typeOfView_(type), viewMinX_(minx), viewMaxX_(maxx),
+      viewMinY_(miny), viewMaxY_(maxy), plotPrepared_(false), plotDone_(false)
 {
     study_ = new WVFStudy();
 
