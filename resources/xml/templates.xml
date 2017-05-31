@@ -282,6 +282,11 @@
   <!-- HomeLeft GCF tab template -->
   <message id="template.homeleft-gcf">
     <p/>
+    <div class="form-group">
+      <div class="help-block col-sm-11 col-sm-offset-1">
+        In this tab, you can configure the plotting options for the GCF of your vector field, in case there is one.
+      </div>
+    </div>
     <div class="form-horizontal">
       <div class="form-group">
         <label class="control-label col-sm-2 col-sm-offset-1" for="dots">
@@ -314,6 +319,11 @@
   <!-- HomeLfet Curves tab template -->
   <message id="template.homeleft-curves">
     <p/>
+    <div class="form-group">
+      <div class="help-block col-sm-11 col-sm-offset-1">
+        Enter a polynomial curve equation in the field, then evaluate it and press Plot to draw it.
+      </div>
+    </div>
     <div class="form-horizontal">
       <div class="form-group">
         <label class="control-label col-sm-3" title="${curve-tooltip-eqn}" for="curve-eq">
