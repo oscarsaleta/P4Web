@@ -22,6 +22,7 @@
 #include "ScriptHandler.h"
 
 #include "MyLogger.h"
+#include "custom.h"
 #include "file_tab.h"
 #include "math_p4.h"
 #include "math_polynom.h"
@@ -35,7 +36,24 @@
 #include <unistd.h>
 #include <vector>
 
-std::string randomFileName(std::string prefix, std::string suffix)
+ScriptHandler::ScriptHandler()
+{
+    str_bindir_ = P4_BINDIR;
+    str_p4m_ = str_bindir_ + "p4.m";
+    str_tmpdir_ = TMP_DIR;
+    str_lypexe_ = "lyapunov";
+    str_lypexe_mpf_ = "lyapunov_mpf";
+    str_sepexe_ = "separatrice";
+    str_exeprefix_ = "";
+    str_platform_ = "LINUX";
+    str_sumtablepath_ = str_bindir_ + "../sumtables/";
+    str_removecmd_ = "rm";
+    str_simplify_ = "false";
+    str_simplifycmd_ = MAPLE_SIMPLIFY_EXPRESSIONS;
+}
+
+std::string ScriptHandler::randomFileName(std::string prefix,
+                                          std::string suffix)
 {
     std::string fullname;
     prefix += "XXXXXX" + suffix;
@@ -55,9 +73,9 @@ std::string randomFileName(std::string prefix, std::string suffix)
     return prefix;
 }
 
-bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
-                      std::vector<std::string> &prmLabels,
-                      std::vector<std::string> &prmValues)
+bool ScriptHandler::prepareMapleFile(std::string &fname,
+                                     std::vector<std::string> &prmLabels,
+                                     std::vector<std::string> &prmValues)
 {
     g_globalLogger.debug("ScriptHandler :: received order to prepare script " +
                          fname);
@@ -72,14 +90,14 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
     std::string command = "chmod 644 " + fname + ".mpl";
     system(command.c_str());
 
-    prms.str_vectable = fname + "_vec.tab";
-    prms.str_fintab = fname + "_fin.tab";
-    prms.str_finres = fname + "_fin.res";
-    prms.str_inftab = fname + "_inf.tab";
-    prms.str_infres = fname + "_inf.res";
+    str_vectable_ = fname + "_vec.tab";
+    str_fintab_ = fname + "_fin.tab";
+    str_finres_ = fname + "_fin.res";
+    str_inftab_ = fname + "_inf.tab";
+    str_infres_ = fname + "_inf.res";
 
     if (mplFile != nullptr) {
-        fillMapleScript(mplFile, prms, prmLabels, prmValues);
+        fillMapleScript(mplFile, prmLabels, prmValues);
         fclose(mplFile);
         g_globalLogger.debug("ScriptHandler :: prepared Maple file " + fname);
         return true;
@@ -89,44 +107,43 @@ bool prepareMapleFile(std::string &fname, mapleParamsStruct &prms,
     }
 }
 
-void fillMapleScript(FILE *f, mapleParamsStruct &prms,
-                     std::vector<std::string> &prmLabels,
-                     std::vector<std::string> &prmValues)
+void ScriptHandler::fillMapleScript(FILE *f,
+                                    std::vector<std::string> &prmLabels,
+                                    std::vector<std::string> &prmValues)
 {
     if (!prmLabels.empty()) {
-        changeParameterNames(prmLabels, prmValues, prms.str_xeq, prms.str_yeq,
-                             prms.str_gcf);
-        prms.str_userf = "[" + prms.str_xeq + "," + prms.str_yeq + "]";
+        changeParameterNames(prmLabels, prmValues, str_xeq_, str_yeq_,
+                             str_gcf_);
+        str_userf_ = "[" + str_xeq_ + "," + str_yeq_ + "]";
     }
 
     fprintf(f, "restart;\n");
-    fprintf(f, "read( \"%s\" ):\n", prms.str_p4m.c_str());
-    fprintf(f, "user_bindir := \"%s\":\n", prms.str_bindir.c_str());
-    fprintf(f, "user_tmpdir := \"%s\":\n", prms.str_tmpdir.c_str());
-    fprintf(f, "user_lypexe := \"%s\":\n", prms.str_lypexe.c_str());
-    fprintf(f, "user_lypexe_mpf := \"%s\":\n", prms.str_lypexe_mpf.c_str());
-    fprintf(f, "user_sepexe := \"%s\":\n", prms.str_sepexe.c_str());
-    fprintf(f, "user_exeprefix := \"%s\":\n", prms.str_exeprefix.c_str());
-    fprintf(f, "user_platform := \"%s\":\n", prms.str_platform.c_str());
-    fprintf(f, "user_sumtablepath := \"%s\":\n", prms.str_sumtablepath.c_str());
-    fprintf(f, "user_removecmd := \"%s\":\n", prms.str_removecmd.c_str());
-    fprintf(f, "user_simplify := %s:\n", prms.str_simplify.c_str());
-    fprintf(f, "user_simplifycmd := %s:\n", prms.str_simplifycmd.c_str());
-    fprintf(f, "all_crit_points := %s:\n", prms.str_critpoints.c_str());
-    fprintf(f, "save_all := %s:\n", prms.str_saveall.c_str());
-    fprintf(f, "vec_table := \"%s\":\n", prms.str_vectable.c_str());
-    fprintf(f, "finite_table := \"%s\":\n", prms.str_fintab.c_str());
-    fprintf(f, "finite_res := \"%s\":\n", prms.str_finres.c_str());
-    fprintf(f, "infinite_table := \"%s\":\n", prms.str_inftab.c_str());
-    fprintf(f, "infinite_res := \"%s\":\n", prms.str_infres.c_str());
-    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", prms.str_xeq.c_str());
-    fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n",
-            prms.str_yeq.c_str());
-    fprintf(f, "    user_f := %s:\n", prms.str_userf.c_str());
+    fprintf(f, "read( \"%s\" ):\n", str_p4m_.c_str());
+    fprintf(f, "user_bindir := \"%s\":\n", str_bindir_.c_str());
+    fprintf(f, "user_tmpdir := \"%s\":\n", str_tmpdir_.c_str());
+    fprintf(f, "user_lypexe := \"%s\":\n", str_lypexe_.c_str());
+    fprintf(f, "user_lypexe_mpf := \"%s\":\n", str_lypexe_mpf_.c_str());
+    fprintf(f, "user_sepexe := \"%s\":\n", str_sepexe_.c_str());
+    fprintf(f, "user_exeprefix := \"%s\":\n", str_exeprefix_.c_str());
+    fprintf(f, "user_platform := \"%s\":\n", str_platform_.c_str());
+    fprintf(f, "user_sumtablepath := \"%s\":\n", str_sumtablepath_.c_str());
+    fprintf(f, "user_removecmd := \"%s\":\n", str_removecmd_.c_str());
+    fprintf(f, "user_simplify := %s:\n", str_simplify_.c_str());
+    fprintf(f, "user_simplifycmd := %s:\n", str_simplifycmd_.c_str());
+    fprintf(f, "all_crit_points := %s:\n", str_critpoints_.c_str());
+    fprintf(f, "save_all := %s:\n", str_saveall_.c_str());
+    fprintf(f, "vec_table := \"%s\":\n", str_vectable_.c_str());
+    fprintf(f, "finite_table := \"%s\":\n", str_fintab_.c_str());
+    fprintf(f, "finite_res := \"%s\":\n", str_finres_.c_str());
+    fprintf(f, "infinite_table := \"%s\":\n", str_inftab_.c_str());
+    fprintf(f, "infinite_res := \"%s\":\n", str_infres_.c_str());
+    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", str_xeq_.c_str());
+    fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n", str_yeq_.c_str());
+    fprintf(f, "    user_f := %s:\n", str_userf_.c_str());
     fprintf(f, "  else `quit(1)` end if:\n");
     fprintf(f, "else `quit(1)` end if:\n");
-    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", prms.str_gcf.c_str());
-    fprintf(f, "  user_gcf := %s:\n", prms.str_gcf.c_str());
+    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", str_gcf_.c_str());
+    fprintf(f, "  user_gcf := %s:\n", str_gcf_.c_str());
     fprintf(f, "else `quit(1)` end if:\n");
 
     if (!prmLabels.empty()) {
@@ -143,18 +160,18 @@ void fillMapleScript(FILE *f, mapleParamsStruct &prms,
         }
     }
 
-    fprintf(f, "user_numeric := %s:\n", prms.str_numeric.c_str());
-    fprintf(f, "epsilon := %s:\n", prms.str_epsilon.c_str());
-    fprintf(f, "test_sep := %s:\n", prms.str_testsep.c_str());
-    fprintf(f, "user_precision := %s:\n", prms.str_precision.c_str());
-    fprintf(f, "user_precision0 := %s:\n", prms.str_precision0.c_str());
-    fprintf(f, "taylor_level := %s:\n", prms.str_taylor.c_str());
-    fprintf(f, "numeric_level := %s:\n", prms.str_numericlevel.c_str());
-    fprintf(f, "max_level := %s:\n", prms.str_maxlevel.c_str());
-    fprintf(f, "weakness_level := %s:\n", prms.str_weaklevel.c_str());
-    fprintf(f, "user_p := %s:\n", prms.str_userp.c_str());
-    fprintf(f, "user_q := %s:\n", prms.str_userq.c_str());
-    fprintf(f, "try timelimit(%s,p4main()) catch:\n", prms.time_limit.c_str());
+    fprintf(f, "user_numeric := %s:\n", str_numeric_.c_str());
+    fprintf(f, "epsilon := %s:\n", str_epsilon_.c_str());
+    fprintf(f, "test_sep := %s:\n", str_testsep_.c_str());
+    fprintf(f, "user_precision := %s:\n", str_precision_.c_str());
+    fprintf(f, "user_precision0 := %s:\n", str_precision0_.c_str());
+    fprintf(f, "taylor_level := %s:\n", str_taylor_.c_str());
+    fprintf(f, "numeric_level := %s:\n", str_numericlevel_.c_str());
+    fprintf(f, "max_level := %s:\n", str_maxlevel_.c_str());
+    fprintf(f, "weakness_level := %s:\n", str_weaklevel_.c_str());
+    fprintf(f, "user_p := %s:\n", str_userp_.c_str());
+    fprintf(f, "user_q := %s:\n", str_userq_.c_str());
+    fprintf(f, "try timelimit(%s,p4main()) catch:\n", time_limit_.c_str());
     fprintf(f, "printf( \"! Error (%%a) %%a\\n\", lastexception[1], "
                "lastexception[2] );\n");
     fprintf(f, "finally: closeallfiles();\n");
@@ -164,7 +181,7 @@ void fillMapleScript(FILE *f, mapleParamsStruct &prms,
     g_globalLogger.debug("ScriptHandler :: filled Maple file");
 }
 
-siginfo_t evaluateMapleScript(std::string fname, int maxtime)
+siginfo_t ScriptHandler::evaluateMapleScript(std::string fname, int maxtime)
 {
     g_globalLogger.debug(
         "ScriptHandler :: Will fork Maple process for script " + fname);
@@ -254,32 +271,30 @@ siginfo_t evaluateMapleScript(std::string fname, int maxtime)
 
     - optional: integer precision0
 */
-bool fillSaveFile(std::string fname, mapleParamsStruct prms,
-                  std::vector<std::string> labels,
-                  std::vector<std::string> values)
+bool ScriptHandler::fillSaveFile(std::string fname,
+                                 std::vector<std::string> labels,
+                                 std::vector<std::string> values)
 {
     g_globalLogger.debug("ScriptHandler :: filling save file...");
     FILE *fp = fopen(fname.c_str(), "w");
 
     if (fp != nullptr) {
         fprintf(fp, "0\n"); // typeofstudy_
-        fprintf(
-            fp, "%s\n",
-            (prms.str_numeric == std::string("true") ? "1" : "0")); // numeric
-        fprintf(fp, "%s\n", prms.str_precision.c_str());            // precision
-        fprintf(fp, "%s\n", prms.str_epsilon.c_str());              // epsilon
-        fprintf(
-            fp, "%s\n",
-            (prms.str_testsep == std::string("true") ? "1" : "0")); // test sep
-        fprintf(fp, "%s\n", prms.str_taylor.c_str());       // taylor level
-        fprintf(fp, "%s\n", prms.str_numericlevel.c_str()); // numeric level
-        fprintf(fp, "%s\n", prms.str_maxlevel.c_str());     // max levels
-        fprintf(fp, "%s\n", prms.str_weaklevel.c_str());    // weakness level
-        fprintf(fp, "%s\n", prms.str_userp.c_str());        // p
-        fprintf(fp, "%s\n", prms.str_userq.c_str());        // q
-        fprintf(fp, "%s\n", prms.str_xeq.c_str());          // x'
-        fprintf(fp, "%s\n", prms.str_yeq.c_str());          // y'
-        fprintf(fp, "%s\n", prms.str_gcf.c_str());          // gcf
+        fprintf(fp, "%s\n",
+                (str_numeric_ == std::string("true") ? "1" : "0")); // numeric
+        fprintf(fp, "%s\n", str_precision_.c_str());                // precision
+        fprintf(fp, "%s\n", str_epsilon_.c_str());                  // epsilon
+        fprintf(fp, "%s\n",
+                (str_testsep_ == std::string("true") ? "1" : "0")); // test sep
+        fprintf(fp, "%s\n", str_taylor_.c_str());       // taylor level
+        fprintf(fp, "%s\n", str_numericlevel_.c_str()); // numeric level
+        fprintf(fp, "%s\n", str_maxlevel_.c_str());     // max levels
+        fprintf(fp, "%s\n", str_weaklevel_.c_str());    // weakness level
+        fprintf(fp, "%s\n", str_userp_.c_str());        // p
+        fprintf(fp, "%s\n", str_userq_.c_str());        // q
+        fprintf(fp, "%s\n", str_xeq_.c_str());          // x'
+        fprintf(fp, "%s\n", str_yeq_.c_str());          // y'
+        fprintf(fp, "%s\n", str_gcf_.c_str());          // gcf
         if (labels.empty()) {
             fprintf(fp, "0\n"); // numparams
         } else {
@@ -298,8 +313,8 @@ bool fillSaveFile(std::string fname, mapleParamsStruct prms,
     }
 }
 
-bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2,
-                int precision, int numpoints)
+bool ScriptHandler::prepareGcf(std::string fname, P4POLYNOM2 f, double y1,
+                               double y2, int precision, int numpoints)
 {
     int i;
     char buf[100];
@@ -342,8 +357,9 @@ bool prepareGcf(std::string fname, P4POLYNOM2 f, double y1, double y2,
     return false;
 }
 
-bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
-                            double theta2, int precision, int numpoints)
+bool ScriptHandler::prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f,
+                                           double theta1, double theta2,
+                                           int precision, int numpoints)
 {
     char buf[100];
     int i;
@@ -390,8 +406,8 @@ bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
     return false;
 }
 
-bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
-                           int numpoints)
+bool ScriptHandler::prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f,
+                                          int precision, int numpoints)
 {
     char buf[100];
     int i;
@@ -437,9 +453,10 @@ bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
     return false;
 }
 
-void changeParameterNames(std::vector<std::string> &labels,
-                          std::vector<std::string> &values, std::string &xeq,
-                          std::string &yeq, std::string &gcf)
+void ScriptHandler::changeParameterNames(std::vector<std::string> &labels,
+                                         std::vector<std::string> &values,
+                                         std::string &xeq, std::string &yeq,
+                                         std::string &gcf)
 {
     xeq = convertLabelsFromString(labels, xeq);
     yeq = convertLabelsFromString(labels, yeq);
@@ -455,8 +472,9 @@ void changeParameterNames(std::vector<std::string> &labels,
     return;
 }
 
-std::string convertLabelsFromString(std::vector<std::string> labels,
-                                    std::string target)
+std::string
+ScriptHandler::convertLabelsFromString(std::vector<std::string> labels,
+                                       std::string target)
 {
     std::string aux;
     std::string currentLabel, newLabel;
@@ -480,7 +498,8 @@ std::string convertLabelsFromString(std::vector<std::string> labels,
     return target;
 }
 
-int findIndexOfWordInTarget(std::string target, std::string word, int start)
+int ScriptHandler::findIndexOfWordInTarget(std::string target, std::string word,
+                                           int start)
 {
     int i, j;
     // search for first occurrence of substring word in target
@@ -514,9 +533,8 @@ int findIndexOfWordInTarget(std::string target, std::string word, int start)
     return i;
 }
 
-//TODO: acabar aquesta funció
-/*void ScriptHandler::prepareCurveFile(std::string fname, mapleParamsStruct &prms)
-{
+// TODO: acabar aquesta funció
+/*void ScriptHandler::prepareCurveFile(std::string fname, mapleParamsStruct){
     FILE *f;
     char buf[100];
 
@@ -524,19 +542,19 @@ int findIndexOfWordInTarget(std::string target, std::string word, int start)
 
     if (fp != nullptr) {
         fprintf(f, "restart;\n");
-        fprintf(f, "read( \"%s\" ):\n", prms.str_p4m.c_str());
-        fprintf(f, "user_bindir := \"%s\":\n", prms.str_bindir.c_str());
-        fprintf(f, "user_tmpdir := \"%s\":\n", prms.str_tmpdir.c_str());
-        fprintf(f, "user_exeprefix := \"%s\":\n", prms.str_exeprefix.c_str());
-        fprintf(f, "user_platform := \"%s\":\n", prms.str_platform.c_str());
-        fprintf(f, "user_removecmd := \"%s\":\n", prms.str_removecmd.c_str());
-        fprintf(f, "user_simplify := %s:\n", prms.str_simplify.c_str());
-        fprintf(f, "user_simplifycmd := %s:\n", prms.str_simplifycmd.c_str());
-        fprintf(f, "all_crit_points := %s:\n", prms.str_critpoints.c_str());
-        
-        prms.str_curvetable = fname + "_veccurve.tab";
-        system(std::string("rm -f " + prms.str_curvetable).c_str());
-        fprintf(f, "curve_table := \"%s\":\n", prms.str_curvetable.c_str());
+        fprintf(f, "read( \"%s\" ):\n", str_p4m_.c_str());
+        fprintf(f, "user_bindir := \"%s\":\n", str_bindir_.c_str());
+        fprintf(f, "user_tmpdir := \"%s\":\n", str_tmpdir_.c_str());
+        fprintf(f, "user_exeprefix := \"%s\":\n", str_exeprefix_.c_str());
+        fprintf(f, "user_platform := \"%s\":\n", str_platform_.c_str());
+        fprintf(f, "user_removecmd := \"%s\":\n", str_removecmd_.c_str());
+        fprintf(f, "user_simplify := %s:\n", str_simplify_.c_str());
+        fprintf(f, "user_simplifycmd := %s:\n", str_simplifycmd_.c_str());
+        fprintf(f, "all_crit_points := %s:\n", str_critpoints_.c_str());
+
+        str_curvetable_ = fname + "_veccurve.tab";
+        system(std::string("rm -f " + str_curvetable_).c_str());
+        fprintf(f, "curve_table := \"%s\":\n", str_curvetable_.c_str());
 
 
     }
