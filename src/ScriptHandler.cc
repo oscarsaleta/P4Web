@@ -437,21 +437,6 @@ bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
     return false;
 }
 
-#if defined(__WIN32__) || defined(_WIN32) || defined(WIN32) ||                 \
-    defined(__WINDOWS__) || defined(__TOS_WIN__)
-
-#include <windows.h>
-
-inline void delay(unsigned long ms) { Sleep(ms); }
-
-#else /* presume POSIX */
-
-#include <unistd.h>
-
-inline void delay(unsigned long ms) { usleep(ms * 1000); }
-
-#endif
-
 void changeParameterNames(std::vector<std::string> &labels,
                           std::vector<std::string> &values, std::string &xeq,
                           std::string &yeq, std::string &gcf)
@@ -528,3 +513,31 @@ int findIndexOfWordInTarget(std::string target, std::string word, int start)
         return -1;
     return i;
 }
+
+//TODO: acabar aquesta funció
+/*void ScriptHandler::prepareCurveFile(std::string fname, mapleParamsStruct &prms)
+{
+    FILE *f;
+    char buf[100];
+
+    f = fopen(std::string(fname + ".mpl").c_str(), "w");
+
+    if (fp != nullptr) {
+        fprintf(f, "restart;\n");
+        fprintf(f, "read( \"%s\" ):\n", prms.str_p4m.c_str());
+        fprintf(f, "user_bindir := \"%s\":\n", prms.str_bindir.c_str());
+        fprintf(f, "user_tmpdir := \"%s\":\n", prms.str_tmpdir.c_str());
+        fprintf(f, "user_exeprefix := \"%s\":\n", prms.str_exeprefix.c_str());
+        fprintf(f, "user_platform := \"%s\":\n", prms.str_platform.c_str());
+        fprintf(f, "user_removecmd := \"%s\":\n", prms.str_removecmd.c_str());
+        fprintf(f, "user_simplify := %s:\n", prms.str_simplify.c_str());
+        fprintf(f, "user_simplifycmd := %s:\n", prms.str_simplifycmd.c_str());
+        fprintf(f, "all_crit_points := %s:\n", prms.str_critpoints.c_str());
+        
+        prms.str_curvetable = fname + "_veccurve.tab";
+        system(std::string("rm -f " + prms.str_curvetable).c_str());
+        fprintf(f, "curve_table := \"%s\":\n", prms.str_curvetable.c_str());
+
+
+    }
+}*/

@@ -32,6 +32,7 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 
 #ifdef ANTZ
 #define MAPLE_PATH "/usr/share/maple11/bin/maple" ///< path to Maple executable
@@ -107,6 +108,14 @@ struct mapleParamsStruct {
      * name of vec.tab file
      */
     std::string str_vectable;
+    /**
+     * name of curve.tab file
+     */
+    std::string str_curvetable;
+    /**
+     * name of isoclines.tab file
+     */
+    std::string str_isoctable;
     /**
      * name of fin.tab file
      */
@@ -312,7 +321,7 @@ bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
  * although this program is thought for Linux, we implemented both, just in
  * case.
  */
-inline void delay(unsigned long ms);
+inline void delay(unsigned long ms) { usleep(ms * 1000); }
 
 /**
  * Change name of parameters from "something" to "something_", to avoid conflict
@@ -357,4 +366,4 @@ std::string convertLabelsFromString(std::vector<std::string> labels,
 int findIndexOfWordInTarget(std::string target, std::string word,
                             int start = 0);
 
-#endif
+#endif // SCRIPTHANDLER_H
