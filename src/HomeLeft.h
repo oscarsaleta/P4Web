@@ -436,6 +436,8 @@ class HomeLeft : public Wt::WContainerWidget
     void onPlotGcfBtn();
     // show an error message box
     void showErrorBox(Wt::WString message);
+    // react to button clicks in curves tab
+    void onEvalCurvesBtn();
 };
 
 #endif // HOMELEFT_H

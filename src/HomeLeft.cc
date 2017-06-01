@@ -55,13 +55,14 @@
 using namespace Wt;
 
 HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
-    : WContainerWidget(parent), scriptHandler_(scriptHandler_),
-      loggedIn_(false), settingsContainer_(nullptr), viewContainer_(nullptr),
-      orbitsContainer_(nullptr), evaluated_(false)
+    : WContainerWidget(parent), loggedIn_(false), settingsContainer_(nullptr),
+      viewContainer_(nullptr), orbitsContainer_(nullptr), evaluated_(false)
 {
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box-left"));
+
+    scriptHandler_ = scriptHandler;
 
     // set UI and connect signals
     setupUI();
@@ -594,8 +595,7 @@ void HomeLeft::evaluate()
     evaluated_ = true;
 
     setOptions();
-    if (scriptHandler_->prepareMapleFile(fileUploadName_, parent_->paramLabels_,
-                                         parent_->paramValues_)) {
+    if (scriptHandler_->prepareMapleFile(fileUploadName_)) {
         g_globalLogger.debug("HomeLeft :: filled Maple script " +
                              fileUploadName_);
     } else {
@@ -649,8 +649,7 @@ void HomeLeft::prepareSaveFile()
         saveFileName_ = fileUploadName_;
 
     setOptions();
-    if (!scriptHandler_->fillSaveFile(saveFileName_, parent_->paramLabels_,
-                                      parent_->paramValues_)) {
+    if (!scriptHandler_->fillSaveFile(saveFileName_)) {
         g_globalLogger.error("Cannot create save file " + saveFileName_);
         showErrorBox("Could not create save file. You can notify this "
                      "error at osr@mat.uab.cat, sorry for the "
@@ -1108,6 +1107,7 @@ void HomeLeft::showSettings()
 
     // plot curve button
     curvesPlotBtn_ = new WPushButton("Plot", curvesContainer_);
+    curvesPlotBtn_->setEnabled(false);
     t->bindWidget("curve-btn-plot", curvesPlotBtn_);
     t->bindString("curve-tooltip-plot", WString::tr("tooltip.curve-plot"));
 
@@ -1126,7 +1126,7 @@ void HomeLeft::showSettings()
                   WString::tr("tooltip.curve-del-all"));
 
     // connect buttons to functions TODO:;
-    // curvesEvalBtn_->clicked().connect(this, &HomeLeft::onEvalCurvesBtn);
+    curvesEvalBtn_->clicked().connect(this, &HomeLeft::onEvalCurvesBtn);
     // curvesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotCurvesBtn);
     // curvesDelOneBtn_->clicked().connect(this, &HomeLeft::onDelOneCurvesBtn);
     // curvesDelAllBtn_->clicked().connect(this, &HomeLeft::onDelAllCurvesBtn);
@@ -1312,7 +1312,30 @@ void HomeLeft::showErrorBox(WString message)
 }
 
 // TODO:
-/*void HomeLeft::onEvalCurvesBtn()
+void HomeLeft::onEvalCurvesBtn()
 {
-    scriptHandler_->str__
-}*/
+    if (!evaluated_) {
+        showErrorBox(
+            "Cannot evaluate curve yet, evaluate a vector field first.");
+        return;
+    }
+    std::string curve = curvesLineEdit_->text().toUTF8();
+    if (curve.empty() || curve == "") {
+        showErrorBox(
+            "The curve field must be filled with the equation of a curve.");
+        return;
+    }
+    scriptHandler_->str_curve_ = curve;
+
+    std::string fname;
+    if (fileUploadName_.empty()) {
+        fname = scriptHandler_->randomFileName(TMP_DIR, "_curve_prep.txt");
+    } else {
+        fname = fileUploadName_;
+    }
+    scriptHandler_->prepareCurveTable(fname);
+    scriptHandler_->evaluateMapleScript(fname + "_curve_prep.txt",
+                                        stoi(scriptHandler_->time_limit_));
+    evaluatedSignal_.emit(fname);
+    curvesPlotBtn_->setEnabled(true);
+}
