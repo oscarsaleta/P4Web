@@ -56,7 +56,7 @@ using namespace Wt;
 
 HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
     : WContainerWidget(parent), settingsContainer_(nullptr),
-      viewContainer_(nullptr), orbitsContainer_(nullptr),
+      viewContainer_(nullptr), orbitsContainer_(nullptr)
 {
     loggedIn_ = false;
     evaluated_ = false;
@@ -1347,7 +1347,7 @@ void HomeLeft::onEvalCurvesBtn()
         evaluatedSignal_.emit(fileUploadName_);
         evaluatedSignal_.emit(fileUploadName_ + "_curve_prep");
         curvesPlotBtn_->setEnabled(true);
-        evaluatedCurves_ = true;
+        evaluatedCurve_ = true;
     } else {
         if (status.si_code == CLD_EXITED) {
             g_globalLogger.error("HomeLeft :: Maple error");
