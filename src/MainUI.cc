@@ -185,6 +185,8 @@ void MainUI::setupUI()
     leftContainer_->gcfSignal().connect(rightContainer_, &HomeRight::onGcfEval);
     leftContainer_->addParameterSignal().connect(
         rightContainer_, &HomeRight::addParameterWithValue);
+    leftContainer_->plotCurveSignal().connect(rightContainer_,
+                                              &HomeRight::onCurvePlot);
 
     // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,

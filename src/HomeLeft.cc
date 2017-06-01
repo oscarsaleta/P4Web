@@ -55,9 +55,13 @@
 using namespace Wt;
 
 HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
-    : WContainerWidget(parent), loggedIn_(false), settingsContainer_(nullptr),
-      viewContainer_(nullptr), orbitsContainer_(nullptr), evaluated_(false)
+    : WContainerWidget(parent), settingsContainer_(nullptr),
+      viewContainer_(nullptr), orbitsContainer_(nullptr),
 {
+    loggedIn_ = false;
+    evaluated_ = false;
+    evaluatedCurve_ = false;
+
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box-left"));
@@ -1127,7 +1131,7 @@ void HomeLeft::showSettings()
 
     // connect buttons to functions TODO:;
     curvesEvalBtn_->clicked().connect(this, &HomeLeft::onEvalCurvesBtn);
-    // curvesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotCurvesBtn);
+    curvesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotCurvesBtn);
     // curvesDelOneBtn_->clicked().connect(this, &HomeLeft::onDelOneCurvesBtn);
     // curvesDelAllBtn_->clicked().connect(this, &HomeLeft::onDelAllCurvesBtn);
 
@@ -1288,7 +1292,7 @@ void HomeLeft::onPlotGcfBtn()
                                    "setting to default value");
         }
         int prec = gcfPrecisionSpinBox_->value();
-        if (prec < GCF_NP_MIN || prec > GCF_NP_MAX) {
+        if (prec < GCF_PREC_MIN || prec > GCF_PREC_MAX) {
             prec = GCF_PREC_DEFAULT;
             g_globalLogger.warning("HomeLeft :: gcf precision out of bounds, "
                                    "setting to default value");
@@ -1311,9 +1315,10 @@ void HomeLeft::showErrorBox(WString message)
     errorBox->show();
 }
 
-// TODO:
 void HomeLeft::onEvalCurvesBtn()
 {
+    evaluatedCurve_ = false;
+
     if (!evaluated_) {
         showErrorBox(
             "Cannot evaluate curve yet, evaluate a vector field first.");
@@ -1329,19 +1334,20 @@ void HomeLeft::onEvalCurvesBtn()
 
     std::string fname;
     if (fileUploadName_.empty()) {
-        fname = scriptHandler_->randomFileName(TMP_DIR, "_curve_prep.mpl");
-    } else {
-        fname = fileUploadName_;
+        fileUploadName_ =
+            scriptHandler_->randomFileName(TMP_DIR, "_curve_prep.mpl");
     }
 
-    scriptHandler_->prepareCurveTable(fname);
+    scriptHandler_->prepareCurveTable(fileUploadName_);
     siginfo_t status = scriptHandler_->evaluateMapleScript(
-        fname + "_curve_prep", stoi(scriptHandler_->time_limit_));
+        fileUploadName_ + "_curve_prep", stoi(scriptHandler_->time_limit_));
 
     if (status.si_status == 0) {
         g_globalLogger.debug("HomeLeft :: Maple curve tables script executed");
         evaluatedSignal_.emit(fileUploadName_);
-        evaluatedSignal_.emit(fname + "_curve_prep");
+        evaluatedSignal_.emit(fileUploadName_ + "_curve_prep");
+        curvesPlotBtn_->setEnabled(true);
+        evaluatedCurves_ = true;
     } else {
         if (status.si_code == CLD_EXITED) {
             g_globalLogger.error("HomeLeft :: Maple error");
@@ -1357,9 +1363,35 @@ void HomeLeft::onEvalCurvesBtn()
             g_globalLogger.error("HomeLeft :: unkwnown error in Maple process");
             showErrorBox("Unknown error when creating Maple process.");
         }
-
-        curvesPlotBtn_->setEnabled(true);
     }
 }
 
 // TODO: read curve table when pressing plot
+void HomeLeft::onPlotCurvesBtn()
+{
+    if (evaluatedCurve_ == false) {
+        g_globalLogger.error("HomeLeft :: a user tried to plot without having "
+                             "evaluated a curve. This should not be allowed to "
+                             "happen");
+        showErrorBox("In order to plot a curve, you must first\n"
+                     "successfully evaluate one.");
+        return;
+    }
+
+    int npoints = curvesNPointsSpinBox_->value();
+    if (npoints < CURVES_NP_MIN || npoints > CURVES_NP_MAX) {
+        npoints = CURVES_NP_DEFAULT;
+        g_globalLogger.warning("HomeLeft :: curve npoints out of bounds, "
+                               "setting to default value");
+    }
+    int prec = curvesPrecisionSpinBox_->value();
+    if (prec < CURVES_PREC_MIN || prec > CURVES_PREC_MAX) {
+        prec = CURVES_PREC_DEFAULT;
+        g_globalLogger.warning("HomeLeft :: curve precision out of bounds, "
+                               "setting to default value");
+    }
+
+    // TODO: read tables
+    plotCurveSignal_.emit(fileUploadName_, curvesAppearanceBtnGrp_->checkedId(),
+                          npoints, prec);
+}

@@ -307,14 +307,26 @@ class HomeLeft : public Wt::WContainerWidget
     {
         return addParameterSignal_;
     }
+    /**
+     * Signal to plot curve
+     *
+     * Is sent after pressing plot. This causes the curve table to be read, and
+     * then to perform all the chained executions for different charts, and
+     * finally to plot the curve.
+     */
+    Wt::Signal<std::string, int, int, int> &plotCurveSignal()
+    {
+        return plotCurveSignal_;
+    }
 
     /* MainUI parent */
     MainUI *parent_;
 
   private:
-    bool loggedIn_;
-    bool evaluated_;
-    int nParams_;
+    bool loggedIn_;       // tells if a user is logged in
+    bool evaluated_;      // tells if the vf has been evaluated
+    bool evaluatedCurve_; // tells if a curve has been evaluated
+    int nParams_;         // tells number of parameters added by user
 
     /* Script Handler */
     ScriptHandler *scriptHandler_;
@@ -400,6 +412,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<int> resetSignal_;
     Wt::Signal<std::string, int, int, int> gcfSignal_;
     Wt::Signal<std::string, std::string> addParameterSignal_;
+    Wt::Signal<std::string, int, int, int> plotCurveSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -438,6 +451,7 @@ class HomeLeft : public Wt::WContainerWidget
     void showErrorBox(Wt::WString message);
     // react to button clicks in curves tab
     void onEvalCurvesBtn();
+    void onPlotCurvesBtn();
 };
 
 #endif // HOMELEFT_H
