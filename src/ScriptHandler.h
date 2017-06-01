@@ -44,6 +44,11 @@
 #define TMP_DIR "/tmp/"                            ///< path to tmp folder
 #endif
 
+#define X_MIN -1
+#define X_MAX 1
+#define Y_MIN -1
+#define Y_MAX 1
+
 /**
  * Struct that stores all the Maple execution parameters for WP4
  */
@@ -207,6 +212,20 @@ class ScriptHandler
      * time limit for Maple execution
      */
     std::string time_limit_;
+    /**
+     * string with the curve equation
+     */
+    std::string str_curve_;
+    std::string str_x0_;
+    std::string str_y0_;
+    /**
+     * Vector of strings for labels
+     */
+    std::vector<std::string> paramLabels_;
+    /**
+     * Vector of strings for values
+     */
+    std::vector<std::string> paramValues_;
 
     /**
      * Generate a random name for a temp file
@@ -221,25 +240,20 @@ class ScriptHandler
      * Prepare Maple script for evaluation
      *
      * @param fname name of file, can be empty and the function will set it
-     * @param prms  struct containing all the parameters for Maple evaluation
      * @return      @c true if file was successfully created, @c false otherwise
      *
      * Opens file and fills it (through calling fillMapleScript())
      */
-    bool prepareMapleFile(std::string &fname,
-                          std::vector<std::string> &prmLabels,
-                          std::vector<std::string> &prmValues);
+    bool prepareMapleFile(std::string &fname);
 
     /**
      * Fill a Maple script with the parameters and commands for evaluation
      *
      * @param f     file stream to write to
-     * @param prms  struct containing all the parameters of the script
      *
      * Called from prepareMapleFile()
      */
-    void fillMapleScript(FILE *f, std::vector<std::string> &prmLabels,
-                         std::vector<std::string> &prmValues);
+    void fillMapleScript(FILE *f);
 
     /**
      * Evaluate a Maple script
@@ -265,8 +279,7 @@ class ScriptHandler
      * This format is compatible with P4. If a user is not logged in, every
      * option will be saved as the default options.
      */
-    bool fillSaveFile(std::string fname, std::vector<std::string> labels,
-                      std::vector<std::string> values);
+    bool fillSaveFile(std::string fname);
 
     /**
      * Prepare files in case of calculating GCF in plane/U1/U2 charts.
@@ -339,14 +352,18 @@ class ScriptHandler
     int findIndexOfWordInTarget(std::string target, std::string word,
                                 int start = 0);
 
+    void prepareCurveTable(std::string fname);
+
   private:
     /**
      * Wait for a certain amount of milliseconds, pausing the program
      *
      * @param ms number of milliseconds to pause execution for
      *
-     * The implementation depends on wether the system is Windows or Linux, and
-     * although this program is thought for Linux, we implemented both, just in
+     * The implementation depends on wether the system is Windows or Linux,
+     * and
+     * although this program is thought for Linux, we implemented both, just
+     * in
      * case.
      */
     inline void delay(unsigned long ms) { usleep(ms * 1000); }
@@ -355,8 +372,6 @@ class ScriptHandler
      * Change name of parameters from "something" to "something_", to avoid
      * conflict
      *
-     * @param labels vector of strings containing the labels of the parameters
-     * @param values vector of strings containing the values of the parameters
      * @param xeq    string that contains x'
      * @param yeq    string that contains y'
      * @param gcf    string that contains the GCF
@@ -365,22 +380,21 @@ class ScriptHandler
      * values
      * vector), and also to x', y', and the GCF.
      */
-    void changeParameterNames(std::vector<std::string> &labels,
-                              std::vector<std::string> &values,
-                              std::string &xeq, std::string &yeq,
+    void changeParameterNames(std::string &xeq, std::string &yeq,
                               std::string &gcf);
     /**
      * Add a _ to the end of all labels present in target
      *
-     * @param labels vector of strings containing the labels to look for
      * @param target string to be modified
      * @return       the modified string
      *
      * If the labels vector is {a,b,c} and the target is a*b*2, then
      * this function returns a_*b_*2
      */
-    std::string convertLabelsFromString(std::vector<std::string> labels,
-                                        std::string target);
+    std::string convertLabelsFromString(std::string target);
+
+    void writeMapleParameters(FILE *f);
+    bool stringToBool(std::string);
 };
 
 #endif // SCRIPTHANDLER_H

@@ -68,14 +68,13 @@ std::string ScriptHandler::randomFileName(std::string prefix,
         close(fd);
     }
 
-    g_globalLogger.debug("ScriptHandler :: created temp file " + fullname);
+    g_globalLogger.debug("ScriptHandler :: created temp file " + fullname +
+                         " and prefix is " + prefix);
 
     return prefix;
 }
 
-bool ScriptHandler::prepareMapleFile(std::string &fname,
-                                     std::vector<std::string> &prmLabels,
-                                     std::vector<std::string> &prmValues)
+bool ScriptHandler::prepareMapleFile(std::string &fname)
 {
     g_globalLogger.debug("ScriptHandler :: received order to prepare script " +
                          fname);
@@ -97,7 +96,7 @@ bool ScriptHandler::prepareMapleFile(std::string &fname,
     str_infres_ = fname + "_inf.res";
 
     if (mplFile != nullptr) {
-        fillMapleScript(mplFile, prmLabels, prmValues);
+        fillMapleScript(mplFile);
         fclose(mplFile);
         g_globalLogger.debug("ScriptHandler :: prepared Maple file " + fname);
         return true;
@@ -107,13 +106,10 @@ bool ScriptHandler::prepareMapleFile(std::string &fname,
     }
 }
 
-void ScriptHandler::fillMapleScript(FILE *f,
-                                    std::vector<std::string> &prmLabels,
-                                    std::vector<std::string> &prmValues)
+void ScriptHandler::fillMapleScript(FILE *f)
 {
-    if (!prmLabels.empty()) {
-        changeParameterNames(prmLabels, prmValues, str_xeq_, str_yeq_,
-                             str_gcf_);
+    if (!paramLabels_.empty()) {
+        changeParameterNames(str_xeq_, str_yeq_, str_gcf_);
         str_userf_ = "[" + str_xeq_ + "," + str_yeq_ + "]";
     }
 
@@ -146,19 +142,7 @@ void ScriptHandler::fillMapleScript(FILE *f,
     fprintf(f, "  user_gcf := %s:\n", str_gcf_.c_str());
     fprintf(f, "else `quit(1)` end if:\n");
 
-    if (!prmLabels.empty()) {
-        std::vector<std::string>::iterator it1;
-        std::vector<std::string>::iterator it2;
-        for (it1 = prmLabels.begin(), it2 = prmValues.begin();
-             it1 < prmLabels.end(), it2 < prmValues.end(); ++it1, ++it2) {
-            fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", it1->c_str());
-            fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n",
-                    it2->c_str());
-            fprintf(f, "    %s := %s:\n", it1->c_str(), it2->c_str());
-            fprintf(f, "  else `quit(1)` end if:\n");
-            fprintf(f, "else `quit(1)` end if:\n");
-        }
-    }
+    writeMapleParameters(f);
 
     fprintf(f, "user_numeric := %s:\n", str_numeric_.c_str());
     fprintf(f, "epsilon := %s:\n", str_epsilon_.c_str());
@@ -271,9 +255,7 @@ siginfo_t ScriptHandler::evaluateMapleScript(std::string fname, int maxtime)
 
     - optional: integer precision0
 */
-bool ScriptHandler::fillSaveFile(std::string fname,
-                                 std::vector<std::string> labels,
-                                 std::vector<std::string> values)
+bool ScriptHandler::fillSaveFile(std::string fname)
 {
     g_globalLogger.debug("ScriptHandler :: filling save file...");
     FILE *fp = fopen(fname.c_str(), "w");
@@ -295,17 +277,11 @@ bool ScriptHandler::fillSaveFile(std::string fname,
         fprintf(fp, "%s\n", str_xeq_.c_str());          // x'
         fprintf(fp, "%s\n", str_yeq_.c_str());          // y'
         fprintf(fp, "%s\n", str_gcf_.c_str());          // gcf
-        if (labels.empty()) {
+        if (paramLabels_.empty()) {
             fprintf(fp, "0\n"); // numparams
         } else {
-            fprintf(fp, "%lu\n", labels.size()); // numparams
-            std::vector<std::string>::iterator it1;
-            std::vector<std::string>::iterator it2;
-            for (it1 = labels.begin(), it2 = values.begin();
-                 it1 != labels.end(), it2 != values.end(); it1++, it2++) {
-                fprintf(fp, "%s\n", (*it1).c_str());
-                fprintf(fp, "%s\n", (*it2).c_str());
-            }
+            fprintf(fp, "%lu\n", paramLabels_.size()); // numparams
+            writeMapleParameters(fp);
         }
 
         fclose(fp);
@@ -453,35 +429,31 @@ bool ScriptHandler::prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f,
     return false;
 }
 
-void ScriptHandler::changeParameterNames(std::vector<std::string> &labels,
-                                         std::vector<std::string> &values,
-                                         std::string &xeq, std::string &yeq,
+void ScriptHandler::changeParameterNames(std::string &xeq, std::string &yeq,
                                          std::string &gcf)
 {
-    xeq = convertLabelsFromString(labels, xeq);
-    yeq = convertLabelsFromString(labels, yeq);
-    gcf = convertLabelsFromString(labels, gcf);
+    xeq = convertLabelsFromString(xeq);
+    yeq = convertLabelsFromString(yeq);
+    gcf = convertLabelsFromString(gcf);
 
     std::vector<std::string>::iterator it;
-    for (it = values.begin(); it != values.end(); it++) {
-        *it = convertLabelsFromString(labels, *it);
+    for (it = paramValues_.begin(); it != paramValues_.end(); it++) {
+        *it = convertLabelsFromString(*it);
     }
-    for (it = labels.begin(); it != labels.end(); it++) {
-        *it = convertLabelsFromString(labels, *it);
+    for (it = paramLabels_.begin(); it != paramLabels_.end(); it++) {
+        *it = convertLabelsFromString(*it);
     }
     return;
 }
 
-std::string
-ScriptHandler::convertLabelsFromString(std::vector<std::string> labels,
-                                       std::string target)
+std::string ScriptHandler::convertLabelsFromString(std::string target)
 {
     std::string aux;
     std::string currentLabel, newLabel;
     int i, j;
 
     std::vector<std::string>::iterator it;
-    for (it = labels.begin(); it != labels.end(); it++) {
+    for (it = paramLabels_.begin(); it != paramLabels_.end(); it++) {
         currentLabel = *it;
         newLabel = currentLabel + "_";
         if (currentLabel.empty())
@@ -533,14 +505,45 @@ int ScriptHandler::findIndexOfWordInTarget(std::string target, std::string word,
     return i;
 }
 
-// TODO: acabar aquesta funció
-/*void ScriptHandler::prepareCurveFile(std::string fname, mapleParamsStruct){
+void ScriptHandler::writeMapleParameters(FILE *f)
+{
+    if (!paramLabels_.empty()) {
+        std::vector<std::string>::iterator it1;
+        std::vector<std::string>::iterator it2;
+        for (it1 = paramLabels_.begin(), it2 = paramValues_.begin();
+             it1 < paramLabels_.end(), it2 < paramValues_.end(); ++it1, ++it2) {
+            fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", it1->c_str());
+            fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n",
+                    it2->c_str());
+            if (!str_numeric_.empty() && stringToBool(str_numeric_))
+                fprintf(f, "    %s := evalf(%s):\n", it1->c_str(),
+                        it2->c_str());
+            else
+                fprintf(f, "    %s := %s:\n", it1->c_str(), it2->c_str());
+            fprintf(f, "  else `quit(1)` end if:\n");
+            fprintf(f, "else `quit(1)` end if:\n");
+        }
+    }
+}
+
+bool ScriptHandler::stringToBool(std::string s)
+{
+    if (s == "true")
+        return true;
+    else
+        return false;
+}
+
+// TODO: canviar el destí on llegim els resultats de evaluateMapleScript (posar
+// que puguem passarli com argument la destinacio dels resultats)
+void ScriptHandler::prepareCurveTable(std::string fname)
+{
     FILE *f;
     char buf[100];
 
-    f = fopen(std::string(fname + ".mpl").c_str(), "w");
+    f = fopen((fname + "_curve_prep.txt").c_str(), "w");
 
-    if (fp != nullptr) {
+    if (f != nullptr) {
         fprintf(f, "restart;\n");
         fprintf(f, "read( \"%s\" ):\n", str_p4m_.c_str());
         fprintf(f, "user_bindir := \"%s\":\n", str_bindir_.c_str());
@@ -556,6 +559,44 @@ int ScriptHandler::findIndexOfWordInTarget(std::string target, std::string word,
         system(std::string("rm -f " + str_curvetable_).c_str());
         fprintf(f, "curve_table := \"%s\":\n", str_curvetable_.c_str());
 
+        // TODO: parse arguments
+        str_curve_ = convertLabelsFromString(str_curve_);
+        fprintf(f, "user_curve := %s\n:", str_curve_.c_str());
 
+        writeMapleParameters(f);
+
+        fprintf(f, "user_numeric := %s:\n", str_numeric_.c_str());
+        fprintf(f, "epsilon := %s:\n", str_epsilon_.c_str());
+        fprintf(f, "test_sep := %s:\n", str_testsep_.c_str());
+        fprintf(f, "user_precision := %s:\n", str_precision_.c_str());
+        fprintf(f, "user_precision0 := %s:\n", str_precision0_.c_str());
+        fprintf(f, "taylor_level := %s:\n", str_taylor_.c_str());
+        fprintf(f, "numeric_level := %s:\n", str_numericlevel_.c_str());
+        fprintf(f, "max_level := %s:\n", str_maxlevel_.c_str());
+        fprintf(f, "weakness_level := %s:\n", str_weaklevel_.c_str());
+
+        if (false /*typeofstudy_ == TYPEOFSTUDY_ONE*/) {
+            fprintf(f, "user_p := 1:\n");
+            fprintf(f, "user_q := 1:\n");
+            fprintf(f, "x0 := %s:\n", str_x0_.c_str());
+            fprintf(f, "y0 := %s:\n", str_y0_.c_str());
+            fprintf(f, "x_min := x0+(%f):\n", (float)(X_MIN));
+            fprintf(f, "x_min := x0+(%f):\n", (float)(X_MIN));
+            fprintf(f, "x_max := x0+(%f):\n", (float)(X_MAX));
+            fprintf(f, "y_min := y0+(%f):\n", (float)(Y_MIN));
+            fprintf(f, "y_max := y0+(%f):\n", (float)(Y_MAX));
+        } else {
+            fprintf(f, "user_p:=%s:\n", str_userp_.c_str());
+            fprintf(f, "user_q:=%s:\n", str_userq_.c_str());
+        }
+
+        fprintf(f, "try prepareCurve() catch:\n"
+                   "printf( \"! Error (\%%a) \%%a\\n\", lastexception[1], "
+                   "lastexception[2] );\n"
+                   "finally: closeallfiles();\n"
+                   "if normalexit=0 then `quit`(0); else `quit(1)` end if: end "
+                   "try:\n");
+        ;
     }
-}*/
+    fclose(f);
+}
