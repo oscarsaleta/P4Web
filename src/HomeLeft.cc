@@ -1333,9 +1333,33 @@ void HomeLeft::onEvalCurvesBtn()
     } else {
         fname = fileUploadName_;
     }
+
     scriptHandler_->prepareCurveTable(fname);
-    scriptHandler_->evaluateMapleScript(fname + "_curve_prep",
-                                        stoi(scriptHandler_->time_limit_));
-    evaluatedSignal_.emit(fname + "_curve_prep");
-    curvesPlotBtn_->setEnabled(true);
+    siginfo_t status = scriptHandler_->evaluateMapleScript(
+        fname + "_curve_prep", stoi(scriptHandler_->time_limit_));
+
+    if (status.si_status == 0) {
+        g_globalLogger.debug("HomeLeft :: Maple curve tables script executed");
+        evaluatedSignal_.emit(fileUploadName_);
+        evaluatedSignal_.emit(fname + "_curve_prep");
+    } else {
+        if (status.si_code == CLD_EXITED) {
+            g_globalLogger.error("HomeLeft :: Maple error");
+            evaluatedSignal_.emit(fileUploadName_);
+        } else if (status.si_code == CLD_KILLED) {
+            g_globalLogger.error("HomeLeft :: Maple process killed by system");
+            showErrorBox("Maple process killed by system.");
+        } else if (status.si_code == -2) {
+            g_globalLogger.error(
+                "HomeLeft :: Maple computation ran out of time");
+            showErrorBox("Computation ran out of time");
+        } else {
+            g_globalLogger.error("HomeLeft :: unkwnown error in Maple process");
+            showErrorBox("Unknown error when creating Maple process.");
+        }
+
+        curvesPlotBtn_->setEnabled(true);
+    }
 }
+
+// TODO: read curve table when pressing plot
