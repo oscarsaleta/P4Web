@@ -558,11 +558,11 @@ void HomeRight::hideParamsTab(bool logout)
     if (logout)
         loggedIn_ = false;
     /* in case there are parameters defined, remove them */
-    if (!paramLabels_.empty()) {
-        std::vector<std::string>().swap(paramLabels_);
+    if (!scriptHandler_->paramLabels_.empty()) {
+        std::vector<std::string>().swap(scriptHandler_->paramLabels_);
     }
-    if (!paramValues_.empty()) {
-        std::vector<std::string>().swap(paramValues_);
+    if (!scriptHandler_->paramValues_.empty()) {
+        std::vector<std::string>().swap(scriptHandler_->paramValues_);
     }
     leLabelsVector_.clear();
     leValuesVector_.clear();
@@ -579,11 +579,11 @@ void HomeRight::refreshParamStringVectors()
 
     // correctly delete and free all memory from these vectors
     // if they are not empty
-    if (!paramLabels_.empty()) {
-        std::vector<std::string>().swap(paramLabels_);
+    if (!scriptHandler_->paramLabels_.empty()) {
+        std::vector<std::string>().swap(scriptHandler_->paramLabels_);
     }
-    if (!paramValues_.empty()) {
-        std::vector<std::string>().swap(paramValues_);
+    if (!scriptHandler_->paramValues_.empty()) {
+        std::vector<std::string>().swap(scriptHandler_->paramValues_);
     }
 
     std::vector<boost::shared_ptr<WLineEdit>>::const_iterator it1;
@@ -593,7 +593,7 @@ void HomeRight::refreshParamStringVectors()
          it1++, it2++) {
         if ((*it1)->text().empty() || (*it2)->text().empty())
             continue;
-        paramLabels_.push_back((*it1)->text().toUTF8());
-        paramValues_.push_back((*it2)->text().toUTF8());
+        scriptHandler_->paramLabels_.push_back((*it1)->text().toUTF8());
+        scriptHandler_->paramValues_.push_back((*it2)->text().toUTF8());
     }
 }
