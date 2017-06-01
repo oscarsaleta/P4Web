@@ -83,9 +83,6 @@ class MainUI : public Wt::WContainerWidget
 
     void getMapleParams();
 
-    std::vector<std::string> paramLabels_;
-    std::vector<std::string> paramValues_;
-
   private:
     Session session_;
     MyAuthWidget *authWidget_;

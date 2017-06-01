@@ -245,9 +245,4 @@ void MainUI::setLogoutIndicator()
     loginAnchor_->show();
 }
 
-void MainUI::getMapleParams()
-{
-    rightContainer_->refreshParamStringVectors();
-    paramLabels_ = rightContainer_->paramLabels_;
-    paramValues_ = rightContainer_->paramValues_;
-}
+void MainUI::getMapleParams() { rightContainer_->refreshParamStringVectors(); }
