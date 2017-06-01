@@ -1329,13 +1329,13 @@ void HomeLeft::onEvalCurvesBtn()
 
     std::string fname;
     if (fileUploadName_.empty()) {
-        fname = scriptHandler_->randomFileName(TMP_DIR, "_curve_prep.txt");
+        fname = scriptHandler_->randomFileName(TMP_DIR, "_curve_prep.mpl");
     } else {
         fname = fileUploadName_;
     }
     scriptHandler_->prepareCurveTable(fname);
-    scriptHandler_->evaluateMapleScript(fname + "_curve_prep.txt",
+    scriptHandler_->evaluateMapleScript(fname + "_curve_prep",
                                         stoi(scriptHandler_->time_limit_));
-    evaluatedSignal_.emit(fname);
+    evaluatedSignal_.emit(fname + "_curve_prep");
     curvesPlotBtn_->setEnabled(true);
 }

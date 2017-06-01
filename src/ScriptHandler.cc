@@ -541,7 +541,7 @@ void ScriptHandler::prepareCurveTable(std::string fname)
     FILE *f;
     char buf[100];
 
-    f = fopen((fname + "_curve_prep.txt").c_str(), "w");
+    f = fopen((fname + "_curve_prep.mpl").c_str(), "w");
 
     if (f != nullptr) {
         fprintf(f, "restart;\n");
