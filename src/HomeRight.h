@@ -207,6 +207,20 @@ class HomeRight : public Wt::WContainerWidget
     void onGcfEval(std::string fname, int pointdash, int npoints, int prec);
 
     /**
+     * React to the curve plot signal
+     *
+     * Set curve variables in sphere (npoints, precision, dashes), call study to
+     * read the curve table, evaluate the curve in the different charts, and
+     * finally plot the curve in the sphere
+     *
+     * @param fname     name of file used in first maple evaluation
+     * @param pointdash plot points (0) or dashes (1) for curve
+     * @param npoints   number of points to plot
+     * @param prec      precision of computations for zeros of curve
+     */
+    void onCurvePlot(std::string fname, int pointdash, int npoints, int prec);
+
+    /**
      * Add a parameter to the list and fill the label and value
      *
      * This function will be called from HomeLeft when reading an input

@@ -597,3 +597,9 @@ void HomeRight::refreshParamStringVectors()
         scriptHandler_->paramValues_.push_back((*it2)->text().toUTF8());
     }
 }
+
+void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
+                            int prec)
+{
+    return;
+}
