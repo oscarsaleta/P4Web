@@ -534,8 +534,6 @@ bool ScriptHandler::stringToBool(std::string s)
         return false;
 }
 
-// TODO: canviar el destí on llegim els resultats de evaluateMapleScript (posar
-// que puguem passarli com argument la destinacio dels resultats)
 void ScriptHandler::prepareCurveTable(std::string fname)
 {
     FILE *f;
@@ -559,7 +557,6 @@ void ScriptHandler::prepareCurveTable(std::string fname)
         system(std::string("rm -f " + str_curvetable_).c_str());
         fprintf(f, "curve_table := \"%s\":\n", str_curvetable_.c_str());
 
-        // TODO: parse arguments
         str_curve_ = convertLabelsFromString(str_curve_);
         fprintf(f, "user_curve := %s\n:", str_curve_.c_str());
 
@@ -599,4 +596,135 @@ void ScriptHandler::prepareCurveTable(std::string fname)
         ;
     }
     fclose(f);
+}
+
+bool ScriptHandler::prepareCurve(std::string fname, P4POLYNOM2 f, double y1,
+                                 double y2, int precision, int numpoints)
+{
+    int i;
+    char buf[100];
+
+    // open original maple script (will get overwritten?!)
+    FILE *fp = fopen(std::string(fname + ".mpl").c_str(), "w");
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read( \"%s\" ):\n", (str_bindir_ + "/p4gcf.m").c_str());
+        fprintf(fp, "user_file := \"%s\":\n",
+                std::string(fname + "_curve.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n", numpoints);
+        fprintf(fp, "user_x1 := -1.0:\n");
+        fprintf(fp, "user_x2 := 1.0:\n");
+        fprintf(fp, "user_y1 := %g:\n", y1);
+        fprintf(fp, "user_y2 := %g:\n", y2);
+        fprintf(fp, "u := x:\n");
+        fprintf(fp, "v := y:\n");
+        fprintf(fp, "user_f := ");
+        for (i = 0; f != nullptr; i++) {
+            fprintf(fp, "%s",
+                    printterm2(buf, f, (i == 0) ? true : false, "x", "y"));
+            f = f->next_term2;
+        }
+        if (i == 0)
+            fprintf(fp, "0:\n");
+        else
+            fprintf(fp, ":\n");
+
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
+                    "`quit`(0); else `quit(1)` end if: end try:\n");
+
+        g_globalLogger.debug("ScriptHandler :: prepared curve file " + fname);
+        fclose(fp);
+        return true;
+    }
+    g_globalLogger.error("ScriptHandler :: cannot prepare curve file");
+    return false;
+}
+
+bool ScriptHandler::prepareCurve_LyapunovCyl(std::string fname, P4POLYNOM3 f,
+                                             double theta1, double theta2,
+                                             int precision, int numpoints)
+{
+    char buf[100];
+    int i;
+
+    FILE *fp = fopen(std::string(fname + ".mpl").c_str(), "w");
+
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read(\"%s\"):\n", (str_bindir_ + "/p4gcf.m").c_str());
+        fprintf(fp, "user_file := \"%s\":\n",
+                std::string(fname + "_curve.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n", numpoints);
+        fprintf(fp, "user_x1 := 0.0:\n");
+        fprintf(fp, "user_x2 := 1.0:\n");
+        fprintf(fp, "user_y1 := %g:\n", theta1);
+        fprintf(fp, "user_y2 := %g:\n", theta2);
+        fprintf(fp, "u := cos(y):\n");
+        fprintf(fp, "v := sin(y):\n");
+        fprintf(fp, "user_f := ");
+        for (i = 0; f != nullptr; i++) {
+            fprintf(fp, "%s",
+                    printterm3(buf, f, (i == 0) ? true : false, "x", "U", "V"));
+            f = f->next_term3;
+        }
+        if (i == 0)
+            fprintf(fp, "0:\n");
+        else
+            fprintf(fp, ":\n");
+
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
+                    "`quit`(0); else `quit(1)` end if: end try:\n");
+
+        g_globalLogger.debug(
+            "ScriptHandler :: prepared curve_LyapunovCyl file " + fname);
+        fclose(fp);
+        return true;
+    }
+    g_globalLogger.error(
+        "ScriptHandler :: cannot prepare curve_LyapunovCyl file");
+    return false;
+}
+
+bool ScriptHandler::prepareCurve_LyapunovR2(std::string fname, P4POLYNOM2 f,
+                                            int precision, int numpoints)
+{
+    char buf[100];
+    int i;
+
+    FILE *fp = fopen(std::string(fname + ".mpl").c_str(), "w");
+
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read( \"%s\" ):\n", (str_bindir_ + "/p4gcf.m").c_str());
+        fprintf(fp, "user_file := \"%s\":\n",
+                std::string(fname + "_curve.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n", numpoints);
+        fprintf(fp, "user_x1 := 0.0:");
+        fprintf(fp, "user_x2 := 1.0:");
+        fprintf(fp, "user_y1 := 0.0:");
+        fprintf(fp, "user_y2 := %g:\n", TWOPI);
+        fprintf(fp, "u := x*cos(y):");
+        fprintf(fp, "v := y*sin(y):");
+        fprintf(fp, "user_f := ");
+        for (i = 0; f != nullptr; i++) {
+            fprintf(fp, "%s",
+                    printterm2(buf, f, (i == 0) ? true : false, "U", "V"));
+            f = f->next_term2;
+        }
+        if (i == 0)
+            fprintf(fp, "0:\n");
+        else
+            fprintf(fp, ":\n");
+
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
+                    "`quit`(0); else `quit(1)` end if: end try:");
+
+        g_globalLogger.debug(
+            "ScriptHandler :: prepared curve_LyapunovR2 file " + fname);
+        fclose(fp);
+        return true;
+    }
+    g_globalLogger.error(
+        "ScriptHandler :: cannot prepare curve_LyapunovR2 file");
+    return false;
 }

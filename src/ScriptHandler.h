@@ -311,8 +311,7 @@ class ScriptHandler
      * otherwise
      *
      * This is only called in case of Poincare-Lyapunov compactification
-     * (weights
-     * (p,q) !=(1,1))
+     * (weights (p,q) !=(1,1))
      */
     bool prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f, double theta1,
                                 double theta2, int precision, int numpoints);
@@ -328,10 +327,9 @@ class ScriptHandler
      * otherwise
      *
      * This is only called in case of Poincare-Lyapunov compactification
-     * (weights
-     * (p,q) !=(1,1)).
+     * (weights (p,q) !=(1,1)).
      * Same as preparegcf, except for the "u := " and "v := " assignments,
-     * and the fact that one always refers to the same function VFResults.gcf,
+     * and the fact that one always refers to the same object WVFStudy.gcf_,
      * and the fact that the x and y intervals are [0,1] and [0,2Pi] resp.
      */
     bool prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
@@ -352,7 +350,67 @@ class ScriptHandler
     int findIndexOfWordInTarget(std::string target, std::string word,
                                 int start = 0);
 
+    /**
+     * Prepare the Maple script that will convert a curve into a table
+     *
+     * @param fname name of file where to write
+     */
     void prepareCurveTable(std::string fname);
+
+    /**
+     * Prepare files in case of calculating curve in plane/U1/U2 charts.
+     *
+     * @param fname     name of file where to write
+     * @param f         terms of curve
+     * @param y1        y coord of point 1
+     * @param y2        y coord of point 2
+     * @param precision precision of integration
+     * @param numpoints number of points to compute
+     * @return          @c true if file was successfully prepared, @c false
+     * otherwise
+     *
+     * This is only called in case of Poincare-compactification (weights p=q=1)
+     */
+    bool prepareCurve(std::string fname, P4POLYNOM2 f, double y1, double y2,
+                      int precision, int numpoints);
+
+    /**
+     * Prepare files in case of calculating curve in charts near infinity.
+     *
+     * @param fname     name of file where to write
+     * @param f         terms of curve
+     * @param theta1    theta coord of point 1
+     * @param theta2    theta coord of point 2
+     * @param precision precision of integration
+     * @param numpoints number of points to compute
+     * @return          @c true if file was successfully prepared, @c false
+     * otherwise
+     *
+     * This is only called in case of Poincare-Lyapunov compactification
+     * (weights (p,q) !=(1,1))
+     */
+    bool prepareCurve_LyapunovCyl(std::string fname, P4POLYNOM3 f,
+                                  double theta1, double theta2, int precision,
+                                  int numpoints);
+
+    /**
+     * Prepare files in case of calculating curve in charts near infinity.
+     *
+     * @param fname     file name of user Maple script
+     * @param f         terms of curve
+     * @param precision precision of integration
+     * @param numpoints number of points to compute
+     * @return          @c true if file was successfully created, @c false
+     * otherwise
+     *
+     * This is only called in case of Poincare-Lyapunov compactification
+     * (weights (p,q) !=(1,1)).
+     * Same as preparecurve, except for the "u := " and "v := " assignments,
+     * and the fact that one always refers to the same object curve_vector_.r2,
+     * and the fact that the x and y intervals are [0,1] and [0,2Pi] resp.
+     */
+    bool prepareCurve_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
+                                 int numpoints);
 
   private:
     /**
