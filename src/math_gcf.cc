@@ -28,7 +28,7 @@
 #include <cmath>
 
 // static global variables
-static int GcfDashes = 1;
+static int s_GcfDashes = 1;
 
 // function definitions
 void WVFStudy::rplane_plsphere0(double x, double y, double *pcoord)
@@ -50,7 +50,7 @@ bool WSphere::evalGcfStart(std::string fname, int dashes, int points,
         gcfTask_ = EVAL_GCF_R2;
 
     gcfError_ = false;
-    GcfDashes = dashes;
+    s_GcfDashes = dashes;
     if (runTask(fname, gcfTask_, points, precis) < 0)
         return false;
     return true;
@@ -156,8 +156,7 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
         return -1;
 }
 
-bool WSphere::readTaskResults(std::string fname,
-                              int task) // , int points, int prec, int memory )
+bool WSphere::readTaskResults(std::string fname, int task)
 {
     g_globalLogger.debug("WSphere :: called readTaskResults with fname=" +
                          fname + " and task=" + std::to_string(task));
@@ -260,7 +259,7 @@ bool WSphere::read_gcf(std::string fname,
             (study_->*chart)(x, y, pcoord);
             study_->insert_gcf_point(pcoord[0], pcoord[1], pcoord[2], d);
             // d=1;
-            d = GcfDashes;
+            d = s_GcfDashes;
         }
         for (c = getc(fp); isspace(c);)
             c = getc(fp);
