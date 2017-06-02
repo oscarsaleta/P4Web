@@ -318,16 +318,25 @@ class HomeLeft : public Wt::WContainerWidget
     {
         return plotCurveSignal_;
     }
+    /**
+     * Signal to delete curves
+     *
+     * The int can be 1 (delete last) or 0 (delete all)
+     */
+    Wt::Signal<int> &curveDeleteSignal() { return curveDeleteSignal_; }
 
     /* MainUI parent */
     MainUI *parent_;
 
   private:
-    bool loggedIn_;       // tells if a user is logged in
-    bool evaluated_;      // tells if the vf has been evaluated
-    bool plotted_;        // tells if the plot button has been pressed
+    bool loggedIn_;  // tells if a user is logged in
+    bool evaluated_; // tells if the vf has been evaluated
+    bool plotted_;   // tells if the plot button has been pressed
+
+    int nCurves_;         // number of curves that have been plotted
     bool evaluatedCurve_; // tells if a curve has been evaluated
-    int nParams_;         // tells number of parameters added by user
+
+    int nParams_; // tells number of parameters added by user
 
     /* Script Handler */
     ScriptHandler *scriptHandler_;
@@ -413,6 +422,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<std::string, int, int, int> gcfSignal_;
     Wt::Signal<std::string, std::string> addParameterSignal_;
     Wt::Signal<std::string, int, int, int> plotCurveSignal_;
+    Wt::Signal<int> curveDeleteSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -451,6 +461,8 @@ class HomeLeft : public Wt::WContainerWidget
     void showErrorBox(Wt::WString message);
     // react to button clicks in curves tab
     void onPlotCurvesBtn();
+    void onDelOneCurvesBtn();
+    void onDelAllCurvesBtn();
 };
 
 #endif // HOMELEFT_H

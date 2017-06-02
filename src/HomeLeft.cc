@@ -61,7 +61,9 @@ HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
     loggedIn_ = false;
     evaluated_ = false;
     plotted_ = false;
+
     evaluatedCurve_ = false;
+    nCurves_ = 0;
 
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
@@ -1114,6 +1116,7 @@ void HomeLeft::showSettings()
     // delete one button
     curvesDelOneBtn_ = new WPushButton("Delete last curve", curvesContainer_);
     curvesDelOneBtn_->setStyleClass("btn btn-warning");
+    curvesDelOneBtn_->disable();
     t->bindWidget("curve-btn-del-one", curvesDelOneBtn_);
     t->bindString("curve-tooltip-del-one",
                   WString::tr("tooltip.curve-del-one"));
@@ -1121,14 +1124,15 @@ void HomeLeft::showSettings()
     // delete all button
     curvesDelAllBtn_ = new WPushButton("Delete all curves", curvesContainer_);
     curvesDelAllBtn_->setStyleClass("btn btn-danger");
+    curvesDelAllBtn_->disable();
     t->bindWidget("curve-btn-del-all", curvesDelAllBtn_);
     t->bindString("curve-tooltip-del-all",
                   WString::tr("tooltip.curve-del-all"));
 
     // connect buttons to functions TODO:;
     curvesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotCurvesBtn);
-    // curvesDelOneBtn_->clicked().connect(this, &HomeLeft::onDelOneCurvesBtn);
-    // curvesDelAllBtn_->clicked().connect(this, &HomeLeft::onDelAllCurvesBtn);
+    curvesDelOneBtn_->clicked().connect(this, &HomeLeft::onDelOneCurvesBtn);
+    curvesDelAllBtn_->clicked().connect(this, &HomeLeft::onDelAllCurvesBtn);
 
     tabs_->setCurrentWidget(settingsContainer_);
 }
@@ -1167,8 +1171,10 @@ void HomeLeft::resetUI()
 {
     evaluated_ = false;
     plotted_ = false;
+
     evaluatedCurve_ = false;
-    
+    nCurves_ = 0;
+
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
     gcfEquationInput_->setText(std::string());
@@ -1325,8 +1331,7 @@ void HomeLeft::onPlotCurvesBtn()
 
     // check if vf is evaluated
     if (!evaluated_) {
-        showErrorBox(
-            "Cannot plot curve yet, evaluate a vector field first.");
+        showErrorBox("Cannot plot curve yet, evaluate a vector field first.");
         return;
     }
     if (!plotted_) {
@@ -1357,8 +1362,8 @@ void HomeLeft::onPlotCurvesBtn()
     // check for errors in execution
     if (status.si_status == 0) {
         g_globalLogger.debug("HomeLeft :: Maple curve tables script executed");
-        evaluatedSignal_.emit(fileUploadName_);
-        evaluatedSignal_.emit(fileUploadName_ + "_curve_prep");
+        //evaluatedSignal_.emit(fileUploadName_);
+        //evaluatedSignal_.emit(fileUploadName_ + "_curve_prep");
         curvesPlotBtn_->setEnabled(true);
         evaluatedCurve_ = true;
     } else {
@@ -1395,4 +1400,43 @@ void HomeLeft::onPlotCurvesBtn()
     // start curve evaluation and plotting
     plotCurveSignal_.emit(fileUploadName_, curvesAppearanceBtnGrp_->checkedId(),
                           npoints, prec);
+    nCurves_++;
+    if (!curvesDelAllBtn_->isEnabled())
+        curvesDelAllBtn_->enable();
+    if (!curvesDelOneBtn_->isEnabled())
+        curvesDelOneBtn_->enable();
+    g_globalLogger.debug("HomeLeft :: evaluated and plotted curve, ncurves = " +
+                         std::to_string(nCurves_));
+}
+
+void HomeLeft::onDelOneCurvesBtn()
+{
+    if (nCurves_ <= 0)
+        return;
+
+    curveDeleteSignal_.emit(1);
+
+    nCurves_--;
+    if (nCurves_ == 0) {
+        curvesDelOneBtn_->disable();
+        curvesDelAllBtn_->disable();
+    }
+
+    g_globalLogger.debug("HomeLeft :: deleted last curve, ncurves = " +
+                         std::to_string(nCurves_));
+}
+
+void HomeLeft::onDelAllCurvesBtn()
+{
+    if (nCurves_ <= 0)
+        return;
+
+    curveDeleteSignal_.emit(0);
+
+    nCurves_ = 0;
+    curvesDelOneBtn_->disable();
+    curvesDelAllBtn_->disable();
+
+    g_globalLogger.debug("HomeLeft :: deleted all curves, ncurves = " +
+                         std::to_string(nCurves_));
 }
