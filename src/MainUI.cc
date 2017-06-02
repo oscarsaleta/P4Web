@@ -189,6 +189,10 @@ void MainUI::setupUI()
                                               &HomeRight::onCurvePlot);
     leftContainer_->curveDeleteSignal().connect(rightContainer_,
                                                 &HomeRight::onCurvesDelete);
+    leftContainer_->plotIsoclineSignal().connect(rightContainer_,
+                                                 &HomeRight::onIsoclinePlot);
+    leftContainer_->isoclineDeleteSignal().connect(
+        rightContainer_, &HomeRight::onIsoclinesDelete);
 
     // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,
