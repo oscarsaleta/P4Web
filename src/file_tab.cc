@@ -198,6 +198,18 @@ void WVFStudy::deleteVF()
     gcf_C_ = nullptr;
     deleteOrbitPoint(gcf_points_);
     gcf_points_ = nullptr;
+    deleteOrbitPoint(last_gcf_point_);
+    last_gcf_point_ = nullptr;
+
+    // Delete curves:
+    curve_vector_.clear();
+    deleteOrbitPoint(last_curves_point_);
+    last_curves_point_ = nullptr;
+
+    // Delete isoclines
+    isocline_vector_.clear();
+    deleteOrbitPoint(last_isoclines_point_);
+    last_isoclines_point_ = nullptr;
 
     // Delete all orbits
     deleteOrbit(first_orbit_);
