@@ -599,7 +599,6 @@ void HomeRight::refreshParamStringVectors()
     }
 }
 
-// TODO:
 void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
                             int prec)
 {
@@ -667,9 +666,88 @@ void HomeRight::onCurvesDelete(int flag)
         sphere_->study_->curve_vector_.clear();
     } else if (flag == 1)
         sphere_->study_->curve_vector_.pop_back();
-        
+
     sphere_->study_->deleteOrbitPoint(sphere_->study_->last_curves_point_);
     sphere_->study_->last_curves_point_ = nullptr;
+
+    sphere_->plotDone_ = false;
+    sphere_->update();
+    if (tabWidget_->currentIndex() != 1)
+        tabWidget_->setCurrentIndex(1);
+}
+
+void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
+                               int prec)
+{
+    g_globalLogger.debug("HomeRight :: received isocline signal with fname " +
+                         fname);
+
+    if (sphere_ == nullptr)
+        return;
+
+    // 1. read isocline tables
+    if (!sphere_->study_->readIsoclines(fname)) {
+        g_globalLogger.error("HomeRight :: cannot read isocline");
+        return;
+    }
+
+    // 2. create and execute maple scripts for charts
+    sphere_->isoclineDashes_ = pointdash;
+    sphere_->isoclineFname_ = fname;
+    sphere_->isoclineNPoints_ = npoints;
+    sphere_->isoclinePrec_ = prec;
+    sphere_->plotDone_ = false;
+
+    int result = sphere_->evalIsoclineStart(
+        sphere_->isoclineFname_, sphere_->isoclineDashes_,
+        sphere_->isoclineNPoints_, sphere_->isoclinePrec_);
+    if (!result) {
+        g_globalLogger.error("HomeRight :: cannot evaluate isocline");
+    } else {
+        int i = 0;
+        do {
+            result = sphere_->evalIsoclineContinue(sphere_->isoclineFname_,
+                                                   CURVE_POINTS, CURVE_PRECIS);
+            if (sphere_->isoclineError_) {
+                g_globalLogger.error("HomeRight :: error while computing "
+                                     "evalIsoclineContinue at step: " +
+                                     std::to_string(i));
+                break;
+            }
+            i++;
+        } while (!result);
+        // finish evaluation
+        result = sphere_->evalIsoclineFinish();
+        if (!result) {
+            g_globalLogger.error("HomeRight :: error in evalIsoclineFinish");
+        } else {
+            g_globalLogger.debug("HomeRight :: computed isocline");
+        }
+    }
+
+    // 3. assign color and plot
+    int nisocs = (sphere_->study_->isocline_vector_.size() - 1) % 4;
+    sphere_->study_->isocline_vector_.back().color = CISOC + nisocs;
+    sphere_->update(PaintUpdate);
+
+    // 4. Focus plot tab
+    tabWidget_->setCurrentIndex(1);
+    return;
+}
+
+void HomeRight::onIsoclinesDelete(int flag)
+{
+    if (sphere_ == nullptr || sphere_->study_ == nullptr ||
+        sphere_->study_->isocline_vector_.empty())
+        return;
+
+    if (flag == 0) {
+        sphere_->study_->isocline_vector_.clear();
+    } else if (flag == 1)
+        sphere_->study_->isocline_vector_.pop_back();
+
+    sphere_->study_->deleteOrbitPoint(sphere_->study_->last_isoclines_point_);
+    sphere_->study_->last_isoclines_point_ = nullptr;
 
     sphere_->plotDone_ = false;
     sphere_->update();

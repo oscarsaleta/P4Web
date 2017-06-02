@@ -221,6 +221,34 @@ class HomeRight : public Wt::WContainerWidget
     void onCurvePlot(std::string fname, int pointdash, int npoints, int prec);
 
     /**
+     * React to a curve delete request
+     *
+     * @param flag can be 0 (delete all) or 1 (delete last)
+     */
+    void onCurvesDelete(int flag);
+
+    /**
+     * React to the isocline plot signal
+     *
+     * Set isocline variables in sphere (npoints, precision, dashes), call study to
+     * read the isocline table, evaluate the isocline in the different charts, and
+     * finally plot the isocline in the sphere
+     *
+     * @param fname     name of file used in first maple evaluation
+     * @param pointdash plot points (0) or dashes (1) for isocline
+     * @param npoints   number of points to plot
+     * @param prec      precision of computations for zeros of isocline
+     */
+    void onIsoclinePlot(std::string fname, int pointdash, int npoints, int prec);
+
+    /**
+     * React to an isocline delete request
+     *
+     * @param flag can be 0 (delete all) or 1 (delete last)
+     */
+    void onIsoclinesDelete(int flag);
+
+    /**
      * Add a parameter to the list and fill the label and value
      *
      * This function will be called from HomeLeft when reading an input
@@ -248,13 +276,6 @@ class HomeRight : public Wt::WContainerWidget
      * Create string vectors from parameter WLineEdits
      */
     void refreshParamStringVectors();
-
-    /**
-     * React to a curve delete request
-     *
-     * @param flag can be 0 (delete all) or 1 (delete last)
-     */
-    void onCurvesDelete(int flag);
 
     /**
      * Vector of strings for labels
