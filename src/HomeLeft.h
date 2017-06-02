@@ -325,6 +325,7 @@ class HomeLeft : public Wt::WContainerWidget
   private:
     bool loggedIn_;       // tells if a user is logged in
     bool evaluated_;      // tells if the vf has been evaluated
+    bool plotted_;        // tells if the plot button has been pressed
     bool evaluatedCurve_; // tells if a curve has been evaluated
     int nParams_;         // tells number of parameters added by user
 
@@ -396,7 +397,6 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WButtonGroup *curvesAppearanceBtnGrp_;
     Wt::WSpinBox *curvesNPointsSpinBox_;
     Wt::WSpinBox *curvesPrecisionSpinBox_;
-    Wt::WPushButton *curvesEvalBtn_;
     Wt::WPushButton *curvesPlotBtn_;
     Wt::WPushButton *curvesDelOneBtn_;
     Wt::WPushButton *curvesDelAllBtn_;
@@ -450,7 +450,6 @@ class HomeLeft : public Wt::WContainerWidget
     // show an error message box
     void showErrorBox(Wt::WString message);
     // react to button clicks in curves tab
-    void onEvalCurvesBtn();
     void onPlotCurvesBtn();
 };
 

@@ -60,6 +60,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
 {
     loggedIn_ = false;
     evaluated_ = false;
+    plotted_ = false;
     evaluatedCurve_ = false;
 
     // set CSS class for inline 50% of the screen
@@ -679,7 +680,7 @@ void HomeLeft::prepareSaveFile()
 void HomeLeft::onPlot()
 {
     if (!evaluated_) {
-        showErrorBox("Cannot read results, evaluate a vector field first.\n");
+        showErrorBox("Cannot read results, evaluate a vector field first.");
     } else {
         g_globalLogger.debug("HomeLeft :: sending onPlot signal");
         if (!loggedIn_)
@@ -735,6 +736,7 @@ void HomeLeft::onPlot()
                                         viewComboBox_->currentIndex(), minx,
                                         maxx, miny, maxy);
             }
+            plotted_ = true;
             tabs_->setCurrentWidget(viewContainer_);
         }
     }
@@ -1104,14 +1106,8 @@ void HomeLeft::showSettings()
     t->bindWidget("curve-prc", curvesPrecisionSpinBox_);
     t->bindString("curve-tooltip-prc", WString::tr("tooltip.prc"));
 
-    // eval curve button
-    curvesEvalBtn_ = new WPushButton("Evaluate", curvesContainer_);
-    t->bindWidget("curve-btn-evaluate", curvesEvalBtn_);
-    t->bindString("curve-tooltip-evaluate", WString::tr("tooltip.curve-eval"));
-
     // plot curve button
-    curvesPlotBtn_ = new WPushButton("Plot", curvesContainer_);
-    curvesPlotBtn_->setEnabled(false);
+    curvesPlotBtn_ = new WPushButton("Plot curve", curvesContainer_);
     t->bindWidget("curve-btn-plot", curvesPlotBtn_);
     t->bindString("curve-tooltip-plot", WString::tr("tooltip.curve-plot"));
 
@@ -1130,7 +1126,6 @@ void HomeLeft::showSettings()
                   WString::tr("tooltip.curve-del-all"));
 
     // connect buttons to functions TODO:;
-    curvesEvalBtn_->clicked().connect(this, &HomeLeft::onEvalCurvesBtn);
     curvesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotCurvesBtn);
     // curvesDelOneBtn_->clicked().connect(this, &HomeLeft::onDelOneCurvesBtn);
     // curvesDelAllBtn_->clicked().connect(this, &HomeLeft::onDelAllCurvesBtn);
@@ -1161,10 +1156,19 @@ void HomeLeft::hideSettings()
         delete gcfContainer_;
         gcfContainer_ = nullptr;
     }
+    if (curvesContainer_ != nullptr) {
+        tabs_->removeTab(curvesContainer_);
+        delete curvesContainer_;
+        curvesContainer_ = nullptr;
+    }
 }
 
 void HomeLeft::resetUI()
 {
+    evaluated_ = false;
+    plotted_ = false;
+    evaluatedCurve_ = false;
+    
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
     gcfEquationInput_->setText(std::string());
@@ -1315,33 +1319,42 @@ void HomeLeft::showErrorBox(WString message)
     errorBox->show();
 }
 
-void HomeLeft::onEvalCurvesBtn()
+void HomeLeft::onPlotCurvesBtn()
 {
     evaluatedCurve_ = false;
 
+    // check if vf is evaluated
     if (!evaluated_) {
         showErrorBox(
-            "Cannot evaluate curve yet, evaluate a vector field first.");
+            "Cannot plot curve yet, evaluate a vector field first.");
         return;
     }
+    if (!plotted_) {
+        showErrorBox("Click the main Plot button first\n"
+                     "in order to create the plot window.");
+        return;
+    }
+    // check if a curve has been introduced
     std::string curve = curvesLineEdit_->text().toUTF8();
     if (curve.empty() || curve == "") {
         showErrorBox(
             "The curve field must be filled with the equation of a curve.");
         return;
     }
+    // set the curve equation
     scriptHandler_->str_curve_ = curve;
 
+    // prepare file where we transform curve equation into table
     std::string fname;
     if (fileUploadName_.empty()) {
         fileUploadName_ =
             scriptHandler_->randomFileName(TMP_DIR, "_curve_prep.mpl");
     }
-
     scriptHandler_->prepareCurveTable(fileUploadName_);
+    // execute file
     siginfo_t status = scriptHandler_->evaluateMapleScript(
         fileUploadName_ + "_curve_prep", stoi(scriptHandler_->time_limit_));
-
+    // check for errors in execution
     if (status.si_status == 0) {
         g_globalLogger.debug("HomeLeft :: Maple curve tables script executed");
         evaluatedSignal_.emit(fileUploadName_);
@@ -1363,21 +1376,9 @@ void HomeLeft::onEvalCurvesBtn()
             g_globalLogger.error("HomeLeft :: unkwnown error in Maple process");
             showErrorBox("Unknown error when creating Maple process.");
         }
-    }
-}
-
-// TODO: read curve table when pressing plot
-void HomeLeft::onPlotCurvesBtn()
-{
-    if (evaluatedCurve_ == false) {
-        g_globalLogger.error("HomeLeft :: a user tried to plot without having "
-                             "evaluated a curve. This should not be allowed to "
-                             "happen");
-        showErrorBox("In order to plot a curve, you must first\n"
-                     "successfully evaluate one.");
         return;
     }
-
+    // check input curve parameters
     int npoints = curvesNPointsSpinBox_->value();
     if (npoints < CURVES_NP_MIN || npoints > CURVES_NP_MAX) {
         npoints = CURVES_NP_DEFAULT;
@@ -1391,7 +1392,7 @@ void HomeLeft::onPlotCurvesBtn()
                                "setting to default value");
     }
 
-    // TODO: read tables
+    // start curve evaluation and plotting
     plotCurveSignal_.emit(fileUploadName_, curvesAppearanceBtnGrp_->checkedId(),
                           npoints, prec);
 }
