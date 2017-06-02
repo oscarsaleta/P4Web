@@ -65,6 +65,9 @@ HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
     evaluatedCurve_ = false;
     nCurves_ = 0;
 
+    evaluatedIsocline_ = false;
+    nIsoclines_ = 0;
+
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box-left"));
@@ -1129,10 +1132,90 @@ void HomeLeft::showSettings()
     t->bindString("curve-tooltip-del-all",
                   WString::tr("tooltip.curve-del-all"));
 
-    // connect buttons to functions TODO:;
+    // connect buttons to functions
     curvesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotCurvesBtn);
     curvesDelOneBtn_->clicked().connect(this, &HomeLeft::onDelOneCurvesBtn);
     curvesDelAllBtn_->clicked().connect(this, &HomeLeft::onDelAllCurvesBtn);
+
+    /*
+     * Isoclines
+     */
+    isoclinesContainer_ = new WContainerWidget(this);
+    isoclinesContainer_->setId("isoclinesContainer_");
+    tabs_->addTab(isoclinesContainer_, "Isoclines");
+
+    t = new WTemplate(WString::tr("template.homeleft-isoclines"),
+                      isoclinesContainer_);
+    t->addFunction("id", WTemplate::Functions::id);
+
+    // isocline equation
+    isoclinesLineEdit_ = new WLineEdit(isoclinesContainer_);
+    t->bindWidget("isocline-eqn", isoclinesLineEdit_);
+    t->bindString("isocline-tooltip-eqn", WString::tr("tooltip.isocline-eqn"));
+
+    // appearance
+    isoclinesAppearanceBtnGrp_ = new WButtonGroup(isoclinesContainer_);
+    t->bindString("isocline-tooltip-appearance",
+                  WString::tr("tooltip.appearance"));
+    button = new WRadioButton("Dots", isoclinesContainer_);
+    button->setInline(true);
+    t->bindWidget("isocline-dots", button);
+    t->bindString("isocline-tooltip-dots",
+                  WString::tr("tooltip.appearance-dots"));
+    isoclinesAppearanceBtnGrp_->addButton(button, Dots);
+    button = new WRadioButton("Dashes", isoclinesContainer_);
+    button->setInline(true);
+    isoclinesAppearanceBtnGrp_->addButton(button, Dashes);
+    isoclinesAppearanceBtnGrp_->setCheckedButton(
+        isoclinesAppearanceBtnGrp_->button(Dashes));
+    t->bindWidget("isocline-dashes", button);
+    t->bindString("isocline-tooltip-dashes",
+                  WString::tr("tooltip.appearance-dashes"));
+
+    // n points
+    isoclinesNPointsSpinBox_ = new WSpinBox(isoclinesContainer_);
+    isoclinesNPointsSpinBox_->setRange(CURVES_NP_MIN, CURVES_NP_MAX);
+    isoclinesNPointsSpinBox_->setValue(CURVES_NP_DEFAULT);
+    t->bindWidget("nps", isoclinesNPointsSpinBox_);
+    t->bindString("isocline-tooltip-nps", WString::tr("tooltip.npoints"));
+
+    // precision
+    isoclinesPrecisionSpinBox_ = new WSpinBox(isoclinesContainer_);
+    isoclinesPrecisionSpinBox_->setRange(CURVES_PREC_MIN, CURVES_PREC_MAX);
+    isoclinesPrecisionSpinBox_->setValue(CURVES_PREC_DEFAULT);
+    t->bindWidget("isocline-prc", isoclinesPrecisionSpinBox_);
+    t->bindString("isocline-tooltip-prc", WString::tr("tooltip.prc"));
+
+    // plot isocline button
+    isoclinesPlotBtn_ = new WPushButton("Plot isocline", isoclinesContainer_);
+    t->bindWidget("isocline-btn-plot", isoclinesPlotBtn_);
+    t->bindString("isocline-tooltip-plot",
+                  WString::tr("tooltip.isocline-plot"));
+
+    // delete one button
+    isoclinesDelOneBtn_ =
+        new WPushButton("Delete last isocline", isoclinesContainer_);
+    isoclinesDelOneBtn_->setStyleClass("btn btn-warning");
+    isoclinesDelOneBtn_->disable();
+    t->bindWidget("isocline-btn-del-one", isoclinesDelOneBtn_);
+    t->bindString("isocline-tooltip-del-one",
+                  WString::tr("tooltip.isocline-del-one"));
+
+    // delete all button
+    isoclinesDelAllBtn_ =
+        new WPushButton("Delete all isoclines", isoclinesContainer_);
+    isoclinesDelAllBtn_->setStyleClass("btn btn-danger");
+    isoclinesDelAllBtn_->disable();
+    t->bindWidget("isocline-btn-del-all", isoclinesDelAllBtn_);
+    t->bindString("isocline-tooltip-del-all",
+                  WString::tr("tooltip.isocline-del-all"));
+
+    // connect buttons to functions TODO:;
+    isoclinesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotIsoclinesBtn);
+    isoclinesDelOneBtn_->clicked().connect(this,
+                                           &HomeLeft::onDelOneIsoclinesBtn);
+    isoclinesDelAllBtn_->clicked().connect(this,
+                                           &HomeLeft::onDelAllIsoclinesBtn);
 
     tabs_->setCurrentWidget(settingsContainer_);
 }
@@ -1164,6 +1247,11 @@ void HomeLeft::hideSettings()
         tabs_->removeTab(curvesContainer_);
         delete curvesContainer_;
         curvesContainer_ = nullptr;
+    }
+    if (isoclinesContainer_ != nullptr) {
+        tabs_->removeTab(isoclinesContainer_);
+        delete isoclinesContainer_;
+        isoclinesContainer_ = nullptr;
     }
 }
 
@@ -1437,4 +1525,144 @@ void HomeLeft::onDelAllCurvesBtn()
 
     g_globalLogger.debug("HomeLeft :: deleted all curves, ncurves = " +
                          std::to_string(nCurves_));
+}
+
+void HomeLeft::onPlotIsoclinesBtn()
+{
+    evaluatedIsocline_ = false;
+
+    // check if vf is evaluated
+    if (!evaluated_) {
+        showErrorBox(
+            "Cannot plot isocline yet, evaluate a vector field first.");
+        return;
+    }
+    if (!plotted_) {
+        showErrorBox("Click the main Plot button first\n"
+                     "in order to create the plot window.");
+        return;
+    }
+    // check if a isocline has been introduced
+    std::string isocline = isoclinesLineEdit_->text().toUTF8();
+    if (isocline.empty() || isocline == "") {
+        showErrorBox("The slope field must be filled with a valid value.");
+        return;
+    }
+    // set the isocline equation
+    if (isocline == "0") {
+        scriptHandler_->str_isocline_ = scriptHandler_->str_yeq_;
+    } else if (isocline == "inf") {
+        scriptHandler_->str_isocline_ = scriptHandler_->str_xeq_;
+    } else {
+        // check if value is correct
+        double val;
+        try {
+            val = std::stod(isocline);
+            scriptHandler_->str_isocline_ = "(" + scriptHandler_->str_yeq_ +
+                                            ")-(" + isocline + ")*(" +
+                                            scriptHandler_->str_xeq_ + ")";
+        } catch (const std::invalid_argument &e) {
+            g_globalLogger.error("HomeLeft :: invalid isocline slope.");
+            showErrorBox("Invalid value for isocline slope");
+            return;
+        } catch (const std::out_of_range &e) {
+            g_globalLogger.error(
+                "HomeLeft :: value for isocline slope out of double range");
+            showErrorBox("HomeLeft :: the introduced value for the slope is "
+                         "out\nof double precision range.");
+            return;
+        }
+    }
+
+    // prepare file where we transform isocline equation into table
+    std::string fname;
+    if (fileUploadName_.empty()) {
+        fileUploadName_ =
+            scriptHandler_->randomFileName(TMP_DIR, "_isocline_prep.mpl");
+    }
+    scriptHandler_->prepareIsoclineTable(fileUploadName_);
+    // execute file
+    siginfo_t status = scriptHandler_->evaluateMapleScript(
+        fileUploadName_ + "_isocline_prep", stoi(scriptHandler_->time_limit_));
+    // check for errors in execution
+    if (status.si_status == 0) {
+        g_globalLogger.debug(
+            "HomeLeft :: Maple isocline tables script executed");
+        isoclinesPlotBtn_->setEnabled(true);
+        evaluatedIsocline_ = true;
+    } else {
+        if (status.si_code == CLD_EXITED) {
+            g_globalLogger.error("HomeLeft :: Maple error");
+            evaluatedSignal_.emit(fileUploadName_);
+        } else if (status.si_code == CLD_KILLED) {
+            g_globalLogger.error("HomeLeft :: Maple process killed by system");
+            showErrorBox("Maple process killed by system.");
+        } else if (status.si_code == -2) {
+            g_globalLogger.error(
+                "HomeLeft :: Maple computation ran out of time");
+            showErrorBox("Computation ran out of time");
+        } else {
+            g_globalLogger.error("HomeLeft :: unkwnown error in Maple process");
+            showErrorBox("Unknown error when creating Maple process.");
+        }
+        return;
+    }
+    // check input isocline parameters
+    int npoints = isoclinesNPointsSpinBox_->value();
+    if (npoints < CURVES_NP_MIN || npoints > CURVES_NP_MAX) {
+        npoints = CURVES_NP_DEFAULT;
+        g_globalLogger.warning("HomeLeft :: isocline npoints out of bounds, "
+                               "setting to default value");
+    }
+    int prec = isoclinesPrecisionSpinBox_->value();
+    if (prec < CURVES_PREC_MIN || prec > CURVES_PREC_MAX) {
+        prec = CURVES_PREC_DEFAULT;
+        g_globalLogger.warning("HomeLeft :: isocline precision out of bounds, "
+                               "setting to default value");
+    }
+
+    // start isocline evaluation and plotting
+    plotIsoclineSignal_.emit(fileUploadName_,
+                             isoclinesAppearanceBtnGrp_->checkedId(), npoints,
+                             prec);
+    nIsoclines_++;
+    if (!isoclinesDelAllBtn_->isEnabled())
+        isoclinesDelAllBtn_->enable();
+    if (!isoclinesDelOneBtn_->isEnabled())
+        isoclinesDelOneBtn_->enable();
+    g_globalLogger.debug(
+        "HomeLeft :: evaluated and plotted isocline, nisoclines = " +
+        std::to_string(nIsoclines_));
+}
+
+void HomeLeft::onDelOneIsoclinesBtn()
+{
+    if (nIsoclines_ <= 0)
+        return;
+
+    isoclineDeleteSignal_.emit(1);
+
+    nIsoclines_--;
+    if (nIsoclines_ == 0) {
+        isoclinesDelOneBtn_->disable();
+        isoclinesDelAllBtn_->disable();
+    }
+
+    g_globalLogger.debug("HomeLeft :: deleted last isocline, nisoclines = " +
+                         std::to_string(nIsoclines_));
+}
+
+void HomeLeft::onDelAllIsoclinesBtn()
+{
+    if (nIsoclines_ <= 0)
+        return;
+
+    isoclineDeleteSignal_.emit(0);
+
+    nIsoclines_ = 0;
+    isoclinesDelOneBtn_->disable();
+    isoclinesDelAllBtn_->disable();
+
+    g_globalLogger.debug("HomeLeft :: deleted all isoclines, nisoclines = " +
+                         std::to_string(nIsoclines_));
 }
