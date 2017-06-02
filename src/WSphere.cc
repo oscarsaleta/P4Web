@@ -91,6 +91,13 @@ WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
     gcfNPoints_ = GCF_POINTS;
     gcfPrec_ = GCF_PRECIS;
 
+    gcfEval_ = false;
+    gcfTask_ = EVAL_GCF_NONE;
+    gcfError_ = false;
+    gcfDashes_ = GCF_DASHES;
+    gcfNPoints_ = GCF_POINTS;
+    gcfPrec_ = GCF_PRECIS;
+
     mouseMoved().connect(this, &WSphere::mouseMovementEvent);
     clicked().connect(this, &WSphere::mouseClickEvent);
 }
@@ -148,6 +155,8 @@ WSphere::~WSphere()
         delete study_;
         study_ = nullptr;
     }
+
+    g_globalLogger.debug("WSphere :: deleted correctly");
 }
 
 bool WSphere::setupPlot(void)
@@ -333,9 +342,13 @@ void WSphere::paintEvent(WPaintDevice *p)
         }
         plotPoints();
         drawOrbits();
+        plotCurves();
+        // plotIsoclines();
         plotDone_ = true;
-    } else { // only draw orbits and gcf
+    } else { // only draw orbits
         drawOrbits();
+        plotCurves();
+        // plotIsoclines();
     }
 }
 
@@ -916,6 +929,24 @@ void WSphere::plotSeparatrices(void)
 }
 
 void WSphere::plotGcf(void) { draw_gcf(study_->gcf_points_, CSING, 1); }
+
+void WSphere::plotCurves(void)
+{
+    std::vector<curves>::const_iterator it;
+    for (it = study_->curve_vector_.begin(); it != study_->curve_vector_.end();
+         it++) {
+        draw_curve(it->points, CCURV, 1);
+    }
+}
+
+/*void QWinSphere::plotIsoclines(void)
+{
+    std::vector<isoclines>::const_iterator it;
+    for (it = study_->isocline_vector_.begin();
+         it != study_->isocline_vector_.end(); it++) {
+        draw_isoclines(it->points, it->color, 1);
+    }
+}*/
 
 // -----------------------------------------------------------------------
 //                          PLOT TOOLS

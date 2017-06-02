@@ -76,6 +76,24 @@
 #define GCF_POINTS 40 ///< gcf npoints is 40 by default
 #define GCF_PRECIS 12 ///< gcf precision is 12 by default
 
+#define EVAL_CURVE_NONE 0           ///< no curve evaluation
+#define EVAL_CURVE_R2 1             ///< curve evaluation in R^2
+#define EVAL_CURVE_U1 2             ///< curve evaluation in U1
+#define EVAL_CURVE_U2 3             ///< curve evaluation in U2
+#define EVAL_CURVE_V1 4             ///< curve evaluation in V1
+#define EVAL_CURVE_V2 5             ///< curve evaluation in V2
+#define EVAL_CURVE_FINISHPOINCARE 6 ///< finish curve evaluation in sphere
+#define EVAL_CURVE_LYP_R2 7         ///< curve evaluation in R^2 with PL weights
+#define EVAL_CURVE_CYL1 8           ///< curve evaluation in the cylinder
+#define EVAL_CURVE_CYL2 9           ///< curve evaluation in the cylinder
+#define EVAL_CURVE_CYL3 10          ///< curve evaluation in the cylinder
+#define EVAL_CURVE_CYL4 11          ///< curve evaluation in the cylinder
+#define EVAL_CURVE_FINISHLYAPUNOV 12 ///< finish curve with PL weights
+
+#define CURVE_DASHES 1   ///< curve dashes is 1 by default
+#define CURVE_POINTS 400 ///< curve npoints is 400 by default
+#define CURVE_PRECIS 12  ///< curve precision is 12 by default
+
 //#define SELECTINGPOINTSTEPS         5
 //#define SELECTINGPOINTSPEED         150
 
@@ -105,7 +123,7 @@ class WSphere : public Wt::WPaintedWidget
   public:
     /**
      * Constructor method for a spherical plot
-     * @param *parent       container widget which created the sphere
+     * @param parent       container widget which created the sphere
      * @param width         width of the painting area
      * @param height        height of the painting area
      * @param basename      name of the file that contains Maple output for the
@@ -117,7 +135,7 @@ class WSphere : public Wt::WPaintedWidget
             double projection = -1.0);
     /**
      * Constructor method for a planar (or chart) plot
-     * @param *parent   container widget which created the sphere
+     * @param parent   container widget which created the sphere
      * @param width     width of the painting area
      * @param height    height of the painting area
      * @param basename  name of the file that contains Maple output for the
@@ -434,6 +452,7 @@ class WSphere : public Wt::WPaintedWidget
      * Flag used to not replot every time we just want to update something
      */
     bool plotDone_;
+
     /**
      * Flag used to make the sphere compute gcf
      */
@@ -455,6 +474,29 @@ class WSphere : public Wt::WPaintedWidget
      * Points (0) or dashes (1) for gcf plot
      */
     int gcfDashes_;
+
+    /**
+     * Name of Maple script from first execution, to be
+     * reused for curve
+     */
+    std::string curveFname_;
+    /**
+     * Number of points for curve
+     */
+    int curveNPoints_;
+    /**
+     * Precision of zeros for curve
+     */
+    int curvePrec_;
+    /**
+     * Points (0) or dashes (1) for curve plot
+     */
+    int curveDashes_;
+    bool curveError_;
+
+    bool evalCurveStart(std::string fname, int dashes, int points, int precis);
+    bool evalCurveContinue(std::string fname, int points, int prec);
+    bool evalCurveFinish(void);
 
   protected:
     /**
@@ -527,6 +569,15 @@ class WSphere : public Wt::WPaintedWidget
     bool read_gcf(std::string fname,
                   void (WVFStudy::*chart)(double, double, double *));
     bool readTaskResults(std::string fname, int task);
+
+    // used for curves
+    int curveTask_;
+    int runTaskCurve(std::string fname, int task, int points, int prec);
+    void draw_curve(orbits_points *sep, int color, int dashes);
+    void plotCurves(void);
+    bool read_curve(std::string fname,
+                    void (WVFStudy::*chart)(double, double, double *));
+    bool readTaskCurveResults(std::string fname, int task);
 
     // script handler
     ScriptHandler *scriptHandler_;
