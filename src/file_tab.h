@@ -1375,13 +1375,21 @@ class WVFStudy
      */
     void insert_gcf_point(double x0, double y0, double z0, int dashes);
     /**
-         * Insert new point in curve linked list
-         * @param x0     1st coordinate
-         * @param y0     2nd coordinate
-         * @param z0     3rd coordinate
-         * @param dashes dashes for @c orbits_points struct
-         */
+     * Insert new point in curve linked list
+     * @param x0     1st coordinate
+     * @param y0     2nd coordinate
+     * @param z0     3rd coordinate
+     * @param dashes dashes for @c orbits_points struct
+     */
     void insert_curve_point(double x0, double y0, double z0, int dashes);
+    /**
+     * Insert new point in isocline linked list
+     * @param x0     1st coordinate
+     * @param y0     2nd coordinate
+     * @param z0     3rd coordinate
+     * @param dashes dashes for @c orbits_points struct
+     */
+    void insert_isocline_point(double x0, double y0, double z0, int dashes);
 
   private:
     // -----------------------------------------------------------------------
