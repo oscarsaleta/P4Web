@@ -343,12 +343,12 @@ void WSphere::paintEvent(WPaintDevice *p)
         plotPoints();
         drawOrbits();
         plotCurves();
-        // plotIsoclines();
+        plotIsoclines();
         plotDone_ = true;
     } else { // only draw orbits
         drawOrbits();
         plotCurves();
-        // plotIsoclines();
+        plotIsoclines();
     }
 }
 
@@ -939,14 +939,14 @@ void WSphere::plotCurves(void)
     }
 }
 
-/*void QWinSphere::plotIsoclines(void)
+void WSphere::plotIsoclines(void)
 {
     std::vector<isoclines>::const_iterator it;
     for (it = study_->isocline_vector_.begin();
          it != study_->isocline_vector_.end(); it++) {
-        draw_isoclines(it->points, it->color, 1);
+        draw_isocline(it->points, it->color, 1);
     }
-}*/
+}
 
 // -----------------------------------------------------------------------
 //                          PLOT TOOLS

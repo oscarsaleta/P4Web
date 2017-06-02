@@ -492,11 +492,81 @@ class WSphere : public Wt::WPaintedWidget
      * Points (0) or dashes (1) for curve plot
      */
     int curveDashes_;
+    /**
+     * Indicates if there was any error when computing curves
+     */
     bool curveError_;
 
+    /**
+     * Start curve evaluation
+     *
+     * @param fname  name of script that will be used for sequential evaluations
+     * @param dashes flag to use dashes or dots in plot
+     * @param points number of points used in computations
+     * @param precis precision used in computations
+     * @return       @c true if no error, @c false if error
+     */
     bool evalCurveStart(std::string fname, int dashes, int points, int precis);
+    /**
+     * After starting evaluation, continue with the other charts
+     *
+     * @param fname  name of script that will be used for sequential evaluations
+     * @param points number of points used in computations
+     * @param prec   precision used in computations
+     * @return       @c true if no error, @c false if error
+     */
     bool evalCurveContinue(std::string fname, int points, int prec);
+    /**
+     * Finish the curve evaluation
+     */
     bool evalCurveFinish(void);
+
+    /**
+     * Name of Maple script from first execution, to be
+     * reused for isocline
+     */
+    std::string isoclineFname_;
+    /**
+     * Number of points for isocline
+     */
+    int isoclineNPoints_;
+    /**
+     * Precision of zeros for isocline
+     */
+    int isoclinePrec_;
+    /**
+     * Points (0) or dashes (1) for isocline plot
+     */
+    int isoclineDashes_;
+    /**
+     * Indicates if there was any error when computing isoclines
+     */
+    bool isoclineError_;
+
+    /**
+     * Start isocline evaluation
+     *
+     * @param fname  name of script that will be used for sequential evaluations
+     * @param dashes flag to use dashes or dots in plot
+     * @param points number of points used in computations
+     * @param precis precision used in computations
+     * @return       @c true if no error, @c false if error
+     */
+    bool evalIsoclineStart(std::string fname, int dashes, int points,
+                           int precis);
+    /**
+     * After starting evaluation, continue with the other charts
+     *
+     * @param fname  name of script that will be used for sequential evaluations
+     * @param points number of points used in computations
+     * @param prec   precision used in computations
+     * @return       @c true if no error, @c false if error
+     */
+    bool evalIsoclineContinue(std::string fname, int points, int prec);
+    /**
+     * Finish the isocline evaluation
+     */
+    bool evalIsoclineFinish(void);
 
   protected:
     /**
@@ -578,6 +648,15 @@ class WSphere : public Wt::WPaintedWidget
     bool read_curve(std::string fname,
                     void (WVFStudy::*chart)(double, double, double *));
     bool readTaskCurveResults(std::string fname, int task);
+
+    // used for isoclines
+    int isoclineTask_;
+    int runTaskIsocline(std::string fname, int task, int points, int prec);
+    void draw_isocline(orbits_points *sep, int color, int dashes);
+    void plotIsoclines(void);
+    bool read_isocline(std::string fname,
+                       void (WVFStudy::*chart)(double, double, double *));
+    bool readTaskIsoclineResults(std::string fname, int task);
 
     // script handler
     ScriptHandler *scriptHandler_;
