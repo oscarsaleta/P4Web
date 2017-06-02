@@ -135,7 +135,7 @@ class ScriptHandler
     /**
      * name of isoclines.tab file
      */
-    std::string str_isoctable_;
+    std::string str_isoclinetable_;
     /**
      * name of fin.tab file
      */
@@ -222,6 +222,7 @@ class ScriptHandler
     std::string str_curve_;
     std::string str_x0_;
     std::string str_y0_;
+    std::string str_isocline_;
     /**
      * Vector of strings for labels
      */
@@ -414,6 +415,68 @@ class ScriptHandler
      * and the fact that the x and y intervals are [0,1] and [0,2Pi] resp.
      */
     bool prepareCurve_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
+                                 int numpoints);
+
+    /**
+     * Prepare the Maple script that will convert an isocline into a table
+     *
+     * @param fname name of file where to write
+     */
+    void prepareIsoclineTable(std::string fname);
+    /**
+     * Prepare files in case of calculating isocline in plane/U1/U2 charts.
+     *
+     * @param fname     name of file where to write
+     * @param f         terms of isocline
+     * @param y1        y coord of point 1
+     * @param y2        y coord of point 2
+     * @param precision precision of integration
+     * @param numpoints number of points to compute
+     * @return          @c true if file was successfully prepared, @c false
+     * otherwise
+     *
+     * This is only called in case of Poincare-compactification (weights p=q=1)
+     */
+    bool prepareIsocline(std::string fname, P4POLYNOM2 f, double y1, double y2,
+                      int precision, int numpoints);
+
+    /**
+     * Prepare files in case of calculating isocline in charts near infinity.
+     *
+     * @param fname     name of file where to write
+     * @param f         terms of isocline
+     * @param theta1    theta coord of point 1
+     * @param theta2    theta coord of point 2
+     * @param precision precision of integration
+     * @param numpoints number of points to compute
+     * @return          @c true if file was successfully prepared, @c false
+     * otherwise
+     *
+     * This is only called in case of Poincare-Lyapunov compactification
+     * (weights (p,q) !=(1,1))
+     */
+    bool prepareIsocline_LyapunovCyl(std::string fname, P4POLYNOM3 f,
+                                  double theta1, double theta2, int precision,
+                                  int numpoints);
+
+    /**
+     * Prepare files in case of calculating isocline in charts near infinity.
+     *
+     * @param fname     file name of user Maple script
+     * @param f         terms of isocline
+     * @param precision precision of integration
+     * @param numpoints number of points to compute
+     * @return          @c true if file was successfully created, @c false
+     * otherwise
+     *
+     * This is only called in case of Poincare-Lyapunov compactification
+     * (weights (p,q) !=(1,1)).
+     * Same as prepareisocline, except for the "u := " and "v := " assignments,
+     * and the fact that one always refers to the same object
+     * isocline_vector_.r2, and the fact that the x and y intervals are [0,1]
+     * and [0,2Pi] resp.
+     */
+    bool prepareIsocline_LyapunovR2(std::string fname, P4POLYNOM2 f, int precision,
                                  int numpoints);
 
   private:

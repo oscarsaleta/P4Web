@@ -558,7 +558,7 @@ void ScriptHandler::prepareCurveTable(std::string fname)
         fprintf(f, "curve_table := \"%s\":\n", str_curvetable_.c_str());
 
         str_curve_ = convertLabelsFromString(str_curve_);
-        fprintf(f, "user_curve := %s\n:", str_curve_.c_str());
+        fprintf(f, "user_curve := %s:\n", str_curve_.c_str());
 
         writeMapleParameters(f);
 
@@ -726,5 +726,200 @@ bool ScriptHandler::prepareCurve_LyapunovR2(std::string fname, P4POLYNOM2 f,
     }
     g_globalLogger.error(
         "ScriptHandler :: cannot prepare curve_LyapunovR2 file");
+    return false;
+}
+
+void ScriptHandler::prepareIsoclineTable(std::string fname)
+{
+    FILE *f;
+    char buf[100];
+
+    f = fopen((fname + "_isocline_prep.mpl").c_str(), "w");
+
+    if (f != nullptr) {
+        fprintf(f, "restart;\n");
+        fprintf(f, "read( \"%s\" ):\n", str_p4m_.c_str());
+        fprintf(f, "user_bindir := \"%s\":\n", str_bindir_.c_str());
+        fprintf(f, "user_tmpdir := \"%s\":\n", str_tmpdir_.c_str());
+        fprintf(f, "user_exeprefix := \"%s\":\n", str_exeprefix_.c_str());
+        fprintf(f, "user_platform := \"%s\":\n", str_platform_.c_str());
+        fprintf(f, "user_removecmd := \"%s\":\n", str_removecmd_.c_str());
+        fprintf(f, "user_simplify := %s:\n", str_simplify_.c_str());
+        fprintf(f, "user_simplifycmd := %s:\n", str_simplifycmd_.c_str());
+        fprintf(f, "all_crit_points := %s:\n", str_critpoints_.c_str());
+
+        str_isoclinetable_ = fname + "_vecisoclines.tab";
+        system(std::string("rm -f " + str_isoclinetable_).c_str());
+        fprintf(f, "isoclines_table := \"%s\":\n", str_isoclinetable_.c_str());
+
+        str_isocline_ = convertLabelsFromString(str_isocline_);
+        fprintf(f, "user_isoclines := %s:\n", str_isocline_.c_str());
+
+        writeMapleParameters(f);
+
+        fprintf(f, "user_numeric := %s:\n", str_numeric_.c_str());
+        fprintf(f, "epsilon := %s:\n", str_epsilon_.c_str());
+        fprintf(f, "test_sep := %s:\n", str_testsep_.c_str());
+        fprintf(f, "user_precision := %s:\n", str_precision_.c_str());
+        fprintf(f, "user_precision0 := %s:\n", str_precision0_.c_str());
+        fprintf(f, "taylor_level := %s:\n", str_taylor_.c_str());
+        fprintf(f, "numeric_level := %s:\n", str_numericlevel_.c_str());
+        fprintf(f, "max_level := %s:\n", str_maxlevel_.c_str());
+        fprintf(f, "weakness_level := %s:\n", str_weaklevel_.c_str());
+
+        if (false /*typeofstudy_ == TYPEOFSTUDY_ONE*/) {
+            fprintf(f, "user_p := 1:\n");
+            fprintf(f, "user_q := 1:\n");
+            fprintf(f, "x0 := %s:\n", str_x0_.c_str());
+            fprintf(f, "y0 := %s:\n", str_y0_.c_str());
+            fprintf(f, "x_min := x0+(%f):\n", (float)(X_MIN));
+            fprintf(f, "x_min := x0+(%f):\n", (float)(X_MIN));
+            fprintf(f, "x_max := x0+(%f):\n", (float)(X_MAX));
+            fprintf(f, "y_min := y0+(%f):\n", (float)(Y_MIN));
+            fprintf(f, "y_max := y0+(%f):\n", (float)(Y_MAX));
+        } else {
+            fprintf(f, "user_p:=%s:\n", str_userp_.c_str());
+            fprintf(f, "user_q:=%s:\n", str_userq_.c_str());
+        }
+
+        fprintf(f, "try prepareIsoclines() catch:\n"
+                   "printf( \"! Error (\%%a) \%%a\\n\", lastexception[1], "
+                   "lastexception[2] );\n"
+                   "finally: closeallfiles();\n"
+                   "if normalexit=0 then `quit`(0); else `quit(1)` end if: end "
+                   "try:\n");
+        ;
+    }
+    fclose(f);
+}
+
+bool ScriptHandler::prepareIsocline(std::string fname, P4POLYNOM2 f, double y1,
+                                 double y2, int precision, int numpoints)
+{
+    int i;
+    char buf[100];
+
+    // open original maple script (will get overwritten?!)
+    FILE *fp = fopen(std::string(fname + ".mpl").c_str(), "w");
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read( \"%s\" ):\n", (str_bindir_ + "/p4gcf.m").c_str());
+        fprintf(fp, "user_file := \"%s\":\n",
+                std::string(fname + "_isocline.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n", numpoints);
+        fprintf(fp, "user_x1 := -1.0:\n");
+        fprintf(fp, "user_x2 := 1.0:\n");
+        fprintf(fp, "user_y1 := %g:\n", y1);
+        fprintf(fp, "user_y2 := %g:\n", y2);
+        fprintf(fp, "u := x:\n");
+        fprintf(fp, "v := y:\n");
+        fprintf(fp, "user_f := ");
+        for (i = 0; f != nullptr; i++) {
+            fprintf(fp, "%s",
+                    printterm2(buf, f, (i == 0) ? true : false, "x", "y"));
+            f = f->next_term2;
+        }
+        if (i == 0)
+            fprintf(fp, "0:\n");
+        else
+            fprintf(fp, ":\n");
+
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
+                    "`quit`(0); else `quit(1)` end if: end try:\n");
+
+        g_globalLogger.debug("ScriptHandler :: prepared isocline file " + fname);
+        fclose(fp);
+        return true;
+    }
+    g_globalLogger.error("ScriptHandler :: cannot prepare isocline file");
+    return false;
+}
+
+bool ScriptHandler::prepareIsocline_LyapunovCyl(std::string fname, P4POLYNOM3 f,
+                                             double theta1, double theta2,
+                                             int precision, int numpoints)
+{
+    char buf[100];
+    int i;
+
+    FILE *fp = fopen(std::string(fname + ".mpl").c_str(), "w");
+
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read(\"%s\"):\n", (str_bindir_ + "/p4gcf.m").c_str());
+        fprintf(fp, "user_file := \"%s\":\n",
+                std::string(fname + "_isocline.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n", numpoints);
+        fprintf(fp, "user_x1 := 0.0:\n");
+        fprintf(fp, "user_x2 := 1.0:\n");
+        fprintf(fp, "user_y1 := %g:\n", theta1);
+        fprintf(fp, "user_y2 := %g:\n", theta2);
+        fprintf(fp, "u := cos(y):\n");
+        fprintf(fp, "v := sin(y):\n");
+        fprintf(fp, "user_f := ");
+        for (i = 0; f != nullptr; i++) {
+            fprintf(fp, "%s",
+                    printterm3(buf, f, (i == 0) ? true : false, "x", "U", "V"));
+            f = f->next_term3;
+        }
+        if (i == 0)
+            fprintf(fp, "0:\n");
+        else
+            fprintf(fp, ":\n");
+
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
+                    "`quit`(0); else `quit(1)` end if: end try:\n");
+
+        g_globalLogger.debug(
+            "ScriptHandler :: prepared isocline_LyapunovCyl file " + fname);
+        fclose(fp);
+        return true;
+    }
+    g_globalLogger.error(
+        "ScriptHandler :: cannot prepare isocline_LyapunovCyl file");
+    return false;
+}
+
+bool ScriptHandler::prepareIsocline_LyapunovR2(std::string fname, P4POLYNOM2 f,
+                                            int precision, int numpoints)
+{
+    char buf[100];
+    int i;
+
+    FILE *fp = fopen(std::string(fname + ".mpl").c_str(), "w");
+
+    if (fp != nullptr) {
+        fprintf(fp, "restart;\n");
+        fprintf(fp, "read( \"%s\" ):\n", (str_bindir_ + "/p4gcf.m").c_str());
+        fprintf(fp, "user_file := \"%s\":\n",
+                std::string(fname + "_isocline.tab").c_str());
+        fprintf(fp, "user_numpoints := %d:\n", numpoints);
+        fprintf(fp, "user_x1 := 0.0:");
+        fprintf(fp, "user_x2 := 1.0:");
+        fprintf(fp, "user_y1 := 0.0:");
+        fprintf(fp, "user_y2 := %g:\n", TWOPI);
+        fprintf(fp, "u := x*cos(y):");
+        fprintf(fp, "v := y*sin(y):");
+        fprintf(fp, "user_f := ");
+        for (i = 0; f != nullptr; i++) {
+            fprintf(fp, "%s",
+                    printterm2(buf, f, (i == 0) ? true : false, "U", "V"));
+            f = f->next_term2;
+        }
+        if (i == 0)
+            fprintf(fp, "0:\n");
+        else
+            fprintf(fp, ":\n");
+
+        fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
+                    "`quit`(0); else `quit(1)` end if: end try:");
+
+        g_globalLogger.debug(
+            "ScriptHandler :: prepared isocline_LyapunovR2 file " + fname);
+        fclose(fp);
+        return true;
+    }
+    g_globalLogger.error(
+        "ScriptHandler :: cannot prepare isocline_LyapunovR2 file");
     return false;
 }
