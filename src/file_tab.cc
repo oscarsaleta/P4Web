@@ -89,6 +89,10 @@ WVFStudy::WVFStudy(double projection) : config_projection_(projection)
     gcf_points_ = nullptr;
     last_gcf_point_ = nullptr;
 
+    // initialize curves and isoclines
+    last_curves_point_ = nullptr;
+    last_isoclines_point_ = nullptr;
+
     // initialize limit cycles & orbits
     first_lim_cycle_ = nullptr;
     first_orbit_ = nullptr;
@@ -366,7 +370,8 @@ bool WVFStudy::readTables(std::string basename)
     }
 
     if (typeofstudy_ == TYPEOFSTUDY_ONE) {
-        if (fscanf(fp, "%lf %lf %lf %lf", &xmin_, &xmax_, &ymin_, &ymax_) != 4) {
+        if (fscanf(fp, "%lf %lf %lf %lf", &xmin_, &xmax_, &ymin_, &ymax_) !=
+            4) {
             g_globalLogger.error("WVFStudy :: Cannot read min-max coords in " +
                                  basename + "_vec.tab.");
             deleteVF();
@@ -671,7 +676,7 @@ bool WVFStudy::readCurve(std::string basename)
                 return false;
         }
     } else {
-        return false; 
+        return false;
     }
 
     curve_vector_.push_back(new_curve);
@@ -688,7 +693,8 @@ bool WVFStudy::readIsoclines(std::string basename)
 
     fp = fopen((basename + "_vecisoclines.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("Cannot open file " + basename + "_vecisoclines.tab");
+        g_globalLogger.error("Cannot open file " + basename +
+                             "_vecisoclines.tab");
         return false;
     }
 
@@ -833,48 +839,48 @@ bool WVFStudy::readPoints(FILE *fp)
         case SADDLE:
             if (!readSaddlePoint(fp)) {
                 lasterror_ = WString("sing #") + std::to_string(i) +
-                            " = saddle : " + lasterror_;
+                             " = saddle : " + lasterror_;
                 return false;
             }
             break;
         case SEMI_HYPERBOLIC:
             if (!readSemiElementaryPoint(fp)) {
                 lasterror_ = WString("sing #") + std::to_string(i) +
-                            " = semi-el : " + lasterror_;
+                             " = semi-el : " + lasterror_;
                 return false;
             }
             break;
         case NODE:
             if (!readNodePoint(fp)) {
                 lasterror_ = WString("sing #") + std::to_string(i) +
-                            " = node : " + lasterror_;
+                             " = node : " + lasterror_;
                 return false;
             }
             break;
         case STRONG_FOCUS:
             if (!readStrongFocusPoint(fp)) {
                 lasterror_ = WString("sing #") + std::to_string(i) +
-                            " = strongfocus : " + lasterror_;
+                             " = strongfocus : " + lasterror_;
                 return false;
             }
             break;
         case WEAK_FOCUS:
             if (!readWeakFocusPoint(fp)) {
                 lasterror_ = WString("sing #") + std::to_string(i) +
-                            " = weakfocus : " + lasterror_;
+                             " = weakfocus : " + lasterror_;
                 return false;
             }
             break;
         case NON_ELEMENTARY:
             if (!readDegeneratePoint(fp)) {
                 lasterror_ = WString("sing #") + std::to_string(i) +
-                            " = degen : " + lasterror_;
+                             " = degen : " + lasterror_;
                 return false;
             }
             break;
         default:
             lasterror_ = WString("sing #") + std::to_string(i) +
-                        " type not exist (" + std::to_string(typ) + ")";
+                         " type not exist (" + std::to_string(typ) + ")";
             return false;
         }
     }
@@ -2953,7 +2959,7 @@ void WVFStudy::plsphere_to_U1(double ch, double x, double y, double *rcoord)
             a = pow(a, -__one_over_p); // cos(y)^(-1/p)
 
         rcoord[0] = sin(y) * pow(a, double_q_); // sin(y) * cos(y)^(-q/p)
-        rcoord[1] = x * a;                     // x * cos(y)^(-1/p)
+        rcoord[1] = x * a;                      // x * cos(y)^(-1/p)
     } else {
         if (x < 0) {
             if ((p_ % 2) == 0) {
@@ -2998,7 +3004,7 @@ void WVFStudy::plsphere_to_U2(double ch, double x, double y, double *rcoord)
             a = pow(a, -__one_over_q); // sin(y)^(-1/q)
 
         rcoord[0] = cos(y) * pow(a, double_p_); // cos(y) * sin(y)^(-p/q)
-        rcoord[1] = x * a;                     // x * sin(y)^(-1/q)
+        rcoord[1] = x * a;                      // x * sin(y)^(-1/q)
     } else {
         if (y < 0) {
             if ((q_ % 2) == 0) {
@@ -3033,7 +3039,7 @@ void WVFStudy::plsphere_to_V1(double ch, double x, double y, double *rcoord)
             a = pow(a, -__one_over_p); // cos(y)^(-1/p)
 
         rcoord[0] = sin(y) * pow(a, double_q_); // sin(y) * cos(y)^(-q/p)
-        rcoord[1] = x * a;                     // x * cos(y)^(-1/p)
+        rcoord[1] = x * a;                      // x * cos(y)^(-1/p)
     } else {
         if (x > 0) {
             if ((p_ % 2) == 0) {
@@ -3076,7 +3082,7 @@ void WVFStudy::plsphere_to_V2(double ch, double x, double y, double *rcoord)
             a = pow(a, -__one_over_q); // sin(y)^(-1/q)
 
         rcoord[0] = cos(y) * pow(a, double_p_); // cos(y) * sin(y)^(-p/q)
-        rcoord[1] = x * a;                     // x * sin(y)^(-1/q)
+        rcoord[1] = x * a;                      // x * sin(y)^(-1/q)
     } else {
         if (y > 0) {
             if ((q_ % 2) == 0) {

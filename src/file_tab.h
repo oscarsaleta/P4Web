@@ -589,7 +589,9 @@ class WVFStudy
     orbits_points *last_gcf_point_; ///< last gcf point
 
     std::vector<curves> curve_vector_;       ///< curves vector
+    P4ORBIT last_curves_point_;              ///< last curves points
     std::vector<isoclines> isocline_vector_; ///< isoclines vector
+    P4ORBIT last_isoclines_point_;           ///< last isoclines points
 
     // limit cycles
 
@@ -1372,6 +1374,14 @@ class WVFStudy
      * @param dashes dashes for @c orbits_points struct
      */
     void insert_gcf_point(double x0, double y0, double z0, int dashes);
+    /**
+         * Insert new point in curve linked list
+         * @param x0     1st coordinate
+         * @param y0     2nd coordinate
+         * @param z0     3rd coordinate
+         * @param dashes dashes for @c orbits_points struct
+         */
+    void insert_curve_point(double x0, double y0, double z0, int dashes);
 
   private:
     // -----------------------------------------------------------------------
