@@ -607,7 +607,7 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
                          fname);
 
     if (sphere_ == nullptr)
-    return;
+        return;
 
     // 1. read curve tables
     if (!sphere_->study_->readCurve(fname)) {
@@ -655,4 +655,24 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
     // 4. Focus plot tab
     tabWidget_->setCurrentIndex(1);
     return;
+}
+
+void HomeRight::onCurvesDelete(int flag)
+{
+    if (sphere_ == nullptr || sphere_->study_ == nullptr ||
+        sphere_->study_->curve_vector_.empty())
+        return;
+
+    if (flag == 0) {
+        sphere_->study_->curve_vector_.clear();
+    } else if (flag == 1)
+        sphere_->study_->curve_vector_.pop_back();
+        
+    sphere_->study_->deleteOrbitPoint(sphere_->study_->last_curves_point_);
+    sphere_->study_->last_curves_point_ = nullptr;
+
+    sphere_->plotDone_ = false;
+    sphere_->update();
+    if (tabWidget_->currentIndex() != 1)
+        tabWidget_->setCurrentIndex(1);
 }

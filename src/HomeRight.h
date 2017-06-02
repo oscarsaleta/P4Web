@@ -250,6 +250,13 @@ class HomeRight : public Wt::WContainerWidget
     void refreshParamStringVectors();
 
     /**
+     * React to a curve delete request
+     *
+     * @param flag can be 0 (delete all) or 1 (delete last)
+     */
+    void onCurvesDelete(int flag);
+
+    /**
      * Vector of strings for labels
      */
     std::vector<std::string> paramLabels_;
