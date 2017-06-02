@@ -1362,8 +1362,6 @@ void HomeLeft::onPlotCurvesBtn()
     // check for errors in execution
     if (status.si_status == 0) {
         g_globalLogger.debug("HomeLeft :: Maple curve tables script executed");
-        //evaluatedSignal_.emit(fileUploadName_);
-        //evaluatedSignal_.emit(fileUploadName_ + "_curve_prep");
         curvesPlotBtn_->setEnabled(true);
         evaluatedCurve_ = true;
     } else {
