@@ -355,6 +355,51 @@
     </div>
   </message>
 
+  <!-- HomeLfet isoclines tab template -->
+  <message id="template.homeleft-isoclines">
+    <p/>
+    <div class="form-group">
+      <div class="help-block col-sm-11 col-sm-offset-1">
+        Enter a value for the slope. This value can be 0, inf, or any floating point number.
+      </div>
+    </div>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-eqn}" for="isocline-eq">
+          Curve:
+        </label>
+        <div class="col-sm-9" title="${isocline-tooltip-eqn}">${isocline-eqn}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-appearance}" for="dots">
+          Appearance:
+        </label>
+        <element id="dots" class="col-sm-2" title="${isocline-tooltip-dots}">${isocline-dots}</element>
+        <element class="col-sm-2" title="${isocline-tooltip-dashes}">${isocline-dashes}</element>
+        <div class="btn-group-md col-sm-4 col-sm-offset-1" title="${isocline-tooltip-plot}">
+          ${isocline-btn-plot}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-nps}" for="${id:nps}">
+          Number of points:
+        </label>
+        <div class="col-sm-2" title="${isocline-tooltip-nps}">${nps}</div>
+        <div class="btn-group-md col-sm-4 col-sm-offset-3" title="${isocline-tooltip-del-one}">
+          ${isocline-btn-del-one}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-prc}" for="${id:isocline-prc}">
+          Precision:
+        </label>
+        <div class="col-sm-2 " title="${isocline-tooltip-prc}">${isocline-prc}</div>
+        <div class="btn-group-md col-sm-4 col-sm-offset-3" title="${isocline-tooltip-del-all}">
+          ${isocline-btn-del-all}
+        </div>
+      </div>
+    </div>
+  </message>
 
   <!-- HomeRight parameters row template -->
   <message id="template.params">
