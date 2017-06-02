@@ -627,7 +627,8 @@ bool WVFStudy::readCurve(std::string basename)
 
     fp = fopen((basename + "_veccurve.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("Cannot open file " + basename + "_veccurve.tab");
+        g_globalLogger.error("WFStudy :: Cannot open file " + basename +
+                             "_veccurve.tab");
         return false;
     }
 
@@ -705,7 +706,7 @@ bool WVFStudy::readIsoclines(std::string basename)
 
     fp = fopen((basename + "_vecisoclines.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("Cannot open file " + basename +
+        g_globalLogger.error("WVFSttudy :: Cannot open file " + basename +
                              "_vecisoclines.tab");
         return false;
     }
