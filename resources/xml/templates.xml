@@ -286,6 +286,9 @@
         </label>
         <element id="dots" class="col-sm-2 col-sm-offset-1" title="${gcf-tooltip-dots}">${gcf-dots}</element>
         <element class="col-sm-2" title="${gcf-tooltip-dashes}">${gcf-dashes}</element>
+        <div class="btn-group-md col-sm-offset-1 col-sm-3">
+          ${gcf-btn}
+        </div>
       </div>
       <div class="form-group">
         <label class="control-label col-sm-offset-1 col-sm-3" title="${gcf-tooltip-nps}" for="${id:nps}">
@@ -300,9 +303,7 @@
         <div class="col-sm-2 col-sm-offset-1" title="${gcf-tooltip-prc}">${gcf-prc}</div>
       </div>
       <div class="form-group">
-        <div class="btn-group-md col-sm-offset-1 col-sm-3">
-          ${gcf-btn}
-        </div>
+        
       </div>
     </div>
   </message>
@@ -313,7 +314,7 @@
     <p/>
     <div class="form-group">
       <div class="help-block col-sm-11 col-sm-offset-1">
-        Enter a polynomial curve equation in the field, then evaluate it and press Plot to draw it.
+        Enter a polynomial curve equation in the field, then press the button to draw it.
       </div>
     </div>
     <div class="form-horizontal">
