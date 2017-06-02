@@ -324,6 +324,23 @@ class HomeLeft : public Wt::WContainerWidget
      * The int can be 1 (delete last) or 0 (delete all)
      */
     Wt::Signal<int> &curveDeleteSignal() { return curveDeleteSignal_; }
+    /**
+     * Signal to plot isocline
+     *
+     * Is sent after pressing plot. This causes the isocline table to be read,
+     * and then to perform all the chained executions for different charts, and
+     * finally to plot the isocline.
+     */
+    Wt::Signal<std::string, int, int, int> &plotIsoclineSignal()
+    {
+        return plotIsoclineSignal_;
+    }
+    /**
+     * Signal to delete isoclines
+     *
+     * The int can be 1 (delete last) or 0 (delete all)
+     */
+    Wt::Signal<int> &isoclineDeleteSignal() { return isoclineDeleteSignal_; }
 
     /* MainUI parent */
     MainUI *parent_;
@@ -335,6 +352,9 @@ class HomeLeft : public Wt::WContainerWidget
 
     int nCurves_;         // number of curves that have been plotted
     bool evaluatedCurve_; // tells if a curve has been evaluated
+
+    int nIsoclines_;
+    bool evaluatedIsocline_;
 
     int nParams_; // tells number of parameters added by user
 
@@ -409,6 +429,15 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WPushButton *curvesPlotBtn_;
     Wt::WPushButton *curvesDelOneBtn_;
     Wt::WPushButton *curvesDelAllBtn_;
+    // isoclines tab
+    Wt::WContainerWidget *isoclinesContainer_;
+    Wt::WLineEdit *isoclinesLineEdit_;
+    Wt::WButtonGroup *isoclinesAppearanceBtnGrp_;
+    Wt::WSpinBox *isoclinesNPointsSpinBox_;
+    Wt::WSpinBox *isoclinesPrecisionSpinBox_;
+    Wt::WPushButton *isoclinesPlotBtn_;
+    Wt::WPushButton *isoclinesDelOneBtn_;
+    Wt::WPushButton *isoclinesDelAllBtn_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
@@ -423,6 +452,8 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<std::string, std::string> addParameterSignal_;
     Wt::Signal<std::string, int, int, int> plotCurveSignal_;
     Wt::Signal<int> curveDeleteSignal_;
+    Wt::Signal<std::string, int, int, int> plotIsoclineSignal_;
+    Wt::Signal<int> isoclineDeleteSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -463,6 +494,10 @@ class HomeLeft : public Wt::WContainerWidget
     void onPlotCurvesBtn();
     void onDelOneCurvesBtn();
     void onDelAllCurvesBtn();
+    // react to button clicks in isoclines tab
+    void onPlotIsoclinesBtn();
+    void onDelOneIsoclinesBtn();
+    void onDelAllIsoclinesBtn();
 };
 
 #endif // HOMELEFT_H
