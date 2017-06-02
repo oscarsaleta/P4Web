@@ -62,7 +62,11 @@ class ScriptHandler
     /**
      * Destructor method
      */
-    ~ScriptHandler(){};
+    ~ScriptHandler()
+    {
+        paramLabels_.clear();
+        paramValues_.clear();
+    };
 
     /**
      * directory where maple scripts are located
