@@ -187,6 +187,8 @@ void MainUI::setupUI()
         rightContainer_, &HomeRight::addParameterWithValue);
     leftContainer_->plotCurveSignal().connect(rightContainer_,
                                               &HomeRight::onCurvePlot);
+    leftContainer_->curveDeleteSignal().connect(rightContainer_,
+                                                &HomeRight::onCurvesDelete);
 
     // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,
