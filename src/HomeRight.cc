@@ -24,6 +24,7 @@
 #include <fstream>
 
 #include <Wt/WLineEdit>
+#include <Wt/WMessageBox>
 #include <Wt/WPushButton>
 #include <Wt/WScrollArea>
 #include <Wt/WTabWidget>
@@ -598,8 +599,60 @@ void HomeRight::refreshParamStringVectors()
     }
 }
 
+// TODO:
 void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
                             int prec)
 {
+    g_globalLogger.debug("HomeRight :: received curve signal with fname " +
+                         fname);
+
+    if (sphere_ == nullptr)
+    return;
+
+    // 1. read curve tables
+    if (!sphere_->study_->readCurve(fname)) {
+        g_globalLogger.error("HomeRight :: cannot read curve");
+        return;
+    }
+
+    // 2. create and execute maple scripts for charts
+    sphere_->curveDashes_ = pointdash;
+    sphere_->curveFname_ = fname;
+    sphere_->curveNPoints_ = npoints;
+    sphere_->curvePrec_ = prec;
+    sphere_->plotDone_ = false;
+
+    int result =
+        sphere_->evalCurveStart(sphere_->curveFname_, sphere_->curveDashes_,
+                                sphere_->curveNPoints_, sphere_->curvePrec_);
+    if (!result) {
+        g_globalLogger.error("HomeRight :: cannot evaluate curve");
+    } else {
+        int i = 0;
+        do {
+            result = sphere_->evalCurveContinue(sphere_->curveFname_,
+                                                CURVE_POINTS, CURVE_PRECIS);
+            if (sphere_->curveError_) {
+                g_globalLogger.error("HomeRight :: error while computing "
+                                     "evalCurveContinue at step: " +
+                                     std::to_string(i));
+                break;
+            }
+            i++;
+        } while (!result);
+        // finish evaluation
+        result = sphere_->evalCurveFinish();
+        if (!result) {
+            g_globalLogger.error("HomeRight :: error in evalCurveFinish");
+        } else {
+            g_globalLogger.debug("HomeRight :: computed curve");
+        }
+    }
+
+    // 3. plot
+    sphere_->update(PaintUpdate);
+
+    // 4. Focus plot tab
+    tabWidget_->setCurrentIndex(1);
     return;
 }
