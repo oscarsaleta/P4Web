@@ -1148,10 +1148,10 @@ void HomeLeft::showSettings()
                       isoclinesContainer_);
     t->addFunction("id", WTemplate::Functions::id);
 
-    // isocline equation
+    // isocline slope
     isoclinesLineEdit_ = new WLineEdit(isoclinesContainer_);
-    t->bindWidget("isocline-eqn", isoclinesLineEdit_);
-    t->bindString("isocline-tooltip-eqn", WString::tr("tooltip.isocline-eqn"));
+    t->bindWidget("isocline-slope", isoclinesLineEdit_);
+    t->bindString("isocline-tooltip-slope", WString::tr("tooltip.isocline-slope"));
 
     // appearance
     isoclinesAppearanceBtnGrp_ = new WButtonGroup(isoclinesContainer_);
@@ -1210,7 +1210,7 @@ void HomeLeft::showSettings()
     t->bindString("isocline-tooltip-del-all",
                   WString::tr("tooltip.isocline-del-all"));
 
-    // connect buttons to functions TODO:;
+    // connect buttons to functions
     isoclinesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotIsoclinesBtn);
     isoclinesDelOneBtn_->clicked().connect(this,
                                            &HomeLeft::onDelOneIsoclinesBtn);
@@ -1551,7 +1551,7 @@ void HomeLeft::onPlotIsoclinesBtn()
     // set the isocline equation
     if (isocline == "0") {
         scriptHandler_->str_isocline_ = scriptHandler_->str_yeq_;
-    } else if (isocline == "inf") {
+    } else if (isocline == "INF" || isocline == "inf") {
         scriptHandler_->str_isocline_ = scriptHandler_->str_xeq_;
     } else {
         // check if value is correct
