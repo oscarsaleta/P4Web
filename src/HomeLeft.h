@@ -237,6 +237,24 @@ class HomeLeft : public Wt::WContainerWidget
     void showOrbitsDialog(bool clickValid, double x, double y);
 
     /**
+     * Receive confirmation that a curve has been computed
+     *
+     * Add a curve to the counter and activate the buttons if necessary
+     *
+     * @param computed boolean flag that tells if the curve has been computed
+     */
+    void curveConfirmed(bool computed);
+
+    /**
+     * Receive confirmation that an isocline has been computed
+     *
+     * Add an isocline to the counter and activate the buttons if necessary
+     *
+     * @param computed boolean flag that tells if the isocline has been computed
+     */
+    void isoclineConfirmed(bool computed);
+
+    /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
     Wt::Signal<std::string> &evaluatedSignal() { return evaluatedSignal_; }

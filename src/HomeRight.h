@@ -165,6 +165,19 @@ class HomeRight : public Wt::WContainerWidget
     }
 
     /**
+     * Send signal of confirmation for computed curve
+     */
+    Wt::Signal<bool> &curveConfirmedSignal() { return curveConfirmedSignal_; }
+
+    /**
+     * Send signal of confirmation for computed isocline
+     */
+    Wt::Signal<bool> &isoclineConfirmedSignal()
+    {
+        return isoclineConfirmedSignal_;
+    }
+
+    /**
      * React to an orbit integration request
      *
      * The @c dir argument tells the direction of integration. If
@@ -230,8 +243,10 @@ class HomeRight : public Wt::WContainerWidget
     /**
      * React to the isocline plot signal
      *
-     * Set isocline variables in sphere (npoints, precision, dashes), call study to
-     * read the isocline table, evaluate the isocline in the different charts, and
+     * Set isocline variables in sphere (npoints, precision, dashes), call study
+     * to
+     * read the isocline table, evaluate the isocline in the different charts,
+     * and
      * finally plot the isocline in the sphere
      *
      * @param fname     name of file used in first maple evaluation
@@ -239,7 +254,8 @@ class HomeRight : public Wt::WContainerWidget
      * @param npoints   number of points to plot
      * @param prec      precision of computations for zeros of isocline
      */
-    void onIsoclinePlot(std::string fname, int pointdash, int npoints, int prec);
+    void onIsoclinePlot(std::string fname, int pointdash, int npoints,
+                        int prec);
 
     /**
      * React to an isocline delete request
@@ -365,6 +381,8 @@ class HomeRight : public Wt::WContainerWidget
     /* SIGNALS */
 
     Wt::Signal<bool, double, double> sphereClickedSignal_;
+    Wt::Signal<bool> curveConfirmedSignal_;
+    Wt::Signal<bool> isoclineConfirmedSignal_;
 };
 
 #endif // HOMERIGHT_H

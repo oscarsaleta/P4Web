@@ -1151,7 +1151,8 @@ void HomeLeft::showSettings()
     // isocline slope
     isoclinesLineEdit_ = new WLineEdit(isoclinesContainer_);
     t->bindWidget("isocline-slope", isoclinesLineEdit_);
-    t->bindString("isocline-tooltip-slope", WString::tr("tooltip.isocline-slope"));
+    t->bindString("isocline-tooltip-slope",
+                  WString::tr("tooltip.isocline-slope"));
 
     // appearance
     isoclinesAppearanceBtnGrp_ = new WButtonGroup(isoclinesContainer_);
@@ -1486,13 +1487,25 @@ void HomeLeft::onPlotCurvesBtn()
     // start curve evaluation and plotting
     plotCurveSignal_.emit(fileUploadName_, curvesAppearanceBtnGrp_->checkedId(),
                           npoints, prec);
-    nCurves_++;
-    if (!curvesDelAllBtn_->isEnabled())
-        curvesDelAllBtn_->enable();
-    if (!curvesDelOneBtn_->isEnabled())
-        curvesDelOneBtn_->enable();
-    g_globalLogger.debug("HomeLeft :: evaluated and plotted curve, ncurves = " +
-                         std::to_string(nCurves_));
+    // after this, wait for confirmation (HomeRight will send a curveConfirmed
+    // signal)
+}
+
+void HomeLeft::curveConfirmed(bool computed)
+{
+    if (computed) {
+        nCurves_++;
+        if (!curvesDelAllBtn_->isEnabled())
+            curvesDelAllBtn_->enable();
+        if (!curvesDelOneBtn_->isEnabled())
+            curvesDelOneBtn_->enable();
+        g_globalLogger.debug(
+            "HomeLeft :: evaluated and plotted curve, ncurves = " +
+            std::to_string(nCurves_));
+    } else {
+        showErrorBox(
+            "Error while computing curve, check inputs and try again.");
+    }
 }
 
 void HomeLeft::onDelOneCurvesBtn()
@@ -1502,8 +1515,7 @@ void HomeLeft::onDelOneCurvesBtn()
 
     curveDeleteSignal_.emit(1);
 
-    nCurves_--;
-    if (nCurves_ == 0) {
+    if (--nCurves_ == 0) {
         curvesDelOneBtn_->disable();
         curvesDelAllBtn_->disable();
     }
@@ -1554,23 +1566,38 @@ void HomeLeft::onPlotIsoclinesBtn()
     } else if (isocline == "INF" || isocline == "inf") {
         scriptHandler_->str_isocline_ = scriptHandler_->str_xeq_;
     } else {
+        bool done = false;
+        // look for isocline string in param labels
+        std::vector<std::string>::const_iterator it;
+        for (it = scriptHandler_->paramLabels_.begin();
+             it != scriptHandler_->paramLabels_.end(); it++) {
+            if (isocline == *it) {
+                scriptHandler_->str_isocline_ = "(" + scriptHandler_->str_yeq_ +
+                                                ")-(" + isocline + ")*(" +
+                                                scriptHandler_->str_xeq_ + ")";
+                done = true;
+            }
+        }
         // check if value is correct
-        double val;
-        try {
-            val = std::stod(isocline);
-            scriptHandler_->str_isocline_ = "(" + scriptHandler_->str_yeq_ +
-                                            ")-(" + isocline + ")*(" +
-                                            scriptHandler_->str_xeq_ + ")";
-        } catch (const std::invalid_argument &e) {
-            g_globalLogger.error("HomeLeft :: invalid isocline slope.");
-            showErrorBox("Invalid value for isocline slope");
-            return;
-        } catch (const std::out_of_range &e) {
-            g_globalLogger.error(
-                "HomeLeft :: value for isocline slope out of double range");
-            showErrorBox("HomeLeft :: the introduced value for the slope is "
-                         "out\nof double precision range.");
-            return;
+        if (!done) {
+            double val;
+            try {
+                val = std::stod(isocline);
+                scriptHandler_->str_isocline_ = "(" + scriptHandler_->str_yeq_ +
+                                                ")-(" + isocline + ")*(" +
+                                                scriptHandler_->str_xeq_ + ")";
+            } catch (const std::invalid_argument &e) {
+                g_globalLogger.error("HomeLeft :: invalid isocline slope.");
+                showErrorBox("Invalid value for isocline slope");
+                return;
+            } catch (const std::out_of_range &e) {
+                g_globalLogger.error(
+                    "HomeLeft :: value for isocline slope out of double range");
+                showErrorBox(
+                    "HomeLeft :: the introduced value for the slope is "
+                    "out\nof double precision range.");
+                return;
+            }
         }
     }
 
@@ -1625,14 +1652,23 @@ void HomeLeft::onPlotIsoclinesBtn()
     plotIsoclineSignal_.emit(fileUploadName_,
                              isoclinesAppearanceBtnGrp_->checkedId(), npoints,
                              prec);
-    nIsoclines_++;
-    if (!isoclinesDelAllBtn_->isEnabled())
-        isoclinesDelAllBtn_->enable();
-    if (!isoclinesDelOneBtn_->isEnabled())
-        isoclinesDelOneBtn_->enable();
-    g_globalLogger.debug(
-        "HomeLeft :: evaluated and plotted isocline, nisoclines = " +
-        std::to_string(nIsoclines_));
+}
+
+void HomeLeft::isoclineConfirmed(bool computed)
+{
+    if (computed) {
+        nIsoclines_++;
+        if (!isoclinesDelAllBtn_->isEnabled())
+            isoclinesDelAllBtn_->enable();
+        if (!isoclinesDelOneBtn_->isEnabled())
+            isoclinesDelOneBtn_->enable();
+        g_globalLogger.debug(
+            "HomeLeft :: evaluated and plotted isocline, nisoclines = " +
+            std::to_string(nIsoclines_));
+    } else {
+        showErrorBox(
+            "Error while computing isocline, check inputs and try again.");
+    }
 }
 
 void HomeLeft::onDelOneIsoclinesBtn()
@@ -1642,8 +1678,7 @@ void HomeLeft::onDelOneIsoclinesBtn()
 
     isoclineDeleteSignal_.emit(1);
 
-    nIsoclines_--;
-    if (nIsoclines_ == 0) {
+    if (--nIsoclines_ == 0) {
         isoclinesDelOneBtn_->disable();
         isoclinesDelAllBtn_->disable();
     }

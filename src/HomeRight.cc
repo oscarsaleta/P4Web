@@ -605,12 +605,15 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
     g_globalLogger.debug("HomeRight :: received curve signal with fname " +
                          fname);
 
-    if (sphere_ == nullptr)
+    if (sphere_ == nullptr) {
         return;
+        curveConfirmedSignal_.emit(false);
+    }
 
     // 1. read curve tables
     if (!sphere_->study_->readCurve(fname)) {
         g_globalLogger.error("HomeRight :: cannot read curve");
+        curveConfirmedSignal_.emit(false);
         return;
     }
 
@@ -626,6 +629,8 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
                                 sphere_->curveNPoints_, sphere_->curvePrec_);
     if (!result) {
         g_globalLogger.error("HomeRight :: cannot evaluate curve");
+        curveConfirmedSignal_.emit(false);
+        return;
     } else {
         int i = 0;
         do {
@@ -635,7 +640,8 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
                 g_globalLogger.error("HomeRight :: error while computing "
                                      "evalCurveContinue at step: " +
                                      std::to_string(i));
-                break;
+                curveConfirmedSignal_.emit(false);
+                return;
             }
             i++;
         } while (!result);
@@ -643,8 +649,11 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
         result = sphere_->evalCurveFinish();
         if (!result) {
             g_globalLogger.error("HomeRight :: error in evalCurveFinish");
+            curveConfirmedSignal_.emit(false);
+            return;
         } else {
             g_globalLogger.debug("HomeRight :: computed curve");
+            curveConfirmedSignal_.emit(true);
         }
     }
 
@@ -653,6 +662,7 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
 
     // 4. Focus plot tab
     tabWidget_->setCurrentIndex(1);
+
     return;
 }
 
@@ -682,12 +692,15 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
     g_globalLogger.debug("HomeRight :: received isocline signal with fname " +
                          fname);
 
-    if (sphere_ == nullptr)
+    if (sphere_ == nullptr) {
+        isoclineConfirmedSignal_.emit(false);
         return;
+    }
 
     // 1. read isocline tables
     if (!sphere_->study_->readIsoclines(fname)) {
         g_globalLogger.error("HomeRight :: cannot read isocline");
+        isoclineConfirmedSignal_.emit(false);
         return;
     }
 
@@ -703,6 +716,7 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
         sphere_->isoclineNPoints_, sphere_->isoclinePrec_);
     if (!result) {
         g_globalLogger.error("HomeRight :: cannot evaluate isocline");
+        isoclineConfirmedSignal_.emit(false);
     } else {
         int i = 0;
         do {
@@ -712,7 +726,8 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
                 g_globalLogger.error("HomeRight :: error while computing "
                                      "evalIsoclineContinue at step: " +
                                      std::to_string(i));
-                break;
+                isoclineConfirmedSignal_.emit(false);
+                return;
             }
             i++;
         } while (!result);
@@ -720,8 +735,10 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
         result = sphere_->evalIsoclineFinish();
         if (!result) {
             g_globalLogger.error("HomeRight :: error in evalIsoclineFinish");
+            isoclineConfirmedSignal_.emit(false);
         } else {
             g_globalLogger.debug("HomeRight :: computed isocline");
+            isoclineConfirmedSignal_.emit(true);
         }
     }
 
