@@ -365,10 +365,10 @@
     </div>
     <div class="form-horizontal">
       <div class="form-group">
-        <label class="control-label col-sm-3" title="${isocline-tooltip-eqn}" for="isocline-eq">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-slope}" for="isocline-slope">
           Slope:
         </label>
-        <div class="col-sm-9" title="${isocline-tooltip-eqn}">${isocline-eqn}</div>
+        <div class="col-sm-9" title="${isocline-tooltip-slope}">${isocline-slope}</div>
       </div>
       <div class="form-group">
         <label class="control-label col-sm-3" title="${isocline-tooltip-appearance}" for="dots">
