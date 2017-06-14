@@ -30,7 +30,11 @@ MyLogger::MyLogger(std::string fname)
     addField("type", false);
     addField("message", true);
     setFile(fname);
-    configure("*"); // configure for showing all logs
+#ifdef ANTZ
+    configure("* -debug"); // configure for showing all logs except debug
+#else
+    configure("*");
+#endif
 }
 
 MyLogger::~MyLogger() {}
