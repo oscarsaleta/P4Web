@@ -197,6 +197,11 @@ void MainUI::setupUI()
     // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,
                                                    &HomeLeft::showOrbitsDialog);
+    rightContainer_->curveConfirmedSignal().connect(leftContainer_,
+                                                    &HomeLeft::curveConfirmed);
+    rightContainer_->isoclineConfirmedSignal().connect(
+        leftContainer_, &HomeLeft::isoclineConfirmed);
+        
     g_globalLogger.debug("MainUI :: signals connected");
 
     g_globalLogger.debug("MainUI :: MainUI set up");
