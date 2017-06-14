@@ -366,7 +366,7 @@
     <div class="form-horizontal">
       <div class="form-group">
         <label class="control-label col-sm-3" title="${isocline-tooltip-eqn}" for="isocline-eq">
-          Curve:
+          Slope:
         </label>
         <div class="col-sm-9" title="${isocline-tooltip-eqn}">${isocline-eqn}</div>
       </div>
