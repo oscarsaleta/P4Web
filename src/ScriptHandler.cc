@@ -108,9 +108,15 @@ bool ScriptHandler::prepareMapleFile(std::string &fname)
 
 void ScriptHandler::fillMapleScript(FILE *f)
 {
+    std::string xeq;
+    std::string yeq;
+    std::string gcf;
+
     if (!paramLabels_.empty()) {
-        changeParameterNames(str_xeq_, str_yeq_, str_gcf_);
-        str_userf_ = "[" + str_xeq_ + "," + str_yeq_ + "]";
+        xeq = convertLabelsFromString(str_xeq_);
+        yeq = convertLabelsFromString(str_yeq_);
+        gcf = convertLabelsFromString(str_gcf_);
+        str_userf_ = "[" + xeq + "," + yeq + "]";
     }
 
     fprintf(f, "restart;\n");
@@ -133,13 +139,13 @@ void ScriptHandler::fillMapleScript(FILE *f)
     fprintf(f, "finite_res := \"%s\":\n", str_finres_.c_str());
     fprintf(f, "infinite_table := \"%s\":\n", str_inftab_.c_str());
     fprintf(f, "infinite_res := \"%s\":\n", str_infres_.c_str());
-    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", str_xeq_.c_str());
-    fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n", str_yeq_.c_str());
+    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", xeq.c_str());
+    fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n", yeq.c_str());
     fprintf(f, "    user_f := %s:\n", str_userf_.c_str());
     fprintf(f, "  else `quit(1)` end if:\n");
     fprintf(f, "else `quit(1)` end if:\n");
-    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", str_gcf_.c_str());
-    fprintf(f, "  user_gcf := %s:\n", str_gcf_.c_str());
+    fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", gcf.c_str());
+    fprintf(f, "  user_gcf := %s:\n", gcf.c_str());
     fprintf(f, "else `quit(1)` end if:\n");
 
     writeMapleParameters(f);
@@ -429,23 +435,6 @@ bool ScriptHandler::prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f,
     return false;
 }
 
-void ScriptHandler::changeParameterNames(std::string &xeq, std::string &yeq,
-                                         std::string &gcf)
-{
-    xeq = convertLabelsFromString(xeq);
-    yeq = convertLabelsFromString(yeq);
-    gcf = convertLabelsFromString(gcf);
-
-    std::vector<std::string>::iterator it;
-    for (it = paramValues_.begin(); it != paramValues_.end(); it++) {
-        *it = convertLabelsFromString(*it);
-    }
-    for (it = paramLabels_.begin(); it != paramLabels_.end(); it++) {
-        *it = convertLabelsFromString(*it);
-    }
-    return;
-}
-
 std::string ScriptHandler::convertLabelsFromString(std::string target)
 {
     std::string aux;
@@ -483,7 +472,6 @@ int ScriptHandler::findIndexOfWordInTarget(std::string target, std::string word,
         // the word is a substring from a bigger one
         j = i;
         if (j > 0) {
-            g_globalLogger.debug("char is " + std::string(&target[j - 1]));
             if (isdigit(target[j - 1]) || isalpha(target[j - 1]) ||
                 target[j - 1] == '_') {
                 continue;
@@ -492,7 +480,6 @@ int ScriptHandler::findIndexOfWordInTarget(std::string target, std::string word,
         // check if substring is end of a word
         j += word.length();
         if (j < target.length()) {
-            g_globalLogger.debug("char is " + std::string(&target[j]));
             if (isdigit(target[j]) || isalpha(target[j]) || target[j] == '_') {
                 continue;
             }
@@ -508,18 +495,23 @@ int ScriptHandler::findIndexOfWordInTarget(std::string target, std::string word,
 void ScriptHandler::writeMapleParameters(FILE *f)
 {
     if (!paramLabels_.empty()) {
+        std::string label;
+        std::string value;
         std::vector<std::string>::iterator it1;
         std::vector<std::string>::iterator it2;
         for (it1 = paramLabels_.begin(), it2 = paramValues_.begin();
              it1 < paramLabels_.end(), it2 < paramValues_.end(); ++it1, ++it2) {
-            fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n", it1->c_str());
+            label = convertLabelsFromString(*it1);
+            value = convertLabelsFromString(*it2);
+            fprintf(f, "if (type(parse(\"%s\"),polynom)) then\n",
+                    label.c_str());
             fprintf(f, "  if (type(parse(\"%s\"),polynom)) then\n",
-                    it2->c_str());
+                    value.c_str());
             if (!str_numeric_.empty() && stringToBool(str_numeric_))
-                fprintf(f, "    %s := evalf(%s):\n", it1->c_str(),
-                        it2->c_str());
+                fprintf(f, "    %s := evalf(%s):\n", label.c_str(),
+                        value.c_str());
             else
-                fprintf(f, "    %s := %s:\n", it1->c_str(), it2->c_str());
+                fprintf(f, "    %s := %s:\n", label.c_str(), value.c_str());
             fprintf(f, "  else `quit(1)` end if:\n");
             fprintf(f, "else `quit(1)` end if:\n");
         }
@@ -538,6 +530,12 @@ void ScriptHandler::prepareCurveTable(std::string fname)
 {
     FILE *f;
     char buf[100];
+    std::string curve;
+
+    g_globalLogger.debug("ScriptHandler :: labels are...");
+    std::vector<std::string>::const_iterator it;
+    for (it = paramLabels_.begin(); it != paramLabels_.end(); it++)
+        g_globalLogger.debug(*it);
 
     f = fopen((fname + "_curve_prep.mpl").c_str(), "w");
 
@@ -557,8 +555,9 @@ void ScriptHandler::prepareCurveTable(std::string fname)
         system(std::string("rm -f " + str_curvetable_).c_str());
         fprintf(f, "curve_table := \"%s\":\n", str_curvetable_.c_str());
 
-        str_curve_ = convertLabelsFromString(str_curve_);
-        fprintf(f, "user_curve := %s:\n", str_curve_.c_str());
+        g_globalLogger.debug("ScriptHandler :: converting curve params...");
+        curve = convertLabelsFromString(str_curve_);
+        fprintf(f, "user_curve := %s:\n", curve.c_str());
 
         writeMapleParameters(f);
 
@@ -794,7 +793,7 @@ void ScriptHandler::prepareIsoclineTable(std::string fname)
 }
 
 bool ScriptHandler::prepareIsocline(std::string fname, P4POLYNOM2 f, double y1,
-                                 double y2, int precision, int numpoints)
+                                    double y2, int precision, int numpoints)
 {
     int i;
     char buf[100];
@@ -827,7 +826,8 @@ bool ScriptHandler::prepareIsocline(std::string fname, P4POLYNOM2 f, double y1,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
-        g_globalLogger.debug("ScriptHandler :: prepared isocline file " + fname);
+        g_globalLogger.debug("ScriptHandler :: prepared isocline file " +
+                             fname);
         fclose(fp);
         return true;
     }
@@ -836,8 +836,8 @@ bool ScriptHandler::prepareIsocline(std::string fname, P4POLYNOM2 f, double y1,
 }
 
 bool ScriptHandler::prepareIsocline_LyapunovCyl(std::string fname, P4POLYNOM3 f,
-                                             double theta1, double theta2,
-                                             int precision, int numpoints)
+                                                double theta1, double theta2,
+                                                int precision, int numpoints)
 {
     char buf[100];
     int i;
@@ -881,7 +881,7 @@ bool ScriptHandler::prepareIsocline_LyapunovCyl(std::string fname, P4POLYNOM3 f,
 }
 
 bool ScriptHandler::prepareIsocline_LyapunovR2(std::string fname, P4POLYNOM2 f,
-                                            int precision, int numpoints)
+                                               int precision, int numpoints)
 {
     char buf[100];
     int i;

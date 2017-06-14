@@ -494,20 +494,6 @@ class ScriptHandler
     inline void delay(unsigned long ms) { usleep(ms * 1000); }
 
     /**
-     * Change name of parameters from "something" to "something_", to avoid
-     * conflict
-     *
-     * @param xeq    string that contains x'
-     * @param yeq    string that contains y'
-     * @param gcf    string that contains the GCF
-     *
-     * The change has to be done recurrently (substitute every label in the
-     * values
-     * vector), and also to x', y', and the GCF.
-     */
-    void changeParameterNames(std::string &xeq, std::string &yeq,
-                              std::string &gcf);
-    /**
      * Add a _ to the end of all labels present in target
      *
      * @param target string to be modified
