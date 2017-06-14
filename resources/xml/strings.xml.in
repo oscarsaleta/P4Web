@@ -221,10 +221,6 @@
     Equation of the curve to plot (must be a polynomial). You can use the defined parameters in the equation.
   </message>
 
-  <message id="tooltip.curve-eval">
-    Evaluate the curve.
-  </message>
-
   <message id="tooltip.curve-plot">
     Plot the curve.
   </message>
@@ -234,7 +230,23 @@
   </message>
 
   <message id="tooltip.curve-del-all">
-    Delete all plotted curves
+    Delete all plotted curves.
+  </message>
+
+  <message id="tooltip.isocline-slope">
+    Slope of the insocline to plot. Can be any double value and also the keyword "inf".
+  </message>
+
+  <message id="tooltip.isocline-plot">
+    Plot the isocline.
+  </message>
+
+  <message id="tooltip.isocline-del-one">
+    Delete last plotted isocline.
+  </message>
+
+  <message id="tooltip.isocline-del-all">
+    Delete all plotted isoclines.
   </message>
 
 </messages>
