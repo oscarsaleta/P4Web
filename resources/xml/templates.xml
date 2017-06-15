@@ -43,7 +43,7 @@
         <div class="form-actions">
           <p>
             ${login class="btn btn-primary"}
-            ${register class="btn btn-default"}
+            <!--${register class="btn btn-default"}-->
             ${lost-password class="btn btn-default"}
           </p>
         </div>
