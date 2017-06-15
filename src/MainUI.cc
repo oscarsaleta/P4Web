@@ -117,6 +117,11 @@ void MainUI::setupUI()
     loginAnchor_->setInline(true);
     loginMessageContainer_->addWidget(loginAnchor_);
 
+    backAnchor_ = new WAnchor("/", "Back", loginMessageContainer_);
+    backAnchor_->setLink(WLink(WLink::InternalPath, "/"));
+    backAnchor_->setInline(true);
+    loginMessageContainer_->addWidget(backAnchor_);
+
     // title
     title_ = new WText(WString::tr("mainui.pagetitle"));
     title_->setId("title_");
@@ -201,7 +206,7 @@ void MainUI::setupUI()
                                                     &HomeLeft::curveConfirmed);
     rightContainer_->isoclineConfirmedSignal().connect(
         leftContainer_, &HomeLeft::isoclineConfirmed);
-        
+
     g_globalLogger.debug("MainUI :: signals connected");
 
     g_globalLogger.debug("MainUI :: MainUI set up");
@@ -233,12 +238,23 @@ void MainUI::handlePathChange()
 
     if (app->internalPath() == "/login") {
         g_globalLogger.debug("MainUI :: handle internal path change /login");
+        backAnchor_->show();
+        loginAnchor_->hide();
+        logoutAnchor_->hide();
         if (session_.login().loggedIn()) {
             session_.login().logout();
         } else
             mainStack_->setCurrentWidget(authWidget_);
     } else {
         mainStack_->setCurrentWidget(pageContainer_);
+        backAnchor_->hide();
+        if (session_.login().loggedIn()) {
+            loginAnchor_->hide();
+            logoutAnchor_->show();
+        } else {
+            loginAnchor_->show();
+            logoutAnchor_->hide();
+        }
         g_globalLogger.debug("MainUI :: setting main page as current view");
     }
 }

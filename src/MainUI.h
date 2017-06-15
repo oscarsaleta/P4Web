@@ -91,6 +91,7 @@ class MainUI : public Wt::WContainerWidget
     Wt::WText *loginText_;
     Wt::WAnchor *loginAnchor_;
     Wt::WAnchor *logoutAnchor_;
+    Wt::WAnchor *backAnchor_;
 
     Wt::WStackedWidget *mainStack_;
     Wt::WContainerWidget *pageContainer_;
