@@ -359,6 +359,10 @@ class HomeLeft : public Wt::WContainerWidget
      * The int can be 1 (delete last) or 0 (delete all)
      */
     Wt::Signal<int> &isoclineDeleteSignal() { return isoclineDeleteSignal_; }
+    /**
+     * Signal to tell HomeRight to refresh the plot without erasing it
+     */
+    Wt::Signal<int> &refreshPlotSignal() { return refreshPlotSignal_; }
 
     /* MainUI parent */
     MainUI *parent_;
@@ -421,6 +425,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WLineEdit *viewMinY_;
     Wt::WLineEdit *viewMaxX_;
     Wt::WLineEdit *viewMaxY_;
+    Wt::WPushButton *refreshPlotButton_;
     // orbits tab
     Wt::WContainerWidget *orbitsContainer_;
     Wt::WLineEdit *orbitsXLineEdit_;
@@ -472,6 +477,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<int> curveDeleteSignal_;
     Wt::Signal<std::string, int, int, int> plotIsoclineSignal_;
     Wt::Signal<int> isoclineDeleteSignal_;
+    Wt::Signal<int> refreshPlotSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -497,6 +503,8 @@ class HomeLeft : public Wt::WContainerWidget
     void onPlot();
     // set default/widget evaluation parameters
     void setOptions();
+    // react to button presses in view tab
+    void onRefreshPlotBtn();
     // react to button presses in orbits tab
     void onOrbitsDialogChange();
     void onOrbitsForwardsBtn();

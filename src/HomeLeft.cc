@@ -965,6 +965,13 @@ void HomeLeft::showSettings()
         }
     }));
 
+    // refresh button
+    refreshPlotButton_ = new WPushButton("Refresh plot", viewContainer_);
+    t->bindWidget("btn", refreshPlotButton_);
+
+    // connect refresh button to refresh plot signal
+    refreshPlotButton_->clicked().connect(this, &HomeLeft::onRefreshPlotBtn);
+
     /*
      * orbits integration
      */
@@ -1274,6 +1281,11 @@ void HomeLeft::resetUI()
     }
 
     resetSignal_.emit(1);
+}
+
+void HomeLeft::onRefreshPlotBtn()
+{
+    refreshPlotSignal_.emit(1);
 }
 
 void HomeLeft::showOrbitsDialog(bool clickValid, double x, double y)
