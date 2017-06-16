@@ -198,6 +198,8 @@ void MainUI::setupUI()
                                                  &HomeRight::onIsoclinePlot);
     leftContainer_->isoclineDeleteSignal().connect(
         rightContainer_, &HomeRight::onIsoclinesDelete);
+    leftContainer_->refreshPlotSignal().connect(rightContainer_,
+                                                &HomeRight::refreshPlot);
 
     // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,
