@@ -530,6 +530,10 @@ class WVFStudy
      */
     WVFStudy(double projection = DEFAULT_PROJECTION);
     /**
+     * Copy constructor
+     */
+    WVFStudy(const WVFStudy &obj);
+    /**
      * Destructor method
      */
     ~WVFStudy();
