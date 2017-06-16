@@ -32,7 +32,7 @@ MyAuthWidget::MyAuthWidget(Session &session, WContainerWidget *parent)
 
 WWidget *MyAuthWidget::createRegistrationView(const Auth::Identity &id)
 {
-/*    RegistrationView *w = new RegistrationView(session_, this);
+    RegistrationView *w = new RegistrationView(session_, this);
     Auth::RegistrationModel *model = createRegistrationModel();
     model->setMinLoginNameLength(3);
 
@@ -40,6 +40,6 @@ WWidget *MyAuthWidget::createRegistrationView(const Auth::Identity &id)
         model->registerIdentified(id);
 
     w->setModel(model);
-    return w;*/
+    return w;
 }
 // TODO: crear pàgina per admin amb boto de registre
