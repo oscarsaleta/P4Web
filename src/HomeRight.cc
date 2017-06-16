@@ -771,3 +771,9 @@ void HomeRight::onIsoclinesDelete(int flag)
     if (tabWidget_->currentIndex() != 1)
         tabWidget_->setCurrentIndex(1);
 }
+
+void HomeRight::refreshPlot(int i)
+{
+    sphere_->plotDone_ = true;
+    sphere_->update();
+}

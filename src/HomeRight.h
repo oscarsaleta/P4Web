@@ -88,7 +88,6 @@ class HomeRight : public Wt::WContainerWidget
      * field evaluation
      */
     void readResults(std::string fname);
-
     /**
      * Print a custom message in the output area
      *
@@ -99,7 +98,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param message String that will be printed in the output area
      */
     void printError(std::string message);
-
     /**
      * Method that triggers a plot in the plot tab
      *
@@ -113,7 +111,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param projection    projection for the sphere view
      */
     void onSpherePlot(std::string basename, double projection);
-
     /**
      * Method that triggers a plot in the plot tab
      *
@@ -132,7 +129,6 @@ class HomeRight : public Wt::WContainerWidget
      */
     void onPlanePlot(std::string basename, int type, double minx, double maxx,
                      double miny, double maxy);
-
     /**
      * React to a mouse event to set the caption of the plot
      *
@@ -146,7 +142,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param caption string to write as caption
      */
     void mouseMovedEvent(Wt::WString caption);
-
     /**
      * React to a click on the sphere by printing the coordinates below
      *
@@ -155,7 +150,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param y          y coordinate
      */
     void sphereClicked(bool clickValid, double x, double y);
-
     /**
      * Send signal of click on plot so we can start orbit integration
      */
@@ -163,12 +157,10 @@ class HomeRight : public Wt::WContainerWidget
     {
         return sphereClickedSignal_;
     }
-
     /**
      * Send signal of confirmation for computed curve
      */
     Wt::Signal<bool> &curveConfirmedSignal() { return curveConfirmedSignal_; }
-
     /**
      * Send signal of confirmation for computed isocline
      */
@@ -176,7 +168,6 @@ class HomeRight : public Wt::WContainerWidget
     {
         return isoclineConfirmedSignal_;
     }
-
     /**
      * React to an orbit integration request
      *
@@ -189,14 +180,12 @@ class HomeRight : public Wt::WContainerWidget
      * @param y0  y coordinate of starting point
      */
     void onOrbitsIntegrate(int dir, double x0, double y0);
-
     /**
      * React to an orbit delete request
      *
      * @param flag can be 0 (delete all) or 1 (delete last)
      */
     void onOrbitsDelete(int flag);
-
     /**
      * React to reset signal from HomeLeft
      *
@@ -205,7 +194,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param dummy not needed but signals cannot be empty
      */
     void onReset(int dummy);
-
     /**
      * React to the GCF evaluation signal
      *
@@ -218,7 +206,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param prec      precision of computations for zeros of gcf
      */
     void onGcfEval(std::string fname, int pointdash, int npoints, int prec);
-
     /**
      * React to the curve plot signal
      *
@@ -232,14 +219,12 @@ class HomeRight : public Wt::WContainerWidget
      * @param prec      precision of computations for zeros of curve
      */
     void onCurvePlot(std::string fname, int pointdash, int npoints, int prec);
-
     /**
      * React to a curve delete request
      *
      * @param flag can be 0 (delete all) or 1 (delete last)
      */
     void onCurvesDelete(int flag);
-
     /**
      * React to the isocline plot signal
      *
@@ -256,14 +241,12 @@ class HomeRight : public Wt::WContainerWidget
      */
     void onIsoclinePlot(std::string fname, int pointdash, int npoints,
                         int prec);
-
     /**
      * React to an isocline delete request
      *
      * @param flag can be 0 (delete all) or 1 (delete last)
      */
     void onIsoclinesDelete(int flag);
-
     /**
      * Add a parameter to the list and fill the label and value
      *
@@ -274,7 +257,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param value value of the parameter
      */
     void addParameterWithValue(std::string label, std::string value);
-
     /**
      * Set loggedIn_ = true and show parameters tab
      */
@@ -287,11 +269,15 @@ class HomeRight : public Wt::WContainerWidget
      * @param logout boolean flag to set the login status to false if needed
      */
     void hideParamsTab(bool logout = false);
-
     /**
      * Create string vectors from parameter WLineEdits
      */
     void refreshParamStringVectors();
+    /**
+     * Refresh the plot
+     */
+    void refreshPlot(int);
+
 
     /**
      * Vector of strings for labels
