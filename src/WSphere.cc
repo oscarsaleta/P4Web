@@ -68,12 +68,17 @@ using namespace Wt;
 // parameters _x1,... are irrelevant if isZoom is false
 
 WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
-                 int height, std::string basename, double projection)
+                 int height, std::string basename, double projection,
+                 WVFStudy *study)
     : width_(width), height_(height), basename_(basename), parentWnd(parent),
       typeOfView_(0), projection_(projection), plotPrepared_(false),
       plotDone_(false)
 {
-    study_ = new WVFStudy(projection);
+    if (study == nullptr)
+        study_ = new WVFStudy(projection);
+    else
+        study_ = study;
+
     scriptHandler_ = s;
 
     ReverseYaxis = false;
@@ -104,12 +109,16 @@ WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
 
 WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
                  int height, std::string basename, int type, double minx,
-                 double maxx, double miny, double maxy)
+                 double maxx, double miny, double maxy, WVFStudy *study)
     : width_(width), height_(height), basename_(basename), parentWnd(parent),
       typeOfView_(type), viewMinX_(minx), viewMaxX_(maxx), viewMinY_(miny),
       viewMaxY_(maxy), plotPrepared_(false), plotDone_(false)
 {
-    study_ = new WVFStudy();
+    if (study == nullptr)
+        study_ = new WVFStudy();
+    else
+        study_ = study;
+
     scriptHandler_ = s;
 
     ReverseYaxis = false;
