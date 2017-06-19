@@ -137,62 +137,62 @@ WVFStudy::WVFStudy(double projection) : config_projection_(projection)
 
 WVFStudy::WVFStudy(const WVFStudy &obj)
 {
-    f_vec_field_[0] = copy_term2(obj->vec_field_[0]);
-    f_vec_field_[1] = copy_term2(obj->vec_field_[1]);
-    vec_field_U1_[0] = copy_term2(obj->vec_field_U1_[0]);
-    vec_field_U1_[1] = copy_term2(obj->vec_field_U1_[1]);
-    vec_field_U2_[0] = copy_term2(obj->vec_field_U2_[0]);
-    vec_field_U2_[1] = copy_term2(obj->vec_field_U2_[1]);
-    vec_field_V1_[0] = copy_term2(obj->vec_field_V1_[0]);
-    vec_field_V1_[1] = copy_term2(obj->vec_field_V1_[1]);
-    vec_field_V2_[0] = copy_term2(obj->vec_field_V2_[0]);
-    vec_field_V2_[1] = copy_term2(obj->vec_field_V2_[1]);
-    vec_field_C_[0] = copy_term3(obj->vec_field_C_[0]);
-    vec_field_C_[1] = copy_term3(obj->vec_field_C_[1]);
+    f_vec_field_[0] = copy_term2(obj.f_vec_field_[0]);
+    f_vec_field_[1] = copy_term2(obj.f_vec_field_[1]);
+    vec_field_U1_[0] = copy_term2(obj.vec_field_U1_[0]);
+    vec_field_U1_[1] = copy_term2(obj.vec_field_U1_[1]);
+    vec_field_U2_[0] = copy_term2(obj.vec_field_U2_[0]);
+    vec_field_U2_[1] = copy_term2(obj.vec_field_U2_[1]);
+    vec_field_V1_[0] = copy_term2(obj.vec_field_V1_[0]);
+    vec_field_V1_[1] = copy_term2(obj.vec_field_V1_[1]);
+    vec_field_V2_[0] = copy_term2(obj.vec_field_V2_[0]);
+    vec_field_V2_[1] = copy_term2(obj.vec_field_V2_[1]);
+    vec_field_C_[0] = copy_term3(obj.vec_field_C_[0]);
+    vec_field_C_[1] = copy_term3(obj.vec_field_C_[1]);
 
-    first_saddle_point_ = copy_saddle(obj->first_saddle_point_);
-    first_se_point_ = copy_semi_elementary(obj->first_se_point_);
-    first_node_point_ = copy_node(obj->first_node_point_);
-    first_sf_point_ = copy_strong_focus(obj->first_sf_point_);
-    first_wf_point_ = copy_weak_focus(obj->first_wf_point_);
-    first_de_point_ = copy_degenerate(obj->first_de_point_);
+    first_saddle_point_ = copy_saddle(obj.first_saddle_point_);
+    first_se_point_ = copy_semi_elementary(obj.first_se_point_);
+    first_node_point_ = copy_node(obj.first_node_point_);
+    first_sf_point_ = copy_strong_focus(obj.first_sf_point_);
+    first_wf_point_ = copy_weak_focus(obj.first_wf_point_);
+    first_de_point_ = copy_degenerate(obj.first_de_point_);
 
-    gcf_ = copy_term2(obj->gcf_);
-    gcf_U1_ = copy_term2(obj->gcf_U1_);
-    gcf_U2_ = copy_term2(obj->gcf_U2_);
-    gcf_V1_ = copy_term2(obj->gcf_V1_);
-    gcf_V2_ = copy_term2(obj->gcf_V2_);
-    gcf_C_ = copy_term3(obj->gcf_C_);
-    gcf_points_ = copy_orbits_points(obj->gcf_points_);
-    last_gcf_point_ = copy_orbits_points(obj->last_gcf_point_);
+    gcf_ = copy_term2(obj.gcf_);
+    gcf_U1_ = copy_term2(obj.gcf_U1_);
+    gcf_U2_ = copy_term2(obj.gcf_U2_);
+    gcf_V1_ = copy_term2(obj.gcf_V1_);
+    gcf_V2_ = copy_term2(obj.gcf_V2_);
+    gcf_C_ = copy_term3(obj.gcf_C_);
+    gcf_points_ = copy_orbits_points(obj.gcf_points_);
+    last_gcf_point_ = copy_orbits_points(obj.last_gcf_point_);
 
-    last_curves_point_ = copy_orbits_points(obj->last_curves_point_);
-    last_isoclines_point_ = copy_orbits_points(obj->last_isoclines_point_);
+    last_curves_point_ = copy_orbits_points(obj.last_curves_point_);
+    last_isoclines_point_ = copy_orbits_points(obj.last_isoclines_point_);
 
-    first_lim_cycle_ = copy_orbit(obj->first_lim_cycle_);
-    first_orbit_ = copy_orbits(obj->first_orbit_);
-    current_orbit_ = copy_orbits(obj->current_orbit_);
+    first_lim_cycle_ = copy_orbits(obj.first_lim_cycle_);
+    first_orbit_ = copy_orbits(obj.first_orbit_);
+    current_orbit_ = copy_orbits(obj.current_orbit_);
 
-    xmin_ = obj->xmin_;
-    xmax_ = obj->xmax_;
-    ymin_ = obj->ymin_;
-    ymax_ = obj->ymax_;
-    p_ = obj->p_;
-    q_ = obj->q_;
-    typeofstudy_ = obj->typeofstudy_;
-    singinf_ = obj->singinf_;
-    dir_vec_field_ = obj->dir_vec_field_;
+    xmin_ = obj.xmin_;
+    xmax_ = obj.xmax_;
+    ymin_ = obj.ymin_;
+    ymax_ = obj.ymax_;
+    p_ = obj.p_;
+    q_ = obj.q_;
+    typeofstudy_ = obj.typeofstudy_;
+    singinf_ = obj.singinf_;
+    dir_vec_field_ = obj.dir_vec_field_;
 
-    config_lc_value_ = obj->config_lc_value_;
-    config_lc_numpoints_ = obj->config_lc_numpoints_;
-    config_hma_ = obj->config_hma_;
-    config_hmi_ = obj->config_hmi_;
-    config_step_ = obj->config_step_;
-    config_currentstep_ = obj->config_currentstep_;
-    config_tolerance_ = obj->config_tolerance_;
-    config_intpoints_ = obj->config_intpoints_;
-    config_dashes_ = obj->config_dashes_;
-    config_kindvf_ = obj->config_kindvf_;
+    config_lc_value_ = obj.config_lc_value_;
+    config_lc_numpoints_ = obj.config_lc_numpoints_;
+    config_hma_ = obj.config_hma_;
+    config_hmi_ = obj.config_hmi_;
+    config_step_ = obj.config_step_;
+    config_currentstep_ = obj.config_currentstep_;
+    config_tolerance_ = obj.config_tolerance_;
+    config_intpoints_ = obj.config_intpoints_;
+    config_dashes_ = obj.config_dashes_;
+    config_kindvf_ = obj.config_kindvf_;
 
     // TODO: copy isoclines and curves
     
@@ -213,11 +213,11 @@ orbits *WVFStudy::copy_orbits(orbits *p)
         q->current_f_orbits = copy_orbits_points(o->current_f_orbits);
         q->next_orbit = nullptr;
         if (last != nullptr)
-            last->next = q;
+            last->next_orbit = q;
         else
             result = q;
         last = q;
-        o = o->next;
+        o = o->next_orbit;
     }
     return result;
 }
@@ -253,7 +253,7 @@ P4POLYNOM1 WVFStudy::copy_term1(P4POLYNOM1 p)
     P4POLYNOM1 o = p;
     P4POLYNOM1 last = nullptr;
     while (o != nullptr) {
-        P4POLYNOM q = new term1;
+        P4POLYNOM1 q = new term1;
         q->exp = o->exp;
         q->coeff = o->coeff;
         q->next_term1 = nullptr;
@@ -310,7 +310,7 @@ P4POLYNOM3 WVFStudy::copy_term3(P4POLYNOM3 p)
     return result;
 }
 
-sep *copy_sep(sep *p)
+sep *WVFStudy::copy_sep(sep *p)
 {
     sep *result = nullptr;
     sep *o = p;
@@ -367,7 +367,7 @@ blow_up_points *WVFStudy::copy_blow_up_points(blow_up_points *p)
     while (o != nullptr) {
         blow_up_points *q = new blow_up_points;
         q->n = o->n;
-        q->trans = copy_trasnformations(o->trans);
+        q->trans = copy_transformations(o->trans);
         q->x0 = o->x0;
         q->y0 = o->y0;
         q->a11 = o->a11;
@@ -394,13 +394,13 @@ blow_up_points *WVFStudy::copy_blow_up_points(blow_up_points *p)
     return result;
 }
 
-transformations *WVFStudy::copy_transformations()
+transformations *WVFStudy::copy_transformations(transformations *p)
 {
     transformations *result = nullptr;
     transformations *o = p;
     transformations *last = nullptr;
     while (o != nullptr) {
-        trasnformations *q = new transformations;
+        transformations *q = new transformations;
         q->x0 = o->x0;
         q->y0 = o->y0;
         q->c1 = o->c1;

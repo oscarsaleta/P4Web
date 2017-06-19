@@ -1531,6 +1531,25 @@ class WVFStudy
     // -----------------------------------------------------------------------
     int change_dir_poincare(double *p);
     int change_dir_lyapunov(double *p);
+    // -----------------------------------------------------------------------
+    //                      COPY FUNCTIONS
+    // -----------------------------------------------------------------------
+    orbits *copy_orbits(orbits *p);
+    P4ORBIT copy_orbits_points(P4ORBIT p);
+    P4POLYNOM1 copy_term1(P4POLYNOM1 p);
+    P4POLYNOM2 copy_term2(P4POLYNOM2 p);
+    P4POLYNOM3 copy_term3(P4POLYNOM3 p);
+    sep *copy_sep(sep *p);
+    degenerate *copy_degenerate(degenerate *p);
+    blow_up_points *copy_blow_up_points(blow_up_points *p);
+    transformations *copy_transformations(transformations *p);
+    weak_focus *copy_weak_focus(weak_focus *p);
+    strong_focus *copy_strong_focus(strong_focus *p);
+    node *copy_node(node *p);
+    semi_elementary *copy_semi_elementary(semi_elementary *p);
+    saddle *copy_saddle(saddle *p);
+    curves *copy_curves(curves *p);
+    isoclines *copy_isoclines(isoclines *p);
 };
 
 #define LINESTYLE_DASHES 1 ///< style for dashed lines in plot
