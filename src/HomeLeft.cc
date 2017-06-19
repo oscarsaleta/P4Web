@@ -1283,9 +1283,69 @@ void HomeLeft::resetUI()
     resetSignal_.emit(1);
 }
 
+// FIXME: create signals
 void HomeLeft::onRefreshPlotBtn()
 {
-    refreshPlotSignal_.emit(1);
+    if (!evaluated_) {
+        showErrorBox("Cannot read results, evaluate a vector field first.");
+    } else {
+        g_globalLogger.debug("HomeLeft :: sending refreshPlot signal");
+        if (!loggedIn_)
+            refreshPlotSignal_.emit(-1);
+        else {
+            if (viewComboBox_->currentIndex() == 0) {
+                double proj;
+                try {
+                    proj = std::stod(viewProjection_->text());
+                } catch (...) {
+                    proj = PROJECTION_DEFAULT;
+                    viewProjection_->setText(
+                        std::to_string(PROJECTION_DEFAULT));
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
+                                           "setting to default value");
+                }
+                refreshPlotSignal_.emit(proj);
+            } else {
+                double minx, maxx, miny, maxy;
+                try {
+                    minx = std::stod(viewMinX_->text());
+                } catch (...) {
+                    minx = -1;
+                    viewMinX_->setText("-1");
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
+                                           "setting to default value");
+                }
+                try {
+                    maxx = std::stod(viewMaxX_->text());
+                } catch (...) {
+                    maxx = 1;
+                    viewMaxX_->setText("1");
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
+                                           "setting to default value");
+                }
+                try {
+                    miny = std::stod(viewMinY_->text());
+                } catch (...) {
+                    miny = -1;
+                    viewMinY_->setText("-1");
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
+                                           "setting to default value");
+                }
+                try {
+                    maxy = std::stod(viewMaxY_->text());
+                } catch (...) {
+                    maxy = 1;
+                    viewMaxY_->setText("1");
+                    g_globalLogger.warning("HomeLeft :: bad view settings, "
+                                           "setting to default value");
+                }
+                refreshPlotSignal_.emit(viewComboBox_->currentIndex(), minx,
+                                        maxx, miny, maxy);
+            }
+            plotted_ = true;
+            tabs_->setCurrentWidget(viewContainer_);
+        }
+    }
 }
 
 void HomeLeft::showOrbitsDialog(bool clickValid, double x, double y)
