@@ -195,7 +195,18 @@ WVFStudy::WVFStudy(const WVFStudy &obj)
     config_kindvf_ = obj.config_kindvf_;
 
     // TODO: copy isoclines and curves
-    
+    std::vector<curves>::const_iterator it1;
+    for (it1 = obj.curve_vector_.begin(); it1 != obj.curve_vector_.end();
+         it1++) {
+        curves *curve = copy_curves((curves *)&(*it1));
+        curve_vector_.push_back(*curve);
+    }
+    std::vector<isoclines>::const_iterator it2;
+    for (it2 = obj.isocline_vector_.begin(); it2 != obj.isocline_vector_.end();
+         it2++) {
+        isoclines *isoc = copy_isoclines((isoclines *)&(*it2));
+        isocline_vector_.push_back(*isoc);
+    }
 }
 
 orbits *WVFStudy::copy_orbits(orbits *p)
