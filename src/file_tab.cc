@@ -129,6 +129,12 @@ WVFStudy::WVFStudy(double projection) : config_projection_(projection)
     // line style (dashes or points)
     config_dashes_ = DEFAULT_LINESTYLE;
     config_kindvf_ = DEFAULT_INTCONFIG;
+
+    selected_saddle_point_ = nullptr;
+    selected_se_point_ = nullptr;
+    selected_de_point_ = nullptr;
+    selected_sep_ = nullptr;
+    selected_de_sep_ = nullptr;
 }
 
 // -----------------------------------------------------------------------
@@ -137,6 +143,24 @@ WVFStudy::WVFStudy(double projection) : config_projection_(projection)
 
 WVFStudy::WVFStudy(const WVFStudy &obj)
 {
+    typeofstudy_ = obj.typeofstudy_;
+    typeofview_ = obj.typeofview_;
+    p_ = obj.p_;
+    q_ = obj.q_;
+    plweights_ = obj.plweights_;
+    double_p_ = (double)p_;
+    double_q_ = (double)q_;
+    double_p_plus_q_ = (double)(p_ + q_);
+    double_p_minus_1_ = (double)(p_ - 1);
+    double_q_minus_1_ = (double)(q_ - 1);
+    double_q_minus_p_ = (double)(q_ - p_);
+    xmin_ = obj.xmin_;
+    xmax_ = obj.xmax_;
+    ymin_ = obj.ymin_;
+    ymax_ = obj.ymax_;
+    singinf_ = obj.singinf_;
+    dir_vec_field_ = obj.dir_vec_field_;
+
     f_vec_field_[0] = copy_term2(obj.f_vec_field_[0]);
     f_vec_field_[1] = copy_term2(obj.f_vec_field_[1]);
     vec_field_U1_[0] = copy_term2(obj.vec_field_U1_[0]);
@@ -166,47 +190,48 @@ WVFStudy::WVFStudy(const WVFStudy &obj)
     gcf_points_ = copy_orbits_points(obj.gcf_points_);
     last_gcf_point_ = copy_orbits_points(obj.last_gcf_point_);
 
-    last_curves_point_ = copy_orbits_points(obj.last_curves_point_);
-    last_isoclines_point_ = copy_orbits_points(obj.last_isoclines_point_);
-
-    first_lim_cycle_ = copy_orbits(obj.first_lim_cycle_);
-    first_orbit_ = copy_orbits(obj.first_orbit_);
-    current_orbit_ = copy_orbits(obj.current_orbit_);
-
-    xmin_ = obj.xmin_;
-    xmax_ = obj.xmax_;
-    ymin_ = obj.ymin_;
-    ymax_ = obj.ymax_;
-    p_ = obj.p_;
-    q_ = obj.q_;
-    typeofstudy_ = obj.typeofstudy_;
-    singinf_ = obj.singinf_;
-    dir_vec_field_ = obj.dir_vec_field_;
-
-    config_lc_value_ = obj.config_lc_value_;
-    config_lc_numpoints_ = obj.config_lc_numpoints_;
-    config_hma_ = obj.config_hma_;
-    config_hmi_ = obj.config_hmi_;
-    config_step_ = obj.config_step_;
-    config_currentstep_ = obj.config_currentstep_;
-    config_tolerance_ = obj.config_tolerance_;
-    config_intpoints_ = obj.config_intpoints_;
-    config_dashes_ = obj.config_dashes_;
-    config_kindvf_ = obj.config_kindvf_;
-
-    // TODO: copy isoclines and curves
     std::vector<curves>::const_iterator it1;
     for (it1 = obj.curve_vector_.begin(); it1 != obj.curve_vector_.end();
          it1++) {
         curves *curve = copy_curves((curves *)&(*it1));
         curve_vector_.push_back(*curve);
     }
+    last_curves_point_ = copy_orbits_points(obj.last_curves_point_);
+
     std::vector<isoclines>::const_iterator it2;
     for (it2 = obj.isocline_vector_.begin(); it2 != obj.isocline_vector_.end();
          it2++) {
         isoclines *isoc = copy_isoclines((isoclines *)&(*it2));
         isocline_vector_.push_back(*isoc);
     }
+    last_isoclines_point_ = copy_orbits_points(obj.last_isoclines_point_);
+
+    first_lim_cycle_ = copy_orbits(obj.first_lim_cycle_);
+    first_orbit_ = copy_orbits(obj.first_orbit_);
+
+    config_lc_value_ = obj.config_lc_value_;
+    config_hma_ = obj.config_hma_;
+    config_hmi_ = obj.config_hmi_;
+    config_step_ = obj.config_step_;
+    config_currentstep_ = obj.config_currentstep_;
+    config_tolerance_ = obj.config_tolerance_;
+    config_projection_ = obj.config_projection_;
+    config_intpoints_ = obj.config_intpoints_;
+    config_lc_numpoints_ = obj.config_lc_numpoints_;
+    config_dashes_ = obj.config_dashes_;
+    config_kindvf_ = obj.config_kindvf_;
+
+    current_orbit_ = copy_orbits(obj.current_orbit_);
+    current_lim_cycle_ = copy_orbits(obj.current_lim_cycle_);
+
+    selected_ucoord_[0] = obj.selected_ucoord_[0];
+    selected_ucoord_[1] = obj.selected_ucoord_[1];
+
+    selected_saddle_point_ = copy_saddle(obj.selected_saddle_point_);
+    selected_se_point_ = copy_semi_elementary(obj.selected_se_point_);
+    selected_de_point_ = copy_degenerate(obj.selected_de_point_);
+    selected_sep_ = copy_sep(obj.selected_sep_);
+    selected_de_sep_ = copy_blow_up_points(obj.selected_de_sep_);
 }
 
 orbits *WVFStudy::copy_orbits(orbits *p)
@@ -831,14 +856,14 @@ bool WVFStudy::readTables(std::string basename)
 
     fp = fopen((basename + "_vec.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("WVFStudy :: Cannot open file " + basename +
+        g_globalLogger.error("[WVFStudy] Cannot open file " + basename +
                              "_vec.tab.");
         deleteVF();
         return false;
     }
 
     if (fscanf(fp, "%d %d %d ", &typeofstudy_, &p_, &q_) != 3) {
-        g_globalLogger.error("WVFStudy :: Cannot read typeofstudy_ in " +
+        g_globalLogger.error("[WVFStudy] Cannot read typeofstudy_ in " +
                              basename + "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -848,7 +873,7 @@ bool WVFStudy::readTables(std::string basename)
     if (typeofstudy_ == TYPEOFSTUDY_ONE) {
         if (fscanf(fp, "%lf %lf %lf %lf", &xmin_, &xmax_, &ymin_, &ymax_) !=
             4) {
-            g_globalLogger.error("WVFStudy :: Cannot read min-max coords in " +
+            g_globalLogger.error("[WVFStudy] Cannot read min-max coords in " +
                                  basename + "_vec.tab.");
             deleteVF();
             fclose(fp);
@@ -869,7 +894,7 @@ bool WVFStudy::readTables(std::string basename)
     double_q_minus_p_ = (double)(q_ - p_);
 
     if (!readGCF(fp)) {
-        g_globalLogger.error("WVFStudy :: Cannot read gcf " + basename +
+        g_globalLogger.error("[WVFStudy] Cannot read gcf " + basename +
                              "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -877,7 +902,7 @@ bool WVFStudy::readTables(std::string basename)
     }
 
     if (!readVectorField(fp, f_vec_field_)) {
-        g_globalLogger.error("WVFStudy :: Cannot read vector field in " +
+        g_globalLogger.error("[WVFStudy] Cannot read vector field in " +
                              basename + "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -886,7 +911,7 @@ bool WVFStudy::readTables(std::string basename)
 
     if (!readVectorField(fp, vec_field_U1_)) {
         g_globalLogger.error(
-            "WVFStudy :: Cannot read vector field in U1-chart in " + basename +
+            "[WVFStudy] Cannot read vector field in U1-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -895,7 +920,7 @@ bool WVFStudy::readTables(std::string basename)
 
     if (!readVectorField(fp, vec_field_V1_)) {
         g_globalLogger.error(
-            "WVFStudy :: Cannot read vector field in V1-chart in " + basename +
+            "[WVFStudy] Cannot read vector field in V1-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -904,7 +929,7 @@ bool WVFStudy::readTables(std::string basename)
 
     if (!readVectorField(fp, vec_field_U2_)) {
         g_globalLogger.error(
-            "WVFStudy :: Cannot read vector field in U2-chart in " + basename +
+            "[WVFStudy] Cannot read vector field in U2-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -913,7 +938,7 @@ bool WVFStudy::readTables(std::string basename)
 
     if (!readVectorField(fp, vec_field_V2_)) {
         g_globalLogger.error(
-            "WVFStudy :: Cannot read vector field in V2-chart in " + basename +
+            "[WVFStudy] Cannot read vector field in V2-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -923,7 +948,7 @@ bool WVFStudy::readTables(std::string basename)
     if (plweights_) {
         if (!readVectorFieldCylinder(fp, vec_field_C_)) {
             g_globalLogger.error(
-                "WVFStudy :: Cannot read vector field in Cylinder-chart in " +
+                "[WVFStudy] Cannot read vector field in Cylinder-chart in " +
                 basename + "_vec.tab.");
             deleteVF();
             fclose(fp);
@@ -932,7 +957,7 @@ bool WVFStudy::readTables(std::string basename)
         singinf_ = 0;
     } else {
         if (fscanf(fp, "%d %d", &flag, &dir_vec_field_) != 2) {
-            g_globalLogger.error("WVFStudy :: Cannot read sing-at-infinity "
+            g_globalLogger.error("[WVFStudy] Cannot read sing-at-infinity "
                                  "flag and directions flag in " +
                                  basename + "_vec.tab.");
             deleteVF();
@@ -949,7 +974,7 @@ bool WVFStudy::readTables(std::string basename)
         if (fp != nullptr) {
             if (!readPoints(fp)) {
                 g_globalLogger.error(
-                    "WVFStudy :: Problem reading singularity info from " +
+                    "[WVFStudy] Problem reading singularity info from " +
                     basename + "_fin.tab: " + lasterror_.toUTF8() + ".");
                 deleteVF();
                 fclose(fp);
@@ -957,7 +982,7 @@ bool WVFStudy::readTables(std::string basename)
             }
             fclose(fp);
         } else {
-            g_globalLogger.error("WVFStudy :: Cannot open " + basename +
+            g_globalLogger.error("[WVFStudy] Cannot open " + basename +
                                  "_fin.tab.");
             deleteVF();
             return false;
@@ -971,7 +996,7 @@ bool WVFStudy::readTables(std::string basename)
                 for (j = 1; j <= 2; j++) {
                     if (!readPoints(fp)) {
                         g_globalLogger.error(
-                            "WVFStudy :: Cannot read singular points in " +
+                            "[WVFStudy] Cannot read singular points in " +
                             basename + "_inf.tab (" + std::to_string(j) +
                             "): " + lasterror_.toUTF8() + ".");
                         deleteVF();
@@ -983,7 +1008,7 @@ bool WVFStudy::readTables(std::string basename)
                 for (j = 1; j <= 4; j++) {
                     if (!readPoints(fp)) {
                         g_globalLogger.error(
-                            "WVFStudy :: Cannot read singular points in " +
+                            "[WVFStudy] Cannot read singular points in " +
                             basename + "_inf.tab (" + std::to_string(j) +
                             "): " + lasterror_.toUTF8() + ".");
                         deleteVF();
@@ -994,14 +1019,14 @@ bool WVFStudy::readTables(std::string basename)
             }
             fclose(fp);
         } else {
-            g_globalLogger.error("WVFStudy :: Cannot open " + basename +
+            g_globalLogger.error("[WVFStudy] Cannot open " + basename +
                                  "_inf.tab.");
             deleteVF();
             return false;
         }
     }
 
-    g_globalLogger.debug("WFStudy :: Files " + basename +
+    g_globalLogger.debug("[WFStudy] Files " + basename +
                          "_{vec,fin,inf}.tab read correctly.");
     return true;
 }
@@ -1091,7 +1116,7 @@ bool WVFStudy::readCurve(std::string basename)
 
     fp = fopen((basename + "_veccurve.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("WFStudy :: Cannot open file " + basename +
+        g_globalLogger.error("[WFStudy] Cannot open file " + basename +
                              "_veccurve.tab");
         return false;
     }
@@ -1170,7 +1195,7 @@ bool WVFStudy::readIsoclines(std::string basename)
 
     fp = fopen((basename + "_vecisoclines.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("WVFSttudy :: Cannot open file " + basename +
+        g_globalLogger.error("[WVFSttudy] Cannot open file " + basename +
                              "_vecisoclines.tab");
         return false;
     }
