@@ -660,6 +660,8 @@ class WSphere : public Wt::WPaintedWidget
 
     // script handler
     ScriptHandler *scriptHandler_;
+    // flag to know if study was copied or will be created
+    bool studyCopied_;
 };
 
 #endif /* WIN_SPHERE_H */
