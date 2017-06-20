@@ -274,10 +274,22 @@ class HomeRight : public Wt::WContainerWidget
      */
     void refreshParamStringVectors();
     /**
-     * Refresh the plot
+     * Refresh the plot into a sphere
+     *
+     * @param proj projection for the plot
      */
-    void refreshPlot(int);
-
+    void refreshPlotSphere(double proj);
+    /**
+     * Refresh the plot into a plane
+     *
+     * @param type identifies if the plot is R2, U1, U2, V1, or V2
+     * @param minx min x coord
+     * @param maxx max x coord
+     * @param miny min y coord
+     * @param maxy max y coord
+     */
+    void refreshPlotPlane(int type, double minx, double maxx, double miny,
+                          double maxy);
 
     /**
      * Vector of strings for labels
@@ -332,6 +344,7 @@ class HomeRight : public Wt::WContainerWidget
 
     // plot tab
     WSphere *sphere_;
+    std::string sphereBasename_;
 
     Wt::WContainerWidget *plotContainer_;
     Wt::WText *plotCaption_;
