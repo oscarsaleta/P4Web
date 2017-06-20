@@ -127,7 +127,7 @@ void MainUI::setupUI()
     title_->setId("title_");
     title_->setStyleClass("page-header center");
     addWidget(title_);
-    g_globalLogger.debug("MainUI :: title set up");
+    g_globalLogger.debug("[MainUI] title set up");
 
     // this is used to change page content
     mainStack_ = new WStackedWidget();
@@ -153,16 +153,16 @@ void MainUI::setupUI()
     scriptHandler_ = new ScriptHandler();
 
     // left widget (file upload, input, buttons)
-    g_globalLogger.debug("MainUI :: creating HomeLeft...");
+    g_globalLogger.debug("[MainUI] creating HomeLeft...");
     leftContainer_ = new HomeLeft(pageContainer_, scriptHandler_);
     leftContainer_->parent_ = this;
-    g_globalLogger.debug("MainUI :: HomeLeft created");
+    g_globalLogger.debug("[MainUI] HomeLeft created");
     t->bindWidget("left", leftContainer_);
 
     // right widget (output text area, plots, legend)
-    g_globalLogger.debug("MainUI :: creating HomeRight...");
+    g_globalLogger.debug("[MainUI] creating HomeRight...");
     rightContainer_ = new HomeRight(pageContainer_, scriptHandler_);
-    g_globalLogger.debug("MainUI :: HomeRight created");
+    g_globalLogger.debug("[MainUI] HomeRight created");
     t->bindWidget("right", rightContainer_);
 
     // copyright
@@ -198,8 +198,10 @@ void MainUI::setupUI()
                                                  &HomeRight::onIsoclinePlot);
     leftContainer_->isoclineDeleteSignal().connect(
         rightContainer_, &HomeRight::onIsoclinesDelete);
-    leftContainer_->refreshPlotSignal().connect(rightContainer_,
-                                                &HomeRight::refreshPlot);
+    leftContainer_->refreshPlotSphereSignal().connect(
+        rightContainer_, &HomeRight::refreshPlotSphere);
+    leftContainer_->refreshPlotPlaneSignal().connect(
+        rightContainer_, &HomeRight::refreshPlotPlane);
 
     // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,
@@ -209,9 +211,9 @@ void MainUI::setupUI()
     rightContainer_->isoclineConfirmedSignal().connect(
         leftContainer_, &HomeLeft::isoclineConfirmed);
 
-    g_globalLogger.debug("MainUI :: signals connected");
+    g_globalLogger.debug("[MainUI] signals connected");
 
-    g_globalLogger.debug("MainUI :: MainUI set up");
+    g_globalLogger.debug("[MainUI] MainUI set up");
 
     authWidget_->processEnvironment();
     handlePathChange();
@@ -220,13 +222,13 @@ void MainUI::setupUI()
 void MainUI::onAuthEvent()
 {
     if (session_.login().loggedIn()) {
-        g_globalLogger.info("Auth :: User " + session_.userName() +
+        g_globalLogger.info("[Auth] User " + session_.userName() +
                             " logged in.");
         setLoginIndicator(session_.userName());
         leftContainer_->showSettings();
         rightContainer_->showParamsTab();
     } else {
-        g_globalLogger.info("Auth :: User logged out.");
+        g_globalLogger.info("[Auth] User logged out.");
         leftContainer_->hideSettings();
         rightContainer_->hideParamsTab(true);
         setLogoutIndicator();
@@ -239,7 +241,7 @@ void MainUI::handlePathChange()
     WApplication *app = WApplication::instance();
 
     if (app->internalPath() == "/login") {
-        g_globalLogger.debug("MainUI :: handle internal path change /login");
+        g_globalLogger.debug("[MainUI] handle internal path change /login");
         backAnchor_->show();
         loginAnchor_->hide();
         logoutAnchor_->hide();
@@ -257,7 +259,7 @@ void MainUI::handlePathChange()
             loginAnchor_->show();
             logoutAnchor_->hide();
         }
-        g_globalLogger.debug("MainUI :: setting main page as current view");
+        g_globalLogger.debug("[MainUI] setting main page as current view");
     }
 }
 
