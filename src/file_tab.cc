@@ -2607,6 +2607,10 @@ void WVFStudy::setupCoordinateTransformations(void)
             sphere_to_viewcoordpair =
                 &WVFStudy::psphere_to_viewcoordpair_discontinuousy;
             break;
+        default:
+            g_globalLogger.fatal("[WVFStudy] could not resolve switch in "
+                                 "setupCoordinateTransformations");
+            return;
         }
     } else {
         U1_to_sphere = &WVFStudy::U1_to_plsphere;
@@ -2678,6 +2682,10 @@ void WVFStudy::setupCoordinateTransformations(void)
             sphere_to_viewcoordpair =
                 &WVFStudy::plsphere_to_viewcoordpair_discontinuousy;
             break;
+        default:
+            g_globalLogger.fatal("[WVFStudy] could not resolve switch in "
+                                 "setupCoordinateTransformations");
+            return;
         }
     }
 }
