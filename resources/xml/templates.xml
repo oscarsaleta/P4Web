@@ -226,7 +226,7 @@
         <div class="col-sm-4" title="${maxy-tooltip}">${maxy}</div>
       </div>
       <div class="form-group">
-        <div class="col-sm-4">${btn}</div>
+        <div class="col-sm-4 col-sm-offset-2">${btn}</div>
       </div>
     </form>
   </message>
