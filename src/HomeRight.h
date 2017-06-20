@@ -24,8 +24,9 @@
  * @file HomeRight.h
  * @author Oscar Saleta
  */
-
 #include <Wt/WContainerWidget>
+
+#include "ScriptHandler.h"
 
 #include <Wt/WString>
 
@@ -70,7 +71,7 @@ class HomeRight : public Wt::WContainerWidget
     /**
      * Constructor method for HomeRight
      */
-    HomeRight(Wt::WContainerWidget *parent = 0);
+    HomeRight(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0);
     /**
      * Destructor method for HomeRight
      */
@@ -87,7 +88,6 @@ class HomeRight : public Wt::WContainerWidget
      * field evaluation
      */
     void readResults(std::string fname);
-
     /**
      * Print a custom message in the output area
      *
@@ -98,7 +98,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param message String that will be printed in the output area
      */
     void printError(std::string message);
-
     /**
      * Method that triggers a plot in the plot tab
      *
@@ -112,7 +111,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param projection    projection for the sphere view
      */
     void onSpherePlot(std::string basename, double projection);
-
     /**
      * Method that triggers a plot in the plot tab
      *
@@ -131,7 +129,6 @@ class HomeRight : public Wt::WContainerWidget
      */
     void onPlanePlot(std::string basename, int type, double minx, double maxx,
                      double miny, double maxy);
-
     /**
      * React to a mouse event to set the caption of the plot
      *
@@ -145,7 +142,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param caption string to write as caption
      */
     void mouseMovedEvent(Wt::WString caption);
-
     /**
      * React to a click on the sphere by printing the coordinates below
      *
@@ -154,7 +150,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param y          y coordinate
      */
     void sphereClicked(bool clickValid, double x, double y);
-
     /**
      * Send signal of click on plot so we can start orbit integration
      */
@@ -162,7 +157,17 @@ class HomeRight : public Wt::WContainerWidget
     {
         return sphereClickedSignal_;
     }
-
+    /**
+     * Send signal of confirmation for computed curve
+     */
+    Wt::Signal<bool> &curveConfirmedSignal() { return curveConfirmedSignal_; }
+    /**
+     * Send signal of confirmation for computed isocline
+     */
+    Wt::Signal<bool> &isoclineConfirmedSignal()
+    {
+        return isoclineConfirmedSignal_;
+    }
     /**
      * React to an orbit integration request
      *
@@ -175,14 +180,12 @@ class HomeRight : public Wt::WContainerWidget
      * @param y0  y coordinate of starting point
      */
     void onOrbitsIntegrate(int dir, double x0, double y0);
-
     /**
      * React to an orbit delete request
      *
      * @param flag can be 0 (delete all) or 1 (delete last)
      */
     void onOrbitsDelete(int flag);
-
     /**
      * React to reset signal from HomeLeft
      *
@@ -191,7 +194,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param dummy not needed but signals cannot be empty
      */
     void onReset(int dummy);
-
     /**
      * React to the GCF evaluation signal
      *
@@ -204,7 +206,47 @@ class HomeRight : public Wt::WContainerWidget
      * @param prec      precision of computations for zeros of gcf
      */
     void onGcfEval(std::string fname, int pointdash, int npoints, int prec);
-
+    /**
+     * React to the curve plot signal
+     *
+     * Set curve variables in sphere (npoints, precision, dashes), call study to
+     * read the curve table, evaluate the curve in the different charts, and
+     * finally plot the curve in the sphere
+     *
+     * @param fname     name of file used in first maple evaluation
+     * @param pointdash plot points (0) or dashes (1) for curve
+     * @param npoints   number of points to plot
+     * @param prec      precision of computations for zeros of curve
+     */
+    void onCurvePlot(std::string fname, int pointdash, int npoints, int prec);
+    /**
+     * React to a curve delete request
+     *
+     * @param flag can be 0 (delete all) or 1 (delete last)
+     */
+    void onCurvesDelete(int flag);
+    /**
+     * React to the isocline plot signal
+     *
+     * Set isocline variables in sphere (npoints, precision, dashes), call study
+     * to
+     * read the isocline table, evaluate the isocline in the different charts,
+     * and
+     * finally plot the isocline in the sphere
+     *
+     * @param fname     name of file used in first maple evaluation
+     * @param pointdash plot points (0) or dashes (1) for isocline
+     * @param npoints   number of points to plot
+     * @param prec      precision of computations for zeros of isocline
+     */
+    void onIsoclinePlot(std::string fname, int pointdash, int npoints,
+                        int prec);
+    /**
+     * React to an isocline delete request
+     *
+     * @param flag can be 0 (delete all) or 1 (delete last)
+     */
+    void onIsoclinesDelete(int flag);
     /**
      * Add a parameter to the list and fill the label and value
      *
@@ -215,7 +257,6 @@ class HomeRight : public Wt::WContainerWidget
      * @param value value of the parameter
      */
     void addParameterWithValue(std::string label, std::string value);
-
     /**
      * Set loggedIn_ = true and show parameters tab
      */
@@ -228,11 +269,27 @@ class HomeRight : public Wt::WContainerWidget
      * @param logout boolean flag to set the login status to false if needed
      */
     void hideParamsTab(bool logout = false);
-
     /**
      * Create string vectors from parameter WLineEdits
      */
     void refreshParamStringVectors();
+    /**
+     * Refresh the plot into a sphere
+     *
+     * @param proj projection for the plot
+     */
+    void refreshPlotSphere(double proj);
+    /**
+     * Refresh the plot into a plane
+     *
+     * @param type identifies if the plot is R2, U1, U2, V1, or V2
+     * @param minx min x coord
+     * @param maxx max x coord
+     * @param miny min y coord
+     * @param maxy max y coord
+     */
+    void refreshPlotPlane(int type, double minx, double maxx, double miny,
+                          double maxy);
 
     /**
      * Vector of strings for labels
@@ -245,6 +302,9 @@ class HomeRight : public Wt::WContainerWidget
     std::vector<std::string> paramValues_;
 
   private:
+    /* script handler */
+    ScriptHandler *scriptHandler_;
+
     bool loggedIn_;
     bool orbitStarted_;
     int projection_;
@@ -284,6 +344,7 @@ class HomeRight : public Wt::WContainerWidget
 
     // plot tab
     WSphere *sphere_;
+    std::string sphereBasename_;
 
     Wt::WContainerWidget *plotContainer_;
     Wt::WText *plotCaption_;
@@ -319,6 +380,8 @@ class HomeRight : public Wt::WContainerWidget
     /* SIGNALS */
 
     Wt::Signal<bool, double, double> sphereClickedSignal_;
+    Wt::Signal<bool> curveConfirmedSignal_;
+    Wt::Signal<bool> isoclineConfirmedSignal_;
 };
 
 #endif // HOMERIGHT_H

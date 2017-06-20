@@ -20,6 +20,7 @@
 #include "HomeLeft.h"
 
 #include "MyLogger.h"
+#include "ScriptHandler.h"
 #include "custom.h"
 
 #include <boost/filesystem.hpp>
@@ -33,7 +34,6 @@
 #include <vector>
 
 #include <Wt/WAnchor>
-#include <Wt/WApplication>
 #include <Wt/WBreak>
 #include <Wt/WButtonGroup>
 #include <Wt/WComboBox>
@@ -44,8 +44,8 @@
 #include <Wt/WGroupBox>
 #include <Wt/WImage>
 #include <Wt/WLabel>
-#include <Wt/WLength>
 #include <Wt/WLineEdit>
+#include <Wt/WMessageBox>
 #include <Wt/WPushButton>
 #include <Wt/WRadioButton>
 #include <Wt/WSpinBox>
@@ -54,33 +54,31 @@
 
 using namespace Wt;
 
-HomeLeft::HomeLeft(WContainerWidget *parent)
-    : WContainerWidget(parent), loggedIn_(false), settingsContainer_(nullptr),
-      viewContainer_(nullptr), orbitsContainer_(nullptr), evaluated_(false)
+HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
+    : WContainerWidget(parent), settingsContainer_(nullptr),
+      viewContainer_(nullptr), orbitsContainer_(nullptr)
 {
+    loggedIn_ = false;
+    evaluated_ = false;
+    plotted_ = false;
+
+    evaluatedCurve_ = false;
+    nCurves_ = 0;
+
+    evaluatedIsocline_ = false;
+    nIsoclines_ = 0;
+
     // set CSS class for inline 50% of the screen
     setId("HomeLeft");
     setStyleClass(WString::fromUTF8("half-box-left"));
+
+    scriptHandler_ = scriptHandler;
 
     // set UI and connect signals
     setupUI();
     setupConnectors();
 
-    // set up maple parameters that will not change
-    mplParams.str_bindir = P4_BINDIR;
-    mplParams.str_p4m = mplParams.str_bindir + "p4.m";
-    mplParams.str_tmpdir = TMP_DIR;
-    mplParams.str_lypexe = "lyapunov";
-    mplParams.str_lypexe_mpf = "lyapunov_mpf";
-    mplParams.str_sepexe = "separatrice";
-    mplParams.str_exeprefix = "";
-    mplParams.str_platform = "LINUX";
-    mplParams.str_sumtablepath = mplParams.str_bindir + "../sumtables/";
-    mplParams.str_removecmd = "rm";
-    mplParams.str_simplify = "false";
-    mplParams.str_simplifycmd = MAPLE_SIMPLIFY_EXPRESSIONS;
-
-    globalLogger__.debug("HomeLeft :: created correctly");
+    g_globalLogger.debug("[HomeLeft] created correctly");
 }
 
 HomeLeft::~HomeLeft()
@@ -140,7 +138,7 @@ HomeLeft::~HomeLeft()
         tabs_ = nullptr;
     }
 
-    globalLogger__.debug("HomeLeft :: deleted correctly");
+    g_globalLogger.debug("[HomeLeft] deleted correctly");
 }
 
 void HomeLeft::setupUI()
@@ -240,7 +238,7 @@ void HomeLeft::setupUI()
     legend->resize(400, 300);
     t->bindWidget("img", legend);
 
-    globalLogger__.debug("HomeLeft :: UI set up");
+    g_globalLogger.debug("[HomeLeft] UI set up");
 }
 
 void HomeLeft::setupConnectors()
@@ -263,29 +261,29 @@ void HomeLeft::setupConnectors()
         delete saveFileResource_;
     }));
 
-    globalLogger__.debug("HomeLeft :: connectors set up");
+    g_globalLogger.debug("[HomeLeft] connectors set up");
 }
 
 void HomeLeft::fileUploaded()
 {
-    globalLogger__.debug("HomeLeft :: input file uploaded");
-    globalLogger__.debug("HomeLeft :: resetting UI before parsing file");
+    g_globalLogger.debug("[HomeLeft] input file uploaded");
+    g_globalLogger.debug("[HomeLeft] resetting UI before parsing file");
 
     resetUI();
     // input validation
     std::string extension = fileUploadWidget_->clientFileName().toUTF8().substr(
         fileUploadWidget_->clientFileName().toUTF8().find_last_of(".") + 1);
     if (extension != "inp") {
-        globalLogger__.warning(
-            "HomeLeft :: client tried to upload a not supported file type");
-        errorSignal_.emit("Filetype not accepted.");
+        g_globalLogger.warning(
+            "[HomeLeft] client tried to upload a not supported file type");
+        showErrorBox("Filetype not accepted.");
         return;
     }
 
     fileUploadName_ = fileUploadWidget_->spoolFileName();
 
 #ifdef ANTZ
-    globalLogger__.debug("[ANTZ] :: copying uploaded file to " +
+    g_globalLogger.debug("[HomeLeft] [ANTZ] copying uploaded file to " +
                          std::string(TMP_DIR));
 
     try {
@@ -305,14 +303,14 @@ void HomeLeft::fileUploaded()
     if (loggedIn_)
         tabs_->setCurrentWidget(settingsContainer_);
 
-    globalLogger__.debug("HomeLeft :: file read correctly.");
+    g_globalLogger.debug("[HomeLeft] file read correctly.");
 }
 
 void HomeLeft::fileTooLarge()
 {
-    globalLogger__.warning(
-        "HomeLeft :: Client tried to upload file too large.");
-    errorSignal_.emit("File too large.");
+    g_globalLogger.warning(
+        "[HomeLeft] Client tried to upload file too large.");
+    showErrorBox("File too large.");
 }
 
 void HomeLeft::parseInputFile()
@@ -331,8 +329,8 @@ void HomeLeft::parseInputFile()
             for (i = 0; i < 15; i++) {
                 std::getline(f, line);
                 if (line.empty()) {
-                    globalLogger__.error(
-                        "HomeLeft :: error reading input file, "
+                    g_globalLogger.error(
+                        "[HomeLeft] error reading input file, "
                         "expected more lines.");
                     break;
                 }
@@ -354,7 +352,7 @@ void HomeLeft::parseInputFile()
                     break;
                 case 3:
                     if (line[0] == '.')
-                        line = "0"+line;
+                        line = "0" + line;
                     epsilonSpinBox_->setValue(
                         (stod(line) > 0) ? stod(line) : EPSILON_DEFAULT);
                     break;
@@ -416,14 +414,14 @@ void HomeLeft::parseInputFile()
                         std::string label, value;
                         std::getline(f, label);
                         if (label.empty()) {
-                            globalLogger__.error("HomeLeft :: error reading "
+                            g_globalLogger.error("[HomeLeft] error reading "
                                                  "input file, wrong number of "
                                                  "parameters.");
                             break;
                         }
                         std::getline(f, value);
                         if (value.empty()) {
-                            globalLogger__.error("HomeLeft :: error reading "
+                            g_globalLogger.error("[HomeLeft] error reading "
                                                  "input file, wrong number of "
                                                  "parameters.");
                             break;
@@ -449,24 +447,24 @@ void HomeLeft::parseInputFile()
             }
         }
         if (f.eof() && i < 12) {
-            globalLogger__.error(
-                "HomeLeft :: EOF while reading input file uploaded with name " +
+            g_globalLogger.error(
+                "[HomeLeft] EOF while reading input file uploaded with name " +
                 fileUploadName_);
-            errorSignal_.emit("Invalid input file.");
+            showErrorBox("Invalid input file.");
             fileUploadName_ = std::string();
         } else if (f.bad()) {
-            globalLogger__.error("HomeLeft :: I/O error while reading input "
+            g_globalLogger.error("[HomeLeft] I/O error while reading input "
                                  "file uploaded with name " +
                                  fileUploadName_);
-            errorSignal_.emit("Invalid input file.");
+            showErrorBox("Invalid input file.");
             fileUploadName_ = std::string();
         } else {
             // prepareSaveFile();
-            globalLogger__.debug("HomeLeft :: Input file uploaded with name " +
+            g_globalLogger.debug("[HomeLeft] Input file uploaded with name " +
                                  fileUploadName_);
             if (!hasParams) {
-                errorSignal_.emit("File uploaded. Press the Evaluate button to "
-                                  "start computing.");
+                textSignal_.emit("File uploaded. Press the Evaluate button to "
+                                 "start computing.");
             }
         }
         f.close();
@@ -477,121 +475,121 @@ void HomeLeft::setOptions()
 {
     parent_->getMapleParams();
 
-    mplParams.str_xeq = xEquationInput_->text().toUTF8();
-    mplParams.str_yeq = yEquationInput_->text().toUTF8();
-    mplParams.str_gcf = gcfEquationInput_->text().empty()
-                            ? "0"
-                            : gcfEquationInput_->text().toUTF8();
-    mplParams.str_userf =
-        "[ " + mplParams.str_xeq + ", " + mplParams.str_yeq + " ]";
+    scriptHandler_->str_xeq_ = xEquationInput_->text().toUTF8();
+    scriptHandler_->str_yeq_ = yEquationInput_->text().toUTF8();
+    scriptHandler_->str_gcf_ = gcfEquationInput_->text().empty()
+                                   ? "0"
+                                   : gcfEquationInput_->text().toUTF8();
+    scriptHandler_->str_userf_ = "[ " + scriptHandler_->str_xeq_ + ", " +
+                                 scriptHandler_->str_yeq_ + " ]";
     if (!loggedIn_) {
-        mplParams.str_critpoints = "0";
-        mplParams.str_saveall = "false";
-        mplParams.str_numeric = "true";
-        mplParams.str_epsilon = "0.01";
-        mplParams.str_testsep = "false";
-        mplParams.str_precision = "8";
-        mplParams.str_precision0 = "0";
-        mplParams.str_taylor = "6";
-        mplParams.str_numericlevel = "10";
-        mplParams.str_maxlevel = "20";
-        mplParams.str_weaklevel = "0";
-        mplParams.str_userp = "1";
-        mplParams.str_userq = "1";
-        mplParams.time_limit = "30";
+        scriptHandler_->str_critpoints_ = "0";
+        scriptHandler_->str_saveall_ = "false";
+        scriptHandler_->str_numeric_ = "true";
+        scriptHandler_->str_epsilon_ = "0.01";
+        scriptHandler_->str_testsep_ = "false";
+        scriptHandler_->str_precision_ = "8";
+        scriptHandler_->str_precision0_ = "0";
+        scriptHandler_->str_taylor_ = "6";
+        scriptHandler_->str_numericlevel_ = "10";
+        scriptHandler_->str_maxlevel_ = "20";
+        scriptHandler_->str_weaklevel_ = "0";
+        scriptHandler_->str_userp_ = "1";
+        scriptHandler_->str_userq_ = "1";
+        scriptHandler_->time_limit_ = "30";
     } else {
         // validators
         double dval;
         int ival;
         // set options
-        mplParams.str_critpoints = "0";
-        mplParams.str_saveall = "false";
-        mplParams.str_numeric =
+        scriptHandler_->str_critpoints_ = "0";
+        scriptHandler_->str_saveall_ = "false";
+        scriptHandler_->str_numeric_ =
             (calculationsBtnGroup_->checkedId() == Numeric) ? "true" : "false";
         dval = epsilonSpinBox_->value();
         if (dval < EPSILON_MIN || dval > EPSILON_MAX) {
-            mplParams.str_epsilon = std::to_string(EPSILON_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_epsilon out of bounds, "
+            scriptHandler_->str_epsilon_ = std::to_string(EPSILON_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_epsilon out of bounds, "
                                    "setting to default value");
             epsilonSpinBox_->setValue(EPSILON_DEFAULT);
         } else {
-            mplParams.str_epsilon = std::to_string(dval);
+            scriptHandler_->str_epsilon_ = std::to_string(dval);
         }
-        mplParams.str_testsep =
+        scriptHandler_->str_testsep_ =
             (separatricesBtnGroup_->checkedId() == No) ? "false" : "true";
         ival = accuracySpinBox_->value();
         if (ival < ACCURACY_MIN || ival > ACCURACY_MAX) {
-            mplParams.str_precision = std::to_string(ACCURACY_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_precision out of bounds, "
+            scriptHandler_->str_precision_ = std::to_string(ACCURACY_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_precision out of bounds, "
                                    "setting to default value");
             accuracySpinBox_->setValue(ACCURACY_DEFAULT);
         } else {
-            mplParams.str_precision = std::to_string(ival);
+            scriptHandler_->str_precision_ = std::to_string(ival);
         }
         ival = precisionSpinBox_->value();
         if (ival < PRECISION_MIN || ival > PRECISION_MAX) {
-            mplParams.str_precision0 = std::to_string(PRECISION_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_precision0 out of bounds, "
+            scriptHandler_->str_precision0_ = std::to_string(PRECISION_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_precision0 out of bounds, "
                                    "setting to default value");
             precisionSpinBox_->setValue(PRECISION_DEFAULT);
         } else {
-            mplParams.str_precision0 = std::to_string(ival);
+            scriptHandler_->str_precision0_ = std::to_string(ival);
         }
         ival = levAppSpinBox_->value();
         if (ival < APPROX_MIN || ival > APPROX_MAX) {
-            mplParams.str_taylor = std::to_string(APPROX_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_taylor out of bounds, "
+            scriptHandler_->str_taylor_ = std::to_string(APPROX_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_taylor out of bounds, "
                                    "setting to default value");
             levAppSpinBox_->setValue(APPROX_DEFAULT);
         } else {
-            mplParams.str_taylor = std::to_string(ival);
+            scriptHandler_->str_taylor_ = std::to_string(ival);
         }
         ival = numericLevelSpinBox_->value();
         if (ival < NUMERIC_MIN || ival > NUMERIC_MAX) {
-            mplParams.str_numericlevel = std::to_string(NUMERIC_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_numericlevel out of "
+            scriptHandler_->str_numericlevel_ = std::to_string(NUMERIC_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_numericlevel out of "
                                    "bounds, setting to default value");
             numericLevelSpinBox_->setValue(NUMERIC_DEFAULT);
         } else {
-            mplParams.str_numericlevel = std::to_string(ival);
+            scriptHandler_->str_numericlevel_ = std::to_string(ival);
         }
         ival = maxLevelSpinBox_->value();
         if (ival < MAXIMUM_MIN || ival > MAXIMUM_MAX) {
-            mplParams.str_maxlevel = std::to_string(MAXIMUM_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_maxlevel out of bounds, "
+            scriptHandler_->str_maxlevel_ = std::to_string(MAXIMUM_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_maxlevel out of bounds, "
                                    "setting to default value");
             maxLevelSpinBox_->setValue(MAXIMUM_DEFAULT);
         } else {
-            mplParams.str_maxlevel = std::to_string(ival);
+            scriptHandler_->str_maxlevel_ = std::to_string(ival);
         }
         ival = maxWeakLevelSpinBox_->value();
         if (ival < WEAKNESS_MIN || ival > WEAKNESS_MAX) {
-            mplParams.str_weaklevel = std::to_string(WEAKNESS_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_weaklevel out of bounds, "
+            scriptHandler_->str_weaklevel_ = std::to_string(WEAKNESS_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_weaklevel out of bounds, "
                                    "setting to default value");
             maxWeakLevelSpinBox_->setValue(WEAKNESS_DEFAULT);
         } else {
-            mplParams.str_weaklevel = std::to_string(ival);
+            scriptHandler_->str_weaklevel_ = std::to_string(ival);
         }
         ival = PLWeightPSpinBox_->value();
         if (ival < PQ_MIN || ival > PQ_MAX) {
-            mplParams.str_userp = std::to_string(PQ_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_userp out of bounds, "
+            scriptHandler_->str_userp_ = std::to_string(PQ_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_userp out of bounds, "
                                    "setting to default value");
             PLWeightPSpinBox_->setValue(PQ_DEFAULT);
         } else {
-            mplParams.str_userp = std::to_string(ival);
+            scriptHandler_->str_userp_ = std::to_string(ival);
         }
         ival = PLWeightQSpinBox_->value();
         if (ival < PQ_MIN || ival > PQ_MAX) {
-            mplParams.str_userq = std::to_string(PQ_DEFAULT);
-            globalLogger__.warning("HomeLeft :: str_userq out of bounds, "
+            scriptHandler_->str_userq_ = std::to_string(PQ_DEFAULT);
+            g_globalLogger.warning("[HomeLeft] str_userq out of bounds, "
                                    "setting to default value");
             PLWeightQSpinBox_->setValue(PQ_DEFAULT);
         } else {
-            mplParams.str_userq = std::to_string(ival);
+            scriptHandler_->str_userq_ = std::to_string(ival);
         }
-        mplParams.time_limit = "180";
+        scriptHandler_->time_limit_ = "180";
     }
 }
 
@@ -599,7 +597,7 @@ void HomeLeft::evaluate()
 {
     // validate options
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
-        errorSignal_.emit(
+        showErrorBox(
             "Cannot evaluate yet, insert a vector field in the input forms.");
         return;
     }
@@ -607,36 +605,35 @@ void HomeLeft::evaluate()
     evaluated_ = true;
 
     setOptions();
-    if (prepareMapleFile(fileUploadName_, mplParams, parent_->paramLabels_,
-                         parent_->paramValues_)) {
-        globalLogger__.debug("HomeLeft :: filled Maple script " +
+    if (scriptHandler_->prepareMapleFile(fileUploadName_)) {
+        g_globalLogger.debug("[HomeLeft] filled Maple script " +
                              fileUploadName_);
     } else {
-        globalLogger__.error("HomeLeft :: Error creating Maple script.");
-        errorSignal_.emit("Error creating Maple script.");
+        g_globalLogger.error("[HomeLeft] Error creating Maple script.");
+        showErrorBox("Error creating Maple script.");
         return;
     }
 
-    siginfo_t status =
-        evaluateMapleScript(fileUploadName_, stoi(mplParams.time_limit));
+    siginfo_t status = scriptHandler_->evaluateMapleScript(
+        fileUploadName_, stoi(scriptHandler_->time_limit_));
     if (status.si_status == 0) {
-        globalLogger__.debug("HomeLeft :: Maple script executed");
+        g_globalLogger.debug("[HomeLeft] Maple script executed");
         evaluatedSignal_.emit(fileUploadName_);
     } else {
         if (status.si_code == CLD_EXITED) {
-            globalLogger__.error("HomeLeft :: Maple error");
+            g_globalLogger.error("[HomeLeft] Maple error");
             evaluatedSignal_.emit(fileUploadName_);
-            // errorSignal_.emit("Maple process terminated prematurely (.");
+            // showErrorBox("Maple process terminated prematurely (.");
         } else if (status.si_code == CLD_KILLED) {
-            globalLogger__.error("HomeLeft :: Maple process killed by system");
-            errorSignal_.emit("Maple process killed by system.");
+            g_globalLogger.error("[HomeLeft] Maple process killed by system");
+            showErrorBox("Maple process killed by system.");
         } else if (status.si_code == -2) {
-            globalLogger__.error(
-                "HomeLeft :: Maple computation ran out of time");
-            errorSignal_.emit("Computation ran out of time");
+            g_globalLogger.error(
+                "[HomeLeft] Maple computation ran out of time");
+            showErrorBox("Computation ran out of time");
         } else {
-            globalLogger__.error("HomeLeft :: unkwnown error in Maple process");
-            errorSignal_.emit("Unknown error when creating Maple process.");
+            g_globalLogger.error("[HomeLeft] unkwnown error in Maple process");
+            showErrorBox("Unknown error when creating Maple process.");
         }
     }
 }
@@ -644,10 +641,10 @@ void HomeLeft::evaluate()
 void HomeLeft::prepareSaveFile()
 {
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
-        errorSignal_.emit("Cannot prepare a Maple script without introducing a "
-                          "vector field first.");
-        globalLogger__.error(
-            "HomeLeft :: tried to save without entering a vector field");
+        showErrorBox("Cannot prepare a Maple script without introducing a "
+                     "vector field first.");
+        g_globalLogger.error(
+            "[HomeLeft] tried to save without entering a vector field");
         return;
     }
 
@@ -655,19 +652,18 @@ void HomeLeft::prepareSaveFile()
 
     if (fileUploadName_.empty()) {
         if (saveFileName_.empty()) {
-            saveFileName_ = randomFileName(TMP_DIR, ".txt");
+            saveFileName_ = scriptHandler_->randomFileName(TMP_DIR, ".txt");
             saveFileName_ += ".txt";
         }
     } else
         saveFileName_ = fileUploadName_;
 
     setOptions();
-    if (!fillSaveFile(saveFileName_, mplParams, parent_->paramLabels_,
-                      parent_->paramValues_)) {
-        globalLogger__.error("Cannot create save file " + saveFileName_);
-        errorSignal_.emit("Could not create save file. You can notify this "
-                          "error at osr@mat.uab.cat, sorry for the "
-                          "inconvenience.");
+    if (!scriptHandler_->fillSaveFile(saveFileName_)) {
+        g_globalLogger.error("Cannot create save file " + saveFileName_);
+        showErrorBox("Could not create save file. You can notify this "
+                     "error at osr@mat.uab.cat, sorry for the "
+                     "inconvenience.");
         return;
     }
 
@@ -689,10 +685,9 @@ void HomeLeft::prepareSaveFile()
 void HomeLeft::onPlot()
 {
     if (!evaluated_) {
-        errorSignal_.emit(
-            "Cannot read results, evaluate a vector field first.\n");
+        showErrorBox("Cannot read results, evaluate a vector field first.");
     } else {
-        globalLogger__.debug("HomeLeft :: sending onPlot signal");
+        g_globalLogger.debug("[HomeLeft] sending onPlot signal");
         if (!loggedIn_)
             onPlotSphereSignal_.emit(fileUploadName_, -1);
         else {
@@ -704,7 +699,7 @@ void HomeLeft::onPlot()
                     proj = PROJECTION_DEFAULT;
                     viewProjection_->setText(
                         std::to_string(PROJECTION_DEFAULT));
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("[HomeLeft] bad view settings, "
                                            "setting to default value");
                 }
                 onPlotSphereSignal_.emit(fileUploadName_, proj);
@@ -715,7 +710,7 @@ void HomeLeft::onPlot()
                 } catch (...) {
                     minx = -1;
                     viewMinX_->setText("-1");
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("[HomeLeft] bad view settings, "
                                            "setting to default value");
                 }
                 try {
@@ -723,7 +718,7 @@ void HomeLeft::onPlot()
                 } catch (...) {
                     maxx = 1;
                     viewMaxX_->setText("1");
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("[HomeLeft] bad view settings, "
                                            "setting to default value");
                 }
                 try {
@@ -731,7 +726,7 @@ void HomeLeft::onPlot()
                 } catch (...) {
                     miny = -1;
                     viewMinY_->setText("-1");
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("[HomeLeft] bad view settings, "
                                            "setting to default value");
                 }
                 try {
@@ -739,13 +734,14 @@ void HomeLeft::onPlot()
                 } catch (...) {
                     maxy = 1;
                     viewMaxY_->setText("1");
-                    globalLogger__.warning("HomeLeft :: bad view settings, "
+                    g_globalLogger.warning("[HomeLeft] bad view settings, "
                                            "setting to default value");
                 }
                 onPlotPlaneSignal_.emit(fileUploadName_,
                                         viewComboBox_->currentIndex(), minx,
                                         maxx, miny, maxy);
             }
+            plotted_ = true;
             tabs_->setCurrentWidget(viewContainer_);
         }
     }
@@ -767,10 +763,13 @@ void HomeLeft::showSettings()
     WDoubleValidator *validator;
     WTemplate *t;
 
-    /* evaluation options */
+    /*
+     * evaluation options
+     */
     settingsContainer_ = new WContainerWidget(this);
     settingsContainer_->setId("settingsContainer_");
-    tabs_->addTab(settingsContainer_, WString("Evaluation options"),
+    tabs_->addTab(settingsContainer_,
+                  WString::tr("homeleft.evaluation-options"),
                   WTabWidget::PreLoading);
 
     t = new WTemplate(WString::tr("template.homeleft-options"),
@@ -886,7 +885,9 @@ void HomeLeft::showSettings()
         }
     }));
 
-    /* view settings */
+    /*
+     * view settings
+     */
     viewContainer_ = new WContainerWidget(this);
     viewContainer_->setId("viewContainer_");
     tabs_->addTab(viewContainer_, WString::fromUTF8("View settings"),
@@ -964,7 +965,16 @@ void HomeLeft::showSettings()
         }
     }));
 
-    /* orbits integration */
+    // refresh button
+    refreshPlotButton_ = new WPushButton("Refresh plot", viewContainer_);
+    t->bindWidget("btn", refreshPlotButton_);
+
+    // connect refresh button to refresh plot signal
+    refreshPlotButton_->clicked().connect(this, &HomeLeft::onRefreshPlotBtn);
+
+    /*
+     * orbits integration
+     */
     orbitsContainer_ = new WContainerWidget(this);
     orbitsContainer_->setId("orbitsContainer_");
     tabs_->addTab(orbitsContainer_, "Orbits");
@@ -1013,7 +1023,9 @@ void HomeLeft::showSettings()
     orbitsDeleteAllBtn_->clicked().connect(this,
                                            &HomeLeft::onOrbitsDeleteAllBtn);
 
-    /* gcf settings */
+    /*
+     * gcf settings
+     */
     gcfContainer_ = new WContainerWidget(this);
     gcfContainer_->setId("gcfContainer_");
     tabs_->addTab(gcfContainer_, "Gcf");
@@ -1026,8 +1038,7 @@ void HomeLeft::showSettings()
     button = new WRadioButton("Dots", gcfContainer_);
     button->setInline(true);
     t->bindWidget("gcf-dots", button);
-    t->bindString("gcf-tooltip-dots",
-                  WString::tr("tooltip.gcf-appearance-dots"));
+    t->bindString("gcf-tooltip-dots", WString::tr("tooltip.appearance-dots"));
     gcfAppearanceBtnGrp_->addButton(button, Dots);
     button = new WRadioButton("Dashes", gcfContainer_);
     button->setInline(true);
@@ -1036,14 +1047,14 @@ void HomeLeft::showSettings()
         gcfAppearanceBtnGrp_->button(Dashes));
     t->bindWidget("gcf-dashes", button);
     t->bindString("gcf-tooltip-dashes",
-                  WString::tr("tooltip.gcf-appearance-dashes"));
+                  WString::tr("tooltip.appearance-dashes"));
 
     // n points
     gcfNPointsSpinBox_ = new WSpinBox(gcfContainer_);
     gcfNPointsSpinBox_->setRange(GCF_NP_MIN, GCF_NP_MAX);
     gcfNPointsSpinBox_->setValue(GCF_NP_DEFAULT);
     t->bindWidget("nps", gcfNPointsSpinBox_);
-    t->bindString("gcf-tooltip-nps", WString::tr("tooltip.gcf-npoints"));
+    t->bindString("gcf-tooltip-nps", WString::tr("tooltip.npoints"));
 
     // precision
     gcfPrecisionSpinBox_ = new WSpinBox(gcfContainer_);
@@ -1058,6 +1069,161 @@ void HomeLeft::showSettings()
 
     // connect gcf plot button to function
     gcfPlotBtn_->clicked().connect(this, &HomeLeft::onPlotGcfBtn);
+
+    /*
+     * Curves
+     */
+    curvesContainer_ = new WContainerWidget(this);
+    curvesContainer_->setId("curvesContainer_");
+    tabs_->addTab(curvesContainer_, "Curves");
+
+    t = new WTemplate(WString::tr("template.homeleft-curves"),
+                      curvesContainer_);
+    t->addFunction("id", WTemplate::Functions::id);
+
+    // curve equation
+    curvesLineEdit_ = new WLineEdit(curvesContainer_);
+    t->bindWidget("curve-eqn", curvesLineEdit_);
+    t->bindString("curve-tooltip-eqn", WString::tr("tooltip.curve-eqn"));
+
+    // appearance
+    curvesAppearanceBtnGrp_ = new WButtonGroup(curvesContainer_);
+    t->bindString("curve-tooltip-appearance",
+                  WString::tr("tooltip.appearance"));
+    button = new WRadioButton("Dots", curvesContainer_);
+    button->setInline(true);
+    t->bindWidget("curve-dots", button);
+    t->bindString("curve-tooltip-dots", WString::tr("tooltip.appearance-dots"));
+    curvesAppearanceBtnGrp_->addButton(button, Dots);
+    button = new WRadioButton("Dashes", curvesContainer_);
+    button->setInline(true);
+    curvesAppearanceBtnGrp_->addButton(button, Dashes);
+    curvesAppearanceBtnGrp_->setCheckedButton(
+        curvesAppearanceBtnGrp_->button(Dashes));
+    t->bindWidget("curve-dashes", button);
+    t->bindString("curve-tooltip-dashes",
+                  WString::tr("tooltip.appearance-dashes"));
+
+    // n points
+    curvesNPointsSpinBox_ = new WSpinBox(curvesContainer_);
+    curvesNPointsSpinBox_->setRange(CURVES_NP_MIN, CURVES_NP_MAX);
+    curvesNPointsSpinBox_->setValue(CURVES_NP_DEFAULT);
+    t->bindWidget("nps", curvesNPointsSpinBox_);
+    t->bindString("curve-tooltip-nps", WString::tr("tooltip.npoints"));
+
+    // precision
+    curvesPrecisionSpinBox_ = new WSpinBox(curvesContainer_);
+    curvesPrecisionSpinBox_->setRange(CURVES_PREC_MIN, CURVES_PREC_MAX);
+    curvesPrecisionSpinBox_->setValue(CURVES_PREC_DEFAULT);
+    t->bindWidget("curve-prc", curvesPrecisionSpinBox_);
+    t->bindString("curve-tooltip-prc", WString::tr("tooltip.prc"));
+
+    // plot curve button
+    curvesPlotBtn_ = new WPushButton("Plot curve", curvesContainer_);
+    t->bindWidget("curve-btn-plot", curvesPlotBtn_);
+    t->bindString("curve-tooltip-plot", WString::tr("tooltip.curve-plot"));
+
+    // delete one button
+    curvesDelOneBtn_ = new WPushButton("Delete last curve", curvesContainer_);
+    curvesDelOneBtn_->setStyleClass("btn btn-warning");
+    curvesDelOneBtn_->disable();
+    t->bindWidget("curve-btn-del-one", curvesDelOneBtn_);
+    t->bindString("curve-tooltip-del-one",
+                  WString::tr("tooltip.curve-del-one"));
+
+    // delete all button
+    curvesDelAllBtn_ = new WPushButton("Delete all curves", curvesContainer_);
+    curvesDelAllBtn_->setStyleClass("btn btn-danger");
+    curvesDelAllBtn_->disable();
+    t->bindWidget("curve-btn-del-all", curvesDelAllBtn_);
+    t->bindString("curve-tooltip-del-all",
+                  WString::tr("tooltip.curve-del-all"));
+
+    // connect buttons to functions
+    curvesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotCurvesBtn);
+    curvesDelOneBtn_->clicked().connect(this, &HomeLeft::onDelOneCurvesBtn);
+    curvesDelAllBtn_->clicked().connect(this, &HomeLeft::onDelAllCurvesBtn);
+
+    /*
+     * Isoclines
+     */
+    isoclinesContainer_ = new WContainerWidget(this);
+    isoclinesContainer_->setId("isoclinesContainer_");
+    tabs_->addTab(isoclinesContainer_, "Isoclines");
+
+    t = new WTemplate(WString::tr("template.homeleft-isoclines"),
+                      isoclinesContainer_);
+    t->addFunction("id", WTemplate::Functions::id);
+
+    // isocline slope
+    isoclinesLineEdit_ = new WLineEdit(isoclinesContainer_);
+    t->bindWidget("isocline-slope", isoclinesLineEdit_);
+    t->bindString("isocline-tooltip-slope",
+                  WString::tr("tooltip.isocline-slope"));
+
+    // appearance
+    isoclinesAppearanceBtnGrp_ = new WButtonGroup(isoclinesContainer_);
+    t->bindString("isocline-tooltip-appearance",
+                  WString::tr("tooltip.appearance"));
+    button = new WRadioButton("Dots", isoclinesContainer_);
+    button->setInline(true);
+    t->bindWidget("isocline-dots", button);
+    t->bindString("isocline-tooltip-dots",
+                  WString::tr("tooltip.appearance-dots"));
+    isoclinesAppearanceBtnGrp_->addButton(button, Dots);
+    button = new WRadioButton("Dashes", isoclinesContainer_);
+    button->setInline(true);
+    isoclinesAppearanceBtnGrp_->addButton(button, Dashes);
+    isoclinesAppearanceBtnGrp_->setCheckedButton(
+        isoclinesAppearanceBtnGrp_->button(Dashes));
+    t->bindWidget("isocline-dashes", button);
+    t->bindString("isocline-tooltip-dashes",
+                  WString::tr("tooltip.appearance-dashes"));
+
+    // n points
+    isoclinesNPointsSpinBox_ = new WSpinBox(isoclinesContainer_);
+    isoclinesNPointsSpinBox_->setRange(CURVES_NP_MIN, CURVES_NP_MAX);
+    isoclinesNPointsSpinBox_->setValue(CURVES_NP_DEFAULT);
+    t->bindWidget("nps", isoclinesNPointsSpinBox_);
+    t->bindString("isocline-tooltip-nps", WString::tr("tooltip.npoints"));
+
+    // precision
+    isoclinesPrecisionSpinBox_ = new WSpinBox(isoclinesContainer_);
+    isoclinesPrecisionSpinBox_->setRange(CURVES_PREC_MIN, CURVES_PREC_MAX);
+    isoclinesPrecisionSpinBox_->setValue(CURVES_PREC_DEFAULT);
+    t->bindWidget("isocline-prc", isoclinesPrecisionSpinBox_);
+    t->bindString("isocline-tooltip-prc", WString::tr("tooltip.prc"));
+
+    // plot isocline button
+    isoclinesPlotBtn_ = new WPushButton("Plot isocline", isoclinesContainer_);
+    t->bindWidget("isocline-btn-plot", isoclinesPlotBtn_);
+    t->bindString("isocline-tooltip-plot",
+                  WString::tr("tooltip.isocline-plot"));
+
+    // delete one button
+    isoclinesDelOneBtn_ =
+        new WPushButton("Delete last isocline", isoclinesContainer_);
+    isoclinesDelOneBtn_->setStyleClass("btn btn-warning");
+    isoclinesDelOneBtn_->disable();
+    t->bindWidget("isocline-btn-del-one", isoclinesDelOneBtn_);
+    t->bindString("isocline-tooltip-del-one",
+                  WString::tr("tooltip.isocline-del-one"));
+
+    // delete all button
+    isoclinesDelAllBtn_ =
+        new WPushButton("Delete all isoclines", isoclinesContainer_);
+    isoclinesDelAllBtn_->setStyleClass("btn btn-danger");
+    isoclinesDelAllBtn_->disable();
+    t->bindWidget("isocline-btn-del-all", isoclinesDelAllBtn_);
+    t->bindString("isocline-tooltip-del-all",
+                  WString::tr("tooltip.isocline-del-all"));
+
+    // connect buttons to functions
+    isoclinesPlotBtn_->clicked().connect(this, &HomeLeft::onPlotIsoclinesBtn);
+    isoclinesDelOneBtn_->clicked().connect(this,
+                                           &HomeLeft::onDelOneIsoclinesBtn);
+    isoclinesDelAllBtn_->clicked().connect(this,
+                                           &HomeLeft::onDelAllIsoclinesBtn);
 
     tabs_->setCurrentWidget(settingsContainer_);
 }
@@ -1085,10 +1251,26 @@ void HomeLeft::hideSettings()
         delete gcfContainer_;
         gcfContainer_ = nullptr;
     }
+    if (curvesContainer_ != nullptr) {
+        tabs_->removeTab(curvesContainer_);
+        delete curvesContainer_;
+        curvesContainer_ = nullptr;
+    }
+    if (isoclinesContainer_ != nullptr) {
+        tabs_->removeTab(isoclinesContainer_);
+        delete isoclinesContainer_;
+        isoclinesContainer_ = nullptr;
+    }
 }
 
 void HomeLeft::resetUI()
 {
+    evaluated_ = false;
+    plotted_ = false;
+
+    evaluatedCurve_ = false;
+    nCurves_ = 0;
+
     xEquationInput_->setText(std::string());
     yEquationInput_->setText(std::string());
     gcfEquationInput_->setText(std::string());
@@ -1099,6 +1281,65 @@ void HomeLeft::resetUI()
     }
 
     resetSignal_.emit(1);
+}
+
+void HomeLeft::onRefreshPlotBtn()
+{
+    if (!evaluated_) {
+        showErrorBox("Cannot read results, evaluate a vector field first.");
+    } else {
+        g_globalLogger.debug("[HomeLeft] sending refreshPlot signal");
+        if (viewComboBox_->currentIndex() == 0) {
+            double proj;
+            try {
+                proj = std::stod(viewProjection_->text());
+            } catch (...) {
+                proj = PROJECTION_DEFAULT;
+                viewProjection_->setText(std::to_string(PROJECTION_DEFAULT));
+                g_globalLogger.warning("[HomeLeft] bad view settings, "
+                                       "setting to default value");
+            }
+            refreshPlotSphereSignal_.emit(proj);
+        } else {
+            double minx, maxx, miny, maxy;
+            try {
+                minx = std::stod(viewMinX_->text());
+            } catch (...) {
+                minx = -1;
+                viewMinX_->setText("-1");
+                g_globalLogger.warning("[HomeLeft] bad view settings, "
+                                       "setting to default value");
+            }
+            try {
+                maxx = std::stod(viewMaxX_->text());
+            } catch (...) {
+                maxx = 1;
+                viewMaxX_->setText("1");
+                g_globalLogger.warning("[HomeLeft] bad view settings, "
+                                       "setting to default value");
+            }
+            try {
+                miny = std::stod(viewMinY_->text());
+            } catch (...) {
+                miny = -1;
+                viewMinY_->setText("-1");
+                g_globalLogger.warning("[HomeLeft] bad view settings, "
+                                       "setting to default value");
+            }
+            try {
+                maxy = std::stod(viewMaxY_->text());
+            } catch (...) {
+                maxy = 1;
+                viewMaxY_->setText("1");
+                g_globalLogger.warning("[HomeLeft] bad view settings, "
+                                       "setting to default value");
+            }
+            refreshPlotPlaneSignal_.emit(viewComboBox_->currentIndex(), minx,
+                                         maxx, miny, maxy);
+        }
+        plotted_ = true;
+        tabs_->setCurrentWidget(viewContainer_);
+    }
 }
 
 void HomeLeft::showOrbitsDialog(bool clickValid, double x, double y)
@@ -1137,7 +1378,7 @@ void HomeLeft::onOrbitsForwardsBtn()
     orbitsDeleteAllBtn_->enable();
     orbitsForwardsBtn_->disable();
 
-    globalLogger__.debug("HomeLeft :: orbit start (" +
+    g_globalLogger.debug("[HomeLeft] orbit start (" +
                          orbitsXLineEdit_->text().toUTF8() + "," +
                          orbitsYLineEdit_->text().toUTF8() + ")");
     orbitIntegrateSignal_.emit(1, std::stod(orbitsXLineEdit_->text()),
@@ -1157,7 +1398,7 @@ void HomeLeft::onOrbitsBackwardsBtn()
     orbitsDeleteAllBtn_->enable();
     orbitsBackwardsBtn_->disable();
 
-    globalLogger__.debug("HomeLeft :: orbit start (" +
+    g_globalLogger.debug("[HomeLeft] orbit start (" +
                          orbitsXLineEdit_->text().toUTF8() + "," +
                          orbitsYLineEdit_->text().toUTF8() + ")");
     orbitIntegrateSignal_.emit(-1, std::stod(orbitsXLineEdit_->text()),
@@ -1180,7 +1421,7 @@ void HomeLeft::onOrbitsDeleteOneBtn()
     // orbitsDeleteAllBtn_->disable();
     // orbitsDeleteOneBtn_->disable();
 
-    globalLogger__.debug("HomeLeft :: deleting last orbit");
+    g_globalLogger.debug("[HomeLeft] deleting last orbit");
     orbitDeleteSignal_.emit(1);
 }
 
@@ -1192,36 +1433,36 @@ void HomeLeft::onOrbitsDeleteAllBtn()
     orbitsForwardsBtn_->enable();
     orbitsBackwardsBtn_->enable();
 
-    globalLogger__.debug("HomeLeft :: deleting all orbits");
+    g_globalLogger.debug("[HomeLeft] deleting all orbits");
     orbitDeleteSignal_.emit(0);
 }
 
 void HomeLeft::onPlotGcfBtn()
 {
     if (!evaluated_) {
-        globalLogger__.warning(
-            "HomeLeft :: user tried to plot GCF for an un-evaluated VF");
-        errorSignal_.emit("Introduce and evaluate a vector field with a common "
-                          "factor first.");
-    } else if (mplParams.str_gcf == "0") {
-        globalLogger__.warning(
-            "HomeLeft :: user tried to plot a nonexistent GCF");
-        errorSignal_.emit(
+        g_globalLogger.warning(
+            "[HomeLeft] user tried to plot GCF for an un-evaluated VF");
+        showErrorBox("Introduce and evaluate a vector field with a common "
+                     "factor first.");
+    } else if (scriptHandler_->str_gcf_ == "0") {
+        g_globalLogger.warning(
+            "[HomeLeft] user tried to plot a nonexistent GCF");
+        showErrorBox(
             "The current vector field has no specified common factor.");
     } else {
         int npoints = gcfNPointsSpinBox_->value();
         if (npoints < GCF_NP_MIN || npoints > GCF_NP_MAX) {
             npoints = GCF_NP_DEFAULT;
-            globalLogger__.warning("HomeLeft :: gcf npoints out of bounds, "
+            g_globalLogger.warning("[HomeLeft] gcf npoints out of bounds, "
                                    "setting to default value");
         }
         int prec = gcfPrecisionSpinBox_->value();
-        if (prec < GCF_NP_MIN || prec > GCF_NP_MAX) {
+        if (prec < GCF_PREC_MIN || prec > GCF_PREC_MAX) {
             prec = GCF_PREC_DEFAULT;
-            globalLogger__.warning("HomeLeft :: gcf precision out of bounds, "
+            g_globalLogger.warning("[HomeLeft] gcf precision out of bounds, "
                                    "setting to default value");
         }
-        globalLogger__.debug("HomeLeft :: sent signal for GCF evaluation");
+        g_globalLogger.debug("[HomeLeft] sent signal for GCF evaluation");
         gcfSignal_.emit(fileUploadName_, gcfAppearanceBtnGrp_->checkedId(),
                         npoints, prec);
     }
@@ -1230,4 +1471,299 @@ void HomeLeft::onPlotGcfBtn()
 void HomeLeft::addParameterToList(std::string label, std::string value)
 {
     addParameterSignal_.emit(label, value);
+}
+
+void HomeLeft::showErrorBox(WString message)
+{
+    WMessageBox *errorBox = new WMessageBox("Error", message, Critical, Ok);
+    errorBox->buttonClicked().connect(std::bind([=]() { delete errorBox; }));
+    errorBox->show();
+}
+
+void HomeLeft::onPlotCurvesBtn()
+{
+    evaluatedCurve_ = false;
+
+    // check if vf is evaluated
+    if (!evaluated_) {
+        showErrorBox("Cannot plot curve yet, evaluate a vector field first.");
+        return;
+    }
+    if (!plotted_) {
+        showErrorBox("Click the main Plot button first\n"
+                     "in order to create the plot window.");
+        return;
+    }
+    // check if a curve has been introduced
+    std::string curve = curvesLineEdit_->text().toUTF8();
+    if (curve.empty() || curve == "") {
+        showErrorBox(
+            "The curve field must be filled with the equation of a curve.");
+        return;
+    }
+    // set the curve equation
+    scriptHandler_->str_curve_ = curve;
+
+    // prepare file where we transform curve equation into table
+    std::string fname;
+    if (fileUploadName_.empty()) {
+        fileUploadName_ =
+            scriptHandler_->randomFileName(TMP_DIR, "_curve_prep.mpl");
+    }
+    scriptHandler_->prepareCurveTable(fileUploadName_);
+    // execute file
+    siginfo_t status = scriptHandler_->evaluateMapleScript(
+        fileUploadName_ + "_curve_prep", stoi(scriptHandler_->time_limit_));
+    // check for errors in execution
+    if (status.si_status == 0) {
+        g_globalLogger.debug("[HomeLeft] Maple curve tables script executed");
+        curvesPlotBtn_->setEnabled(true);
+        evaluatedCurve_ = true;
+    } else {
+        if (status.si_code == CLD_EXITED) {
+            g_globalLogger.error("[HomeLeft] Maple error");
+            evaluatedSignal_.emit(fileUploadName_);
+        } else if (status.si_code == CLD_KILLED) {
+            g_globalLogger.error("[HomeLeft] Maple process killed by system");
+            showErrorBox("Maple process killed by system.");
+        } else if (status.si_code == -2) {
+            g_globalLogger.error(
+                "[HomeLeft] Maple computation ran out of time");
+            showErrorBox("Computation ran out of time");
+        } else {
+            g_globalLogger.error("[HomeLeft] unkwnown error in Maple process");
+            showErrorBox("Unknown error when creating Maple process.");
+        }
+        return;
+    }
+    // check input curve parameters
+    int npoints = curvesNPointsSpinBox_->value();
+    if (npoints < CURVES_NP_MIN || npoints > CURVES_NP_MAX) {
+        npoints = CURVES_NP_DEFAULT;
+        g_globalLogger.warning("[HomeLeft] curve npoints out of bounds, "
+                               "setting to default value");
+    }
+    int prec = curvesPrecisionSpinBox_->value();
+    if (prec < CURVES_PREC_MIN || prec > CURVES_PREC_MAX) {
+        prec = CURVES_PREC_DEFAULT;
+        g_globalLogger.warning("[HomeLeft] curve precision out of bounds, "
+                               "setting to default value");
+    }
+
+    // start curve evaluation and plotting
+    plotCurveSignal_.emit(fileUploadName_, curvesAppearanceBtnGrp_->checkedId(),
+                          npoints, prec);
+    // after this, wait for confirmation (HomeRight will send a curveConfirmed
+    // signal)
+}
+
+void HomeLeft::curveConfirmed(bool computed)
+{
+    if (computed) {
+        nCurves_++;
+        if (!curvesDelAllBtn_->isEnabled())
+            curvesDelAllBtn_->enable();
+        if (!curvesDelOneBtn_->isEnabled())
+            curvesDelOneBtn_->enable();
+        g_globalLogger.debug(
+            "[HomeLeft] evaluated and plotted curve, ncurves = " +
+            std::to_string(nCurves_));
+    } else {
+        showErrorBox(
+            "Error while computing curve, check inputs and try again.");
+    }
+}
+
+void HomeLeft::onDelOneCurvesBtn()
+{
+    if (nCurves_ <= 0)
+        return;
+
+    curveDeleteSignal_.emit(1);
+
+    if (--nCurves_ == 0) {
+        curvesDelOneBtn_->disable();
+        curvesDelAllBtn_->disable();
+    }
+
+    g_globalLogger.debug("[HomeLeft] deleted last curve, ncurves = " +
+                         std::to_string(nCurves_));
+}
+
+void HomeLeft::onDelAllCurvesBtn()
+{
+    if (nCurves_ <= 0)
+        return;
+
+    curveDeleteSignal_.emit(0);
+
+    nCurves_ = 0;
+    curvesDelOneBtn_->disable();
+    curvesDelAllBtn_->disable();
+
+    g_globalLogger.debug("[HomeLeft] deleted all curves, ncurves = " +
+                         std::to_string(nCurves_));
+}
+
+void HomeLeft::onPlotIsoclinesBtn()
+{
+    evaluatedIsocline_ = false;
+
+    // check if vf is evaluated
+    if (!evaluated_) {
+        showErrorBox(
+            "Cannot plot isocline yet, evaluate a vector field first.");
+        return;
+    }
+    if (!plotted_) {
+        showErrorBox("Click the main Plot button first\n"
+                     "in order to create the plot window.");
+        return;
+    }
+    // check if a isocline has been introduced
+    std::string isocline = isoclinesLineEdit_->text().toUTF8();
+    if (isocline.empty() || isocline == "") {
+        showErrorBox("The slope field must be filled with a valid value.");
+        return;
+    }
+    // set the isocline equation
+    if (isocline == "0") {
+        scriptHandler_->str_isocline_ = scriptHandler_->str_yeq_;
+    } else if (isocline == "INF" || isocline == "inf") {
+        scriptHandler_->str_isocline_ = scriptHandler_->str_xeq_;
+    } else {
+        bool done = false;
+        // look for isocline string in param labels
+        std::vector<std::string>::const_iterator it;
+        for (it = scriptHandler_->paramLabels_.begin();
+             it != scriptHandler_->paramLabels_.end(); it++) {
+            if (isocline == *it) {
+                scriptHandler_->str_isocline_ = "(" + scriptHandler_->str_yeq_ +
+                                                ")-(" + isocline + ")*(" +
+                                                scriptHandler_->str_xeq_ + ")";
+                done = true;
+            }
+        }
+        // check if value is correct
+        if (!done) {
+            double val;
+            try {
+                val = std::stod(isocline);
+                scriptHandler_->str_isocline_ = "(" + scriptHandler_->str_yeq_ +
+                                                ")-(" + isocline + ")*(" +
+                                                scriptHandler_->str_xeq_ + ")";
+            } catch (const std::invalid_argument &e) {
+                g_globalLogger.error("[HomeLeft] invalid isocline slope.");
+                showErrorBox("Invalid value for isocline slope");
+                return;
+            } catch (const std::out_of_range &e) {
+                g_globalLogger.error(
+                    "[HomeLeft] value for isocline slope out of double range");
+                showErrorBox(
+                    "[HomeLeft] the introduced value for the slope is "
+                    "out\nof double precision range.");
+                return;
+            }
+        }
+    }
+
+    // prepare file where we transform isocline equation into table
+    std::string fname;
+    if (fileUploadName_.empty()) {
+        fileUploadName_ =
+            scriptHandler_->randomFileName(TMP_DIR, "_isocline_prep.mpl");
+    }
+    scriptHandler_->prepareIsoclineTable(fileUploadName_);
+    // execute file
+    siginfo_t status = scriptHandler_->evaluateMapleScript(
+        fileUploadName_ + "_isocline_prep", stoi(scriptHandler_->time_limit_));
+    // check for errors in execution
+    if (status.si_status == 0) {
+        g_globalLogger.debug(
+            "[HomeLeft] Maple isocline tables script executed");
+        isoclinesPlotBtn_->setEnabled(true);
+        evaluatedIsocline_ = true;
+    } else {
+        if (status.si_code == CLD_EXITED) {
+            g_globalLogger.error("[HomeLeft] Maple error");
+            evaluatedSignal_.emit(fileUploadName_);
+        } else if (status.si_code == CLD_KILLED) {
+            g_globalLogger.error("[HomeLeft] Maple process killed by system");
+            showErrorBox("Maple process killed by system.");
+        } else if (status.si_code == -2) {
+            g_globalLogger.error(
+                "[HomeLeft] Maple computation ran out of time");
+            showErrorBox("Computation ran out of time");
+        } else {
+            g_globalLogger.error("[HomeLeft] unkwnown error in Maple process");
+            showErrorBox("Unknown error when creating Maple process.");
+        }
+        return;
+    }
+    // check input isocline parameters
+    int npoints = isoclinesNPointsSpinBox_->value();
+    if (npoints < CURVES_NP_MIN || npoints > CURVES_NP_MAX) {
+        npoints = CURVES_NP_DEFAULT;
+        g_globalLogger.warning("[HomeLeft] isocline npoints out of bounds, "
+                               "setting to default value");
+    }
+    int prec = isoclinesPrecisionSpinBox_->value();
+    if (prec < CURVES_PREC_MIN || prec > CURVES_PREC_MAX) {
+        prec = CURVES_PREC_DEFAULT;
+        g_globalLogger.warning("[HomeLeft] isocline precision out of bounds, "
+                               "setting to default value");
+    }
+
+    // start isocline evaluation and plotting
+    plotIsoclineSignal_.emit(fileUploadName_,
+                             isoclinesAppearanceBtnGrp_->checkedId(), npoints,
+                             prec);
+}
+
+void HomeLeft::isoclineConfirmed(bool computed)
+{
+    if (computed) {
+        nIsoclines_++;
+        if (!isoclinesDelAllBtn_->isEnabled())
+            isoclinesDelAllBtn_->enable();
+        if (!isoclinesDelOneBtn_->isEnabled())
+            isoclinesDelOneBtn_->enable();
+        g_globalLogger.debug(
+            "[HomeLeft] evaluated and plotted isocline, nisoclines = " +
+            std::to_string(nIsoclines_));
+    } else {
+        showErrorBox(
+            "Error while computing isocline, check inputs and try again.");
+    }
+}
+
+void HomeLeft::onDelOneIsoclinesBtn()
+{
+    if (nIsoclines_ <= 0)
+        return;
+
+    isoclineDeleteSignal_.emit(1);
+
+    if (--nIsoclines_ == 0) {
+        isoclinesDelOneBtn_->disable();
+        isoclinesDelAllBtn_->disable();
+    }
+
+    g_globalLogger.debug("[HomeLeft] deleted last isocline, nisoclines = " +
+                         std::to_string(nIsoclines_));
+}
+
+void HomeLeft::onDelAllIsoclinesBtn()
+{
+    if (nIsoclines_ <= 0)
+        return;
+
+    isoclineDeleteSignal_.emit(0);
+
+    nIsoclines_ = 0;
+    isoclinesDelOneBtn_->disable();
+    isoclinesDelAllBtn_->disable();
+
+    g_globalLogger.debug("[HomeLeft] deleted all isoclines, nisoclines = " +
+                         std::to_string(nIsoclines_));
 }

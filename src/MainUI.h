@@ -27,11 +27,12 @@
 
 #include <Wt/WContainerWidget>
 
+#include "HomeRight.h"
+#include "MyAuthWidget.h"
+#include "ScriptHandler.h"
 #include "Session.h"
 
 class HomeLeft;
-class HomeRight;
-class MyAuthWidget;
 
 /**
  * Auxiliary class for organizing the different elements of the UI
@@ -82,9 +83,6 @@ class MainUI : public Wt::WContainerWidget
 
     void getMapleParams();
 
-    std::vector<std::string> paramLabels_;
-    std::vector<std::string> paramValues_;
-
   private:
     Session session_;
     MyAuthWidget *authWidget_;
@@ -93,9 +91,12 @@ class MainUI : public Wt::WContainerWidget
     Wt::WText *loginText_;
     Wt::WAnchor *loginAnchor_;
     Wt::WAnchor *logoutAnchor_;
+    Wt::WAnchor *backAnchor_;
 
     Wt::WStackedWidget *mainStack_;
     Wt::WContainerWidget *pageContainer_;
+
+    ScriptHandler *scriptHandler_;
 
     HomeLeft *leftContainer_;
     HomeRight *rightContainer_;

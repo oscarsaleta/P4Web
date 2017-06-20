@@ -24,12 +24,22 @@
   </message>
 
   <message id="mainui.pagetitle">
-    <h1><strong>WP4</strong>: <small>Web</small> Planar Polynomial Phase Portraits</h1>
+    <h1>
+      <strong>WP4</strong>
+      :
+      <small>Web</small>
+      Planar Polynomial Phase Portraits
+    </h1>
   </message>
 
   <message id="mainui.disclaimer-copyright">
-    <p style="float:left">This is a development version. Please report any issues <a href="https://github.com/oscarsaleta/WP4/issues/new">in GitHub</a>
-    and feel free to <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send suggestions</a>.</p>
+    <p style="float:left">
+      This is a development version. Please report any issues
+      <a href="https://github.com/oscarsaleta/WP4/issues/new">in GitHub</a>
+      and feel free to
+      <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send suggestions</a>
+      .
+    </p>
     <p style="float:right">v@WP4_VERSION_MAJOR@.@WP4_VERSION_MINOR@.@WP4_VERSION_PATCH@ &copy; 2016-2017 Oscar Saleta.</p>
   </message>
 
@@ -45,18 +55,22 @@
     y'=
   </message>
 
+  <message id="homeleft.evaluation-options">Options</message>
+
   <message id="mainui.logintext-default">
-    Not logged in. 
+    Not logged in.
   </message>
 
   <message id="mainui.logintext-user">
-    Logged in as <b>{1}</b>. 
+    Logged in as
+    <b>{1}</b>
+    .
   </message>
 
   <!-- Tooltips -->
-  
+
   <message id="tooltip.vectorfield">
-    Enter your differential equations here. Use Maple syntax.  
+    Enter your differential equations here. Use Maple syntax.
   </message>
 
   <message id="tooltip.gcf">
@@ -70,11 +84,11 @@
   </message>
 
   <message id="tooltip.separatrices">
-    Enable/disable numeric testing of the Taylor developments for separatrices.  
+    Enable/disable numeric testing of the Taylor developments for separatrices.
   </message>
 
   <message id="tooltip.accuracy">
-    Number of digits required when checking for zero equality.  
+    Number of digits required when checking for zero equality.
   </message>
 
   <message id="tooltip.precision">
@@ -82,45 +96,45 @@
   </message>
 
   <message id="tooltip.epsilon">
-    Default epsilon for separatrices. Can take values from 0.01 to 0.3.  
+    Default epsilon for separatrices. Can take values from 0.01 to 0.3.
   </message>
 
   <message id="tooltip.approximation-level">
-    Order of Taylor approximation. This order is increased as long as the separatrice test fails.  
+    Order of Taylor approximation. This order is increased as long as the separatrice test fails.
   </message>
 
   <message id="tooltip.numeric-level">
-    Start working numerically when order of Taylor approximation reaches this level.  
+    Start working numerically when order of Taylor approximation reaches this level.
   </message>
 
   <message id="tooltip.maximum-level">
-    Maximum order of Taylor approximation. Stop testing separatrices at this order.  
+    Maximum order of Taylor approximation. Stop testing separatrices at this order.
   </message>
 
   <message id="tooltip.maximum-weakness-level">
-    Maximum order of Lyapunov constants to be computed for weak foci.  
+    Maximum order of Lyapunov constants to be computed for weak foci.
   </message>
 
   <message id="tooltip.poincare-lyapunov-weights">
-    Poincaré-Lyapunov weights.  
+    Poincaré-Lyapunov weights.
   </message>
 
   <message id="tooltip.homeleft-eval-button">
     Evaluate the vector field to find singularities, compute Lyapunov constants
-      and blow-up when needed, and integrate separatrices.  
+    and blow-up when needed, and integrate separatrices.
   </message>
 
   <message id="tooltip.homeleft-plot-button">
-    Plot the evaluated vector field in the Poincaré sphere.  
+    Plot the evaluated vector field in the Poincaré sphere.
   </message>
-  
+
   <message id="tooltip.homeleft-save-button">
     Save the current vector field and evaluation options to a P4 compatible
-      input file.  
+    input file.
   </message>
 
   <message id="tooltip.homeleft-clear-button">
-    Clear the x' and y' input fields.  
+    Clear the x' and y' input fields.
   </message>
 
   <message id="tooltip.homeright-addparam-button">
@@ -132,69 +146,107 @@
   </message>
 
   <message id="tooltip.homeright-full-button">
-    Show the full Maple output for the currently evaluated vector field.  
+    Show the full Maple output for the currently evaluated vector field.
   </message>
 
   <message id="tooltip.homeright-finite-button">
-    Show the output regarding finite singularities.  
+    Show the output regarding finite singularities.
   </message>
 
   <message id="tooltip.homeright-infinite-button">
-    Show the output regarding singularities at the infinite.  
+    Show the output regarding singularities at the infinite.
   </message>
 
   <message id="tooltip.homeright-clear-button">
-    Clear output text area.  
+    Clear output text area.
   </message>
 
   <message id="tooltip.view-select">
     Select view of study:
-      - Spherical: spherical projection of the plane (Poincare or Poincare-Lyapunov)
-      - Planar: planar view of a compact, rectangular region of the plane
-      - U1: View of the U1 chart. Infinity is shown as a line
-      - V1: View of the V1 chart. Infinity is shown as a line
-      - U2: View of the U2 chart. Infinity is shown as a line
-      - V2: View of the V2 chart. Infinity is shown as a line
+    - Spherical: spherical projection of the plane (Poincare or Poincare-Lyapunov)
+    - Planar: planar view of a compact, rectangular region of the plane
+    - U1: View of the U1 chart. Infinity is shown as a line
+    - V1: View of the V1 chart. Infinity is shown as a line
+    - U2: View of the U2 chart. Infinity is shown as a line
+    - V2: View of the V2 chart. Infinity is shown as a line
   </message>
 
   <message id="tooltip.view-projection">
-    Choose projection point of the Poincare sphere. Point must be <![CDATA[<]]> 0. Only relevant for sphere view.  
+    Choose projection point of the Poincare sphere. Point must be
+    <![CDATA[<]]>
+    0. Only relevant for sphere view.
   </message>
 
   <message id="tooltip.view-minx">
-    Minimum coordinate on the horizontal axis. Only relevant for plane or chart view.  
+    Minimum coordinate on the horizontal axis. Only relevant for plane or chart view.
   </message>
 
   <message id="tooltip.view-maxx">
-    Maximum coordinate on the horizontal axis. Only relevant for plane or chart view.  
+    Maximum coordinate on the horizontal axis. Only relevant for plane or chart view.
   </message>
 
   <message id="tooltip.view-miny">
-    Minimum coordinate on the vertical axis. Only relevant for plane or chart view.  
+    Minimum coordinate on the vertical axis. Only relevant for plane or chart view.
   </message>
 
   <message id="tooltip.view-maxy">
-    Maximum coordinate on the vertical axis. Only relevant for plane or chart view.  
+    Maximum coordinate on the vertical axis. Only relevant for plane or chart view.
   </message>
 
   <message id="tooltip.orbits-selected-point">
-    Start point of orbit. You can either select a point by clicking on the plot widget, or fill the form with a custom starting point.  
+    Start point of orbit. You can either select a point by clicking on the plot widget, or fill the form with a custom starting point.
   </message>
 
-  <message id="tooltip.gcf-appearance-dots">
-    Plot individual points of the curve of singularities.  
+  <message id="tooltip.appearance">
+    Select the appearance of the plot (can be dots or dashes).
   </message>
 
-  <message id="tooltip.gcf-appearance-dashes">
-    Connect points of the curve of singularities with small line segments.  
+  <message id="tooltip.appearance-dots">
+    Plot individual points of the curve.
   </message>
 
-  <message id="tooltip.gcf-npoints">
+  <message id="tooltip.appearance-dashes">
+    Connect points of the curve with small line segments.
+  </message>
+
+  <message id="tooltip.npoints">
     Number of points.
   </message>
 
-  <message id="tooltip.gcf-prc">
+  <message id="tooltip.prc">
     Required precision.
+  </message>
+
+  <message id="tooltip.curve-eqn">
+    Equation of the curve to plot (must be a polynomial). You can use the defined parameters in the equation.
+  </message>
+
+  <message id="tooltip.curve-plot">
+    Plot the curve.
+  </message>
+
+  <message id="tooltip.curve-del-one">
+    Delete last plotted curve.
+  </message>
+
+  <message id="tooltip.curve-del-all">
+    Delete all plotted curves.
+  </message>
+
+  <message id="tooltip.isocline-slope">
+    Slope of the insocline to plot. Can be any double value and also the keyword INF.
+  </message>
+
+  <message id="tooltip.isocline-plot">
+    Plot the isocline.
+  </message>
+
+  <message id="tooltip.isocline-del-one">
+    Delete last plotted isocline.
+  </message>
+
+  <message id="tooltip.isocline-del-all">
+    Delete all plotted isoclines.
   </message>
 
 </messages>

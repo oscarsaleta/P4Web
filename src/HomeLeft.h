@@ -140,11 +140,11 @@
 /**
  * Minimum value for number of points in gcf
  */
-#define GCF_NP_MIN 1
+#define GCF_NP_MIN 40
 /**
  * Maximum value for number of points in gcf
  */
-#define GCF_NP_MAX 99
+#define GCF_NP_MAX 40000
 /**
  * Default value for number of points in gcf
  */
@@ -161,6 +161,31 @@
  * Default value for zero precision in gcf
  */
 #define GCF_PREC_DEFAULT 12
+
+/**
+ * Minimum value for number of points in curves
+ */
+#define CURVES_NP_MIN 40
+/**
+ * Maximum value for number of points in curves
+ */
+#define CURVES_NP_MAX 40000
+/**
+ * Default value for number of points in curves
+ */
+#define CURVES_NP_DEFAULT 400
+/**
+ * Minimum value for zero precision in curves
+ */
+#define CURVES_PREC_MIN 8
+/**
+ * Maximum value for zero precision in curves
+ */
+#define CURVES_PREC_MAX 16
+/**
+ * Default value for zero precision in curves
+ */
+#define CURVES_PREC_DEFAULT 12
 
 /**
  * This class holds the UI from the left side of the website
@@ -183,7 +208,8 @@ class HomeLeft : public Wt::WContainerWidget
      * Constructor method for HomeLeft
      * @param parent Parent container widget
      */
-    HomeLeft(Wt::WContainerWidget *parent = 0);
+    HomeLeft(Wt::WContainerWidget *parent = 0,
+             ScriptHandler *scriptHandler = 0);
     /**
      * Destructor method for HomeLeft
      */
@@ -211,6 +237,24 @@ class HomeLeft : public Wt::WContainerWidget
     void showOrbitsDialog(bool clickValid, double x, double y);
 
     /**
+     * Receive confirmation that a curve has been computed
+     *
+     * Add a curve to the counter and activate the buttons if necessary
+     *
+     * @param computed boolean flag that tells if the curve has been computed
+     */
+    void curveConfirmed(bool computed);
+
+    /**
+     * Receive confirmation that an isocline has been computed
+     *
+     * Add an isocline to the counter and activate the buttons if necessary
+     *
+     * @param computed boolean flag that tells if the isocline has been computed
+     */
+    void isoclineConfirmed(bool computed);
+
+    /**
      * Method that sends a signal when a vector field is evaluated by Maple
      */
     Wt::Signal<std::string> &evaluatedSignal() { return evaluatedSignal_; }
@@ -218,7 +262,7 @@ class HomeLeft : public Wt::WContainerWidget
      * Method that sends a signal to print some message in the output text area
      * from #HomeRight
      */
-    Wt::Signal<std::string> &errorSignal() { return errorSignal_; }
+    Wt::Signal<std::string> &textSignal() { return textSignal_; }
     /**
      * Method that sends a signal when the plot button is pressed in order to
      * display a plot
@@ -281,19 +325,73 @@ class HomeLeft : public Wt::WContainerWidget
     {
         return addParameterSignal_;
     }
-    
-    /* MAPLE FILE PARAMETERS */
     /**
-     * struct where all the Maple settings are stored
+     * Signal to plot curve
+     *
+     * Is sent after pressing plot. This causes the curve table to be read, and
+     * then to perform all the chained executions for different charts, and
+     * finally to plot the curve.
      */
-    mapleParamsStruct mplParams;
+    Wt::Signal<std::string, int, int, int> &plotCurveSignal()
+    {
+        return plotCurveSignal_;
+    }
+    /**
+     * Signal to delete curves
+     *
+     * The int can be 1 (delete last) or 0 (delete all)
+     */
+    Wt::Signal<int> &curveDeleteSignal() { return curveDeleteSignal_; }
+    /**
+     * Signal to plot isocline
+     *
+     * Is sent after pressing plot. This causes the isocline table to be read,
+     * and then to perform all the chained executions for different charts, and
+     * finally to plot the isocline.
+     */
+    Wt::Signal<std::string, int, int, int> &plotIsoclineSignal()
+    {
+        return plotIsoclineSignal_;
+    }
+    /**
+     * Signal to delete isoclines
+     *
+     * The int can be 1 (delete last) or 0 (delete all)
+     */
+    Wt::Signal<int> &isoclineDeleteSignal() { return isoclineDeleteSignal_; }
+    /**
+     * Signal to tell HomeRight to refresh the plot and draw a sphere
+     */
+    Wt::Signal<double> &refreshPlotSphereSignal()
+    {
+        return refreshPlotSphereSignal_;
+    }
+    /**
+     * Signal to tell HomeRight to refresh the plot and draw a plane
+     */
+    Wt::Signal<int, double, double, double, double> &refreshPlotPlaneSignal()
+    {
+        return refreshPlotPlaneSignal_;
+    }
 
     /* MainUI parent */
     MainUI *parent_;
 
   private:
-    bool evaluated_;
-    int nParams_;
+    bool loggedIn_;  // tells if a user is logged in
+    bool evaluated_; // tells if the vf has been evaluated
+    bool plotted_;   // tells if the plot button has been pressed
+
+    int nCurves_;         // number of curves that have been plotted
+    bool evaluatedCurve_; // tells if a curve has been evaluated
+
+    int nIsoclines_;
+    bool evaluatedIsocline_;
+
+    int nParams_; // tells number of parameters added by user
+
+    /* Script Handler */
+    ScriptHandler *scriptHandler_;
 
     /* PUBLIC UI (no need to log in) */
     Wt::WGroupBox *equationsBox_;
@@ -314,7 +412,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WTabWidget *tabs_;
 
     /* PRIVATE UI (log in needed) */
-    // evaluation parameters
+    // evaluation parameters tab
     Wt::WContainerWidget *settingsContainer_;
     Wt::WButtonGroup *calculationsBtnGroup_;
     enum Calculations { Algebraic = 0, Numeric = 1 };
@@ -329,7 +427,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WSpinBox *maxWeakLevelSpinBox_;
     Wt::WSpinBox *PLWeightPSpinBox_;
     Wt::WSpinBox *PLWeightQSpinBox_;
-    // view settings
+    // view settings tab
     Wt::WContainerWidget *viewContainer_;
     Wt::WComboBox *viewComboBox_;
     Wt::WLineEdit *viewProjection_;
@@ -337,7 +435,8 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WLineEdit *viewMinY_;
     Wt::WLineEdit *viewMaxX_;
     Wt::WLineEdit *viewMaxY_;
-    // orbits dialog
+    Wt::WPushButton *refreshPlotButton_;
+    // orbits tab
     Wt::WContainerWidget *orbitsContainer_;
     Wt::WLineEdit *orbitsXLineEdit_;
     Wt::WLineEdit *orbitsYLineEdit_;
@@ -347,17 +446,35 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WPushButton *orbitsDeleteOneBtn_;
     Wt::WPushButton *orbitsDeleteAllBtn_;
     bool orbitsStartSelected_;
-    // gcf dialog
+    // gcf tab
     Wt::WContainerWidget *gcfContainer_;
     Wt::WButtonGroup *gcfAppearanceBtnGrp_;
     enum Appearance { Dots = 0, Dashes = 1 };
     Wt::WSpinBox *gcfNPointsSpinBox_;
     Wt::WSpinBox *gcfPrecisionSpinBox_;
     Wt::WPushButton *gcfPlotBtn_;
+    // curves tab
+    Wt::WContainerWidget *curvesContainer_;
+    Wt::WLineEdit *curvesLineEdit_;
+    Wt::WButtonGroup *curvesAppearanceBtnGrp_;
+    Wt::WSpinBox *curvesNPointsSpinBox_;
+    Wt::WSpinBox *curvesPrecisionSpinBox_;
+    Wt::WPushButton *curvesPlotBtn_;
+    Wt::WPushButton *curvesDelOneBtn_;
+    Wt::WPushButton *curvesDelAllBtn_;
+    // isoclines tab
+    Wt::WContainerWidget *isoclinesContainer_;
+    Wt::WLineEdit *isoclinesLineEdit_;
+    Wt::WButtonGroup *isoclinesAppearanceBtnGrp_;
+    Wt::WSpinBox *isoclinesNPointsSpinBox_;
+    Wt::WSpinBox *isoclinesPrecisionSpinBox_;
+    Wt::WPushButton *isoclinesPlotBtn_;
+    Wt::WPushButton *isoclinesDelOneBtn_;
+    Wt::WPushButton *isoclinesDelAllBtn_;
 
     /* SIGNALS */
     Wt::Signal<std::string> evaluatedSignal_;
-    Wt::Signal<std::string> errorSignal_;
+    Wt::Signal<std::string> textSignal_;
     Wt::Signal<std::string, double> onPlotSphereSignal_;
     Wt::Signal<std::string, int, double, double, double, double>
         onPlotPlaneSignal_;
@@ -366,6 +483,12 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<int> resetSignal_;
     Wt::Signal<std::string, int, int, int> gcfSignal_;
     Wt::Signal<std::string, std::string> addParameterSignal_;
+    Wt::Signal<std::string, int, int, int> plotCurveSignal_;
+    Wt::Signal<int> curveDeleteSignal_;
+    Wt::Signal<std::string, int, int, int> plotIsoclineSignal_;
+    Wt::Signal<int> isoclineDeleteSignal_;
+    Wt::Signal<double> refreshPlotSphereSignal_;
+    Wt::Signal<int, double, double, double, double> refreshPlotPlaneSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -391,6 +514,8 @@ class HomeLeft : public Wt::WContainerWidget
     void onPlot();
     // set default/widget evaluation parameters
     void setOptions();
+    // react to button presses in view tab
+    void onRefreshPlotBtn();
     // react to button presses in orbits tab
     void onOrbitsDialogChange();
     void onOrbitsForwardsBtn();
@@ -400,8 +525,16 @@ class HomeLeft : public Wt::WContainerWidget
     void onOrbitsDeleteAllBtn();
     // react to button presses in gcf tab
     void onPlotGcfBtn();
-
-    bool loggedIn_;
+    // show an error message box
+    void showErrorBox(Wt::WString message);
+    // react to button clicks in curves tab
+    void onPlotCurvesBtn();
+    void onDelOneCurvesBtn();
+    void onDelAllCurvesBtn();
+    // react to button clicks in isoclines tab
+    void onPlotIsoclinesBtn();
+    void onDelOneIsoclinesBtn();
+    void onDelAllIsoclinesBtn();
 };
 
 #endif // HOMELEFT_H

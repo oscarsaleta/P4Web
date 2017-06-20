@@ -22,109 +22,106 @@
 #include "file_tab.h"
 
 #include <fstream>
-#include <iostream>
-#include <string>
 
-#include <Wt/WBreak>
-#include <Wt/WEvent>
-#include <Wt/WGroupBox>
-#include <Wt/WImage>
 #include <Wt/WLineEdit>
-#include <Wt/WMenuItem>
+#include <Wt/WMessageBox>
 #include <Wt/WPushButton>
 #include <Wt/WScrollArea>
 #include <Wt/WTabWidget>
 #include <Wt/WTemplate>
+#include <Wt/WTextArea>
 #include <Wt/WToolBar>
 
 using namespace Wt;
 
-HomeRight::HomeRight(WContainerWidget *parent)
+HomeRight::HomeRight(WContainerWidget *parent, ScriptHandler *s)
     : WContainerWidget(parent), plotCaption_(nullptr), sphere_(nullptr),
       orbitStarted_(false), loggedIn_(false)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
 
-    globalLogger__.debug("HomeRight :: setting up UI...");
+    scriptHandler_ = s;
+
+    g_globalLogger.debug("[HomeRight] setting up UI...");
     setupUI();
-    globalLogger__.debug("HomeRight :: setting up connectors...");
+    g_globalLogger.debug("[HomeRight] setting up connectors...");
     setupConnectors();
-    globalLogger__.debug("HomeRight :: created correctly");
+    g_globalLogger.debug("[HomeRight] created correctly");
 }
 
 HomeRight::~HomeRight()
 {
     // output tab
-    if (fullResButton_!=nullptr){
+    if (fullResButton_ != nullptr) {
         delete fullResButton_;
-        fullResButton_=nullptr;
-        }
-    if (finResButton_!=nullptr){
+        fullResButton_ = nullptr;
+    }
+    if (finResButton_ != nullptr) {
         delete finResButton_;
-        finResButton_=nullptr;
-        }
-    if (infResButton_!=nullptr){
+        finResButton_ = nullptr;
+    }
+    if (infResButton_ != nullptr) {
         delete infResButton_;
-        infResButton_=nullptr;
-        }
-    if (clearOutputButton_!=nullptr){
+        infResButton_ = nullptr;
+    }
+    if (clearOutputButton_ != nullptr) {
         delete clearOutputButton_;
-        clearOutputButton_=nullptr;
-        }
-    if (outputButtonsToolbar_!=nullptr){
+        clearOutputButton_ = nullptr;
+    }
+    if (outputButtonsToolbar_ != nullptr) {
         delete outputButtonsToolbar_;
-        outputButtonsToolbar_=nullptr;
-        }
-    if (outputTextArea_!=nullptr){
+        outputButtonsToolbar_ = nullptr;
+    }
+    if (outputTextArea_ != nullptr) {
         delete outputTextArea_;
-        outputTextArea_=nullptr;
-        }
-    if (outputContainer_!=nullptr){
+        outputTextArea_ = nullptr;
+    }
+    if (outputContainer_ != nullptr) {
         delete outputContainer_;
-        outputContainer_=nullptr;
-        }
+        outputContainer_ = nullptr;
+    }
 
     // plot tab
-    if (sphere_!=nullptr){
+    if (sphere_ != nullptr) {
         delete sphere_;
-        sphere_=nullptr;
-        }
-    if (plotCaption_!=nullptr){
+        sphere_ = nullptr;
+    }
+    if (plotCaption_ != nullptr) {
         delete plotCaption_;
-        plotCaption_=nullptr;
-        }
-    if (plotContainer_!=nullptr){
+        plotCaption_ = nullptr;
+    }
+    if (plotContainer_ != nullptr) {
         delete plotContainer_;
-        plotContainer_=nullptr;
-        }
+        plotContainer_ = nullptr;
+    }
 
     // parameters tab
-    if (addParamBtn_!=nullptr){
+    if (addParamBtn_ != nullptr) {
         delete addParamBtn_;
-        addParamBtn_=nullptr;
-        }
-    if (delParamBtn_!=nullptr){
+        addParamBtn_ = nullptr;
+    }
+    if (delParamBtn_ != nullptr) {
         delete delParamBtn_;
-        delParamBtn_=nullptr;
-        }
+        delParamBtn_ = nullptr;
+    }
     std::vector<std::string>().swap(paramLabels_);
     std::vector<std::string>().swap(paramValues_);
     leLabelsVector_.clear();
     leValuesVector_.clear();
     templatesVector_.clear();
-    if (paramsScrollArea_!=nullptr){
+    if (paramsScrollArea_ != nullptr) {
         delete paramsScrollArea_;
-        paramsScrollArea_=nullptr;
-        }
+        paramsScrollArea_ = nullptr;
+    }
 
     // tab widget
-    if (tabWidget_!=nullptr){
+    if (tabWidget_ != nullptr) {
         delete tabWidget_;
-        tabWidget_=nullptr;
-        }
+        tabWidget_ = nullptr;
+    }
 
-    globalLogger__.debug("HomeRight :: deleted correctly");
+    g_globalLogger.debug("[HomeRight] deleted correctly");
 }
 
 void HomeRight::setupUI()
@@ -242,7 +239,7 @@ void HomeRight::setupUI()
 
     tabWidget_->setCurrentIndex(0);
     tabWidget_->setTabHidden(2, true);
-    globalLogger__.debug("HomeRight :: UI set up");
+    g_globalLogger.debug("[HomeRight] UI set up");
 }
 
 void HomeRight::setupConnectors()
@@ -260,7 +257,7 @@ void HomeRight::setupConnectors()
     plotSeparatricesButton_->clicked().connect(this,&HomeRight::plotSeparatrices);
     clearPlotButton_->clicked().connect(this,&HomeRight::clearPlot);*/
 
-    globalLogger__.debug("HomeRight :: connectors set up");
+    g_globalLogger.debug("[HomeRight] connectors set up");
 }
 
 void HomeRight::readResults(std::string fileName)
@@ -312,52 +309,56 @@ void HomeRight::fullResults()
     outputTextAreaContent_ = fullResults_;
     outputTextArea_->setText(outputTextAreaContent_);
     tabWidget_->setCurrentIndex(0);
-    globalLogger__.debug("HomeRight :: showing output panel");
+    g_globalLogger.debug("[HomeRight] showing output panel");
 }
 
 void HomeRight::showFinResults()
 {
     outputTextAreaContent_ = finResults_;
     outputTextArea_->setText(outputTextAreaContent_);
-    globalLogger__.debug("HomeRight :: showing finite results");
+    g_globalLogger.debug("[HomeRight] showing finite results");
 }
 
 void HomeRight::showInfResults()
 {
     outputTextAreaContent_ = infResults_;
     outputTextArea_->setText(outputTextAreaContent_);
-    globalLogger__.debug("HomeRight :: showing infinite results");
+    g_globalLogger.debug("[HomeRight] showing infinite results");
 }
 
 void HomeRight::clearResults()
 {
     outputTextArea_->setText("");
     outputTextAreaContent_ = "";
-    globalLogger__.debug("HomeRight :: cleared output panel");
+    g_globalLogger.debug("[HomeRight] cleared output panel");
 }
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
 {
-    if (sphere_!=nullptr){
+    if (sphere_ != nullptr) {
         delete sphere_;
-        sphere_=nullptr;
-        }
-
-    sphere_ = new WSphere(plotContainer_, 550, 550, basename, projection);
+        sphere_ = nullptr;
+    }
+    sphereBasename_ = basename;
+    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550, basename,
+                          projection);
     setupSphereAndPlot();
+    g_globalLogger.debug("[HomeRight] reacted to onSpherePlot signal");
+    
 }
 
 void HomeRight::onPlanePlot(std::string basename, int type, double minx,
                             double maxx, double miny, double maxy)
 {
-    if (sphere_!=nullptr){
+    if (sphere_ != nullptr) {
         delete sphere_;
-        sphere_=nullptr;
-        }
-
-    sphere_ = new WSphere(plotContainer_, 550, 550, basename, type, minx, maxx,
-                          miny, maxy);
+        sphere_ = nullptr;
+    }
+    sphereBasename_ = basename;
+    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550, basename,
+                          type, minx, maxx, miny, maxy);
     setupSphereAndPlot();
+    g_globalLogger.debug("[HomeRight] reacted to onPlanePlot signal");
 }
 
 void HomeRight::setupSphereAndPlot()
@@ -366,10 +367,10 @@ void HomeRight::setupSphereAndPlot()
     sphere_->setMargin(5, Top);
     plotContainer_->addWidget(sphere_);
 
-    if (plotCaption_!=nullptr){
+    if (plotCaption_ != nullptr) {
         delete plotCaption_;
-        plotCaption_=nullptr;
-        }
+        plotCaption_ = nullptr;
+    }
 
     plotCaption_ = new WText(plotContainer_);
     plotCaption_->setId("plotCaption_");
@@ -381,7 +382,6 @@ void HomeRight::setupSphereAndPlot()
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
-    globalLogger__.debug("HomeRight :: reacted to onPlot signal");
 }
 
 void HomeRight::mouseMovedEvent(WString caption)
@@ -396,10 +396,10 @@ void HomeRight::sphereClicked(bool clickValid, double x, double y)
 
 void HomeRight::onReset(int dummy)
 {
-    if (sphere_!=nullptr){
+    if (sphere_ != nullptr) {
         delete sphere_;
-        sphere_=nullptr;
-        }
+        sphere_ = nullptr;
+    }
 
     outputTextAreaContent_ = std::string();
     outputTextArea_->setText(outputTextAreaContent_);
@@ -419,11 +419,11 @@ void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
         orbitStarted_ = sphere_->startOrbit(x0, y0, true);
 
     if (dir == 1)
-        globalLogger__.debug("HomeRight :: integrating forwards...");
+        g_globalLogger.debug("[HomeRight] integrating forwards...");
     else if (dir == -1)
-        globalLogger__.debug("HomeRight :: integrating backwards...");
+        g_globalLogger.debug("[HomeRight] integrating backwards...");
     else
-        globalLogger__.debug("HomeRight :: continuing integration...");
+        g_globalLogger.debug("[HomeRight] continuing integration...");
 
     sphere_->integrateOrbit(dir);
 
@@ -437,13 +437,13 @@ void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
 void HomeRight::onOrbitsDelete(int flag)
 {
     if (sphere_ == nullptr || sphere_->study_ == nullptr ||
-        sphere_->study_->first_orbit == nullptr ||
-        sphere_->study_->current_orbit == nullptr)
+        sphere_->study_->first_orbit_ == nullptr ||
+        sphere_->study_->current_orbit_ == nullptr)
         return;
 
     if (flag == 0) {
-        sphere_->study_->deleteOrbit(sphere_->study_->first_orbit);
-        sphere_->study_->first_orbit = nullptr;
+        sphere_->study_->deleteOrbit(sphere_->study_->first_orbit_);
+        sphere_->study_->first_orbit_ = nullptr;
     } else if (flag == 1)
         sphere_->deleteLastOrbit();
 
@@ -456,7 +456,7 @@ void HomeRight::onOrbitsDelete(int flag)
 void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints,
                           int prec)
 {
-    globalLogger__.debug("HomeRight :: received gcf signal with fname " +
+    g_globalLogger.debug("[HomeRight] received gcf signal with fname " +
                          fname);
     if (sphere_ == nullptr)
         return;
@@ -561,16 +561,15 @@ void HomeRight::hideParamsTab(bool logout)
     if (logout)
         loggedIn_ = false;
     /* in case there are parameters defined, remove them */
-    if (paramLabels_.size() != 0) {
-        std::vector<std::string>().swap(paramLabels_);
+    if (!scriptHandler_->paramLabels_.empty()) {
+        std::vector<std::string>().swap(scriptHandler_->paramLabels_);
     }
-    if (paramValues_.size() != 0) {
-        std::vector<std::string>().swap(paramValues_);
+    if (!scriptHandler_->paramValues_.empty()) {
+        std::vector<std::string>().swap(scriptHandler_->paramValues_);
     }
-    while (!leLabelsVector_.empty() && !leValuesVector_.empty() &&
-           !templatesVector_.empty()) {
-        delParameter();
-    }
+    leLabelsVector_.clear();
+    leValuesVector_.clear();
+    templatesVector_.clear();
     tabWidget_->setTabHidden(2, true);
     if (tabWidget_->currentIndex() != 2)
         tabWidget_->setCurrentIndex(2);
@@ -583,11 +582,11 @@ void HomeRight::refreshParamStringVectors()
 
     // correctly delete and free all memory from these vectors
     // if they are not empty
-    if (paramLabels_.size() != 0) {
-        std::vector<std::string>().swap(paramLabels_);
+    if (!scriptHandler_->paramLabels_.empty()) {
+        std::vector<std::string>().swap(scriptHandler_->paramLabels_);
     }
-    if (paramValues_.size() != 0) {
-        std::vector<std::string>().swap(paramValues_);
+    if (!scriptHandler_->paramValues_.empty()) {
+        std::vector<std::string>().swap(scriptHandler_->paramValues_);
     }
 
     std::vector<boost::shared_ptr<WLineEdit>>::const_iterator it1;
@@ -597,7 +596,223 @@ void HomeRight::refreshParamStringVectors()
          it1++, it2++) {
         if ((*it1)->text().empty() || (*it2)->text().empty())
             continue;
-        paramLabels_.push_back((*it1)->text().toUTF8());
-        paramValues_.push_back((*it2)->text().toUTF8());
+        scriptHandler_->paramLabels_.push_back((*it1)->text().toUTF8());
+        scriptHandler_->paramValues_.push_back((*it2)->text().toUTF8());
     }
+}
+
+void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
+                            int prec)
+{
+    g_globalLogger.debug("[HomeRight] received curve signal with fname " +
+                         fname);
+
+    if (sphere_ == nullptr) {
+        return;
+        curveConfirmedSignal_.emit(false);
+    }
+
+    // 1. read curve tables
+    if (!sphere_->study_->readCurve(fname)) {
+        g_globalLogger.error("[HomeRight] cannot read curve");
+        curveConfirmedSignal_.emit(false);
+        return;
+    }
+
+    // 2. create and execute maple scripts for charts
+    sphere_->curveDashes_ = pointdash;
+    sphere_->curveFname_ = fname;
+    sphere_->curveNPoints_ = npoints;
+    sphere_->curvePrec_ = prec;
+    sphere_->plotDone_ = false;
+
+    int result =
+        sphere_->evalCurveStart(sphere_->curveFname_, sphere_->curveDashes_,
+                                sphere_->curveNPoints_, sphere_->curvePrec_);
+    if (!result) {
+        g_globalLogger.error("[HomeRight] cannot evaluate curve");
+        curveConfirmedSignal_.emit(false);
+        return;
+    } else {
+        int i = 0;
+        do {
+            result = sphere_->evalCurveContinue(sphere_->curveFname_,
+                                                CURVE_POINTS, CURVE_PRECIS);
+            if (sphere_->curveError_) {
+                g_globalLogger.error("[HomeRight] error while computing "
+                                     "evalCurveContinue at step: " +
+                                     std::to_string(i));
+                curveConfirmedSignal_.emit(false);
+                return;
+            }
+            i++;
+        } while (!result);
+        // finish evaluation
+        result = sphere_->evalCurveFinish();
+        if (!result) {
+            g_globalLogger.error("[HomeRight] error in evalCurveFinish");
+            curveConfirmedSignal_.emit(false);
+            return;
+        } else {
+            g_globalLogger.debug("[HomeRight] computed curve");
+            curveConfirmedSignal_.emit(true);
+        }
+    }
+
+    // 3. plot
+    sphere_->update(PaintUpdate);
+
+    // 4. Focus plot tab
+    tabWidget_->setCurrentIndex(1);
+
+    return;
+}
+
+void HomeRight::onCurvesDelete(int flag)
+{
+    if (sphere_ == nullptr || sphere_->study_ == nullptr ||
+        sphere_->study_->curve_vector_.empty())
+        return;
+
+    if (flag == 0) {
+        sphere_->study_->curve_vector_.clear();
+    } else if (flag == 1)
+        sphere_->study_->curve_vector_.pop_back();
+
+    sphere_->study_->deleteOrbitPoint(sphere_->study_->last_curves_point_);
+    sphere_->study_->last_curves_point_ = nullptr;
+
+    sphere_->plotDone_ = false;
+    sphere_->update();
+    if (tabWidget_->currentIndex() != 1)
+        tabWidget_->setCurrentIndex(1);
+}
+
+void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
+                               int prec)
+{
+    g_globalLogger.debug("[HomeRight] received isocline signal with fname " +
+                         fname);
+
+    if (sphere_ == nullptr) {
+        isoclineConfirmedSignal_.emit(false);
+        return;
+    }
+
+    // 1. read isocline tables
+    if (!sphere_->study_->readIsoclines(fname)) {
+        g_globalLogger.error("[HomeRight] cannot read isocline");
+        isoclineConfirmedSignal_.emit(false);
+        return;
+    }
+
+    // 2. create and execute maple scripts for charts
+    sphere_->isoclineDashes_ = pointdash;
+    sphere_->isoclineFname_ = fname;
+    sphere_->isoclineNPoints_ = npoints;
+    sphere_->isoclinePrec_ = prec;
+    sphere_->plotDone_ = false;
+
+    int result = sphere_->evalIsoclineStart(
+        sphere_->isoclineFname_, sphere_->isoclineDashes_,
+        sphere_->isoclineNPoints_, sphere_->isoclinePrec_);
+    if (!result) {
+        g_globalLogger.error("[HomeRight] cannot evaluate isocline");
+        isoclineConfirmedSignal_.emit(false);
+    } else {
+        int i = 0;
+        do {
+            result = sphere_->evalIsoclineContinue(sphere_->isoclineFname_,
+                                                   CURVE_POINTS, CURVE_PRECIS);
+            if (sphere_->isoclineError_) {
+                g_globalLogger.error("[HomeRight] error while computing "
+                                     "evalIsoclineContinue at step: " +
+                                     std::to_string(i));
+                isoclineConfirmedSignal_.emit(false);
+                return;
+            }
+            i++;
+        } while (!result);
+        // finish evaluation
+        result = sphere_->evalIsoclineFinish();
+        if (!result) {
+            g_globalLogger.error("[HomeRight] error in evalIsoclineFinish");
+            isoclineConfirmedSignal_.emit(false);
+        } else {
+            g_globalLogger.debug("[HomeRight] computed isocline");
+            isoclineConfirmedSignal_.emit(true);
+        }
+    }
+
+    // 3. assign color and plot
+    int nisocs = (sphere_->study_->isocline_vector_.size() - 1) % 4;
+    sphere_->study_->isocline_vector_.back().color = CISOC + nisocs;
+    sphere_->update(PaintUpdate);
+
+    // 4. Focus plot tab
+    tabWidget_->setCurrentIndex(1);
+    return;
+}
+
+void HomeRight::onIsoclinesDelete(int flag)
+{
+    if (sphere_ == nullptr || sphere_->study_ == nullptr ||
+        sphere_->study_->isocline_vector_.empty())
+        return;
+
+    if (flag == 0) {
+        sphere_->study_->isocline_vector_.clear();
+    } else if (flag == 1)
+        sphere_->study_->isocline_vector_.pop_back();
+
+    sphere_->study_->deleteOrbitPoint(sphere_->study_->last_isoclines_point_);
+    sphere_->study_->last_isoclines_point_ = nullptr;
+
+    sphere_->plotDone_ = false;
+    sphere_->update();
+    if (tabWidget_->currentIndex() != 1)
+        tabWidget_->setCurrentIndex(1);
+}
+
+void HomeRight::refreshPlotSphere(double p)
+{
+    WVFStudy *study;
+    if (sphere_->study_ != nullptr) {
+        g_globalLogger.debug("[HomeRight] copying study");
+        study = new WVFStudy(*(sphere_->study_));
+    } else {
+        g_globalLogger.debug("[HomeRight] using null study");
+        study = nullptr;
+    }
+
+    if (sphere_ != nullptr) {
+        delete sphere_;
+        sphere_ = nullptr;
+    }
+
+    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550,
+                          sphereBasename_, p, study);
+    setupSphereAndPlot();
+}
+
+void HomeRight::refreshPlotPlane(int type, double minx, double maxx,
+                                 double miny, double maxy)
+{
+    WVFStudy *study;
+    if (sphere_->study_ != nullptr) {
+        g_globalLogger.debug("[HomeRight] copying study");
+        study = new WVFStudy(*(sphere_->study_));
+    } else {
+        g_globalLogger.debug("[HomeRight] using null study");
+        study = nullptr;
+    }
+
+    if (sphere_ != nullptr) {
+        delete sphere_;
+        sphere_ = nullptr;
+    }
+
+    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550,
+                          sphereBasename_, type, minx, maxx, miny, maxy, study);
+    setupSphereAndPlot();
 }

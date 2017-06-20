@@ -18,8 +18,6 @@
 #include "RegistrationView.h"
 #include "UserDetailsModel.h"
 
-#include <Wt/WLineEdit>
-
 using namespace Wt;
 
 RegistrationView::RegistrationView(Session &session,

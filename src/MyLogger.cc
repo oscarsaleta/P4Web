@@ -21,7 +21,7 @@
 
 using namespace Wt;
 
-MyLogger globalLogger__("log.txt");
+MyLogger g_globalLogger("log.txt");
 
 MyLogger::MyLogger(std::string fname)
 {
@@ -30,14 +30,18 @@ MyLogger::MyLogger(std::string fname)
     addField("type", false);
     addField("message", true);
     setFile(fname);
-    configure("*"); // configure for showing all logs
+#ifdef ANTZ
+    configure("* -debug"); // configure for showing all logs except debug
+#else
+    configure("*");
+#endif
 }
 
 MyLogger::~MyLogger() {}
 
 void MyLogger::log(std::string type, std::string message)
 {
-    WLogEntry entry = globalLogger__.entry(type);
+    WLogEntry entry = g_globalLogger.entry(type);
     entry << WLogger::timestamp << WLogger::sep << '['
           << WApplication::instance()->sessionId() << ']' << WLogger::sep << '['
           << type << ']' << WLogger::sep << message;

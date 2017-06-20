@@ -55,76 +55,569 @@ using namespace Wt;
 //                              WVFStudy CONSTRUCTOR
 // -----------------------------------------------------------------------
 
-WVFStudy::WVFStudy(double projection) : config_projection(projection)
+WVFStudy::WVFStudy(double projection) : config_projection_(projection)
 {
     // initialize vector field structures:
-    f_vec_field[0] = nullptr;
-    f_vec_field[1] = nullptr;
-    vec_field_U1[0] = nullptr;
-    vec_field_U1[1] = nullptr;
-    vec_field_U2[0] = nullptr;
-    vec_field_U2[1] = nullptr;
-    vec_field_V1[0] = nullptr;
-    vec_field_V1[1] = nullptr;
-    vec_field_V2[0] = nullptr;
-    vec_field_V2[1] = nullptr;
-    vec_field_C[0] = nullptr;
-    vec_field_C[1] = nullptr;
+    f_vec_field_[0] = nullptr;
+    f_vec_field_[1] = nullptr;
+    vec_field_U1_[0] = nullptr;
+    vec_field_U1_[1] = nullptr;
+    vec_field_U2_[0] = nullptr;
+    vec_field_U2_[1] = nullptr;
+    vec_field_V1_[0] = nullptr;
+    vec_field_V1_[1] = nullptr;
+    vec_field_V2_[0] = nullptr;
+    vec_field_V2_[1] = nullptr;
+    vec_field_C_[0] = nullptr;
+    vec_field_C_[1] = nullptr;
 
     // initialize singular points structures:
-    first_saddle_point = nullptr;
-    first_se_point = nullptr;
-    first_node_point = nullptr;
-    first_sf_point = nullptr;
-    first_wf_point = nullptr;
-    first_de_point = nullptr;
+    first_saddle_point_ = nullptr;
+    first_se_point_ = nullptr;
+    first_node_point_ = nullptr;
+    first_sf_point_ = nullptr;
+    first_wf_point_ = nullptr;
+    first_de_point_ = nullptr;
 
     // initialize GCF:
-    gcf = nullptr;
-    gcf_U1 = nullptr;
-    gcf_U2 = nullptr;
-    gcf_V1 = nullptr;
-    gcf_V2 = nullptr;
-    gcf_C = nullptr;
-    gcf_points = nullptr;
-    last_gcf_point = nullptr;
+    gcf_ = nullptr;
+    gcf_U1_ = nullptr;
+    gcf_U2_ = nullptr;
+    gcf_V1_ = nullptr;
+    gcf_V2_ = nullptr;
+    gcf_C_ = nullptr;
+    gcf_points_ = nullptr;
+    last_gcf_point_ = nullptr;
+
+    // initialize curves and isoclines
+    last_curves_point_ = nullptr;
+    last_isoclines_point_ = nullptr;
 
     // initialize limit cycles & orbits
-    first_lim_cycle = nullptr;
-    first_orbit = nullptr;
-    current_orbit = nullptr;
+    first_lim_cycle_ = nullptr;
+    first_orbit_ = nullptr;
+    current_orbit_ = nullptr;
 
     // initialize others
-    xmin = -1.0;
-    xmax = 1.0;
-    ymin = -1.0;
-    ymax = 1.0;
-    p = 1;
-    q = 1;
-    typeofstudy = TYPEOFSTUDY_ALL;
-    singinf = false;
-    dir_vec_field = 1;
+    xmin_ = -1.0;
+    xmax_ = 1.0;
+    ymin_ = -1.0;
+    ymax_ = 1.0;
+    p_ = 1;
+    q_ = 1;
+    typeofstudy_ = TYPEOFSTUDY_ALL;
+    singinf_ = false;
+    dir_vec_field_ = 1;
 
     // initialize parameters
     // number of orbits in the limit cycle window
-    config_lc_value = DEFAULT_LCORBITS;
+    config_lc_value_ = DEFAULT_LCORBITS;
     // number of points in the limit cycle window
-    config_lc_numpoints = DEFAULT_LCPOINTS;
+    config_lc_numpoints_ = DEFAULT_LCPOINTS;
     // maximum step size
-    config_hma = DEFAULT_HMA;
+    config_hma_ = DEFAULT_HMA;
     // minimum step size
-    config_hmi = DEFAULT_HMI;
+    config_hmi_ = DEFAULT_HMI;
     // step size
-    config_step = DEFAULT_STEPSIZE;
+    config_step_ = DEFAULT_STEPSIZE;
     // current step size (during integration)
-    config_currentstep = DEFAULT_STEPSIZE;
+    config_currentstep_ = DEFAULT_STEPSIZE;
     // tolerance
-    config_tolerance = DEFAULT_TOLERANCE;
+    config_tolerance_ = DEFAULT_TOLERANCE;
     // number of points to integrate
-    config_intpoints = DEFAULT_INTPOINTS;
+    config_intpoints_ = DEFAULT_INTPOINTS;
     // line style (dashes or points)
-    config_dashes = DEFAULT_LINESTYLE;
-    config_kindvf = DEFAULT_INTCONFIG;
+    config_dashes_ = DEFAULT_LINESTYLE;
+    config_kindvf_ = DEFAULT_INTCONFIG;
+
+    selected_saddle_point_ = nullptr;
+    selected_se_point_ = nullptr;
+    selected_de_point_ = nullptr;
+    selected_sep_ = nullptr;
+    selected_de_sep_ = nullptr;
+}
+
+// -----------------------------------------------------------------------
+//                              WVFStudy copy functions
+// -----------------------------------------------------------------------
+
+WVFStudy::WVFStudy(const WVFStudy &obj)
+{
+    typeofstudy_ = obj.typeofstudy_;
+    typeofview_ = obj.typeofview_;
+    p_ = obj.p_;
+    q_ = obj.q_;
+    plweights_ = obj.plweights_;
+    double_p_ = (double)p_;
+    double_q_ = (double)q_;
+    double_p_plus_q_ = (double)(p_ + q_);
+    double_p_minus_1_ = (double)(p_ - 1);
+    double_q_minus_1_ = (double)(q_ - 1);
+    double_q_minus_p_ = (double)(q_ - p_);
+    xmin_ = obj.xmin_;
+    xmax_ = obj.xmax_;
+    ymin_ = obj.ymin_;
+    ymax_ = obj.ymax_;
+    singinf_ = obj.singinf_;
+    dir_vec_field_ = obj.dir_vec_field_;
+
+    f_vec_field_[0] = copy_term2(obj.f_vec_field_[0]);
+    f_vec_field_[1] = copy_term2(obj.f_vec_field_[1]);
+    vec_field_U1_[0] = copy_term2(obj.vec_field_U1_[0]);
+    vec_field_U1_[1] = copy_term2(obj.vec_field_U1_[1]);
+    vec_field_U2_[0] = copy_term2(obj.vec_field_U2_[0]);
+    vec_field_U2_[1] = copy_term2(obj.vec_field_U2_[1]);
+    vec_field_V1_[0] = copy_term2(obj.vec_field_V1_[0]);
+    vec_field_V1_[1] = copy_term2(obj.vec_field_V1_[1]);
+    vec_field_V2_[0] = copy_term2(obj.vec_field_V2_[0]);
+    vec_field_V2_[1] = copy_term2(obj.vec_field_V2_[1]);
+    vec_field_C_[0] = copy_term3(obj.vec_field_C_[0]);
+    vec_field_C_[1] = copy_term3(obj.vec_field_C_[1]);
+
+    first_saddle_point_ = copy_saddle(obj.first_saddle_point_);
+    first_se_point_ = copy_semi_elementary(obj.first_se_point_);
+    first_node_point_ = copy_node(obj.first_node_point_);
+    first_sf_point_ = copy_strong_focus(obj.first_sf_point_);
+    first_wf_point_ = copy_weak_focus(obj.first_wf_point_);
+    first_de_point_ = copy_degenerate(obj.first_de_point_);
+
+    gcf_ = copy_term2(obj.gcf_);
+    gcf_U1_ = copy_term2(obj.gcf_U1_);
+    gcf_U2_ = copy_term2(obj.gcf_U2_);
+    gcf_V1_ = copy_term2(obj.gcf_V1_);
+    gcf_V2_ = copy_term2(obj.gcf_V2_);
+    gcf_C_ = copy_term3(obj.gcf_C_);
+    gcf_points_ = copy_orbits_points(obj.gcf_points_);
+    last_gcf_point_ = copy_orbits_points(obj.last_gcf_point_);
+
+    std::vector<curves>::const_iterator it1;
+    for (it1 = obj.curve_vector_.begin(); it1 != obj.curve_vector_.end();
+         it1++) {
+        curves *curve = copy_curves((curves *)&(*it1));
+        curve_vector_.push_back(*curve);
+    }
+    last_curves_point_ = copy_orbits_points(obj.last_curves_point_);
+
+    std::vector<isoclines>::const_iterator it2;
+    for (it2 = obj.isocline_vector_.begin(); it2 != obj.isocline_vector_.end();
+         it2++) {
+        isoclines *isoc = copy_isoclines((isoclines *)&(*it2));
+        isocline_vector_.push_back(*isoc);
+    }
+    last_isoclines_point_ = copy_orbits_points(obj.last_isoclines_point_);
+
+    first_lim_cycle_ = copy_orbits(obj.first_lim_cycle_);
+    first_orbit_ = copy_orbits(obj.first_orbit_);
+
+    config_lc_value_ = obj.config_lc_value_;
+    config_hma_ = obj.config_hma_;
+    config_hmi_ = obj.config_hmi_;
+    config_step_ = obj.config_step_;
+    config_currentstep_ = obj.config_currentstep_;
+    config_tolerance_ = obj.config_tolerance_;
+    config_projection_ = obj.config_projection_;
+    config_intpoints_ = obj.config_intpoints_;
+    config_lc_numpoints_ = obj.config_lc_numpoints_;
+    config_dashes_ = obj.config_dashes_;
+    config_kindvf_ = obj.config_kindvf_;
+
+    current_orbit_ = copy_orbits(obj.current_orbit_);
+    current_lim_cycle_ = copy_orbits(obj.current_lim_cycle_);
+
+    selected_ucoord_[0] = obj.selected_ucoord_[0];
+    selected_ucoord_[1] = obj.selected_ucoord_[1];
+
+    selected_saddle_point_ = copy_saddle(obj.selected_saddle_point_);
+    selected_se_point_ = copy_semi_elementary(obj.selected_se_point_);
+    selected_de_point_ = copy_degenerate(obj.selected_de_point_);
+    selected_sep_ = copy_sep(obj.selected_sep_);
+    selected_de_sep_ = copy_blow_up_points(obj.selected_de_sep_);
+}
+
+orbits *WVFStudy::copy_orbits(orbits *p)
+{
+    orbits *result = nullptr;
+    orbits *o = p;
+    orbits *last = nullptr;
+    while (o != nullptr) {
+        orbits *q = new orbits;
+        q->pcoord[0] = o->pcoord[0];
+        q->pcoord[1] = o->pcoord[1];
+        q->pcoord[2] = o->pcoord[2];
+        q->color = o->color;
+        q->f_orbits = copy_orbits_points(o->f_orbits);
+        q->current_f_orbits = copy_orbits_points(o->current_f_orbits);
+        q->next_orbit = nullptr;
+        if (last != nullptr)
+            last->next_orbit = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_orbit;
+    }
+    return result;
+}
+
+P4ORBIT WVFStudy::copy_orbits_points(P4ORBIT p)
+{
+    P4ORBIT result = nullptr;
+    P4ORBIT o = p;
+    P4ORBIT last = nullptr;
+    while (o != nullptr) {
+        P4ORBIT q = new orbits_points;
+        q->color = o->color;
+        q->pcoord[0] = o->pcoord[0];
+        q->pcoord[1] = o->pcoord[1];
+        q->pcoord[2] = o->pcoord[2];
+        q->dashes = o->dashes;
+        q->dir = o->dir;
+        q->type = o->type;
+        q->next_point = nullptr;
+        if (last != nullptr)
+            last->next_point = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_point;
+    }
+    return result;
+}
+
+P4POLYNOM1 WVFStudy::copy_term1(P4POLYNOM1 p)
+{
+    P4POLYNOM1 result = nullptr;
+    P4POLYNOM1 o = p;
+    P4POLYNOM1 last = nullptr;
+    while (o != nullptr) {
+        P4POLYNOM1 q = new term1;
+        q->exp = o->exp;
+        q->coeff = o->coeff;
+        q->next_term1 = nullptr;
+        if (last != nullptr)
+            last->next_term1 = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_term1;
+    }
+    return result;
+}
+
+P4POLYNOM2 WVFStudy::copy_term2(P4POLYNOM2 p)
+{
+    P4POLYNOM2 result = nullptr;
+    P4POLYNOM2 o = p;
+    P4POLYNOM2 last = nullptr;
+    while (o != nullptr) {
+        P4POLYNOM2 q = new term2;
+        q->exp_x = o->exp_x;
+        q->exp_y = o->exp_y;
+        q->coeff = o->coeff;
+        q->next_term2 = nullptr;
+        if (last != nullptr)
+            last->next_term2 = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_term2;
+    }
+    return result;
+}
+
+P4POLYNOM3 WVFStudy::copy_term3(P4POLYNOM3 p)
+{
+    P4POLYNOM3 result = nullptr;
+    P4POLYNOM3 o = p;
+    P4POLYNOM3 last = nullptr;
+    while (o != nullptr) {
+        P4POLYNOM3 q = new term3;
+        q->exp_r = o->exp_r;
+        q->exp_Co = o->exp_Co;
+        q->exp_Si = o->exp_Si;
+        q->coeff = o->coeff;
+        q->next_term3 = nullptr;
+        if (last != nullptr)
+            last->next_term3 = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_term3;
+    }
+    return result;
+}
+
+sep *WVFStudy::copy_sep(sep *p)
+{
+    sep *result = nullptr;
+    sep *o = p;
+    sep *last = nullptr;
+    while (o != nullptr) {
+        sep *q = new sep;
+        q->first_sep_point = copy_orbits_points(o->first_sep_point);
+        q->last_sep_point = copy_orbits_points(o->last_sep_point);
+        q->type = o->type;
+        q->direction = o->direction;
+        q->d = o->d;
+        q->notadummy = o->notadummy;
+        q->separatrice = copy_term1(o->separatrice);
+        q->next_sep = nullptr;
+        if (last != nullptr)
+            last->next_sep = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_sep;
+    }
+    return result;
+}
+
+degenerate *WVFStudy::copy_degenerate(degenerate *p)
+{
+    degenerate *result = nullptr;
+    degenerate *o = p;
+    degenerate *last = nullptr;
+    while (o != nullptr) {
+        degenerate *q = new degenerate;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->epsilon = o->epsilon;
+        q->notadummy = o->notadummy;
+        q->blow_up = copy_blow_up_points(o->blow_up);
+        q->next_de = nullptr;
+        if (last != nullptr)
+            last->next_de = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_de;
+    }
+    return result;
+}
+
+blow_up_points *WVFStudy::copy_blow_up_points(blow_up_points *p)
+{
+    blow_up_points *result = nullptr;
+    blow_up_points *o = p;
+    blow_up_points *last = nullptr;
+    while (o != nullptr) {
+        blow_up_points *q = new blow_up_points;
+        q->n = o->n;
+        q->trans = copy_transformations(o->trans);
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->a11 = o->a11;
+        q->a12 = o->a12;
+        q->a21 = o->a21;
+        q->a22 = o->a22;
+        q->vector_field[0] = copy_term2(o->vector_field[0]);
+        q->vector_field[1] = copy_term2(o->vector_field[1]);
+        q->sep = copy_term1(o->sep);
+        q->type = o->type;
+        q->blow_up_vec_field = o->blow_up_vec_field;
+        q->point[0] = o->point[0];
+        q->point[1] = o->point[1];
+        q->first_sep_point = copy_orbits_points(o->first_sep_point);
+        q->last_sep_point = copy_orbits_points(o->last_sep_point);
+        q->next_blow_up_point = nullptr;
+        if (last != nullptr)
+            last->next_blow_up_point = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_blow_up_point;
+    }
+    return result;
+}
+
+transformations *WVFStudy::copy_transformations(transformations *p)
+{
+    transformations *result = nullptr;
+    transformations *o = p;
+    transformations *last = nullptr;
+    while (o != nullptr) {
+        transformations *q = new transformations;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->c1 = o->c1;
+        q->c2 = o->c2;
+        q->d1 = o->d1;
+        q->d2 = o->d2;
+        q->d3 = o->d3;
+        q->d4 = o->d4;
+        q->d = o->d;
+        q->next_trans = nullptr;
+        if (last != nullptr)
+            last->next_trans = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_trans;
+    }
+    return result;
+}
+
+weak_focus *WVFStudy::copy_weak_focus(weak_focus *p)
+{
+    weak_focus *result = nullptr;
+    weak_focus *o = p;
+    weak_focus *last = nullptr;
+    while (o != nullptr) {
+        weak_focus *q = new weak_focus;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->type = o->type;
+        q->next_wf = nullptr;
+        if (last != nullptr)
+            last->next_wf = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_wf;
+    }
+    return result;
+}
+
+strong_focus *WVFStudy::copy_strong_focus(strong_focus *p)
+{
+    strong_focus *result = nullptr;
+    strong_focus *o = p;
+    strong_focus *last = nullptr;
+    while (o != nullptr) {
+        strong_focus *q = new strong_focus;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->stable = o->stable;
+        q->next_sf = nullptr;
+        if (last != nullptr)
+            last->next_sf = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_sf;
+    }
+    return result;
+}
+
+node *WVFStudy::copy_node(node *p)
+{
+    node *result = nullptr;
+    node *o = p;
+    node *last = nullptr;
+    while (o != nullptr) {
+        node *q = new node;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->stable = o->stable;
+        if (last != nullptr)
+            last->next_node = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_node;
+    }
+    return result;
+}
+
+semi_elementary *WVFStudy::copy_semi_elementary(semi_elementary *p)
+{
+    semi_elementary *result = nullptr;
+    semi_elementary *o = p;
+    semi_elementary *last = nullptr;
+    while (o != nullptr) {
+        semi_elementary *q = new semi_elementary;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->epsilon = o->epsilon;
+        q->notadummy = o->notadummy;
+        q->separatrices = copy_sep(o->separatrices);
+        q->vector_field[0] = copy_term2(o->vector_field[0]);
+        q->vector_field[1] = copy_term2(o->vector_field[1]);
+        q->a11 = o->a11;
+        q->a12 = o->a12;
+        q->a21 = o->a21;
+        q->a22 = o->a22;
+        q->type = o->type;
+        q->next_se = nullptr;
+        if (last != nullptr)
+            last->next_se = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_se;
+    }
+    return result;
+}
+
+saddle *WVFStudy::copy_saddle(saddle *p)
+{
+    saddle *result = nullptr;
+    saddle *o = p;
+    saddle *last = nullptr;
+    while (o != nullptr) {
+        saddle *q = new saddle;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->epsilon = o->epsilon;
+        q->notadummy = o->notadummy;
+        q->separatrices = copy_sep(o->separatrices);
+        q->vector_field[0] = copy_term2(o->vector_field[0]);
+        q->vector_field[1] = copy_term2(o->vector_field[1]);
+        q->a11 = o->a11;
+        q->a12 = o->a12;
+        q->a21 = o->a21;
+        q->a22 = o->a22;
+        q->next_saddle = nullptr;
+        if (last != nullptr)
+            last->next_saddle = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_saddle;
+    }
+    return result;
+}
+
+curves *WVFStudy::copy_curves(curves *p)
+{
+    curves *result = nullptr;
+    curves *o = p;
+    if (o != nullptr) {
+        curves *q = new curves;
+        q->r2 = copy_term2(o->r2);
+        q->u1 = copy_term2(o->u1);
+        q->u2 = copy_term2(o->u2);
+        q->v1 = copy_term2(o->v1);
+        q->v2 = copy_term2(o->v2);
+        q->c = copy_term3(o->c);
+        q->points = copy_orbits_points(o->points);
+        result = q;
+    }
+    return result;
+}
+
+isoclines *WVFStudy::copy_isoclines(isoclines *p)
+{
+    isoclines *result = nullptr;
+    isoclines *o = p;
+    if (o != nullptr) {
+        isoclines *q = new isoclines;
+        q->r2 = copy_term2(o->r2);
+        q->u1 = copy_term2(o->u1);
+        q->u2 = copy_term2(o->u2);
+        q->v1 = copy_term2(o->v1);
+        q->v2 = copy_term2(o->v2);
+        q->c = copy_term3(o->c);
+        q->points = copy_orbits_points(o->points);
+        q->color = o->color;
+        result = q;
+    }
+    return result;
 }
 
 // -----------------------------------------------------------------------
@@ -140,85 +633,81 @@ WVFStudy::~WVFStudy() { deleteVF(); }
 void WVFStudy::deleteVF()
 {
     // Delete Vector Field
-    delete_term2(f_vec_field[0]);
-    delete_term2(f_vec_field[1]);
-    delete_term2(vec_field_U1[0]);
-    delete_term2(vec_field_U1[1]);
-    delete_term2(vec_field_U2[0]);
-    delete_term2(vec_field_U2[1]);
-    delete_term2(vec_field_V1[0]);
-    delete_term2(vec_field_V1[1]);
-    delete_term2(vec_field_V2[0]);
-    delete_term2(vec_field_V2[1]);
-    delete_term3(vec_field_C[0]);
-    delete_term3(vec_field_C[1]);
-
-    f_vec_field[0] = nullptr;
-    f_vec_field[1] = nullptr;
-    vec_field_U1[0] = nullptr;
-    vec_field_U1[1] = nullptr;
-    vec_field_U2[0] = nullptr;
-    vec_field_U2[1] = nullptr;
-    vec_field_V1[0] = nullptr;
-    vec_field_V1[1] = nullptr;
-    vec_field_V2[0] = nullptr;
-    vec_field_V2[1] = nullptr;
-    vec_field_C[0] = nullptr;
-    vec_field_C[1] = nullptr;
+    delete_term2(f_vec_field_[0]);
+    f_vec_field_[0] = nullptr;
+    delete_term2(f_vec_field_[1]);
+    f_vec_field_[1] = nullptr;
+    delete_term2(vec_field_U1_[0]);
+    vec_field_U1_[0] = nullptr;
+    delete_term2(vec_field_U1_[1]);
+    vec_field_U1_[1] = nullptr;
+    delete_term2(vec_field_U2_[0]);
+    vec_field_U2_[0] = nullptr;
+    delete_term2(vec_field_U2_[1]);
+    vec_field_U2_[1] = nullptr;
+    delete_term2(vec_field_V1_[0]);
+    vec_field_V1_[0] = nullptr;
+    delete_term2(vec_field_V1_[1]);
+    vec_field_V1_[1] = nullptr;
+    delete_term2(vec_field_V2_[0]);
+    vec_field_V2_[0] = nullptr;
+    delete_term2(vec_field_V2_[1]);
+    vec_field_V2_[1] = nullptr;
+    delete_term3(vec_field_C_[0]);
+    vec_field_C_[0] = nullptr;
+    delete_term3(vec_field_C_[1]);
+    vec_field_C_[1] = nullptr;
 
     // Delete singular points
-    deleteSaddle(first_saddle_point);
-    deleteSemiElementary(first_se_point);
-    deleteNode(first_node_point);
-    deleteDegenerate(first_de_point);
-    deleteStrongFocus(first_sf_point);
-    deleteWeakFocus(first_wf_point);
-
-    first_saddle_point = nullptr;
-    first_se_point = nullptr;
-    first_node_point = nullptr;
-    first_sf_point = nullptr;
-    first_wf_point = nullptr;
-    first_de_point = nullptr;
+    deleteSaddle(first_saddle_point_);
+    first_saddle_point_ = nullptr;
+    deleteSemiElementary(first_se_point_);
+    first_se_point_ = nullptr;
+    deleteNode(first_node_point_);
+    first_node_point_ = nullptr;
+    deleteDegenerate(first_de_point_);
+    first_sf_point_ = nullptr;
+    deleteStrongFocus(first_sf_point_);
+    first_wf_point_ = nullptr;
+    deleteWeakFocus(first_wf_point_);
+    first_de_point_ = nullptr;
 
     // Delete GCF:
-    delete_term2(gcf);
-    delete_term2(gcf_U1);
-    delete_term2(gcf_U2);
-    delete_term2(gcf_V1);
-    delete_term2(gcf_V2);
-    delete_term3(gcf_C);
-    deleteOrbitPoint(gcf_points);
+    delete_term2(gcf_);
+    gcf_ = nullptr;
+    delete_term2(gcf_U1_);
+    gcf_U1_ = nullptr;
+    delete_term2(gcf_U2_);
+    gcf_U2_ = nullptr;
+    delete_term2(gcf_V1_);
+    gcf_V1_ = nullptr;
+    delete_term2(gcf_V2_);
+    gcf_V2_ = nullptr;
+    delete_term3(gcf_C_);
+    gcf_C_ = nullptr;
+    deleteOrbitPoint(gcf_points_);
+    gcf_points_ = nullptr;
+    deleteOrbitPoint(last_gcf_point_);
+    last_gcf_point_ = nullptr;
 
-    gcf = nullptr;
-    gcf_U1 = nullptr;
-    gcf_U2 = nullptr;
-    gcf_V1 = nullptr;
-    gcf_V2 = nullptr;
-    gcf_C = nullptr;
-    gcf_points = nullptr;
+    // Delete curves:
+    curve_vector_.clear();
+    deleteOrbitPoint(last_curves_point_);
+    last_curves_point_ = nullptr;
+
+    // Delete isoclines
+    isocline_vector_.clear();
+    deleteOrbitPoint(last_isoclines_point_);
+    last_isoclines_point_ = nullptr;
 
     // Delete all orbits
-    deleteOrbit(first_orbit);
-    first_orbit = nullptr;
-    current_orbit = nullptr;
+    deleteOrbit(first_orbit_);
+    first_orbit_ = nullptr;
+    current_orbit_ = nullptr;
 
     // Delete limit cycles
-    deleteLimitCycle(first_lim_cycle);
-    first_lim_cycle = nullptr;
-
-    // reset others
-    xmin = -1.0;
-    xmax = 1.0;
-    ymin = -1.0;
-    ymax = 1.0;
-    p = 1;
-    q = 1;
-    typeofstudy = TYPEOFSTUDY_ALL;
-    singinf = false;
-    dir_vec_field = 1;
-
-    lasterror = "";
+    deleteLimitCycle(first_lim_cycle_);
+    first_lim_cycle_ = nullptr;
 }
 
 // -----------------------------------------------------------------------
@@ -264,54 +753,6 @@ void WVFStudy::deleteSemiElementary(semi_elementary *p)
 }
 
 // -----------------------------------------------------------------------
-//                          WVFStudy::DeleteNode
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteNode(node *p)
-{
-    node *q;
-
-    while (p != nullptr) {
-        q = p;
-        p = p->next_node;
-        delete q;
-        q = nullptr;
-    }
-}
-
-// -----------------------------------------------------------------------
-//                      WVFStudy::DeleteStrongFocus
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteStrongFocus(strong_focus *p)
-{
-    strong_focus *q;
-
-    while (p != nullptr) {
-        q = p;
-        p = p->next_sf;
-        delete q;
-        q = nullptr;
-    }
-}
-
-// -----------------------------------------------------------------------
-//                          WVFStudy::DeleteWeakFocus
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteWeakFocus(weak_focus *p)
-{
-    weak_focus *q;
-
-    while (p != nullptr) {
-        q = p;
-        p = p->next_wf;
-        delete q;
-        q = nullptr;
-    }
-}
-
-// -----------------------------------------------------------------------
 //                      WVFStudy::DeleteDegenerate
 // -----------------------------------------------------------------------
 
@@ -351,22 +792,6 @@ void WVFStudy::deleteSeparatrices(sep *p)
 }
 
 // -----------------------------------------------------------------------
-//                      WVFStudy::DeleteTransformations
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteTransformations(transformations *t)
-{
-    transformations *u;
-
-    while (t != nullptr) {
-        u = t;
-        t = t->next_trans;
-        delete u;
-        u = nullptr;
-    }
-}
-
-// -----------------------------------------------------------------------
 //                      WVFStudy::DeleteBlowup
 // -----------------------------------------------------------------------
 
@@ -394,23 +819,6 @@ void WVFStudy::deleteBlowup(blow_up_points *b)
 void WVFStudy::deleteLimitCycle(orbits *p)
 {
     deleteOrbit(p); // limit cycle is implemented as orbit.
-}
-
-// -----------------------------------------------------------------------
-//                  WVFStudy::DeleteOrbitPoint
-// -----------------------------------------------------------------------
-
-void WVFStudy::deleteOrbitPoint(P4ORBIT p)
-{
-    P4ORBIT q;
-
-    while (p != nullptr) {
-        q = p;
-        p = p->next_point;
-
-        delete q;
-        q = nullptr;
-    }
 }
 
 // -----------------------------------------------------------------------
@@ -448,148 +856,149 @@ bool WVFStudy::readTables(std::string basename)
 
     fp = fopen((basename + "_vec.tab").c_str(), "rt");
     if (fp == nullptr) {
-        globalLogger__.error("WVFStudy :: Cannot open file " + basename +
+        g_globalLogger.error("[WVFStudy] Cannot open file " + basename +
                              "_vec.tab.");
         deleteVF();
         return false;
     }
 
-    if (fscanf(fp, "%d %d %d ", &typeofstudy, &p, &q) != 3) {
-        globalLogger__.error("WVFStudy :: Cannot read typeofstudy in " +
+    if (fscanf(fp, "%d %d %d ", &typeofstudy_, &p_, &q_) != 3) {
+        g_globalLogger.error("[WVFStudy] Cannot read typeofstudy_ in " +
                              basename + "_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
     }
 
-    if (typeofstudy == TYPEOFSTUDY_ONE) {
-        if (fscanf(fp, "%lf %lf %lf %lf", &xmin, &xmax, &ymin, &ymax) != 4) {
-            globalLogger__.error("WVFStudy :: Cannot read min-max coords in " +
+    if (typeofstudy_ == TYPEOFSTUDY_ONE) {
+        if (fscanf(fp, "%lf %lf %lf %lf", &xmin_, &xmax_, &ymin_, &ymax_) !=
+            4) {
+            g_globalLogger.error("[WVFStudy] Cannot read min-max coords in " +
                                  basename + "_vec.tab.");
             deleteVF();
             fclose(fp);
             return false;
         }
-        p = q = 1;
-        typeofview = TYPEOFVIEW_PLANE;
+        p_ = q_ = 1;
+        typeofview_ = TYPEOFVIEW_PLANE;
     } else
-        typeofview = TYPEOFVIEW_SPHERE;
+        typeofview_ = TYPEOFVIEW_SPHERE;
 
-    plweights = ((p == 1 && q == 1) ? false : true);
+    plweights_ = ((p_ == 1 && q_ == 1) ? false : true);
 
-    double_p = (double)p;
-    double_q = (double)q;
-    double_p_plus_q = (double)(p + q);
-    double_p_minus_1 = (double)(p - 1);
-    double_q_minus_1 = (double)(q - 1);
-    double_q_minus_p = (double)(q - p);
+    double_p_ = (double)p_;
+    double_q_ = (double)q_;
+    double_p_plus_q_ = (double)(p_ + q_);
+    double_p_minus_1_ = (double)(p_ - 1);
+    double_q_minus_1_ = (double)(q_ - 1);
+    double_q_minus_p_ = (double)(q_ - p_);
 
     if (!readGCF(fp)) {
-        globalLogger__.error("WVFStudy :: Cannot read gcf " + basename +
+        g_globalLogger.error("[WVFStudy] Cannot read gcf " + basename +
                              "_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
     }
 
-    if (!readVectorField(fp, f_vec_field)) {
-        globalLogger__.error("WVFStudy :: Cannot read vector field in " +
+    if (!readVectorField(fp, f_vec_field_)) {
+        g_globalLogger.error("[WVFStudy] Cannot read vector field in " +
                              basename + "_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
     }
 
-    if (!readVectorField(fp, vec_field_U1)) {
-        globalLogger__.error(
-            "WVFStudy :: Cannot read vector field in U1-chart in " + basename +
+    if (!readVectorField(fp, vec_field_U1_)) {
+        g_globalLogger.error(
+            "[WVFStudy] Cannot read vector field in U1-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
     }
 
-    if (!readVectorField(fp, vec_field_V1)) {
-        globalLogger__.error(
-            "WVFStudy :: Cannot read vector field in V1-chart in " + basename +
+    if (!readVectorField(fp, vec_field_V1_)) {
+        g_globalLogger.error(
+            "[WVFStudy] Cannot read vector field in V1-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
     }
 
-    if (!readVectorField(fp, vec_field_U2)) {
-        globalLogger__.error(
-            "WVFStudy :: Cannot read vector field in U2-chart in " + basename +
+    if (!readVectorField(fp, vec_field_U2_)) {
+        g_globalLogger.error(
+            "[WVFStudy] Cannot read vector field in U2-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
     }
 
-    if (!readVectorField(fp, vec_field_V2)) {
-        globalLogger__.error(
-            "WVFStudy :: Cannot read vector field in V2-chart in " + basename +
+    if (!readVectorField(fp, vec_field_V2_)) {
+        g_globalLogger.error(
+            "[WVFStudy] Cannot read vector field in V2-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
         return false;
     }
 
-    if (plweights) {
-        if (!readVectorFieldCylinder(fp, vec_field_C)) {
-            globalLogger__.error(
-                "WVFStudy :: Cannot read vector field in Cylinder-chart in " +
+    if (plweights_) {
+        if (!readVectorFieldCylinder(fp, vec_field_C_)) {
+            g_globalLogger.error(
+                "[WVFStudy] Cannot read vector field in Cylinder-chart in " +
                 basename + "_vec.tab.");
             deleteVF();
             fclose(fp);
             return false;
         }
-        singinf = 0;
+        singinf_ = 0;
     } else {
-        if (fscanf(fp, "%d %d", &flag, &dir_vec_field) != 2) {
-            globalLogger__.error("WVFStudy :: Cannot read sing-at-infinity "
+        if (fscanf(fp, "%d %d", &flag, &dir_vec_field_) != 2) {
+            g_globalLogger.error("[WVFStudy] Cannot read sing-at-infinity "
                                  "flag and directions flag in " +
                                  basename + "_vec.tab.");
             deleteVF();
             fclose(fp);
             return false;
         }
-        singinf = ((flag == 0) ? false : true);
+        singinf_ = ((flag == 0) ? false : true);
     }
 
     fclose(fp);
 
-    if (typeofstudy != TYPEOFSTUDY_INF) {
+    if (typeofstudy_ != TYPEOFSTUDY_INF) {
         fp = fopen((basename + "_fin.tab").c_str(), "rt");
         if (fp != nullptr) {
             if (!readPoints(fp)) {
-                globalLogger__.error(
-                    "WVFStudy :: Problem reading singularity info from " +
-                    basename + "_fin.tab: " + lasterror.toUTF8() + ".");
+                g_globalLogger.error(
+                    "[WVFStudy] Problem reading singularity info from " +
+                    basename + "_fin.tab: " + lasterror_.toUTF8() + ".");
                 deleteVF();
                 fclose(fp);
                 return false;
             }
             fclose(fp);
         } else {
-            globalLogger__.error("WVFStudy :: Cannot open " + basename +
+            g_globalLogger.error("[WVFStudy] Cannot open " + basename +
                                  "_fin.tab.");
             deleteVF();
             return false;
         }
     }
 
-    if (typeofstudy != TYPEOFSTUDY_ONE && typeofstudy != TYPEOFSTUDY_FIN) {
+    if (typeofstudy_ != TYPEOFSTUDY_ONE && typeofstudy_ != TYPEOFSTUDY_FIN) {
         fp = fopen((basename + "_inf.tab").c_str(), "rt");
         if (fp != nullptr) {
-            if (p == 1 && q == 1) {
+            if (p_ == 1 && q_ == 1) {
                 for (j = 1; j <= 2; j++) {
                     if (!readPoints(fp)) {
-                        globalLogger__.error(
-                            "WVFStudy :: Cannot read singular points in " +
+                        g_globalLogger.error(
+                            "[WVFStudy] Cannot read singular points in " +
                             basename + "_inf.tab (" + std::to_string(j) +
-                            "): " + lasterror.toUTF8() + ".");
+                            "): " + lasterror_.toUTF8() + ".");
                         deleteVF();
                         fclose(fp);
                         return false;
@@ -598,10 +1007,10 @@ bool WVFStudy::readTables(std::string basename)
             } else {
                 for (j = 1; j <= 4; j++) {
                     if (!readPoints(fp)) {
-                        globalLogger__.error(
-                            "WVFStudy :: Cannot read singular points in " +
+                        g_globalLogger.error(
+                            "[WVFStudy] Cannot read singular points in " +
                             basename + "_inf.tab (" + std::to_string(j) +
-                            "): " + lasterror.toUTF8() + ".");
+                            "): " + lasterror_.toUTF8() + ".");
                         deleteVF();
                         fclose(fp);
                         return false;
@@ -610,14 +1019,14 @@ bool WVFStudy::readTables(std::string basename)
             }
             fclose(fp);
         } else {
-            globalLogger__.error("WVFStudy :: Cannot open " + basename +
+            g_globalLogger.error("[WVFStudy] Cannot open " + basename +
                                  "_inf.tab.");
             deleteVF();
             return false;
         }
     }
 
-    globalLogger__.debug("WFStudy :: Files " + basename +
+    g_globalLogger.debug("[WFStudy] Files " + basename +
                          "_{vec,fin,inf}.tab read correctly.");
     return true;
 }
@@ -637,63 +1046,225 @@ bool WVFStudy::readGCF(FILE *fp)
         if (fscanf(fp, "%d", &N) != 1)
             return false;
 
-        gcf = new term2;
-        gcf->next_term2 = nullptr;
+        gcf_ = new term2;
+        gcf_->next_term2 = nullptr;
 
-        if (!readTerm2(fp, gcf, N))
+        if (!readTerm2(fp, gcf_, N))
             return false;
 
         if (fscanf(fp, "%d", &N) != 1)
             return false;
 
-        gcf_U1 = new term2;
-        gcf_U1->next_term2 = nullptr;
+        gcf_U1_ = new term2;
+        gcf_U1_->next_term2 = nullptr;
 
-        if (!readTerm2(fp, gcf_U1, N))
+        if (!readTerm2(fp, gcf_U1_, N))
             return false;
 
         if (fscanf(fp, "%d", &N) != 1)
             return false;
 
-        gcf_U2 = new term2;
-        gcf_U2->next_term2 = nullptr;
+        gcf_U2_ = new term2;
+        gcf_U2_->next_term2 = nullptr;
 
-        if (!readTerm2(fp, gcf_U2, N))
+        if (!readTerm2(fp, gcf_U2_, N))
             return false;
 
         if (fscanf(fp, "%d", &N) != 1)
             return false;
 
-        gcf_V1 = new term2;
-        gcf_V1->next_term2 = nullptr;
-        if (!readTerm2(fp, gcf_V1, N))
+        gcf_V1_ = new term2;
+        gcf_V1_->next_term2 = nullptr;
+        if (!readTerm2(fp, gcf_V1_, N))
             return false;
 
         if (fscanf(fp, "%d", &N) != 1)
             return false;
-        gcf_V2 = new term2;
-        gcf_V2->next_term2 = nullptr;
-        if (!readTerm2(fp, gcf_V2, N))
+        gcf_V2_ = new term2;
+        gcf_V2_->next_term2 = nullptr;
+        if (!readTerm2(fp, gcf_V2_, N))
             return false;
 
-        if (p != 1 || q != 1) {
+        if (p_ != 1 || q_ != 1) {
             if (fscanf(fp, "%d", &N) != 1)
                 return false;
 
-            gcf_C = new term3;
-            gcf_C->next_term3 = nullptr;
-            if (!readTerm3(fp, gcf_C, N))
+            gcf_C_ = new term3;
+            gcf_C_->next_term3 = nullptr;
+            if (!readTerm3(fp, gcf_C_, N))
                 return false;
         }
     } else {
-        gcf = nullptr;
-        gcf_U1 = nullptr;
-        gcf_U2 = nullptr;
-        gcf_V1 = nullptr;
-        gcf_V2 = nullptr;
-        gcf_C = nullptr;
+        gcf_ = nullptr;
+        gcf_U1_ = nullptr;
+        gcf_U2_ = nullptr;
+        gcf_V1_ = nullptr;
+        gcf_V2_ = nullptr;
+        gcf_C_ = nullptr;
     }
 
+    return true;
+}
+
+// -----------------------------------------------------------------------
+//                      WVFStudy::ReadCurve
+// -----------------------------------------------------------------------
+bool WVFStudy::readCurve(std::string basename)
+{
+    int N, degree_curve;
+    FILE *fp = nullptr;
+
+    fp = fopen((basename + "_veccurve.tab").c_str(), "rt");
+    if (fp == nullptr) {
+        g_globalLogger.error("[WFStudy] Cannot open file " + basename +
+                             "_veccurve.tab");
+        return false;
+    }
+
+    curves new_curve;
+    if (fscanf(fp, "%d", &degree_curve) != 1)
+        return false;
+
+    if (degree_curve > 0) {
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_curve.r2 = new term2;
+        new_curve.r2->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_curve.r2, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_curve.u1 = new term2;
+        new_curve.u1->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_curve.u1, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_curve.u2 = new term2;
+        new_curve.u2->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_curve.u2, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_curve.v1 = new term2;
+        new_curve.v1->next_term2 = nullptr;
+        if (!readTerm2(fp, new_curve.v1, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+        new_curve.v2 = new term2;
+        new_curve.v2->next_term2 = nullptr;
+        if (!readTerm2(fp, new_curve.v2, N))
+            return false;
+
+        if (p_ != 1 || q_ != 1) {
+            if (fscanf(fp, "%d", &N) != 1)
+                return false;
+
+            new_curve.c = new term3;
+            new_curve.c->next_term3 = nullptr;
+            if (!readTerm3(fp, new_curve.c, N))
+                return false;
+        }
+    } else {
+        return false;
+    }
+
+    curve_vector_.push_back(new_curve);
+    return true;
+}
+
+// -----------------------------------------------------------------------
+//                      WVFStudy::ReadIsoclines
+// -----------------------------------------------------------------------
+bool WVFStudy::readIsoclines(std::string basename)
+{
+    int N, degree_curve;
+    FILE *fp = nullptr;
+
+    fp = fopen((basename + "_vecisoclines.tab").c_str(), "rt");
+    if (fp == nullptr) {
+        g_globalLogger.error("[WVFSttudy] Cannot open file " + basename +
+                             "_vecisoclines.tab");
+        return false;
+    }
+
+    isoclines new_isocline;
+    if (fscanf(fp, "%d", &degree_curve) != 1)
+        return false;
+
+    if (degree_curve > 0) {
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        // prepare a new isocline and link it to the list
+
+        new_isocline.r2 = new term2;
+        new_isocline.r2->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_isocline.r2, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_isocline.u1 = new term2;
+        new_isocline.u1->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_isocline.u1, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_isocline.u2 = new term2;
+        new_isocline.u2->next_term2 = nullptr;
+
+        if (!readTerm2(fp, new_isocline.u2, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+
+        new_isocline.v1 = new term2;
+        new_isocline.v1->next_term2 = nullptr;
+        if (!readTerm2(fp, new_isocline.v1, N))
+            return false;
+
+        if (fscanf(fp, "%d", &N) != 1)
+            return false;
+        new_isocline.v2 = new term2;
+        new_isocline.v2->next_term2 = nullptr;
+        if (!readTerm2(fp, new_isocline.v2, N))
+            return false;
+
+        if (p_ != 1 || q_ != 1) {
+            if (fscanf(fp, "%d", &N) != 1)
+                return false;
+
+            new_isocline.c = new term3;
+            new_isocline.c->next_term3 = nullptr;
+            if (!readTerm3(fp, new_isocline.c, N))
+                return false;
+        } else {
+            new_isocline.c = nullptr;
+        }
+    } else {
+        return false;
+    }
+
+    isocline_vector_.push_back(new_isocline);
     return true;
 }
 
@@ -756,62 +1327,62 @@ bool WVFStudy::readPoints(FILE *fp)
     int N, i, typ;
 
     if (fscanf(fp, "%d ", &N) != 1) {
-        lasterror = "#sing not readable";
+        lasterror_ = "#sing not readable";
         return false;
     }
 
     for (i = 1; i <= N; i++) {
         if (fscanf(fp, "%d ", &typ) != 1) {
-            lasterror =
+            lasterror_ =
                 WString("sing #") + std::to_string(i) + " type not readable";
             return false;
         }
         switch (typ) {
         case SADDLE:
             if (!readSaddlePoint(fp)) {
-                lasterror = WString("sing #") + std::to_string(i) +
-                            " = saddle : " + lasterror;
+                lasterror_ = WString("sing #") + std::to_string(i) +
+                             " = saddle : " + lasterror_;
                 return false;
             }
             break;
         case SEMI_HYPERBOLIC:
             if (!readSemiElementaryPoint(fp)) {
-                lasterror = WString("sing #") + std::to_string(i) +
-                            " = semi-el : " + lasterror;
+                lasterror_ = WString("sing #") + std::to_string(i) +
+                             " = semi-el : " + lasterror_;
                 return false;
             }
             break;
         case NODE:
             if (!readNodePoint(fp)) {
-                lasterror = WString("sing #") + std::to_string(i) +
-                            " = node : " + lasterror;
+                lasterror_ = WString("sing #") + std::to_string(i) +
+                             " = node : " + lasterror_;
                 return false;
             }
             break;
         case STRONG_FOCUS:
             if (!readStrongFocusPoint(fp)) {
-                lasterror = WString("sing #") + std::to_string(i) +
-                            " = strongfocus : " + lasterror;
+                lasterror_ = WString("sing #") + std::to_string(i) +
+                             " = strongfocus : " + lasterror_;
                 return false;
             }
             break;
         case WEAK_FOCUS:
             if (!readWeakFocusPoint(fp)) {
-                lasterror = WString("sing #") + std::to_string(i) +
-                            " = weakfocus : " + lasterror;
+                lasterror_ = WString("sing #") + std::to_string(i) +
+                             " = weakfocus : " + lasterror_;
                 return false;
             }
             break;
         case NON_ELEMENTARY:
             if (!readDegeneratePoint(fp)) {
-                lasterror = WString("sing #") + std::to_string(i) +
-                            " = degen : " + lasterror;
+                lasterror_ = WString("sing #") + std::to_string(i) +
+                             " = degen : " + lasterror_;
                 return false;
             }
             break;
         default:
-            lasterror = WString("sing #") + std::to_string(i) +
-                        " type not exist (" + std::to_string(typ) + ")";
+            lasterror_ = WString("sing #") + std::to_string(i) +
+                         " type not exist (" + std::to_string(typ) + ")";
             return false;
         }
     }
@@ -919,7 +1490,7 @@ bool WVFStudy::readSaddlePoint(FILE *fp)
     saddle *point;
 
     last = nullptr;
-    point = first_saddle_point;
+    point = first_saddle_point_;
     while (point != nullptr) {
         last = point;
         point = point->next_saddle;
@@ -927,7 +1498,7 @@ bool WVFStudy::readSaddlePoint(FILE *fp)
 
     point = new saddle;
     if (last == nullptr)
-        first_saddle_point = point;
+        first_saddle_point_ = point;
     else
         last->next_saddle = point;
 
@@ -964,7 +1535,7 @@ bool WVFStudy::readSaddlePoint(FILE *fp)
     sep1->last_sep_point = nullptr;
     sep1->next_sep = nullptr;
 
-    if (point->chart == CHART_R2 || singinf) {
+    if (point->chart == CHART_R2 || singinf_) {
         // point is finite hence we have 4 separatrices or we have a line of
         // singularities
         // at infinity and hence we have also 4 separatrices after removing the
@@ -1018,7 +1589,7 @@ bool WVFStudy::readSaddlePoint(FILE *fp)
 
     // line at infinity a line of singularities in poincare disc
 
-    if (singinf && point->chart != CHART_R2) {
+    if (singinf_ && point->chart != CHART_R2) {
         last = point;
         point = new saddle;
         last->next_saddle = point;
@@ -1058,7 +1629,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
     bool ok;
 
     last = nullptr;
-    point = first_se_point;
+    point = first_se_point_;
     while (point != nullptr) {
         last = point;
         point = point->next_se;
@@ -1066,7 +1637,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
 
     point = new semi_elementary;
     if (last == nullptr)
-        first_se_point = point;
+        first_se_point_ = point;
     else
         last->next_se = point;
 
@@ -1083,7 +1654,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
 
     switch (point->type) {
     case 1: // saddle-node
-        if (s && point->chart != CHART_R2 && !singinf) {
+        if (s && point->chart != CHART_R2 && !singinf_) {
             // hyperbolic sep = line at infinity, not reported
             // center sep in the wrong direction
             // so no separatrices
@@ -1104,9 +1675,9 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
                 sep1->type = OT_UNSTABLE;
 
             sep1->d = 0;
-            if (((p == 1) && (q == 1) &&
+            if (((p_ == 1) && (q_ == 1) &&
                  ((point->chart == CHART_V1) || (point->chart == CHART_V2))) ||
-                (point->chart == CHART_R2 || singinf)) {
+                (point->chart == CHART_R2 || singinf_)) {
                 sep1->direction = -1;
             } else {
                 sep1->direction = 1;
@@ -1120,7 +1691,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
             sep1->next_sep = nullptr;
-            if (point->chart == CHART_R2 || singinf) {
+            if (point->chart == CHART_R2 || singinf_) {
                 // read second (hyperbolic) separatrix
 
                 sep1->next_sep = new sep;
@@ -1160,7 +1731,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
             sep1->type = STYPE_STABLE;
 
         sep1->d = 0;
-        if ((p == 1) && (q == 1) &&
+        if ((p_ == 1) && (q_ == 1) &&
             ((point->chart == CHART_V1) || (point->chart == CHART_V2)))
             sep1->direction = -1;
         else
@@ -1174,7 +1745,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
         sep1->next_sep = nullptr;
-        if (point->chart == CHART_R2 || singinf) {
+        if (point->chart == CHART_R2 || singinf_) {
             sep1->next_sep = new sep;
             sep1 = sep1->next_sep;
             sep1->type = STYPE_STABLE;
@@ -1207,7 +1778,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         else
             sep1->type = STYPE_UNSTABLE;
         sep1->d = 0;
-        if ((p == 1) && (q == 1) &&
+        if ((p_ == 1) && (q_ == 1) &&
             ((point->chart == CHART_V1) || (point->chart == CHART_V2)))
             sep1->direction = -1;
         else
@@ -1221,7 +1792,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
         sep1->next_sep = nullptr;
-        if (point->chart == CHART_R2 || singinf) {
+        if (point->chart == CHART_R2 || singinf_) {
             sep1->next_sep = new sep;
             sep1 = sep1->next_sep;
             sep1->type = STYPE_UNSTABLE;
@@ -1247,7 +1818,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         break;
 
     case 4: // saddle-node
-        if (s && (point->chart != CHART_R2) && !singinf) {
+        if (s && (point->chart != CHART_R2) && !singinf_) {
             point->separatrices = nullptr;
         } else {
             point->separatrices = new sep;
@@ -1258,9 +1829,9 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
                 sep1->type = STYPE_STABLE;
 
             sep1->d = 0;
-            if (((p == 1) && (q == 1) &&
+            if (((p_ == 1) && (q_ == 1) &&
                  ((point->chart == CHART_V1) || (point->chart == CHART_V2))) ||
-                (point->chart == CHART_R2 || singinf))
+                (point->chart == CHART_R2 || singinf_))
                 sep1->direction = -1;
             else
                 sep1->direction = 1;
@@ -1273,7 +1844,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
             sep1->first_sep_point = nullptr;
             sep1->last_sep_point = nullptr;
             sep1->next_sep = nullptr;
-            if (point->chart == CHART_R2 || singinf) {
+            if (point->chart == CHART_R2 || singinf_) {
                 sep1->next_sep = new sep;
                 sep1 = sep1->next_sep;
                 sep1->type = STYPE_STABLE;
@@ -1307,7 +1878,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         else
             sep1->type = STYPE_STABLE;
         sep1->d = 0;
-        if ((p == 1) && (q == 1) &&
+        if ((p_ == 1) && (q_ == 1) &&
             ((point->chart == CHART_V1) || (point->chart == CHART_V2)))
             sep1->direction = -1;
         else
@@ -1320,7 +1891,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
         sep1->next_sep = nullptr;
-        if (point->chart == CHART_R2 || singinf) {
+        if (point->chart == CHART_R2 || singinf_) {
             sep1->next_sep = new sep;
             sep1->next_sep->type = STYPE_CENUNSTABLE;
             sep1->next_sep->d = 0;
@@ -1361,7 +1932,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         else
             sep1->type = STYPE_UNSTABLE;
         sep1->d = 0;
-        if ((p == 1) && (q == 1) &&
+        if ((p_ == 1) && (q_ == 1) &&
             ((point->chart == CHART_V1) || (point->chart == CHART_V2)))
             sep1->direction = -1;
         else
@@ -1374,7 +1945,7 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         sep1->first_sep_point = nullptr;
         sep1->last_sep_point = nullptr;
         sep1->next_sep = nullptr;
-        if (point->chart == CHART_R2 || singinf) {
+        if (point->chart == CHART_R2 || singinf_) {
             sep1->next_sep = new sep;
             sep1->next_sep->type = STYPE_CENSTABLE;
             sep1->next_sep->d = 0;
@@ -1416,27 +1987,27 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
         ok = false;
         switch (point->chart) {
         case CHART_R2:
-            if (eval_term2(gcf, y) < 0)
+            if (eval_term2(gcf_, y) < 0)
                 ok = true;
             break;
         case CHART_U1:
-            if (eval_term2(gcf_U1, y) < 0)
+            if (eval_term2(gcf_U1_, y) < 0)
                 ok = true;
             break;
         case CHART_V1:
-            if ((p == 1) && (q == 1))
+            if ((p_ == 1) && (q_ == 1))
                 y[0] = -y[0];
-            if (eval_term2(gcf_V1, y) < 0)
+            if (eval_term2(gcf_V1_, y) < 0)
                 ok = true;
             break;
         case CHART_U2:
-            if (eval_term2(gcf_U2, y) < 0)
+            if (eval_term2(gcf_U2_, y) < 0)
                 ok = true;
             break;
         case CHART_V2:
-            if ((p == 1) && (q == 1))
+            if ((p_ == 1) && (q_ == 1))
                 y[0] = -y[0];
-            if (eval_term2(gcf_V2, y) < 0)
+            if (eval_term2(gcf_V2_, y) < 0)
                 ok = true;
             break;
         }
@@ -1454,11 +2025,11 @@ bool WVFStudy::readSemiElementaryPoint(FILE *fp)
 
     // line at infinity a line of singularities in poincare disc
 
-    if (singinf && (point->chart != CHART_R2)) {
+    if (singinf_ && (point->chart != CHART_R2)) {
         point->next_se = new semi_elementary;
         point->next_se->x0 = point->x0;
         point->next_se->y0 = 0.0;
-        if (dir_vec_field == 1)
+        if (dir_vec_field_ == 1)
             point->next_se->type = point->type;
         else
             switch (point->type) {
@@ -1514,7 +2085,7 @@ bool WVFStudy::readStrongFocusPoint(FILE *fp)
     strong_focus *point;
 
     last = nullptr;
-    point = first_sf_point;
+    point = first_sf_point_;
     while (point != nullptr) {
         last = point;
         point = point->next_sf;
@@ -1522,7 +2093,7 @@ bool WVFStudy::readStrongFocusPoint(FILE *fp)
 
     point = new strong_focus;
     if (last == nullptr)
-        first_sf_point = point;
+        first_sf_point_ = point;
     else
         last->next_sf = point;
 
@@ -1543,40 +2114,40 @@ bool WVFStudy::readStrongFocusPoint(FILE *fp)
 
     switch (point->chart) {
     case CHART_R2:
-        if (eval_term2(gcf, y) < 0)
+        if (eval_term2(gcf_, y) < 0)
             point->stable *= -1;
         break;
 
     case CHART_U1:
-        if (eval_term2(gcf_U1, y) < 0)
+        if (eval_term2(gcf_U1_, y) < 0)
             point->stable *= -1;
         break;
 
     case CHART_V1:
-        if (p == 1 && q == 1)
+        if (p_ == 1 && q_ == 1)
             y[0] = -y[0];
 
-        if (eval_term2(gcf_V1, y) < 0)
+        if (eval_term2(gcf_V1_, y) < 0)
             point->stable *= -1;
         break;
 
     case CHART_U2:
-        if (eval_term2(gcf_U2, y) < 0)
+        if (eval_term2(gcf_U2_, y) < 0)
             point->stable *= -1;
         break;
 
     case CHART_V2:
-        if (p == 1 && q == 1)
+        if (p_ == 1 && q_ == 1)
             y[0] = -y[0];
 
-        if (eval_term2(gcf_V2, y) < 0)
+        if (eval_term2(gcf_V2_, y) < 0)
             point->stable *= -1;
         break;
     }
 
     // line at infinity a line of singularities in poincare disc
 
-    if (singinf && point->chart != CHART_R2) {
+    if (singinf_ && point->chart != CHART_R2) {
         last = point;
         point = new strong_focus;
         last->next_sf = point;
@@ -1585,7 +2156,7 @@ bool WVFStudy::readStrongFocusPoint(FILE *fp)
         point->x0 = last->x0;
         point->y0 = 0.0;
         point->chart = ((point->chart == CHART_U1) ? CHART_V1 : CHART_V2);
-        point->stable = last->stable * ((dir_vec_field == -1) ? -1 : 1);
+        point->stable = last->stable * ((dir_vec_field_ == -1) ? -1 : 1);
     }
 
     return true;
@@ -1600,7 +2171,7 @@ bool WVFStudy::readWeakFocusPoint(FILE *fp)
     double y[2];
 
     last = nullptr;
-    point = first_wf_point;
+    point = first_wf_point_;
     while (point != nullptr) {
         last = point;
         point = point->next_wf;
@@ -1608,7 +2179,7 @@ bool WVFStudy::readWeakFocusPoint(FILE *fp)
 
     point = new weak_focus;
     if (last == nullptr)
-        first_wf_point = point;
+        first_wf_point_ = point;
     else
         last->next_wf = point;
 
@@ -1627,42 +2198,42 @@ bool WVFStudy::readWeakFocusPoint(FILE *fp)
 
         switch (point->chart) {
         case CHART_R2:
-            if (eval_term2(gcf, y) < 0)
+            if (eval_term2(gcf_, y) < 0)
                 point->type *= -1;
             break;
 
         case CHART_U1:
-            if (eval_term2(gcf_U1, y) < 0)
+            if (eval_term2(gcf_U1_, y) < 0)
                 point->type *= -1;
             break;
 
         case CHART_V1:
-            if ((p == 1) && (q == 1))
+            if ((p_ == 1) && (q_ == 1))
                 y[0] = -y[0];
-            if (eval_term2(gcf_V1, y) < 0)
+            if (eval_term2(gcf_V1_, y) < 0)
                 point->type *= -1;
             break;
 
         case CHART_U2:
-            if (eval_term2(gcf_U2, y) < 0)
+            if (eval_term2(gcf_U2_, y) < 0)
                 point->type *= -1;
             break;
 
         case CHART_V2:
-            if ((p == 1) && (q == 1))
+            if ((p_ == 1) && (q_ == 1))
                 y[0] = -y[0];
-            if (eval_term2(gcf_V2, y) < 0)
+            if (eval_term2(gcf_V2_, y) < 0)
                 point->type *= -1;
             break;
         }
     }
 
-    if (singinf && (point->chart != CHART_R2)) {
+    if (singinf_ && (point->chart != CHART_R2)) {
         point->next_wf = new weak_focus;
         point->next_wf->x0 = point->x0;
         point->next_wf->y0 = 0.0;
 
-        if (dir_vec_field == 1)
+        if (dir_vec_field_ == 1)
             point->next_wf->type = point->type;
         else
             switch (point->type) {
@@ -1700,7 +2271,7 @@ bool WVFStudy::readDegeneratePoint(FILE *fp)
     degenerate *point;
 
     last = nullptr;
-    point = first_de_point;
+    point = first_de_point_;
     while (point != nullptr) {
         last = point;
         point = point->next_de;
@@ -1708,7 +2279,7 @@ bool WVFStudy::readDegeneratePoint(FILE *fp)
 
     point = new degenerate;
     if (last == nullptr)
-        first_de_point = point;
+        first_de_point_ = point;
     else
         last->next_de = point;
 
@@ -1733,7 +2304,7 @@ bool WVFStudy::readDegeneratePoint(FILE *fp)
 
     // line at infinity a line of singularities in poincare disc
 
-    if (singinf && point->chart != CHART_R2) {
+    if (singinf_ && point->chart != CHART_R2) {
         last = point;
         point = new degenerate;
         last->next_de = point;
@@ -1764,7 +2335,7 @@ bool WVFStudy::readNodePoint(FILE *fp)
     node *point;
 
     last = nullptr;
-    point = first_node_point;
+    point = first_node_point_;
     while (point != nullptr) {
         last = point;
         point = point->next_node;
@@ -1772,7 +2343,7 @@ bool WVFStudy::readNodePoint(FILE *fp)
 
     point = new node;
     if (last == nullptr)
-        first_node_point = point;
+        first_node_point_ = point;
     else
         last->next_node = point;
 
@@ -1793,32 +2364,32 @@ bool WVFStudy::readNodePoint(FILE *fp)
 
     switch (point->chart) {
     case CHART_R2:
-        if (eval_term2(gcf, y) < 0)
+        if (eval_term2(gcf_, y) < 0)
             point->stable *= -1;
         break;
 
     case CHART_U1:
-        if (eval_term2(gcf_U1, y) < 0)
+        if (eval_term2(gcf_U1_, y) < 0)
             point->stable *= -1;
         break;
 
     case CHART_V1:
-        if (p == 1 && q == 1)
+        if (p_ == 1 && q_ == 1)
             y[0] = -y[0];
 
-        if (eval_term2(gcf_V1, y) < 0)
+        if (eval_term2(gcf_V1_, y) < 0)
             point->stable *= -1;
         break;
 
     case CHART_U2:
-        if (eval_term2(gcf_U2, y) < 0)
+        if (eval_term2(gcf_U2_, y) < 0)
             point->stable *= -1;
         break;
 
     case CHART_V2:
-        if (p == 1 && q == 1)
+        if (p_ == 1 && q_ == 1)
             y[0] = -y[0];
-        if (eval_term2(gcf_V2, y) < 0)
+        if (eval_term2(gcf_V2_, y) < 0)
             point->stable *= -1;
         break;
     }
@@ -1826,7 +2397,7 @@ bool WVFStudy::readNodePoint(FILE *fp)
     // if line at infinity a line of singularities in poincare disc:
     // duplicate singularity by using a symmetry
 
-    if (singinf != 0 && point->chart != CHART_R2) {
+    if (singinf_ != 0 && point->chart != CHART_R2) {
         last = point;
         point = new node;
         last->next_node = point;
@@ -1835,7 +2406,7 @@ bool WVFStudy::readNodePoint(FILE *fp)
         point->x0 = last->x0;
         point->y0 = 0.0;
         point->chart = (last->chart == CHART_U1) ? CHART_V1 : CHART_V2;
-        point->stable = last->stable * (dir_vec_field == -1) ? -1 : 1;
+        point->stable = last->stable * (dir_vec_field_ == -1) ? -1 : 1;
     }
 
     return true;
@@ -1964,7 +2535,7 @@ bool WVFStudy::readBlowupPoints(FILE *fp, blow_up_points *b, int n)
 
 void WVFStudy::setupCoordinateTransformations(void)
 {
-    if (!plweights) {
+    if (!plweights_) {
         U1_to_sphere = &WVFStudy::U1_to_psphere;
         U2_to_sphere = &WVFStudy::U2_to_psphere;
         V1_to_sphere = &WVFStudy::VV1_to_psphere;
@@ -1982,7 +2553,7 @@ void WVFStudy::setupCoordinateTransformations(void)
         less2 = &WVFStudy::less_poincare;
         change_dir = &WVFStudy::change_dir_poincare;
 
-        switch (typeofview) {
+        switch (typeofview_) {
         case TYPEOFVIEW_SPHERE:
             viewcoord_to_sphere = &WVFStudy::ucircle_psphere;
             sphere_to_viewcoord = &WVFStudy::psphere_ucircle;
@@ -2036,6 +2607,10 @@ void WVFStudy::setupCoordinateTransformations(void)
             sphere_to_viewcoordpair =
                 &WVFStudy::psphere_to_viewcoordpair_discontinuousy;
             break;
+        default:
+            g_globalLogger.fatal("[WVFStudy] could not resolve switch in "
+                                 "setupCoordinateTransformations");
+            return;
         }
     } else {
         U1_to_sphere = &WVFStudy::U1_to_plsphere;
@@ -2055,7 +2630,7 @@ void WVFStudy::setupCoordinateTransformations(void)
         less2 = &WVFStudy::less_lyapunov;
         change_dir = &WVFStudy::change_dir_lyapunov;
 
-        switch (typeofview) {
+        switch (typeofview_) {
         case TYPEOFVIEW_SPHERE:
             viewcoord_to_sphere = &WVFStudy::annulus_plsphere;
             sphere_to_viewcoord = &WVFStudy::plsphere_annulus;
@@ -2107,6 +2682,10 @@ void WVFStudy::setupCoordinateTransformations(void)
             sphere_to_viewcoordpair =
                 &WVFStudy::plsphere_to_viewcoordpair_discontinuousy;
             break;
+        default:
+            g_globalLogger.fatal("[WVFStudy] could not resolve switch in "
+                                 "setupCoordinateTransformations");
+            return;
         }
     }
 }
@@ -2168,11 +2747,11 @@ void WVFStudy::psphere_ucircle(double X, double Y, double Z, double *ucoord)
 {
     double k;
 
-    if (config_projection == 0) {
+    if (config_projection_ == 0) {
         ucoord[0] = X;
         ucoord[1] = Y;
     } else {
-        k = -Z / (Z - config_projection);
+        k = -Z / (Z - config_projection_);
         ucoord[0] = (1.0 + k) * X;
         ucoord[1] = (1.0 + k) * Y;
     }
@@ -2182,7 +2761,7 @@ void WVFStudy::ucircle_psphere(double u, double v, double *pcoord)
 {
     double k, projection;
 
-    projection = config_projection;
+    projection = config_projection_;
 
     if (projection == 0) {
         pcoord[0] = u;
@@ -2332,8 +2911,8 @@ bool WVFStudy::isvalid_U1viewcoord(double u, double v, double *pcoord)
 {
     // the u coordinate must be positive, except when p is odd.
 
-    if (plweights) {
-        if ((p % 2) == 0 && u < 0)
+    if (plweights_) {
+        if ((p_ % 2) == 0 && u < 0)
             return false;
     }
 
@@ -2343,8 +2922,8 @@ bool WVFStudy::isvalid_U1viewcoord(double u, double v, double *pcoord)
 
 bool WVFStudy::isvalid_U2viewcoord(double u, double v, double *pcoord)
 {
-    if (plweights) {
-        if ((q % 2) == 0 && v < 0)
+    if (plweights_) {
+        if ((q_ % 2) == 0 && v < 0)
             return false;
     }
 
@@ -2354,8 +2933,8 @@ bool WVFStudy::isvalid_U2viewcoord(double u, double v, double *pcoord)
 
 bool WVFStudy::isvalid_V1viewcoord(double u, double v, double *pcoord)
 {
-    if (plweights) {
-        if ((p % 2) == 0 && u < 0)
+    if (plweights_) {
+        if ((p_ % 2) == 0 && u < 0)
             return false;
     }
 
@@ -2365,8 +2944,8 @@ bool WVFStudy::isvalid_V1viewcoord(double u, double v, double *pcoord)
 
 bool WVFStudy::isvalid_V2viewcoord(double u, double v, double *pcoord)
 {
-    if (plweights) {
-        if ((q % 2) == 0 && v < 0)
+    if (plweights_) {
+        if ((q_ % 2) == 0 && v < 0)
             return false;
     }
 
@@ -2442,25 +3021,25 @@ static double U = 0.0;
 
 double WVFStudy::func_U1(double x)
 {
-    return pow(x, double_p) + U * U * pow(x, double_q) - 1.0;
+    return pow(x, double_p_) + U * U * pow(x, double_q_) - 1.0;
 }
 
 double WVFStudy::dfunc_U1(double x)
 {
-    return double_p * pow(x, double_p_minus_1) +
-           U * U * double_q * pow(x, double_q_minus_1);
+    return double_p_ * pow(x, double_p_minus_1_) +
+           U * U * double_q_ * pow(x, double_q_minus_1_);
 }
 
 double WVFStudy::func_U1_s0(double theta)
 {
     /* find theta if s=0 and u<>0 */
-    return U * pow(cos(theta), double_q) - pow(sin(theta), double_p);
+    return U * pow(cos(theta), double_q_) - pow(sin(theta), double_p_);
 }
 
 double WVFStudy::dfunc_U1_s0(double theta)
 {
-    return (-double_q * U * pow(cos(theta), double_q_minus_1) * sin(theta) -
-            double_p * cos(theta) * pow(sin(theta), double_p_minus_1));
+    return (-double_q_ * U * pow(cos(theta), double_q_minus_1_) * sin(theta) -
+            double_p_ * cos(theta) * pow(sin(theta), double_p_minus_1_));
 }
 
 void WVFStudy::U1_to_cylinder(double u, double s, double *c)
@@ -2474,7 +3053,7 @@ void WVFStudy::U1_to_cylinder(double u, double s, double *c)
         c[1] = 0;
     } else if (s == 0) {
         c[0] = 0;
-        U = pow(u, double_p);
+        U = pow(u, double_p_);
         if (u > 0) {
             x[0] = 0;
             x[1] = PI / 2.0;
@@ -2489,7 +3068,7 @@ void WVFStudy::U1_to_cylinder(double u, double s, double *c)
         U = u;
         y = find_root(&WVFStudy::func_U1, &WVFStudy::dfunc_U1, x);
         c[0] = sqrt(y) * s;
-        c[1] = atan(u * pow(sqrt(y), double_q_minus_p));
+        c[1] = atan(u * pow(sqrt(y), double_q_minus_p_));
     }
 }
 
@@ -2497,7 +3076,7 @@ void WVFStudy::U1_to_cylinder(double u, double s, double *c)
 void WVFStudy::cylinder_to_U1( double r, double theta, double * c)
 {
     c[1]=r/pow(cos(theta),__one_over_p);
-    c[0]=sin(theta)*pow(c[1]/r,double_q);
+    c[0]=sin(theta)*pow(c[1]/r,double_q_);
 }
 */
 
@@ -2512,7 +3091,7 @@ void WVFStudy::V1_to_cylinder(double u, double s, double *c)
         c[1] = PI;
     } else if (s == 0) {
         c[0] = 0;
-        U = pow(u, double_p) * __minus_one_to_q;
+        U = pow(u, double_p_) * __minus_one_to_q;
         if (u > 0) {
             x[0] = PI / 2;
             x[1] = PI;
@@ -2527,7 +3106,7 @@ void WVFStudy::V1_to_cylinder(double u, double s, double *c)
         U = u;
         y = find_root(&WVFStudy::func_U1, &WVFStudy::dfunc_U1, x);
         c[0] = sqrt(y) * s;
-        c[1] = atan(-u * pow(sqrt(y), double_q_minus_p));
+        c[1] = atan(-u * pow(sqrt(y), double_q_minus_p_));
         if (c[1] > 0)
             c[1] -= PI;
         else
@@ -2539,7 +3118,7 @@ void WVFStudy::V1_to_cylinder(double u, double s, double *c)
 void WVFStudy::cylinder_to_V1( double r, double theta, double * c)
 {
     c[1]=r/pow(-cos(theta),__one_over_p);
-    c[0]=sin(theta)*pow(c[1]/r,double_q);
+    c[0]=sin(theta)*pow(c[1]/r,double_q_);
 }
 */
 
@@ -2554,24 +3133,24 @@ void WVFStudy::cylinder_to_V1( double r, double theta, double * c)
 
 double WVFStudy::func_U2(double x)
 {
-    return (U * U * pow(x, double_p) + pow(x, double_q) - 1.0);
+    return (U * U * pow(x, double_p_) + pow(x, double_q_) - 1.0);
 }
 
 double WVFStudy::dfunc_U2(double x)
 {
-    return (double_p * U * U * pow(x, double_p_minus_1) +
-            double_q * pow(x, double_q_minus_1));
+    return (double_p_ * U * U * pow(x, double_p_minus_1_) +
+            double_q_ * pow(x, double_q_minus_1_));
 }
 
 double WVFStudy::func_U2_s0(double theta)
 {
-    return (U * pow(sin(theta), double_p) - pow(cos(theta), double_q));
+    return (U * pow(sin(theta), double_p_) - pow(cos(theta), double_q_));
 }
 
 double WVFStudy::dfunc_U2_s0(double theta)
 {
-    return (double_p * U * cos(theta) * pow(sin(theta), double_p_minus_1) +
-            double_q * sin(theta) * pow(cos(theta), double_q_minus_1)); ////
+    return (double_p_ * U * cos(theta) * pow(sin(theta), double_p_minus_1_) +
+            double_q_ * sin(theta) * pow(cos(theta), double_q_minus_1_)); ////
 }
 
 void WVFStudy::U2_to_cylinder(double u, double s, double *c)
@@ -2585,7 +3164,7 @@ void WVFStudy::U2_to_cylinder(double u, double s, double *c)
         c[1] = PI / 2;
     } else if (s == 0) {
         c[0] = 0;
-        U = pow(u, double_q);
+        U = pow(u, double_q_);
         if (u > 0) {
             x[0] = 0;
             x[1] = PI / 2.0;
@@ -2600,7 +3179,7 @@ void WVFStudy::U2_to_cylinder(double u, double s, double *c)
         U = u;
         y = find_root(&WVFStudy::func_U2, &WVFStudy::dfunc_U2, x);
         c[0] = sqrt(y) * s;
-        c[1] = atan(pow(sqrt(y), double_q_minus_p) / u);
+        c[1] = atan(pow(sqrt(y), double_q_minus_p_) / u);
         if (c[1] < 0)
             c[1] += PI;
     }
@@ -2610,7 +3189,7 @@ void WVFStudy::U2_to_cylinder(double u, double s, double *c)
 void WVFStudy::cylinder_to_U2( double r, double theta, double * c )
 {
     c[1] = r/pow(sin(theta),__one_over_q);
-    c[0] = cos(theta)*pow(c[1]/r,double_p);
+    c[0] = cos(theta)*pow(c[1]/r,double_p_);
 }
 */
 
@@ -2627,7 +3206,7 @@ void WVFStudy::V2_to_cylinder(double u, double s, double *c)
     } else {
         if (s == 0) {
             c[0] = 0;
-            U = pow(u, double_q) * __minus_one_to_p;
+            U = pow(u, double_q_) * __minus_one_to_p;
             if (u > 0) {
                 x[0] = -PI / 2;
                 x[1] = 0;
@@ -2642,7 +3221,7 @@ void WVFStudy::V2_to_cylinder(double u, double s, double *c)
             U = u;
             y = find_root(&WVFStudy::func_U2, &WVFStudy::dfunc_U2, x);
             c[0] = sqrt(y) * s;
-            c[1] = atan(-pow(sqrt(y), double_q_minus_p) / u);
+            c[1] = atan(-pow(sqrt(y), double_q_minus_p_) / u);
             if (c[1] > 0)
                 c[1] -= PI;
         }
@@ -2653,7 +3232,7 @@ void WVFStudy::V2_to_cylinder(double u, double s, double *c)
 void WVFStudy::cylinder_to_V2( double r, double theta, double * c)
 {
     c[1] = r / pow( -sin(theta), __one_over_q );
-    c[0] = cos(theta) * pow( c[1]/r, double_p );
+    c[0] = cos(theta) * pow( c[1]/r, double_p_ );
 }
 */
 
@@ -2737,13 +3316,13 @@ static double B = 0.0;
 
 double WVFStudy::func(double z)
 {
-    return pow(z, double_p) * A + pow(z, double_q) * B - 1.0;
+    return pow(z, double_p_) * A + pow(z, double_q_) * B - 1.0;
 }
 
 double WVFStudy::dfunc(double z)
 {
-    return double_p * pow(z, double_p_minus_1) * A +
-           double_q * pow(z, double_q_minus_1) * B;
+    return double_p_ * pow(z, double_p_minus_1_) * A +
+           double_q_ * pow(z, double_q_minus_1_) * B;
 }
 
 void WVFStudy::R2_to_plsphere(double x, double y, double *pcoord)
@@ -2764,7 +3343,7 @@ void WVFStudy::R2_to_plsphere(double x, double y, double *pcoord)
         pcoord[1] = find_root(&WVFStudy::func, &WVFStudy::dfunc, z);
         pcoord[1] = sqrt(pcoord[1]);
         pcoord[2] =
-            atan2(pow(pcoord[1], double_q) * y, pow(pcoord[1], double_p) * x);
+            atan2(pow(pcoord[1], double_q_) * y, pow(pcoord[1], double_p_) * x);
     }
 }
 
@@ -2788,8 +3367,8 @@ void WVFStudy::R2_to_plsphere(double x, double y, double *pcoord)
 void WVFStudy::plsphere_to_R2(double ch, double u, double v, double *c)
 {
     if (ch) {
-        c[0] = cos(v) / pow(u, double_p);
-        c[1] = sin(v) / pow(u, double_q);
+        c[0] = cos(v) / pow(u, double_p_);
+        c[1] = sin(v) / pow(u, double_q_);
     } else {
         c[0] = u;
         c[1] = v;
@@ -2820,8 +3399,8 @@ void WVFStudy::cylinder_to_plsphere(double r, double theta, double *pcoord)
         pcoord[2] = theta;
     } else {
         pcoord[0] = 0;
-        pcoord[1] = cos(theta) / pow(r, double_p);
-        pcoord[2] = sin(theta) / pow(r, double_q);
+        pcoord[1] = cos(theta) / pow(r, double_p_);
+        pcoord[2] = sin(theta) / pow(r, double_q_);
     }
 }
 
@@ -2879,7 +3458,7 @@ void WVFStudy::plsphere_to_U1(double ch, double x, double y, double *rcoord)
         a = cos(y);
 
         if (a < 0) {
-            if ((p % 2) == 0) {
+            if ((p_ % 2) == 0) {
                 // p is even: so we have a problem
                 rcoord[0] = floatinfinity();
                 rcoord[1] = floatinfinity();
@@ -2889,11 +3468,11 @@ void WVFStudy::plsphere_to_U1(double ch, double x, double y, double *rcoord)
         } else
             a = pow(a, -__one_over_p); // cos(y)^(-1/p)
 
-        rcoord[0] = sin(y) * pow(a, double_q); // sin(y) * cos(y)^(-q/p)
-        rcoord[1] = x * a;                     // x * cos(y)^(-1/p)
+        rcoord[0] = sin(y) * pow(a, double_q_); // sin(y) * cos(y)^(-q/p)
+        rcoord[1] = x * a;                      // x * cos(y)^(-1/p)
     } else {
         if (x < 0) {
-            if ((p % 2) == 0) {
+            if ((p_ % 2) == 0) {
                 rcoord[0] = floatinfinity();
                 rcoord[1] = floatinfinity();
                 return;
@@ -2902,7 +3481,7 @@ void WVFStudy::plsphere_to_U1(double ch, double x, double y, double *rcoord)
         } else
             a = pow(x, -__one_over_p); // x^(-1/p)
 
-        rcoord[0] = y * pow(a, double_q);
+        rcoord[0] = y * pow(a, double_q_);
         rcoord[1] = a;
     }
 }
@@ -2924,7 +3503,7 @@ void WVFStudy::plsphere_to_U2(double ch, double x, double y, double *rcoord)
         a = sin(y);
 
         if (a < 0) {
-            if ((q % 2) == 0) {
+            if ((q_ % 2) == 0) {
                 // p is even: so we have a problem
                 rcoord[0] = floatinfinity();
                 rcoord[1] = floatinfinity();
@@ -2934,11 +3513,11 @@ void WVFStudy::plsphere_to_U2(double ch, double x, double y, double *rcoord)
         } else
             a = pow(a, -__one_over_q); // sin(y)^(-1/q)
 
-        rcoord[0] = cos(y) * pow(a, double_p); // cos(y) * sin(y)^(-p/q)
-        rcoord[1] = x * a;                     // x * sin(y)^(-1/q)
+        rcoord[0] = cos(y) * pow(a, double_p_); // cos(y) * sin(y)^(-p/q)
+        rcoord[1] = x * a;                      // x * sin(y)^(-1/q)
     } else {
         if (y < 0) {
-            if ((q % 2) == 0) {
+            if ((q_ % 2) == 0) {
                 rcoord[0] = floatinfinity();
                 rcoord[1] = floatinfinity();
                 return;
@@ -2947,7 +3526,7 @@ void WVFStudy::plsphere_to_U2(double ch, double x, double y, double *rcoord)
         } else
             a = pow(y, -__one_over_q); // x^(-1/p)
 
-        rcoord[0] = x * pow(a, double_p);
+        rcoord[0] = x * pow(a, double_p_);
         rcoord[1] = a;
     }
 }
@@ -2959,7 +3538,7 @@ void WVFStudy::plsphere_to_V1(double ch, double x, double y, double *rcoord)
         a = -cos(y);
 
         if (a < 0) {
-            if ((p % 2) == 0) {
+            if ((p_ % 2) == 0) {
                 // p is even: so we have a problem
                 rcoord[0] = floatinfinity();
                 rcoord[1] = floatinfinity();
@@ -2969,11 +3548,11 @@ void WVFStudy::plsphere_to_V1(double ch, double x, double y, double *rcoord)
         } else
             a = pow(a, -__one_over_p); // cos(y)^(-1/p)
 
-        rcoord[0] = sin(y) * pow(a, double_q); // sin(y) * cos(y)^(-q/p)
-        rcoord[1] = x * a;                     // x * cos(y)^(-1/p)
+        rcoord[0] = sin(y) * pow(a, double_q_); // sin(y) * cos(y)^(-q/p)
+        rcoord[1] = x * a;                      // x * cos(y)^(-1/p)
     } else {
         if (x > 0) {
-            if ((p % 2) == 0) {
+            if ((p_ % 2) == 0) {
                 rcoord[0] = floatinfinity();
                 rcoord[1] = floatinfinity();
                 return;
@@ -2982,7 +3561,7 @@ void WVFStudy::plsphere_to_V1(double ch, double x, double y, double *rcoord)
         } else
             a = pow(-x, -__one_over_p); // x^(-1/p)
 
-        rcoord[0] = y * pow(a, double_q);
+        rcoord[0] = y * pow(a, double_q_);
         rcoord[1] = a;
     }
 }
@@ -3002,7 +3581,7 @@ void WVFStudy::plsphere_to_V2(double ch, double x, double y, double *rcoord)
         a = -sin(y);
 
         if (a < 0) {
-            if ((q % 2) == 0) {
+            if ((q_ % 2) == 0) {
                 // p is even: so we have a problem
                 rcoord[0] = floatinfinity();
                 rcoord[1] = floatinfinity();
@@ -3012,11 +3591,11 @@ void WVFStudy::plsphere_to_V2(double ch, double x, double y, double *rcoord)
         } else
             a = pow(a, -__one_over_q); // sin(y)^(-1/q)
 
-        rcoord[0] = cos(y) * pow(a, double_p); // cos(y) * sin(y)^(-p/q)
-        rcoord[1] = x * a;                     // x * sin(y)^(-1/q)
+        rcoord[0] = cos(y) * pow(a, double_p_); // cos(y) * sin(y)^(-p/q)
+        rcoord[1] = x * a;                      // x * sin(y)^(-1/q)
     } else {
         if (y > 0) {
-            if ((q % 2) == 0) {
+            if ((q_ % 2) == 0) {
                 rcoord[0] = floatinfinity();
                 rcoord[1] = floatinfinity();
                 return;
@@ -3025,7 +3604,7 @@ void WVFStudy::plsphere_to_V2(double ch, double x, double y, double *rcoord)
         } else
             a = pow(-y, -__one_over_q); // x^(-1/p)
 
-        rcoord[0] = x * pow(a, double_p);
+        rcoord[0] = x * pow(a, double_p_);
         rcoord[1] = a;
     }
 }
@@ -3038,78 +3617,78 @@ void WVFStudy::eval_r_vec_field(double *y, double *f)
 {
     double s = 1.0;
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && gcf != nullptr)
-        s = eval_term2(gcf, y);
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && gcf_ != nullptr)
+        s = eval_term2(gcf_, y);
 
-    f[0] = s * eval_term2(f_vec_field[0], y);
-    f[1] = s * eval_term2(f_vec_field[1], y);
+    f[0] = s * eval_term2(f_vec_field_[0], y);
+    f[1] = s * eval_term2(f_vec_field_[1], y);
 }
 
 void WVFStudy::eval_U1_vec_field(double *y, double *f)
 {
     double s = 1.0;
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && gcf_U1 != nullptr)
-        s = eval_term2(gcf_U1, y);
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && gcf_U1_ != nullptr)
+        s = eval_term2(gcf_U1_, y);
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && singinf)
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && singinf_)
         s *= y[1];
 
-    f[0] = s * eval_term2(vec_field_U1[0], y);
-    f[1] = s * eval_term2(vec_field_U1[1], y);
+    f[0] = s * eval_term2(vec_field_U1_[0], y);
+    f[1] = s * eval_term2(vec_field_U1_[1], y);
 }
 
 void WVFStudy::eval_U2_vec_field(double *y, double *f)
 {
     double s = 1.0;
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && gcf_U2 != nullptr)
-        s = eval_term2(gcf_U2, y);
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && gcf_U2_ != nullptr)
+        s = eval_term2(gcf_U2_, y);
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && singinf)
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && singinf_)
         s *= y[1];
 
-    f[0] = s * eval_term2(vec_field_U2[0], y);
-    f[1] = s * eval_term2(vec_field_U2[1], y);
+    f[0] = s * eval_term2(vec_field_U2_[0], y);
+    f[1] = s * eval_term2(vec_field_U2_[1], y);
 }
 
 void WVFStudy::eval_V1_vec_field(double *y, double *f)
 {
     double s = 1.0;
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && gcf_V1 != nullptr)
-        s = eval_term2(gcf_V1, y);
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && gcf_V1_ != nullptr)
+        s = eval_term2(gcf_V1_, y);
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && singinf)
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && singinf_)
         s *= y[1];
 
-    f[0] = s * eval_term2(vec_field_V1[0], y);
-    f[1] = s * eval_term2(vec_field_V1[1], y);
+    f[0] = s * eval_term2(vec_field_V1_[0], y);
+    f[1] = s * eval_term2(vec_field_V1_[1], y);
 }
 
 void WVFStudy::eval_V2_vec_field(double *y, double *f)
 {
     double s = 1.0;
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && gcf_V2 != nullptr)
-        s = eval_term2(gcf_V2, y);
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && gcf_V2_ != nullptr)
+        s = eval_term2(gcf_V2_, y);
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && singinf)
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && singinf_)
         s *= y[1];
 
-    f[0] = s * eval_term2(vec_field_V2[0], y);
-    f[1] = s * eval_term2(vec_field_V2[1], y);
+    f[0] = s * eval_term2(vec_field_V2_[0], y);
+    f[1] = s * eval_term2(vec_field_V2_[1], y);
 }
 
 void WVFStudy::eval_vec_field_cyl(double *y, double *f)
 {
     double s = 1.0;
 
-    if (config_kindvf == INTCONFIG_ORIGINAL && gcf_C != nullptr)
-        s = eval_term3(gcf_C, y);
+    if (config_kindvf_ == INTCONFIG_ORIGINAL && gcf_C_ != nullptr)
+        s = eval_term3(gcf_C_, y);
 
-    f[0] = s * eval_term3(vec_field_C[0], y);
-    f[1] = s * eval_term3(vec_field_C[1], y);
+    f[0] = s * eval_term3(vec_field_C_[0], y);
+    f[1] = s * eval_term3(vec_field_C_[1], y);
 }
 
 void WVFStudy::default_finite_to_viewcoord(double x, double y, double *ucoord)
@@ -3375,9 +3954,9 @@ double WVFStudy::eval_lc_poincare(double *pp, double a, double b, double c)
 double WVFStudy::eval_lc_lyapunov(double *pp, double a, double b, double c)
 {
     if (pp[0])
-        return (a * pow(pp[1], double_q) * cos(pp[2]) +
-                b * pow(pp[1], double_p) * sin(pp[2]) +
-                c * pow(pp[1], double_p_plus_q));
+        return (a * pow(pp[1], double_q_) * cos(pp[2]) +
+                b * pow(pp[1], double_p_) * sin(pp[2]) +
+                c * pow(pp[1], double_p_plus_q_));
     else
         return (a * pp[1] + b * pp[2] + c);
 }
@@ -3397,5 +3976,5 @@ bool WVFStudy::less_lyapunov(double *p1, double *p2)
 
 void WVFStudy::set_current_step(double curstep)
 {
-    config_currentstep = curstep;
+    config_currentstep_ = curstep;
 }

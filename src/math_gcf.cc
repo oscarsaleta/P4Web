@@ -28,7 +28,7 @@
 #include <cmath>
 
 // static global variables
-static int GcfDashes = 1;
+static int s_GcfDashes = 1;
 
 // function definitions
 void WVFStudy::rplane_plsphere0(double x, double y, double *pcoord)
@@ -39,24 +39,18 @@ void WVFStudy::rplane_plsphere0(double x, double y, double *pcoord)
 bool WSphere::evalGcfStart(std::string fname, int dashes, int points,
                            int precis)
 {
-    if (study_->gcf_points != nullptr) {
-        /* here we just paint in black over the previous gcf,
-           we can simply reset the plot or something */
-        // sp->prepareDrawing();
-        // draw_gcf( sp, study_->gcf_points, CBACKGROUND, GcfDashes );
-        // sp->finishDrawing();
-        study_->deleteOrbitPoint(study_->gcf_points);
-        study_->gcf_points = nullptr;
+    if (study_->gcf_points_ != nullptr) {
+        study_->deleteOrbitPoint(study_->gcf_points_);
+        study_->gcf_points_ = nullptr;
     }
 
-    if (study_->plweights)
+    if (study_->plweights_)
         gcfTask_ = EVAL_GCF_LYP_R2;
     else
         gcfTask_ = EVAL_GCF_R2;
 
     gcfError_ = false;
-    // GcfSphere = sp;
-    GcfDashes = dashes;
+    s_GcfDashes = dashes;
     if (runTask(fname, gcfTask_, points, precis) < 0)
         return false;
     return true;
@@ -71,7 +65,7 @@ bool WSphere::evalGcfContinue(std::string fname, int points, int prec)
 
     if (!readTaskResults(fname, gcfTask_)) {
         gcfError_ = true;
-        globalLogger__.error("WSphere :: error at gcf readTaskResults");
+        g_globalLogger.error("[WSphere] error at gcf readTaskResults");
         return true;
     }
     gcfTask_++;
@@ -82,7 +76,7 @@ bool WSphere::evalGcfContinue(std::string fname, int points, int prec)
 
     if (runTask(fname, gcfTask_, points, prec) < 0) {
         gcfError_ = true;
-        globalLogger__.error("WSphere :: error at gcf runTask");
+        g_globalLogger.error("[WSphere] error at gcf runTask");
         return true;
     }
 
@@ -106,45 +100,50 @@ bool WSphere::evalGcfFinish(void) // return false in case an error occured
 int WSphere::runTask(std::string fname, int task, int points, int prec)
 {
     bool value;
-    // std::string fname = randomFileName(TMP_DIR,"_gcf.tab");
 
-    globalLogger__.debug("WSphere :: will run GCF task=" +
+    g_globalLogger.debug("[WSphere] will run GCF task=" +
                          std::to_string(task) + " using file=" + fname);
 
     switch (task) {
     case EVAL_GCF_R2:
-        value = prepareGcf(fname, study_->gcf, -1, 1, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_, -1, 1, prec,
+                                           points);
         break;
     case EVAL_GCF_U1:
-        value = prepareGcf(fname, study_->gcf_U1, 0, 1, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_U1_, 0, 1, prec,
+                                           points);
         break;
     case EVAL_GCF_V1:
-        value = prepareGcf(fname, study_->gcf_U1, -1, 0, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_U1_, -1, 0, prec,
+                                           points);
         break;
     case EVAL_GCF_U2:
-        value = prepareGcf(fname, study_->gcf_U2, 0, 1, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_U2_, 0, 1, prec,
+                                           points);
         break;
     case EVAL_GCF_V2:
-        value = prepareGcf(fname, study_->gcf_U2, -1, 0, prec, points);
+        value = scriptHandler_->prepareGcf(fname, study_->gcf_U2_, -1, 0, prec,
+                                           points);
         break;
     case EVAL_GCF_LYP_R2:
-        value = prepareGcf_LyapunovR2(fname, study_->gcf, prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovR2(fname, study_->gcf_, prec,
+                                                      points);
         break;
     case EVAL_GCF_CYL1:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C, -PI_DIV4, PI_DIV4,
-                                       prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovCyl(
+            fname, study_->gcf_C_, -PI_DIV4, PI_DIV4, prec, points);
         break;
     case EVAL_GCF_CYL2:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C, PI_DIV4,
-                                       PI - PI_DIV4, prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovCyl(
+            fname, study_->gcf_C_, PI_DIV4, PI - PI_DIV4, prec, points);
         break;
     case EVAL_GCF_CYL3:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C, PI - PI_DIV4,
-                                       PI + PI_DIV4, prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovCyl(
+            fname, study_->gcf_C_, PI - PI_DIV4, PI + PI_DIV4, prec, points);
         break;
     case EVAL_GCF_CYL4:
-        value = prepareGcf_LyapunovCyl(fname, study_->gcf_C, -PI + PI_DIV4,
-                                       -PI_DIV4, prec, points);
+        value = scriptHandler_->prepareGcf_LyapunovCyl(
+            fname, study_->gcf_C_, -PI + PI_DIV4, -PI_DIV4, prec, points);
         break;
     default:
         value = false;
@@ -152,15 +151,14 @@ int WSphere::runTask(std::string fname, int task, int points, int prec)
     }
 
     if (value)
-        return evaluateMapleScript(fname,60).si_status;
+        return scriptHandler_->evaluateMapleScript(fname, 60).si_status;
     else
         return -1;
 }
 
-bool WSphere::readTaskResults(std::string fname,
-                              int task) // , int points, int prec, int memory )
+bool WSphere::readTaskResults(std::string fname, int task)
 {
-    globalLogger__.debug("WSphere :: called readTaskResults with fname=" +
+    g_globalLogger.debug("[WSphere] called readTaskResults with fname=" +
                          fname + " and task=" + std::to_string(task));
     bool value;
 
@@ -219,27 +217,26 @@ void WSphere::draw_gcf(orbits_points *sep, int color, int dashes)
 
 void WVFStudy::insert_gcf_point(double x0, double y0, double z0, int dashes)
 {
-    if (gcf_points != nullptr) {
-        last_gcf_point->next_point = new orbits_points;
-        last_gcf_point = last_gcf_point->next_point;
+    if (gcf_points_ != nullptr) {
+        last_gcf_point_->next_point = new orbits_points;
+        last_gcf_point_ = last_gcf_point_->next_point;
     } else {
-        last_gcf_point = new orbits_points;
-        gcf_points = last_gcf_point;
+        last_gcf_point_ = new orbits_points;
+        gcf_points_ = last_gcf_point_;
     }
 
-    last_gcf_point->pcoord[0] = x0;
-    last_gcf_point->pcoord[1] = y0;
-    last_gcf_point->pcoord[2] = z0;
+    last_gcf_point_->pcoord[0] = x0;
+    last_gcf_point_->pcoord[1] = y0;
+    last_gcf_point_->pcoord[2] = z0;
 
-    last_gcf_point->dashes = dashes;
-    last_gcf_point->color = CSING;
-    last_gcf_point->next_point = nullptr;
+    last_gcf_point_->dashes = dashes;
+    last_gcf_point_->color = CSING;
+    last_gcf_point_->next_point = nullptr;
 }
 
 bool WSphere::read_gcf(std::string fname,
                        void (WVFStudy::*chart)(double, double, double *))
 {
-
     int t;
     int k;
     FILE *fp;
@@ -249,7 +246,7 @@ bool WSphere::read_gcf(std::string fname,
 
     fp = fopen(std::string(fname + "_gcf.tab").c_str(), "r");
     if (fp == nullptr) {
-        globalLogger__.debug("WSphere :: cannot open file " +
+        g_globalLogger.debug("[WSphere] cannot open file " +
                              std::string(fname + "_gcf.tab") + " for reading");
         return false;
     }
@@ -262,7 +259,7 @@ bool WSphere::read_gcf(std::string fname,
             (study_->*chart)(x, y, pcoord);
             study_->insert_gcf_point(pcoord[0], pcoord[1], pcoord[2], d);
             // d=1;
-            d = GcfDashes;
+            d = s_GcfDashes;
         }
         for (c = getc(fp); isspace(c);)
             c = getc(fp);

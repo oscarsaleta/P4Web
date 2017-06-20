@@ -18,7 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 <messages xmlns:if="Wt.WTemplate.conditions">
-  
+
   <!-- template for login -->
   <message id="Wt.Auth.template.login">
     <div class="span8 offset2 Wt-auth-login">
@@ -41,9 +41,11 @@
         ${</if:oauth>}
 
         <div class="form-actions">
-          <p>${login class="btn btn-primary"}
-          ${register class="btn btn-default"}
-          ${lost-password class="btn btn-default"}</p>
+          <p>
+            ${login class="btn btn-primary"}
+            ${register class="btn btn-default"}
+            ${lost-password class="btn btn-default"}
+          </p>
         </div>
       </div>
     </div>
@@ -55,7 +57,8 @@
   <!-- Logged in template -->
   <message id="Wt.Auth.template.logged-in">
     <div class="Wt-auth-logged-in">
-      <b>${user-name}</b> ${logout class="btn-warning"}
+      <b>${user-name}</b>
+      ${logout class="btn-warning"}
     </div>
   </message>
 
@@ -104,11 +107,11 @@
 
   <!-- HomeLeft legend image tab template -->
   <message id="template.legend">
-    <p></p>
+    <p/>
     <div class="row">
-        <div class="help-block col-sm-11 col-sm-offset-1">
-          This legend shows the type of singularities, separatrices and orbits that the plot can have.
-        </div>
+      <div class="help-block col-sm-11 col-sm-offset-1">
+        This legend shows the type of singularities, separatrices and orbits that the plot can have.
+      </div>
     </div>
     <div class="row">
       <div class="col-sm-8 col-sm-offset-2">${img}</div>
@@ -117,7 +120,7 @@
 
   <!-- HomeLeft evaluation options template -->
   <message id="template.homeleft-options">
-    <p></p>
+    <p/>
     <form class="form-horizontal">
       <div class="form-group">
         <label class="control-label col-sm-offset-1 col-sm-3" title="${calc-tooltip}" for="calc">
@@ -185,7 +188,7 @@
 
   <!-- HomeLeft view settings template -->
   <message id="template.homeleft-view">
-    <p></p>
+    <p/>
     <form class="form-horizontal">
       <div class="form-group">
         <div class="help-block col-sm-11 col-sm-offset-1">
@@ -222,13 +225,16 @@
         </label>
         <div class="col-sm-4" title="${maxy-tooltip}">${maxy}</div>
       </div>
+      <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">${btn}</div>
+      </div>
     </form>
   </message>
 
 
   <!-- HomeLeft orbit integration tab template -->
   <message id="template.homeleft-orbits">
-    <p></p>
+    <p/>
     <div class="form-horizontal">
       <div class="form-group">
         <div class="help-block col-sm-11 col-sm-offset-1">
@@ -267,9 +273,15 @@
     </div>
   </message>
 
-  <!-- HomeLeft GCF settings template -->
+
+  <!-- HomeLeft GCF tab template -->
   <message id="template.homeleft-gcf">
-    <p></p>
+    <p/>
+    <div class="form-group">
+      <div class="help-block col-sm-11 col-sm-offset-1">
+        In this tab, you can configure the plotting options for the GCF of your vector field, in case there is one.
+      </div>
+    </div>
     <div class="form-horizontal">
       <div class="form-group">
         <label class="control-label col-sm-2 col-sm-offset-1" for="dots">
@@ -277,6 +289,9 @@
         </label>
         <element id="dots" class="col-sm-2 col-sm-offset-1" title="${gcf-tooltip-dots}">${gcf-dots}</element>
         <element class="col-sm-2" title="${gcf-tooltip-dashes}">${gcf-dashes}</element>
+        <div class="btn-group-md col-sm-offset-1 col-sm-3">
+          ${gcf-btn}
+        </div>
       </div>
       <div class="form-group">
         <label class="control-label col-sm-offset-1 col-sm-3" title="${gcf-tooltip-nps}" for="${id:nps}">
@@ -291,8 +306,99 @@
         <div class="col-sm-2 col-sm-offset-1" title="${gcf-tooltip-prc}">${gcf-prc}</div>
       </div>
       <div class="form-group">
-        <div class="btn-group-md col-sm-offset-1 col-sm-3">
-          ${gcf-btn}
+        
+      </div>
+    </div>
+  </message>
+
+
+  <!-- HomeLfet Curves tab template -->
+  <message id="template.homeleft-curves">
+    <p/>
+    <div class="form-group">
+      <div class="help-block col-sm-11 col-sm-offset-1">
+        Enter a polynomial curve equation in the field, then press the button to draw it.
+      </div>
+    </div>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${curve-tooltip-eqn}" for="curve-eq">
+          Curve:
+        </label>
+        <div class="col-sm-9" title="${curve-tooltip-eqn}">${curve-eqn}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${curve-tooltip-appearance}" for="dots">
+          Appearance:
+        </label>
+        <element id="dots" class="col-sm-2" title="${curve-tooltip-dots}">${curve-dots}</element>
+        <element class="col-sm-2" title="${curve-tooltip-dashes}">${curve-dashes}</element>
+        <div class="btn-group-md col-sm-4 col-sm-offset-1" title="${curve-tooltip-plot}">
+          ${curve-btn-plot}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${curve-tooltip-nps}" for="${id:nps}">
+          Number of points:
+        </label>
+        <div class="col-sm-2" title="${curve-tooltip-nps}">${nps}</div>
+        <div class="btn-group-md col-sm-4 col-sm-offset-3" title="${curve-tooltip-del-one}">
+          ${curve-btn-del-one}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${curve-tooltip-prc}" for="${id:curve-prc}">
+          Precision:
+        </label>
+        <div class="col-sm-2 " title="${curve-tooltip-prc}">${curve-prc}</div>
+        <div class="btn-group-md col-sm-4 col-sm-offset-3" title="${curve-tooltip-del-all}">
+          ${curve-btn-del-all}
+        </div>
+      </div>
+    </div>
+  </message>
+
+  <!-- HomeLfet isoclines tab template -->
+  <message id="template.homeleft-isoclines">
+    <p/>
+    <div class="form-group">
+      <div class="help-block col-sm-11 col-sm-offset-1">
+        Enter a value for the slope. This value can be 0, inf, or any floating point number.
+      </div>
+    </div>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-slope}" for="isocline-slope">
+          Slope:
+        </label>
+        <div class="col-sm-9" title="${isocline-tooltip-slope}">${isocline-slope}</div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-appearance}" for="dots">
+          Appearance:
+        </label>
+        <element id="dots" class="col-sm-2" title="${isocline-tooltip-dots}">${isocline-dots}</element>
+        <element class="col-sm-2" title="${isocline-tooltip-dashes}">${isocline-dashes}</element>
+        <div class="btn-group-md col-sm-4 col-sm-offset-1" title="${isocline-tooltip-plot}">
+          ${isocline-btn-plot}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-nps}" for="${id:nps}">
+          Number of points:
+        </label>
+        <div class="col-sm-2" title="${isocline-tooltip-nps}">${nps}</div>
+        <div class="btn-group-md col-sm-4 col-sm-offset-3" title="${isocline-tooltip-del-one}">
+          ${isocline-btn-del-one}
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="control-label col-sm-3" title="${isocline-tooltip-prc}" for="${id:isocline-prc}">
+          Precision:
+        </label>
+        <div class="col-sm-2 " title="${isocline-tooltip-prc}">${isocline-prc}</div>
+        <div class="btn-group-md col-sm-4 col-sm-offset-3" title="${isocline-tooltip-del-all}">
+          ${isocline-btn-del-all}
         </div>
       </div>
     </div>

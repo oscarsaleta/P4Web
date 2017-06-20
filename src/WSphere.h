@@ -48,6 +48,7 @@
  * projection.
  */
 
+#include "ScriptHandler.h"
 #include "custom.h"
 #include "file_tab.h"
 
@@ -74,6 +75,24 @@
 #define GCF_DASHES 1  ///< gcf dashes is 1 by default
 #define GCF_POINTS 40 ///< gcf npoints is 40 by default
 #define GCF_PRECIS 12 ///< gcf precision is 12 by default
+
+#define EVAL_CURVE_NONE 0           ///< no curve evaluation
+#define EVAL_CURVE_R2 1             ///< curve evaluation in R^2
+#define EVAL_CURVE_U1 2             ///< curve evaluation in U1
+#define EVAL_CURVE_U2 3             ///< curve evaluation in U2
+#define EVAL_CURVE_V1 4             ///< curve evaluation in V1
+#define EVAL_CURVE_V2 5             ///< curve evaluation in V2
+#define EVAL_CURVE_FINISHPOINCARE 6 ///< finish curve evaluation in sphere
+#define EVAL_CURVE_LYP_R2 7         ///< curve evaluation in R^2 with PL weights
+#define EVAL_CURVE_CYL1 8           ///< curve evaluation in the cylinder
+#define EVAL_CURVE_CYL2 9           ///< curve evaluation in the cylinder
+#define EVAL_CURVE_CYL3 10          ///< curve evaluation in the cylinder
+#define EVAL_CURVE_CYL4 11          ///< curve evaluation in the cylinder
+#define EVAL_CURVE_FINISHLYAPUNOV 12 ///< finish curve with PL weights
+
+#define CURVE_DASHES 1   ///< curve dashes is 1 by default
+#define CURVE_POINTS 400 ///< curve npoints is 400 by default
+#define CURVE_PRECIS 12  ///< curve precision is 12 by default
 
 //#define SELECTINGPOINTSTEPS         5
 //#define SELECTINGPOINTSPEED         150
@@ -104,18 +123,19 @@ class WSphere : public Wt::WPaintedWidget
   public:
     /**
      * Constructor method for a spherical plot
-     * @param *parent       container widget which created the sphere
+     * @param parent       container widget which created the sphere
      * @param width         width of the painting area
      * @param height        height of the painting area
      * @param basename      name of the file that contains Maple output for the
      * current vector field
      * @param projection    projection for the sphere
      */
-    WSphere(Wt::WContainerWidget *parent = 0, int width = 255, int height = 255,
-            std::string basename = "", double projection = -1.0);
+    WSphere(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0,
+            int width = 255, int height = 255, std::string basename = "",
+            double projection = -1.0, WVFStudy *study = 0);
     /**
      * Constructor method for a planar (or chart) plot
-     * @param *parent   container widget which created the sphere
+     * @param parent   container widget which created the sphere
      * @param width     width of the painting area
      * @param height    height of the painting area
      * @param basename  name of the file that contains Maple output for the
@@ -126,9 +146,10 @@ class WSphere : public Wt::WPaintedWidget
      * @param miny      minimum y for plot
      * @param maxy      maximum y for plot
      */
-    WSphere(Wt::WContainerWidget *parent = 0, int width = 255, int height = 255,
-            std::string basename = "", int type = 1, double minx = -1,
-            double maxx = 1, double miny = -1, double maxy = 1);
+    WSphere(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0,
+            int width = 255, int height = 255, std::string basename = "",
+            int type = 1, double minx = -1, double maxx = 1, double miny = -1,
+            double maxy = 1, WVFStudy *study = 0);
     /**
      * Destructor method
      */
@@ -421,40 +442,131 @@ class WSphere : public Wt::WPaintedWidget
     Wt::Signal<std::string> &errorSignal() { return errorSignal_; }
 
     /**
-     * pointer to a painter linked to a paint device
-     * created in a paint event. This makes possible
-     * to distribute painting to different functions
-     * and compiling units (even from outside the
-     * object)
+     * Pointer to a painter linked to a paint device created in a paint event.
+     * This makes possible to distribute painting to different functions and
+     * compiling units (even from outside the object)
      */
     Wt::WPainter *staticPainter;
 
     /**
-     * flag used to not replot every time we just want to
-     * update something
+     * Flag used to not replot every time we just want to update something
      */
     bool plotDone_;
+
     /**
-     * flag used to make the sphere compute gcf
+     * Flag used to make the sphere compute gcf
      */
     bool gcfEval_;
     /**
-     * name of Maple script from first execution, to be
+     * Name of Maple script from first execution, to be
      * reused for gcf
      */
     std::string gcfFname_;
     /**
-     * number of points for gcf
+     * Number of points for gcf
      */
     int gcfNPoints_;
     /**
-     * precision of zeros for gcf
+     * Precision of zeros for gcf
      */
     int gcfPrec_;
     /**
-     * points (0) or dashes (1) for gcf plot
+     * Points (0) or dashes (1) for gcf plot
      */
     int gcfDashes_;
+
+    /**
+     * Name of Maple script from first execution, to be
+     * reused for curve
+     */
+    std::string curveFname_;
+    /**
+     * Number of points for curve
+     */
+    int curveNPoints_;
+    /**
+     * Precision of zeros for curve
+     */
+    int curvePrec_;
+    /**
+     * Points (0) or dashes (1) for curve plot
+     */
+    int curveDashes_;
+    /**
+     * Indicates if there was any error when computing curves
+     */
+    bool curveError_;
+
+    /**
+     * Start curve evaluation
+     *
+     * @param fname  name of script that will be used for sequential evaluations
+     * @param dashes flag to use dashes or dots in plot
+     * @param points number of points used in computations
+     * @param precis precision used in computations
+     * @return       @c true if no error, @c false if error
+     */
+    bool evalCurveStart(std::string fname, int dashes, int points, int precis);
+    /**
+     * After starting evaluation, continue with the other charts
+     *
+     * @param fname  name of script that will be used for sequential evaluations
+     * @param points number of points used in computations
+     * @param prec   precision used in computations
+     * @return       @c true if no error, @c false if error
+     */
+    bool evalCurveContinue(std::string fname, int points, int prec);
+    /**
+     * Finish the curve evaluation
+     */
+    bool evalCurveFinish(void);
+
+    /**
+     * Name of Maple script from first execution, to be
+     * reused for isocline
+     */
+    std::string isoclineFname_;
+    /**
+     * Number of points for isocline
+     */
+    int isoclineNPoints_;
+    /**
+     * Precision of zeros for isocline
+     */
+    int isoclinePrec_;
+    /**
+     * Points (0) or dashes (1) for isocline plot
+     */
+    int isoclineDashes_;
+    /**
+     * Indicates if there was any error when computing isoclines
+     */
+    bool isoclineError_;
+
+    /**
+     * Start isocline evaluation
+     *
+     * @param fname  name of script that will be used for sequential evaluations
+     * @param dashes flag to use dashes or dots in plot
+     * @param points number of points used in computations
+     * @param precis precision used in computations
+     * @return       @c true if no error, @c false if error
+     */
+    bool evalIsoclineStart(std::string fname, int dashes, int points,
+                           int precis);
+    /**
+     * After starting evaluation, continue with the other charts
+     *
+     * @param fname  name of script that will be used for sequential evaluations
+     * @param points number of points used in computations
+     * @param prec   precision used in computations
+     * @return       @c true if no error, @c false if error
+     */
+    bool evalIsoclineContinue(std::string fname, int points, int prec);
+    /**
+     * Finish the isocline evaluation
+     */
+    bool evalIsoclineFinish(void);
 
   protected:
     /**
@@ -527,6 +639,29 @@ class WSphere : public Wt::WPaintedWidget
     bool read_gcf(std::string fname,
                   void (WVFStudy::*chart)(double, double, double *));
     bool readTaskResults(std::string fname, int task);
+
+    // used for curves
+    int curveTask_;
+    int runTaskCurve(std::string fname, int task, int points, int prec);
+    void draw_curve(orbits_points *sep, int color, int dashes);
+    void plotCurves(void);
+    bool read_curve(std::string fname,
+                    void (WVFStudy::*chart)(double, double, double *));
+    bool readTaskCurveResults(std::string fname, int task);
+
+    // used for isoclines
+    int isoclineTask_;
+    int runTaskIsocline(std::string fname, int task, int points, int prec);
+    void draw_isocline(orbits_points *sep, int color, int dashes);
+    void plotIsoclines(void);
+    bool read_isocline(std::string fname,
+                       void (WVFStudy::*chart)(double, double, double *));
+    bool readTaskIsoclineResults(std::string fname, int task);
+
+    // script handler
+    ScriptHandler *scriptHandler_;
+    // flag to know if study was copied or will be created
+    bool studyCopied_;
 };
 
 #endif /* WIN_SPHERE_H */

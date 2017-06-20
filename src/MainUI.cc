@@ -20,24 +20,20 @@
 
 #include "HomeLeft.h"
 #include "HomeRight.h"
-#include "MyAuthWidget.h"
 #include "MyLogger.h"
+#include "ScriptHandler.h"
 #include "file_tab.h"
 
 #include <Wt/WAnchor>
 #include <Wt/WApplication>
-#include <Wt/WGroupBox>
 #include <Wt/WLink>
-#include <Wt/WMenu>
-#include <Wt/WMenuItem>
-#include <Wt/WMessageBox>
-#include <Wt/WPopupMenu>
 #include <Wt/WStackedWidget>
 #include <Wt/WString>
 #include <Wt/WText>
-#include <Wt/WVBoxLayout>
 
 #include <Wt/Dbo/Transaction>
+
+class MyAuthWidget;
 
 using namespace Wt;
 
@@ -53,7 +49,30 @@ MainUI::MainUI(WContainerWidget *parent) : WContainerWidget(parent)
 
 MainUI::~MainUI()
 {
-    // TODO: completar destructor
+    if (loginText_ != nullptr) {
+        delete loginText_;
+        loginText_ = nullptr;
+    }
+    if (logoutAnchor_ != nullptr) {
+        delete logoutAnchor_;
+        logoutAnchor_ = nullptr;
+    }
+    if (loginAnchor_ != nullptr) {
+        delete loginAnchor_;
+        loginAnchor_ = nullptr;
+    }
+    if (loginMessageContainer_ != nullptr) {
+        delete loginMessageContainer_;
+        loginMessageContainer_ = nullptr;
+    }
+    if (title_ != nullptr) {
+        delete title_;
+        title_ = nullptr;
+    }
+    if (authWidget_ != nullptr) {
+        delete authWidget_;
+        authWidget_ = nullptr;
+    }
     if (leftContainer_ != nullptr) {
         delete leftContainer_;
         leftContainer_ = nullptr;
@@ -62,9 +81,13 @@ MainUI::~MainUI()
         delete rightContainer_;
         rightContainer_ = nullptr;
     }
-    if (authWidget_ != nullptr) {
-        delete authWidget_;
-        authWidget_ = nullptr;
+    if (pageContainer_ != nullptr) {
+        delete pageContainer_;
+        pageContainer_ = nullptr;
+    }
+    if (mainStack_ != nullptr) {
+        delete mainStack_;
+        mainStack_ = nullptr;
     }
 }
 
@@ -94,12 +117,17 @@ void MainUI::setupUI()
     loginAnchor_->setInline(true);
     loginMessageContainer_->addWidget(loginAnchor_);
 
+    backAnchor_ = new WAnchor("/", "Back", loginMessageContainer_);
+    backAnchor_->setLink(WLink(WLink::InternalPath, "/"));
+    backAnchor_->setInline(true);
+    loginMessageContainer_->addWidget(backAnchor_);
+
     // title
     title_ = new WText(WString::tr("mainui.pagetitle"));
     title_->setId("title_");
     title_->setStyleClass("page-header center");
     addWidget(title_);
-    globalLogger__.debug("MainUI :: title set up");
+    g_globalLogger.debug("[MainUI] title set up");
 
     // this is used to change page content
     mainStack_ = new WStackedWidget();
@@ -110,7 +138,7 @@ void MainUI::setupUI()
     authWidget_ = new MyAuthWidget(session_, mainStack_);
     authWidget_->setId("authWidget_");
     authWidget_->model()->addPasswordAuth(&Session::passwordAuth());
-    authWidget_->model()->addOAuth(Session::oAuth());
+    // authWidget_->model()->addOAuth(Session::oAuth());
     authWidget_->setRegistrationEnabled(true);
 
     // this holds the main page content
@@ -121,17 +149,20 @@ void MainUI::setupUI()
         new WTemplate(WString::tr("template.mainui"), pageContainer_);
     t->addFunction("id", WTemplate::Functions::id);
 
+    // create "global" script handler for both left and right containers
+    scriptHandler_ = new ScriptHandler();
+
     // left widget (file upload, input, buttons)
-    globalLogger__.debug("MainUI :: creating HomeLeft...");
-    leftContainer_ = new HomeLeft(pageContainer_);
+    g_globalLogger.debug("[MainUI] creating HomeLeft...");
+    leftContainer_ = new HomeLeft(pageContainer_, scriptHandler_);
     leftContainer_->parent_ = this;
-    globalLogger__.debug("MainUI :: HomeLeft created");
+    g_globalLogger.debug("[MainUI] HomeLeft created");
     t->bindWidget("left", leftContainer_);
 
     // right widget (output text area, plots, legend)
-    globalLogger__.debug("MainUI :: creating HomeRight...");
-    rightContainer_ = new HomeRight(pageContainer_);
-    globalLogger__.debug("MainUI :: HomeRight created");
+    g_globalLogger.debug("[MainUI] creating HomeRight...");
+    rightContainer_ = new HomeRight(pageContainer_, scriptHandler_);
+    g_globalLogger.debug("[MainUI] HomeRight created");
     t->bindWidget("right", rightContainer_);
 
     // copyright
@@ -145,8 +176,8 @@ void MainUI::setupUI()
     // signals from HomeLeft
     leftContainer_->evaluatedSignal().connect(rightContainer_,
                                               &HomeRight::readResults);
-    leftContainer_->errorSignal().connect(rightContainer_,
-                                          &HomeRight::printError);
+    leftContainer_->textSignal().connect(rightContainer_,
+                                         &HomeRight::printError);
     leftContainer_->resetSignal().connect(rightContainer_, &HomeRight::onReset);
     leftContainer_->onPlotSphereSignal().connect(rightContainer_,
                                                  &HomeRight::onSpherePlot);
@@ -159,13 +190,30 @@ void MainUI::setupUI()
     leftContainer_->gcfSignal().connect(rightContainer_, &HomeRight::onGcfEval);
     leftContainer_->addParameterSignal().connect(
         rightContainer_, &HomeRight::addParameterWithValue);
+    leftContainer_->plotCurveSignal().connect(rightContainer_,
+                                              &HomeRight::onCurvePlot);
+    leftContainer_->curveDeleteSignal().connect(rightContainer_,
+                                                &HomeRight::onCurvesDelete);
+    leftContainer_->plotIsoclineSignal().connect(rightContainer_,
+                                                 &HomeRight::onIsoclinePlot);
+    leftContainer_->isoclineDeleteSignal().connect(
+        rightContainer_, &HomeRight::onIsoclinesDelete);
+    leftContainer_->refreshPlotSphereSignal().connect(
+        rightContainer_, &HomeRight::refreshPlotSphere);
+    leftContainer_->refreshPlotPlaneSignal().connect(
+        rightContainer_, &HomeRight::refreshPlotPlane);
 
     // signals from HomeRight
     rightContainer_->sphereClickedSignal().connect(leftContainer_,
                                                    &HomeLeft::showOrbitsDialog);
-    globalLogger__.debug("MainUI :: signals connected");
+    rightContainer_->curveConfirmedSignal().connect(leftContainer_,
+                                                    &HomeLeft::curveConfirmed);
+    rightContainer_->isoclineConfirmedSignal().connect(
+        leftContainer_, &HomeLeft::isoclineConfirmed);
 
-    globalLogger__.debug("MainUI :: MainUI set up");
+    g_globalLogger.debug("[MainUI] signals connected");
+
+    g_globalLogger.debug("[MainUI] MainUI set up");
 
     authWidget_->processEnvironment();
     handlePathChange();
@@ -174,13 +222,13 @@ void MainUI::setupUI()
 void MainUI::onAuthEvent()
 {
     if (session_.login().loggedIn()) {
-        globalLogger__.info("Auth :: User " + session_.userName() +
+        g_globalLogger.info("[Auth] User " + session_.userName() +
                             " logged in.");
         setLoginIndicator(session_.userName());
         leftContainer_->showSettings();
         rightContainer_->showParamsTab();
     } else {
-        globalLogger__.info("Auth :: User logged out.");
+        g_globalLogger.info("[Auth] User logged out.");
         leftContainer_->hideSettings();
         rightContainer_->hideParamsTab(true);
         setLogoutIndicator();
@@ -193,14 +241,25 @@ void MainUI::handlePathChange()
     WApplication *app = WApplication::instance();
 
     if (app->internalPath() == "/login") {
-        globalLogger__.debug("MainUI :: handle internal path change /login");
+        g_globalLogger.debug("[MainUI] handle internal path change /login");
+        backAnchor_->show();
+        loginAnchor_->hide();
+        logoutAnchor_->hide();
         if (session_.login().loggedIn()) {
             session_.login().logout();
         } else
             mainStack_->setCurrentWidget(authWidget_);
     } else {
         mainStack_->setCurrentWidget(pageContainer_);
-        globalLogger__.debug("MainUI :: setting main page as current view");
+        backAnchor_->hide();
+        if (session_.login().loggedIn()) {
+            loginAnchor_->hide();
+            logoutAnchor_->show();
+        } else {
+            loginAnchor_->show();
+            logoutAnchor_->hide();
+        }
+        g_globalLogger.debug("[MainUI] setting main page as current view");
     }
 }
 
@@ -219,9 +278,4 @@ void MainUI::setLogoutIndicator()
     loginAnchor_->show();
 }
 
-void MainUI::getMapleParams()
-{
-    rightContainer_->refreshParamStringVectors();
-    paramLabels_ = rightContainer_->paramLabels_;
-    paramValues_ = rightContainer_->paramValues_;
-}
+void MainUI::getMapleParams() { rightContainer_->refreshParamStringVectors(); }

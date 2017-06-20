@@ -45,30 +45,6 @@
 #include "WSphere.h"
 #include "file_tab.h"
 
-/*extern void (*change_epsilon)( WSphere *, double );
-extern void (*start_plot_sep)( WSphere * );
-extern void (*cont_plot_sep)( WSphere * );
-extern void (*plot_next_sep)( WSphere * );
-extern void (*select_next_sep)( WSphere * );
-
-void start_plot_saddle_sep( WSphere * spherewnd );
-void cont_plot_saddle_sep( WSphere * spherewnd );
-void plot_next_saddle_sep( WSphere * spherewnd );
-void select_next_saddle_sep( WSphere * spherewnd );
-void change_epsilon_saddle( WSphere * spherewnd, double e );
-
-void start_plot_se_sep( WSphere * spherewnd );
-void cont_plot_se_sep( WSphere * spherewnd );
-void plot_next_se_sep( WSphere * spherewnd );
-void select_next_se_sep( WSphere * spherewnd );
-void change_epsilon_se( WSphere * spherewnd, double e);
-
-void start_plot_de_sep( WSphere * spherewnd );
-void cont_plot_de_sep( WSphere * spherewnd );
-void plot_next_de_sep( WSphere * spherewnd );
-void select_next_de_sep( WSphere * spherewnd );
-void change_epsilon_de( WSphere * spherewnd, double e );*/
-
 /**
  * Compute all separatrices for all singularities
  * @param spherewnd sphere object where the study and plot are stored

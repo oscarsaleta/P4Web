@@ -41,10 +41,8 @@
 #include "math_p4.h"
 //#include "math_findpoint.h"
 //#include "math_limitcycles.h"
-//#include "math_orbits.h"
 #include "MyLogger.h"
 #include "math_separatrice.h"
-//#include "math_gcf.h"
 #include "plot_points.h"
 #include "plot_tools.h"
 
@@ -53,9 +51,6 @@
 #include <cmath>
 
 using namespace Wt;
-
-// int WSphere::numSpheres = 0;
-// WSphere * * WSphere::SphereList = nullptr;
 
 /*
     Coordinates on the sphere:
@@ -72,22 +67,24 @@ using namespace Wt;
 
 // parameters _x1,... are irrelevant if isZoom is false
 
-WSphere::WSphere(WContainerWidget *parent, int width, int height,
-                 std::string basename, double projection)
+WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
+                 int height, std::string basename, double projection,
+                 WVFStudy *study)
     : width_(width), height_(height), basename_(basename), parentWnd(parent),
       typeOfView_(0), projection_(projection), plotPrepared_(false),
       plotDone_(false)
 {
-    study_ = new WVFStudy(projection);
+    if (study == nullptr) {
+        study_ = new WVFStudy(projection);
+        studyCopied_ = false;
+    } else {
+        study_ = study;
+        studyCopied_ = true;
+    }
+
+    scriptHandler_ = s;
 
     ReverseYaxis = false;
-
-    /*SphereList = (WSphere * *)realloc( SphereList, sizeof(WSphere *) *
-    (numSpheres+1) );
-    SphereList[numSpheres++] = this;
-    if( numSpheres > 1 ) {
-        SphereList[numSpheres-2]->next = this;
-    }*/
 
     resize(width_, height_);
 
@@ -102,27 +99,35 @@ WSphere::WSphere(WContainerWidget *parent, int width, int height,
     gcfNPoints_ = GCF_POINTS;
     gcfPrec_ = GCF_PRECIS;
 
+    gcfEval_ = false;
+    gcfTask_ = EVAL_GCF_NONE;
+    gcfError_ = false;
+    gcfDashes_ = GCF_DASHES;
+    gcfNPoints_ = GCF_POINTS;
+    gcfPrec_ = GCF_PRECIS;
+
     mouseMoved().connect(this, &WSphere::mouseMovementEvent);
     clicked().connect(this, &WSphere::mouseClickEvent);
 }
 
-WSphere::WSphere(WContainerWidget *parent, int width, int height,
-                 std::string basename, int type, double minx, double maxx,
-                 double miny, double maxy)
+WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
+                 int height, std::string basename, int type, double minx,
+                 double maxx, double miny, double maxy, WVFStudy *study)
     : width_(width), height_(height), basename_(basename), parentWnd(parent),
       typeOfView_(type), viewMinX_(minx), viewMaxX_(maxx), viewMinY_(miny),
       viewMaxY_(maxy), plotPrepared_(false), plotDone_(false)
 {
-    study_ = new WVFStudy();
+    if (study == nullptr) {
+        study_ = new WVFStudy();
+        studyCopied_ = false;
+    } else {
+        study_ = study;
+        studyCopied_ = true;
+    }
+
+    scriptHandler_ = s;
 
     ReverseYaxis = false;
-
-    /*SphereList = (WSphere * *)realloc( SphereList, sizeof(WSphere *) *
-    (numSpheres+1) );
-    SphereList[numSpheres++] = this;
-    if( numSpheres > 1 ) {
-        SphereList[numSpheres-2]->next = this;
-    }*/
 
     resize(width_, height_);
 
@@ -165,6 +170,8 @@ WSphere::~WSphere()
         delete study_;
         study_ = nullptr;
     }
+
+    g_globalLogger.debug("[WSphere] deleted correctly");
 }
 
 bool WSphere::setupPlot(void)
@@ -175,60 +182,57 @@ bool WSphere::setupPlot(void)
     } else
         firstTimePlot_ = true;
 
-    if (!study_->readTables(basename_)) {
+    if (!studyCopied_ && !study_->readTables(basename_)) {
         return false;
     } else {
         switch (typeOfView_) {
         case 0:
-            study_->typeofview = TYPEOFVIEW_SPHERE;
-            study_->config_projection = projection_;
+            study_->typeofview_ = TYPEOFVIEW_SPHERE;
+            study_->config_projection_ = projection_;
             break;
         case 1:
-            study_->typeofview = TYPEOFVIEW_PLANE;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_PLANE;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         case 2:
-            study_->typeofview = TYPEOFVIEW_U1;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_U1;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         case 3:
-            study_->typeofview = TYPEOFVIEW_V1;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_V1;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         case 4:
-            study_->typeofview = TYPEOFVIEW_U2;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_U2;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         case 5:
-            study_->typeofview = TYPEOFVIEW_V2;
-            study_->xmin = viewMinX_;
-            study_->xmax = viewMaxX_;
-            study_->ymin = viewMinY_;
-            study_->ymax = viewMaxY_;
+            study_->typeofview_ = TYPEOFVIEW_V2;
+            study_->xmin_ = viewMinX_;
+            study_->xmax_ = viewMaxX_;
+            study_->ymin_ = viewMinY_;
+            study_->ymax_ = viewMaxY_;
             break;
         }
+        g_globalLogger.debug(
+            "[WSphere] Setting up WVFStudy coordinate transformations...");
         study_->setupCoordinateTransformations();
+        g_globalLogger.debug("[WSPhere] Transformations set up successfully");
     }
 
     struct P4POLYLINES *t;
-    /*QPalette palette;
-
-    spherebgcolor=CBACKGROUND;
-    palette.setColor(backgroundRole(), QXFIGCOLOR(spherebgcolor) );
-    setPalette(palette);*/
-
     while (CircleAtInfinity != nullptr) {
         t = CircleAtInfinity;
         CircleAtInfinity = t->next;
@@ -242,16 +246,16 @@ bool WSphere::setupPlot(void)
         t = nullptr;
     }
 
-    switch (study_->typeofview) {
+    switch (study_->typeofview_) {
     case TYPEOFVIEW_PLANE:
     case TYPEOFVIEW_U1:
     case TYPEOFVIEW_U2:
     case TYPEOFVIEW_V1:
     case TYPEOFVIEW_V2:
-        x0 = study_->xmin;
-        y0 = study_->ymin;
-        x1 = study_->xmax;
-        y1 = study_->ymax;
+        x0 = study_->xmin_;
+        y0 = study_->ymin_;
+        x1 = study_->xmax_;
+        y1 = study_->ymax_;
         break;
     case TYPEOFVIEW_SPHERE:
         x0 = -1.1;
@@ -264,29 +268,29 @@ bool WSphere::setupPlot(void)
     dx = x1 - x0;
     dy = y1 - y0;
 
-    switch (study_->typeofview) {
+    switch (study_->typeofview_) {
     case TYPEOFVIEW_PLANE:
     case TYPEOFVIEW_SPHERE:
         chartString_ = "";
         break;
     case TYPEOFVIEW_U1:
-        setChartString(study_->p, study_->q, true, false);
+        setChartString(study_->p_, study_->q_, true, false);
         break;
     case TYPEOFVIEW_U2:
-        setChartString(study_->p, study_->q, false, false);
+        setChartString(study_->p_, study_->q_, false, false);
         break;
     case TYPEOFVIEW_V1:
-        setChartString(study_->p, study_->q, true, true);
+        setChartString(study_->p_, study_->q_, true, true);
         break;
     case TYPEOFVIEW_V2:
-        setChartString(study_->p, study_->q, false, true);
+        setChartString(study_->p_, study_->q_, false, true);
         break;
     }
 
-    if (study_->typeofview == TYPEOFVIEW_SPHERE) {
+    if (study_->typeofview_ == TYPEOFVIEW_SPHERE) {
         CircleAtInfinity =
             produceEllipse(0.0, 0.0, 1.0, 1.0, false, coWinH(1.0), coWinV(1.0));
-        if (study_->plweights)
+        if (study_->plweights_)
             PLCircle = produceEllipse(0.0, 0.0, RADIUS, RADIUS, true,
                                       coWinH(RADIUS), coWinV(RADIUS));
     }
@@ -308,9 +312,9 @@ void WSphere::paintEvent(WPaintDevice *p)
     if (!plotDone_) {
         paint.fillRect(0., 0., width_, height_,
                        WBrush(QXFIGCOLOR(CBACKGROUND)));
-        if (study_->typeofview != TYPEOFVIEW_PLANE) {
-            if (study_->typeofview == TYPEOFVIEW_SPHERE) {
-                if (study_->plweights) {
+        if (study_->typeofview_ != TYPEOFVIEW_PLANE) {
+            if (study_->typeofview_ == TYPEOFVIEW_SPHERE) {
+                if (study_->plweights_) {
                     plotPoincareLyapunovSphere();
                 } else {
                     plotPoincareSphere();
@@ -322,14 +326,14 @@ void WSphere::paintEvent(WPaintDevice *p)
             int result =
                 evalGcfStart(gcfFname_, gcfDashes_, gcfNPoints_, gcfPrec_);
             if (!result) {
-                globalLogger__.error("WSphere :: cannot compute Gcf");
+                g_globalLogger.error("[WSphere] cannot compute Gcf");
             } else {
                 // this calls evalGcfContinue at least once
                 int i = 0;
                 do {
                     result = evalGcfContinue(gcfFname_, GCF_POINTS, GCF_PRECIS);
                     if (gcfError_) {
-                        globalLogger__.error("WSphere :: error while computing "
+                        g_globalLogger.error("[WSphere] error while computing "
                                              "evalGcfContinue at step: " +
                                              std::to_string(i));
                         break;
@@ -339,10 +343,10 @@ void WSphere::paintEvent(WPaintDevice *p)
                 // finish evaluation
                 result = evalGcfFinish();
                 if (!result) {
-                    globalLogger__.error(
-                        "WSphere :: error while computing evalGcfFinish");
+                    g_globalLogger.error(
+                        "[WSphere] error while computing evalGcfFinish");
                 } else {
-                    globalLogger__.debug("WSphere :: computed Gcf");
+                    g_globalLogger.debug("[WSphere] computed Gcf");
                 }
             }
             plotGcf();
@@ -356,9 +360,13 @@ void WSphere::paintEvent(WPaintDevice *p)
         }
         plotPoints();
         drawOrbits();
+        plotCurves();
+        plotIsoclines();
         plotDone_ = true;
-    } else { // only draw orbits and gcf
+    } else { // only draw orbits
         drawOrbits();
+        plotCurves();
+        plotIsoclines();
     }
 }
 
@@ -418,9 +426,9 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
 
     double pcoord[3];
     if ((study_->*(study_->is_valid_viewcoord))(wx, wy, pcoord)) {
-        switch (study_->typeofview) {
+        switch (study_->typeofview_) {
         case TYPEOFVIEW_PLANE:
-            if (study_->typeofstudy == TYPEOFSTUDY_ONE) {
+            if (study_->typeofstudy_ == TYPEOFSTUDY_ONE) {
                 buf = WString("Local study  (x,y) = ({1},{2})")
                           .arg(std::to_string(wx))
                           .arg(std::to_string(wy));
@@ -433,15 +441,15 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
         case TYPEOFVIEW_SPHERE:
             (study_->*(study_->sphere_to_R2))(pcoord[0], pcoord[1], pcoord[2],
                                               ucoord);
-            if (study_->p == 1 && study_->q == 1) {
+            if (study_->p_ == 1 && study_->q_ == 1) {
                 buf = WString("The Poincare sphere (x,y) = ({1},{2})")
                           .arg(std::to_string(ucoord[0]))
                           .arg(std::to_string(ucoord[1]));
             } else {
                 buf = WString(
                           "The P-L sphere of type ({1},{2})  (x,y) = ({3},{4})")
-                          .arg(study_->p)
-                          .arg(study_->q)
+                          .arg(study_->p_)
+                          .arg(study_->q_)
                           .arg(std::to_string(ucoord[0]))
                           .arg(std::to_string(ucoord[1]));
             }
@@ -458,7 +466,7 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
         case TYPEOFVIEW_V1:
             (study_->*(study_->sphere_to_V1))(pcoord[0], pcoord[1], pcoord[2],
                                               ucoord);
-            if (!study_->plweights) {
+            if (!study_->plweights_) {
                 ucoord[0] = -ucoord[0];
                 ucoord[1] = -ucoord[1];
             }
@@ -480,7 +488,7 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
         case TYPEOFVIEW_V2:
             (study_->*(study_->sphere_to_V2))(pcoord[0], pcoord[1], pcoord[2],
                                               ucoord);
-            if (!study_->plweights) {
+            if (!study_->plweights_) {
                 ucoord[0] = -ucoord[0];
                 ucoord[1] = -ucoord[1];
             }
@@ -492,20 +500,20 @@ void WSphere::mouseMovementEvent(WMouseEvent e)
             break;
         }
     } else {
-        switch (study_->typeofview) {
+        switch (study_->typeofview_) {
         case TYPEOFVIEW_PLANE:
-            if (study_->typeofstudy == TYPEOFSTUDY_ONE)
+            if (study_->typeofstudy_ == TYPEOFSTUDY_ONE)
                 buf = "Local study";
             else
                 buf = "Planar view";
             break;
         case TYPEOFVIEW_SPHERE:
-            if (study_->p == 1 && study_->q == 1)
+            if (study_->p_ == 1 && study_->q_ == 1)
                 buf = "The Poincare sphere";
             else {
                 buf = WString("The P-L sphere of type ({1},{2})")
-                          .arg(study_->p)
-                          .arg(study_->q);
+                          .arg(study_->p_)
+                          .arg(study_->q_);
             }
             break;
         case TYPEOFVIEW_U1:
@@ -882,17 +890,17 @@ void WSphere::plotPoints(void)
     struct semi_elementary *sep;
     struct degenerate *dp;
 
-    for (sp = study_->first_saddle_point; sp != nullptr; sp = sp->next_saddle)
+    for (sp = study_->first_saddle_point_; sp != nullptr; sp = sp->next_saddle)
         plotPoint(sp);
-    for (np = study_->first_node_point; np != nullptr; np = np->next_node)
+    for (np = study_->first_node_point_; np != nullptr; np = np->next_node)
         plotPoint(np);
-    for (wfp = study_->first_wf_point; wfp != nullptr; wfp = wfp->next_wf)
+    for (wfp = study_->first_wf_point_; wfp != nullptr; wfp = wfp->next_wf)
         plotPoint(wfp);
-    for (sfp = study_->first_sf_point; sfp != nullptr; sfp = sfp->next_sf)
+    for (sfp = study_->first_sf_point_; sfp != nullptr; sfp = sfp->next_sf)
         plotPoint(sfp);
-    for (sep = study_->first_se_point; sep != nullptr; sep = sep->next_se)
+    for (sep = study_->first_se_point_; sep != nullptr; sep = sep->next_se)
         plotPoint(sep);
-    for (dp = study_->first_de_point; dp != nullptr; dp = dp->next_de)
+    for (dp = study_->first_de_point_; dp != nullptr; dp = dp->next_de)
         plotPoint(dp);
 }
 
@@ -930,15 +938,44 @@ void WSphere::plotSeparatrices(void)
     struct semi_elementary *sep;
     struct degenerate *dp;
 
-    for (sp = study_->first_saddle_point; sp != nullptr; sp = sp->next_saddle)
+    for (sp = study_->first_saddle_point_; sp != nullptr; sp = sp->next_saddle)
         plotPointSeparatrices(sp);
-    for (sep = study_->first_se_point; sep != nullptr; sep = sep->next_se)
+    for (sep = study_->first_se_point_; sep != nullptr; sep = sep->next_se)
         plotPointSeparatrices(sep);
-    for (dp = study_->first_de_point; dp != nullptr; dp = dp->next_de)
+    for (dp = study_->first_de_point_; dp != nullptr; dp = dp->next_de)
         plotPointSeparatrices(dp);
 }
 
-void WSphere::plotGcf(void) { draw_gcf(study_->gcf_points, CSING, 1); }
+void WSphere::plotGcf(void) { draw_gcf(study_->gcf_points_, CSING, 1); }
+
+void WSphere::plotCurves(void)
+{
+    g_globalLogger.debug("[WSphere] plotting curves");
+    std::vector<curves>::const_iterator it;
+    for (it = study_->curve_vector_.begin(); it != study_->curve_vector_.end();
+         it++) {
+        g_globalLogger.debug("[WSphere] r2: " + std::to_string(it->r2->coeff) +
+                             "*x^" + std::to_string(it->r2->exp_x) + "*y^" +
+                             std::to_string(it->r2->exp_y));
+        P4POLYNOM2 p = it->r2->next_term2;
+        while (p != nullptr) {
+            g_globalLogger.debug("[WSphere] + " + std::to_string(p->coeff) +
+                                 "*x^" + std::to_string(p->exp_x) + "*y^" +
+                                 std::to_string(p->exp_y));
+            p = p->next_term2;
+        }
+        draw_curve(it->points, CCURV, 1);
+    }
+}
+
+void WSphere::plotIsoclines(void)
+{
+    std::vector<isoclines>::const_iterator it;
+    for (it = study_->isocline_vector_.begin();
+         it != study_->isocline_vector_.end(); it++) {
+        draw_isocline(it->points, it->color, 1);
+    }
+}
 
 // -----------------------------------------------------------------------
 //                          PLOT TOOLS
@@ -975,19 +1012,12 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
     d = false;
     doton = true;
 
-    //  FILE * fp;
-    //  fp = fopen( "C:\\test.txt", "wt" );
-
     while (theta < TWOPI) {
-        //        fprintf( fp, "%f\n", (float)theta );
-        //        fflush(fp);
         c = (x0 - cx) / a;
         if (c > -1.0 && c < 1.0) {
             t1 = acos(c);
             t2 = TWOPI - t1;
             if (theta >= t1 && theta < t2) {
-                //                fprintf( fp, "A EXCL [%f %f]\n", (float)t1,
-                //                (float)t2 );
                 theta = t2 + e / 4;
                 d = false;
                 continue;
@@ -998,15 +1028,11 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
             t1 = acos(c);
             t2 = TWOPI - t1;
             if (theta < t1) {
-                //                fprintf( fp, "B EXCL [-infinity %f]\n",
-                //                (float)t1 );
                 theta = t1 + e / 4;
                 d = false;
                 continue;
             }
             if (theta >= t2) {
-                //                fprintf( fp, "C EXCL [%f, infinity]\n",
-                //                (float)t2 );
                 theta = TWOPI + e / 4;
                 d = false;
                 break;
@@ -1020,23 +1046,17 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
                 t2 = t1 + TWOPI;
                 t1 = PI - t1;
                 if (theta >= t1 && theta < t2) {
-                    //                    fprintf( fp, "D EXCL [%f %f]\n",
-                    //                    (float)t1, (float)t2 );
                     theta = t2 + e / 4;
                     d = false;
                     continue;
                 }
             } else {
                 if (theta < t1) {
-                    //                    fprintf( fp, "E EXCL [-infinity
-                    //                    %f]\n", (float)t1 );
                     theta = t1 + e / 4;
                     d = false;
                     continue;
                 }
                 if (theta >= t2) {
-                    //                    fprintf( fp, "F EXCL [%f,
-                    //                    infinity]\n",  (float)t2 );
                     theta = TWOPI + e / 4;
                     d = false;
                     break;
@@ -1051,23 +1071,17 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
                 t2 = t1 + TWOPI;
                 t1 = PI - t1;
                 if (theta < t1) {
-                    //                    fprintf( fp, "G EXCL [-infinity
-                    //                    %f]\n", (float)t1 );
                     theta = t1 + e / 4;
                     d = false;
                     continue;
                 }
                 if (theta >= t2) {
-                    //                    fprintf( fp, "H EXCL [%f,
-                    //                    infinity]\n",  (float)t2 );
                     theta = TWOPI;
                     d = false;
                     break;
                 }
             } else {
                 if (theta >= t1 && theta < t2) {
-                    //                    fprintf( fp, "I EXCL [%f %f]\n",
-                    //                    (float)t1, (float)t2 );
                     theta = t2 + e / 4;
                     d = false;
                     continue;
@@ -1121,7 +1135,6 @@ P4POLYLINES *WSphere::produceEllipse(double cx, double cy, double a, double b,
             }
         }
     }
-    //  fclose(fp);
     return first;
 }
 
@@ -1130,7 +1143,7 @@ void WSphere::plotPoincareSphere(void)
     int color;
     WPainterPath path;
     P4POLYLINES *circlePoint = CircleAtInfinity;
-    color = study_->singinf ? CSING : CLINEATINFINITY;
+    color = study_->singinf_ ? CSING : CLINEATINFINITY;
     staticPainter->setPen(QXFIGCOLOR(color));
     while (circlePoint != nullptr) {
         path.moveTo(coWinX(circlePoint->x1), coWinY(circlePoint->y1));
@@ -1146,13 +1159,11 @@ void WSphere::plotPoincareLyapunovSphere(void)
     int color;
     WPainterPath *path = new WPainterPath();
     P4POLYLINES *p = CircleAtInfinity;
-    color = study_->singinf ? CSING : CLINEATINFINITY;
+    color = study_->singinf_ ? CSING : CLINEATINFINITY;
     staticPainter->setPen(QXFIGCOLOR(color));
     while (p != nullptr) {
         path->moveTo(coWinX(p->x1), coWinY(p->y1));
         path->lineTo(coWinX(p->x2), coWinY(p->y2));
-        // staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2),
-        // coWinY(p->y2) );
         p = p->next;
     }
     path->closeSubPath();
@@ -1166,8 +1177,6 @@ void WSphere::plotPoincareLyapunovSphere(void)
     while (p != nullptr) {
         path->moveTo(coWinX(p->x1), coWinY(p->y1));
         path->lineTo(coWinX(p->x2), coWinY(p->y2));
-        // staticPainter->drawLine( coWinX(p->x1), coWinY(p->y1), coWinX(p->x2),
-        // coWinY(p->y2) );
         p = p->next;
     }
     path->closeSubPath();
@@ -1177,7 +1186,7 @@ void WSphere::plotPoincareLyapunovSphere(void)
 
 void WSphere::plotLineAtInfinity(void)
 {
-    switch (study_->typeofview) {
+    switch (study_->typeofview_) {
     case TYPEOFVIEW_U1:
     case TYPEOFVIEW_V1:
         if (x0 < 0.0 && x1 > 0.0) {
@@ -1212,7 +1221,6 @@ void WSphere::drawLine(double _x1, double _y1, double _x2, double _y2,
 
             if (_x2 >= x0 && _x2 <= x1 && _y2 >= y0 && _y2 <= y1) {
                 // both points are visible in the window
-
                 wx2 = coWinX(_x2);
                 wy2 = coWinY(_y2);
 
@@ -1237,7 +1245,6 @@ void WSphere::drawLine(double _x1, double _y1, double _x2, double _y2,
                 staticPainter->drawLine(wx1, wy1, wx2, wy2);
             } else {
                 // only (_x2,_y2) is not visible
-
                 if (lineRectangleIntersect(_x1, _y1, _x2, _y2, x0, x1, y0,
                                            y1)) {
                     wx1 = coWinX(_x1);
@@ -1269,7 +1276,6 @@ void WSphere::drawLine(double _x1, double _y1, double _x2, double _y2,
         } else {
             if (_x2 >= x0 && _x2 <= x1 && _y2 >= y0 && _y2 <= y1) {
                 // only (_x2,_y2) is visible
-
                 if (lineRectangleIntersect(_x1, _y1, _x2, _y2, x0, x1, y0,
                                            y1)) {
                     wx1 = coWinX(_x1);
@@ -1299,7 +1305,6 @@ void WSphere::drawLine(double _x1, double _y1, double _x2, double _y2,
                 }
             } else {
                 // both end points are invisible
-
                 if (lineRectangleIntersect(_x1, _y1, _x2, _y2, x0, x1, y0,
                                            y1)) {
                     wx1 = coWinX(_x1);

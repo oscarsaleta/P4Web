@@ -42,3 +42,4 @@ WWidget *MyAuthWidget::createRegistrationView(const Auth::Identity &id)
     w->setModel(model);
     return w;
 }
+// TODO: crear pàgina per admin amb boto de registre
