@@ -43,11 +43,11 @@ HomeRight::HomeRight(WContainerWidget *parent, ScriptHandler *s)
 
     scriptHandler_ = s;
 
-    g_globalLogger.debug("HomeRight :: setting up UI...");
+    g_globalLogger.debug("[HomeRight] setting up UI...");
     setupUI();
-    g_globalLogger.debug("HomeRight :: setting up connectors...");
+    g_globalLogger.debug("[HomeRight] setting up connectors...");
     setupConnectors();
-    g_globalLogger.debug("HomeRight :: created correctly");
+    g_globalLogger.debug("[HomeRight] created correctly");
 }
 
 HomeRight::~HomeRight()
@@ -121,7 +121,7 @@ HomeRight::~HomeRight()
         tabWidget_ = nullptr;
     }
 
-    g_globalLogger.debug("HomeRight :: deleted correctly");
+    g_globalLogger.debug("[HomeRight] deleted correctly");
 }
 
 void HomeRight::setupUI()
@@ -239,7 +239,7 @@ void HomeRight::setupUI()
 
     tabWidget_->setCurrentIndex(0);
     tabWidget_->setTabHidden(2, true);
-    g_globalLogger.debug("HomeRight :: UI set up");
+    g_globalLogger.debug("[HomeRight] UI set up");
 }
 
 void HomeRight::setupConnectors()
@@ -257,7 +257,7 @@ void HomeRight::setupConnectors()
     plotSeparatricesButton_->clicked().connect(this,&HomeRight::plotSeparatrices);
     clearPlotButton_->clicked().connect(this,&HomeRight::clearPlot);*/
 
-    g_globalLogger.debug("HomeRight :: connectors set up");
+    g_globalLogger.debug("[HomeRight] connectors set up");
 }
 
 void HomeRight::readResults(std::string fileName)
@@ -309,28 +309,28 @@ void HomeRight::fullResults()
     outputTextAreaContent_ = fullResults_;
     outputTextArea_->setText(outputTextAreaContent_);
     tabWidget_->setCurrentIndex(0);
-    g_globalLogger.debug("HomeRight :: showing output panel");
+    g_globalLogger.debug("[HomeRight] showing output panel");
 }
 
 void HomeRight::showFinResults()
 {
     outputTextAreaContent_ = finResults_;
     outputTextArea_->setText(outputTextAreaContent_);
-    g_globalLogger.debug("HomeRight :: showing finite results");
+    g_globalLogger.debug("[HomeRight] showing finite results");
 }
 
 void HomeRight::showInfResults()
 {
     outputTextAreaContent_ = infResults_;
     outputTextArea_->setText(outputTextAreaContent_);
-    g_globalLogger.debug("HomeRight :: showing infinite results");
+    g_globalLogger.debug("[HomeRight] showing infinite results");
 }
 
 void HomeRight::clearResults()
 {
     outputTextArea_->setText("");
     outputTextAreaContent_ = "";
-    g_globalLogger.debug("HomeRight :: cleared output panel");
+    g_globalLogger.debug("[HomeRight] cleared output panel");
 }
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
@@ -339,10 +339,12 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
         delete sphere_;
         sphere_ = nullptr;
     }
-
+    sphereBasename_ = basename;
     sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550, basename,
                           projection);
     setupSphereAndPlot();
+    g_globalLogger.debug("[HomeRight] reacted to onSpherePlot signal");
+    
 }
 
 void HomeRight::onPlanePlot(std::string basename, int type, double minx,
@@ -352,10 +354,11 @@ void HomeRight::onPlanePlot(std::string basename, int type, double minx,
         delete sphere_;
         sphere_ = nullptr;
     }
-
+    sphereBasename_ = basename;
     sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550, basename,
                           type, minx, maxx, miny, maxy);
     setupSphereAndPlot();
+    g_globalLogger.debug("[HomeRight] reacted to onPlanePlot signal");
 }
 
 void HomeRight::setupSphereAndPlot()
@@ -379,7 +382,6 @@ void HomeRight::setupSphereAndPlot()
 
     sphere_->update();
     tabWidget_->setCurrentIndex(1);
-    g_globalLogger.debug("HomeRight :: reacted to onPlot signal");
 }
 
 void HomeRight::mouseMovedEvent(WString caption)
@@ -417,11 +419,11 @@ void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
         orbitStarted_ = sphere_->startOrbit(x0, y0, true);
 
     if (dir == 1)
-        g_globalLogger.debug("HomeRight :: integrating forwards...");
+        g_globalLogger.debug("[HomeRight] integrating forwards...");
     else if (dir == -1)
-        g_globalLogger.debug("HomeRight :: integrating backwards...");
+        g_globalLogger.debug("[HomeRight] integrating backwards...");
     else
-        g_globalLogger.debug("HomeRight :: continuing integration...");
+        g_globalLogger.debug("[HomeRight] continuing integration...");
 
     sphere_->integrateOrbit(dir);
 
@@ -454,7 +456,7 @@ void HomeRight::onOrbitsDelete(int flag)
 void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints,
                           int prec)
 {
-    g_globalLogger.debug("HomeRight :: received gcf signal with fname " +
+    g_globalLogger.debug("[HomeRight] received gcf signal with fname " +
                          fname);
     if (sphere_ == nullptr)
         return;
@@ -602,7 +604,7 @@ void HomeRight::refreshParamStringVectors()
 void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
                             int prec)
 {
-    g_globalLogger.debug("HomeRight :: received curve signal with fname " +
+    g_globalLogger.debug("[HomeRight] received curve signal with fname " +
                          fname);
 
     if (sphere_ == nullptr) {
@@ -612,7 +614,7 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
 
     // 1. read curve tables
     if (!sphere_->study_->readCurve(fname)) {
-        g_globalLogger.error("HomeRight :: cannot read curve");
+        g_globalLogger.error("[HomeRight] cannot read curve");
         curveConfirmedSignal_.emit(false);
         return;
     }
@@ -628,7 +630,7 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
         sphere_->evalCurveStart(sphere_->curveFname_, sphere_->curveDashes_,
                                 sphere_->curveNPoints_, sphere_->curvePrec_);
     if (!result) {
-        g_globalLogger.error("HomeRight :: cannot evaluate curve");
+        g_globalLogger.error("[HomeRight] cannot evaluate curve");
         curveConfirmedSignal_.emit(false);
         return;
     } else {
@@ -637,7 +639,7 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
             result = sphere_->evalCurveContinue(sphere_->curveFname_,
                                                 CURVE_POINTS, CURVE_PRECIS);
             if (sphere_->curveError_) {
-                g_globalLogger.error("HomeRight :: error while computing "
+                g_globalLogger.error("[HomeRight] error while computing "
                                      "evalCurveContinue at step: " +
                                      std::to_string(i));
                 curveConfirmedSignal_.emit(false);
@@ -648,11 +650,11 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
         // finish evaluation
         result = sphere_->evalCurveFinish();
         if (!result) {
-            g_globalLogger.error("HomeRight :: error in evalCurveFinish");
+            g_globalLogger.error("[HomeRight] error in evalCurveFinish");
             curveConfirmedSignal_.emit(false);
             return;
         } else {
-            g_globalLogger.debug("HomeRight :: computed curve");
+            g_globalLogger.debug("[HomeRight] computed curve");
             curveConfirmedSignal_.emit(true);
         }
     }
@@ -689,7 +691,7 @@ void HomeRight::onCurvesDelete(int flag)
 void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
                                int prec)
 {
-    g_globalLogger.debug("HomeRight :: received isocline signal with fname " +
+    g_globalLogger.debug("[HomeRight] received isocline signal with fname " +
                          fname);
 
     if (sphere_ == nullptr) {
@@ -699,7 +701,7 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
 
     // 1. read isocline tables
     if (!sphere_->study_->readIsoclines(fname)) {
-        g_globalLogger.error("HomeRight :: cannot read isocline");
+        g_globalLogger.error("[HomeRight] cannot read isocline");
         isoclineConfirmedSignal_.emit(false);
         return;
     }
@@ -715,7 +717,7 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
         sphere_->isoclineFname_, sphere_->isoclineDashes_,
         sphere_->isoclineNPoints_, sphere_->isoclinePrec_);
     if (!result) {
-        g_globalLogger.error("HomeRight :: cannot evaluate isocline");
+        g_globalLogger.error("[HomeRight] cannot evaluate isocline");
         isoclineConfirmedSignal_.emit(false);
     } else {
         int i = 0;
@@ -723,7 +725,7 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
             result = sphere_->evalIsoclineContinue(sphere_->isoclineFname_,
                                                    CURVE_POINTS, CURVE_PRECIS);
             if (sphere_->isoclineError_) {
-                g_globalLogger.error("HomeRight :: error while computing "
+                g_globalLogger.error("[HomeRight] error while computing "
                                      "evalIsoclineContinue at step: " +
                                      std::to_string(i));
                 isoclineConfirmedSignal_.emit(false);
@@ -734,10 +736,10 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
         // finish evaluation
         result = sphere_->evalIsoclineFinish();
         if (!result) {
-            g_globalLogger.error("HomeRight :: error in evalIsoclineFinish");
+            g_globalLogger.error("[HomeRight] error in evalIsoclineFinish");
             isoclineConfirmedSignal_.emit(false);
         } else {
-            g_globalLogger.debug("HomeRight :: computed isocline");
+            g_globalLogger.debug("[HomeRight] computed isocline");
             isoclineConfirmedSignal_.emit(true);
         }
     }
@@ -770,4 +772,47 @@ void HomeRight::onIsoclinesDelete(int flag)
     sphere_->update();
     if (tabWidget_->currentIndex() != 1)
         tabWidget_->setCurrentIndex(1);
+}
+
+void HomeRight::refreshPlotSphere(double p)
+{
+    WVFStudy *study;
+    if (sphere_->study_ != nullptr) {
+        g_globalLogger.debug("[HomeRight] copying study");
+        study = new WVFStudy(*(sphere_->study_));
+    } else {
+        g_globalLogger.debug("[HomeRight] using null study");
+        study = nullptr;
+    }
+
+    if (sphere_ != nullptr) {
+        delete sphere_;
+        sphere_ = nullptr;
+    }
+
+    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550,
+                          sphereBasename_, p, study);
+    setupSphereAndPlot();
+}
+
+void HomeRight::refreshPlotPlane(int type, double minx, double maxx,
+                                 double miny, double maxy)
+{
+    WVFStudy *study;
+    if (sphere_->study_ != nullptr) {
+        g_globalLogger.debug("[HomeRight] copying study");
+        study = new WVFStudy(*(sphere_->study_));
+    } else {
+        g_globalLogger.debug("[HomeRight] using null study");
+        study = nullptr;
+    }
+
+    if (sphere_ != nullptr) {
+        delete sphere_;
+        sphere_ = nullptr;
+    }
+
+    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550,
+                          sphereBasename_, type, minx, maxx, miny, maxy, study);
+    setupSphereAndPlot();
 }

@@ -132,7 +132,7 @@ class WSphere : public Wt::WPaintedWidget
      */
     WSphere(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0,
             int width = 255, int height = 255, std::string basename = "",
-            double projection = -1.0);
+            double projection = -1.0, WVFStudy *study = 0);
     /**
      * Constructor method for a planar (or chart) plot
      * @param parent   container widget which created the sphere
@@ -149,7 +149,7 @@ class WSphere : public Wt::WPaintedWidget
     WSphere(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0,
             int width = 255, int height = 255, std::string basename = "",
             int type = 1, double minx = -1, double maxx = 1, double miny = -1,
-            double maxy = 1);
+            double maxy = 1, WVFStudy *study = 0);
     /**
      * Destructor method
      */
@@ -660,6 +660,8 @@ class WSphere : public Wt::WPaintedWidget
 
     // script handler
     ScriptHandler *scriptHandler_;
+    // flag to know if study was copied or will be created
+    bool studyCopied_;
 };
 
 #endif /* WIN_SPHERE_H */

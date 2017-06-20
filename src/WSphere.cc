@@ -68,12 +68,20 @@ using namespace Wt;
 // parameters _x1,... are irrelevant if isZoom is false
 
 WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
-                 int height, std::string basename, double projection)
+                 int height, std::string basename, double projection,
+                 WVFStudy *study)
     : width_(width), height_(height), basename_(basename), parentWnd(parent),
       typeOfView_(0), projection_(projection), plotPrepared_(false),
       plotDone_(false)
 {
-    study_ = new WVFStudy(projection);
+    if (study == nullptr) {
+        study_ = new WVFStudy(projection);
+        studyCopied_ = false;
+    } else {
+        study_ = study;
+        studyCopied_ = true;
+    }
+
     scriptHandler_ = s;
 
     ReverseYaxis = false;
@@ -104,12 +112,19 @@ WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
 
 WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
                  int height, std::string basename, int type, double minx,
-                 double maxx, double miny, double maxy)
+                 double maxx, double miny, double maxy, WVFStudy *study)
     : width_(width), height_(height), basename_(basename), parentWnd(parent),
       typeOfView_(type), viewMinX_(minx), viewMaxX_(maxx), viewMinY_(miny),
       viewMaxY_(maxy), plotPrepared_(false), plotDone_(false)
 {
-    study_ = new WVFStudy();
+    if (study == nullptr) {
+        study_ = new WVFStudy();
+        studyCopied_ = false;
+    } else {
+        study_ = study;
+        studyCopied_ = true;
+    }
+
     scriptHandler_ = s;
 
     ReverseYaxis = false;
@@ -156,7 +171,7 @@ WSphere::~WSphere()
         study_ = nullptr;
     }
 
-    g_globalLogger.debug("WSphere :: deleted correctly");
+    g_globalLogger.debug("[WSphere] deleted correctly");
 }
 
 bool WSphere::setupPlot(void)
@@ -167,7 +182,7 @@ bool WSphere::setupPlot(void)
     } else
         firstTimePlot_ = true;
 
-    if (!study_->readTables(basename_)) {
+    if (!studyCopied_ && !study_->readTables(basename_)) {
         return false;
     } else {
         switch (typeOfView_) {
@@ -211,7 +226,10 @@ bool WSphere::setupPlot(void)
             study_->ymax_ = viewMaxY_;
             break;
         }
+        g_globalLogger.debug(
+            "[WSphere] Setting up WVFStudy coordinate transformations...");
         study_->setupCoordinateTransformations();
+        g_globalLogger.debug("[WSPhere] Transformations set up successfully");
     }
 
     struct P4POLYLINES *t;
@@ -308,14 +326,14 @@ void WSphere::paintEvent(WPaintDevice *p)
             int result =
                 evalGcfStart(gcfFname_, gcfDashes_, gcfNPoints_, gcfPrec_);
             if (!result) {
-                g_globalLogger.error("WSphere :: cannot compute Gcf");
+                g_globalLogger.error("[WSphere] cannot compute Gcf");
             } else {
                 // this calls evalGcfContinue at least once
                 int i = 0;
                 do {
                     result = evalGcfContinue(gcfFname_, GCF_POINTS, GCF_PRECIS);
                     if (gcfError_) {
-                        g_globalLogger.error("WSphere :: error while computing "
+                        g_globalLogger.error("[WSphere] error while computing "
                                              "evalGcfContinue at step: " +
                                              std::to_string(i));
                         break;
@@ -326,9 +344,9 @@ void WSphere::paintEvent(WPaintDevice *p)
                 result = evalGcfFinish();
                 if (!result) {
                     g_globalLogger.error(
-                        "WSphere :: error while computing evalGcfFinish");
+                        "[WSphere] error while computing evalGcfFinish");
                 } else {
-                    g_globalLogger.debug("WSphere :: computed Gcf");
+                    g_globalLogger.debug("[WSphere] computed Gcf");
                 }
             }
             plotGcf();
@@ -932,9 +950,20 @@ void WSphere::plotGcf(void) { draw_gcf(study_->gcf_points_, CSING, 1); }
 
 void WSphere::plotCurves(void)
 {
+    g_globalLogger.debug("[WSphere] plotting curves");
     std::vector<curves>::const_iterator it;
     for (it = study_->curve_vector_.begin(); it != study_->curve_vector_.end();
          it++) {
+        g_globalLogger.debug("[WSphere] r2: " + std::to_string(it->r2->coeff) +
+                             "*x^" + std::to_string(it->r2->exp_x) + "*y^" +
+                             std::to_string(it->r2->exp_y));
+        P4POLYNOM2 p = it->r2->next_term2;
+        while (p != nullptr) {
+            g_globalLogger.debug("[WSphere] + " + std::to_string(p->coeff) +
+                                 "*x^" + std::to_string(p->exp_x) + "*y^" +
+                                 std::to_string(p->exp_y));
+            p = p->next_term2;
+        }
         draw_curve(it->points, CCURV, 1);
     }
 }

@@ -43,7 +43,7 @@
         <div class="form-actions">
           <p>
             ${login class="btn btn-primary"}
-            <!--${register class="btn btn-default"}-->
+            ${register class="btn btn-default"}
             ${lost-password class="btn btn-default"}
           </p>
         </div>
@@ -224,6 +224,9 @@
           Max. y:
         </label>
         <div class="col-sm-4" title="${maxy-tooltip}">${maxy}</div>
+      </div>
+      <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">${btn}</div>
       </div>
     </form>
   </message>

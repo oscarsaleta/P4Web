@@ -55,7 +55,7 @@ bool WSphere::evalCurveContinue(std::string fname, int points, int prec)
 
     if (!readTaskCurveResults(fname, curveTask_)) {
         curveError_ = true;
-        g_globalLogger.error("WSphere :: error at curve readTaskCurveResults");
+        g_globalLogger.error("[WSphere] error at curve readTaskCurveResults");
         return true;
     }
     curveTask_++;
@@ -66,7 +66,7 @@ bool WSphere::evalCurveContinue(std::string fname, int points, int prec)
 
     if (runTaskCurve(fname, curveTask_, points, prec) < 0) {
         curveError_ = true;
-        g_globalLogger.error("WSphere :: error at curve runTaskCurve");
+        g_globalLogger.error("[WSphere] error at curve runTaskCurve");
         return true;
     }
 
@@ -89,7 +89,7 @@ int WSphere::runTaskCurve(std::string fname, int task, int points, int prec)
 {
     bool value;
 
-    g_globalLogger.debug("WSphere :: will run curve task=" +
+    g_globalLogger.debug("[WSphere] will run curve task=" +
                          std::to_string(task) + " using file=" + fname);
     // TODO: prepareCurve functions
     switch (task) {
@@ -150,7 +150,7 @@ int WSphere::runTaskCurve(std::string fname, int task, int points, int prec)
 
 bool WSphere::readTaskCurveResults(std::string fname, int task)
 {
-    g_globalLogger.debug("WSphere :: called readTaskCurveResults with fname=" +
+    g_globalLogger.debug("[WSphere] called readTaskCurveResults with fname=" +
                          fname + " and task=" + std::to_string(task));
     bool value;
 
@@ -238,7 +238,7 @@ bool WSphere::read_curve(std::string fname,
 
     fp = fopen(std::string(fname + "_curve.tab").c_str(), "r");
     if (fp == nullptr) {
-        g_globalLogger.debug("WSphere :: cannot open file " +
+        g_globalLogger.debug("[WSphere] cannot open file " +
                              std::string(fname + "_curve.tab") +
                              " for reading");
         return false;

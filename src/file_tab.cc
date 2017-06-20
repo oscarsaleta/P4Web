@@ -129,6 +129,495 @@ WVFStudy::WVFStudy(double projection) : config_projection_(projection)
     // line style (dashes or points)
     config_dashes_ = DEFAULT_LINESTYLE;
     config_kindvf_ = DEFAULT_INTCONFIG;
+
+    selected_saddle_point_ = nullptr;
+    selected_se_point_ = nullptr;
+    selected_de_point_ = nullptr;
+    selected_sep_ = nullptr;
+    selected_de_sep_ = nullptr;
+}
+
+// -----------------------------------------------------------------------
+//                              WVFStudy copy functions
+// -----------------------------------------------------------------------
+
+WVFStudy::WVFStudy(const WVFStudy &obj)
+{
+    typeofstudy_ = obj.typeofstudy_;
+    typeofview_ = obj.typeofview_;
+    p_ = obj.p_;
+    q_ = obj.q_;
+    plweights_ = obj.plweights_;
+    double_p_ = (double)p_;
+    double_q_ = (double)q_;
+    double_p_plus_q_ = (double)(p_ + q_);
+    double_p_minus_1_ = (double)(p_ - 1);
+    double_q_minus_1_ = (double)(q_ - 1);
+    double_q_minus_p_ = (double)(q_ - p_);
+    xmin_ = obj.xmin_;
+    xmax_ = obj.xmax_;
+    ymin_ = obj.ymin_;
+    ymax_ = obj.ymax_;
+    singinf_ = obj.singinf_;
+    dir_vec_field_ = obj.dir_vec_field_;
+
+    f_vec_field_[0] = copy_term2(obj.f_vec_field_[0]);
+    f_vec_field_[1] = copy_term2(obj.f_vec_field_[1]);
+    vec_field_U1_[0] = copy_term2(obj.vec_field_U1_[0]);
+    vec_field_U1_[1] = copy_term2(obj.vec_field_U1_[1]);
+    vec_field_U2_[0] = copy_term2(obj.vec_field_U2_[0]);
+    vec_field_U2_[1] = copy_term2(obj.vec_field_U2_[1]);
+    vec_field_V1_[0] = copy_term2(obj.vec_field_V1_[0]);
+    vec_field_V1_[1] = copy_term2(obj.vec_field_V1_[1]);
+    vec_field_V2_[0] = copy_term2(obj.vec_field_V2_[0]);
+    vec_field_V2_[1] = copy_term2(obj.vec_field_V2_[1]);
+    vec_field_C_[0] = copy_term3(obj.vec_field_C_[0]);
+    vec_field_C_[1] = copy_term3(obj.vec_field_C_[1]);
+
+    first_saddle_point_ = copy_saddle(obj.first_saddle_point_);
+    first_se_point_ = copy_semi_elementary(obj.first_se_point_);
+    first_node_point_ = copy_node(obj.first_node_point_);
+    first_sf_point_ = copy_strong_focus(obj.first_sf_point_);
+    first_wf_point_ = copy_weak_focus(obj.first_wf_point_);
+    first_de_point_ = copy_degenerate(obj.first_de_point_);
+
+    gcf_ = copy_term2(obj.gcf_);
+    gcf_U1_ = copy_term2(obj.gcf_U1_);
+    gcf_U2_ = copy_term2(obj.gcf_U2_);
+    gcf_V1_ = copy_term2(obj.gcf_V1_);
+    gcf_V2_ = copy_term2(obj.gcf_V2_);
+    gcf_C_ = copy_term3(obj.gcf_C_);
+    gcf_points_ = copy_orbits_points(obj.gcf_points_);
+    last_gcf_point_ = copy_orbits_points(obj.last_gcf_point_);
+
+    std::vector<curves>::const_iterator it1;
+    for (it1 = obj.curve_vector_.begin(); it1 != obj.curve_vector_.end();
+         it1++) {
+        curves *curve = copy_curves((curves *)&(*it1));
+        curve_vector_.push_back(*curve);
+    }
+    last_curves_point_ = copy_orbits_points(obj.last_curves_point_);
+
+    std::vector<isoclines>::const_iterator it2;
+    for (it2 = obj.isocline_vector_.begin(); it2 != obj.isocline_vector_.end();
+         it2++) {
+        isoclines *isoc = copy_isoclines((isoclines *)&(*it2));
+        isocline_vector_.push_back(*isoc);
+    }
+    last_isoclines_point_ = copy_orbits_points(obj.last_isoclines_point_);
+
+    first_lim_cycle_ = copy_orbits(obj.first_lim_cycle_);
+    first_orbit_ = copy_orbits(obj.first_orbit_);
+
+    config_lc_value_ = obj.config_lc_value_;
+    config_hma_ = obj.config_hma_;
+    config_hmi_ = obj.config_hmi_;
+    config_step_ = obj.config_step_;
+    config_currentstep_ = obj.config_currentstep_;
+    config_tolerance_ = obj.config_tolerance_;
+    config_projection_ = obj.config_projection_;
+    config_intpoints_ = obj.config_intpoints_;
+    config_lc_numpoints_ = obj.config_lc_numpoints_;
+    config_dashes_ = obj.config_dashes_;
+    config_kindvf_ = obj.config_kindvf_;
+
+    current_orbit_ = copy_orbits(obj.current_orbit_);
+    current_lim_cycle_ = copy_orbits(obj.current_lim_cycle_);
+
+    selected_ucoord_[0] = obj.selected_ucoord_[0];
+    selected_ucoord_[1] = obj.selected_ucoord_[1];
+
+    selected_saddle_point_ = copy_saddle(obj.selected_saddle_point_);
+    selected_se_point_ = copy_semi_elementary(obj.selected_se_point_);
+    selected_de_point_ = copy_degenerate(obj.selected_de_point_);
+    selected_sep_ = copy_sep(obj.selected_sep_);
+    selected_de_sep_ = copy_blow_up_points(obj.selected_de_sep_);
+}
+
+orbits *WVFStudy::copy_orbits(orbits *p)
+{
+    orbits *result = nullptr;
+    orbits *o = p;
+    orbits *last = nullptr;
+    while (o != nullptr) {
+        orbits *q = new orbits;
+        q->pcoord[0] = o->pcoord[0];
+        q->pcoord[1] = o->pcoord[1];
+        q->pcoord[2] = o->pcoord[2];
+        q->color = o->color;
+        q->f_orbits = copy_orbits_points(o->f_orbits);
+        q->current_f_orbits = copy_orbits_points(o->current_f_orbits);
+        q->next_orbit = nullptr;
+        if (last != nullptr)
+            last->next_orbit = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_orbit;
+    }
+    return result;
+}
+
+P4ORBIT WVFStudy::copy_orbits_points(P4ORBIT p)
+{
+    P4ORBIT result = nullptr;
+    P4ORBIT o = p;
+    P4ORBIT last = nullptr;
+    while (o != nullptr) {
+        P4ORBIT q = new orbits_points;
+        q->color = o->color;
+        q->pcoord[0] = o->pcoord[0];
+        q->pcoord[1] = o->pcoord[1];
+        q->pcoord[2] = o->pcoord[2];
+        q->dashes = o->dashes;
+        q->dir = o->dir;
+        q->type = o->type;
+        q->next_point = nullptr;
+        if (last != nullptr)
+            last->next_point = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_point;
+    }
+    return result;
+}
+
+P4POLYNOM1 WVFStudy::copy_term1(P4POLYNOM1 p)
+{
+    P4POLYNOM1 result = nullptr;
+    P4POLYNOM1 o = p;
+    P4POLYNOM1 last = nullptr;
+    while (o != nullptr) {
+        P4POLYNOM1 q = new term1;
+        q->exp = o->exp;
+        q->coeff = o->coeff;
+        q->next_term1 = nullptr;
+        if (last != nullptr)
+            last->next_term1 = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_term1;
+    }
+    return result;
+}
+
+P4POLYNOM2 WVFStudy::copy_term2(P4POLYNOM2 p)
+{
+    P4POLYNOM2 result = nullptr;
+    P4POLYNOM2 o = p;
+    P4POLYNOM2 last = nullptr;
+    while (o != nullptr) {
+        P4POLYNOM2 q = new term2;
+        q->exp_x = o->exp_x;
+        q->exp_y = o->exp_y;
+        q->coeff = o->coeff;
+        q->next_term2 = nullptr;
+        if (last != nullptr)
+            last->next_term2 = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_term2;
+    }
+    return result;
+}
+
+P4POLYNOM3 WVFStudy::copy_term3(P4POLYNOM3 p)
+{
+    P4POLYNOM3 result = nullptr;
+    P4POLYNOM3 o = p;
+    P4POLYNOM3 last = nullptr;
+    while (o != nullptr) {
+        P4POLYNOM3 q = new term3;
+        q->exp_r = o->exp_r;
+        q->exp_Co = o->exp_Co;
+        q->exp_Si = o->exp_Si;
+        q->coeff = o->coeff;
+        q->next_term3 = nullptr;
+        if (last != nullptr)
+            last->next_term3 = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_term3;
+    }
+    return result;
+}
+
+sep *WVFStudy::copy_sep(sep *p)
+{
+    sep *result = nullptr;
+    sep *o = p;
+    sep *last = nullptr;
+    while (o != nullptr) {
+        sep *q = new sep;
+        q->first_sep_point = copy_orbits_points(o->first_sep_point);
+        q->last_sep_point = copy_orbits_points(o->last_sep_point);
+        q->type = o->type;
+        q->direction = o->direction;
+        q->d = o->d;
+        q->notadummy = o->notadummy;
+        q->separatrice = copy_term1(o->separatrice);
+        q->next_sep = nullptr;
+        if (last != nullptr)
+            last->next_sep = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_sep;
+    }
+    return result;
+}
+
+degenerate *WVFStudy::copy_degenerate(degenerate *p)
+{
+    degenerate *result = nullptr;
+    degenerate *o = p;
+    degenerate *last = nullptr;
+    while (o != nullptr) {
+        degenerate *q = new degenerate;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->epsilon = o->epsilon;
+        q->notadummy = o->notadummy;
+        q->blow_up = copy_blow_up_points(o->blow_up);
+        q->next_de = nullptr;
+        if (last != nullptr)
+            last->next_de = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_de;
+    }
+    return result;
+}
+
+blow_up_points *WVFStudy::copy_blow_up_points(blow_up_points *p)
+{
+    blow_up_points *result = nullptr;
+    blow_up_points *o = p;
+    blow_up_points *last = nullptr;
+    while (o != nullptr) {
+        blow_up_points *q = new blow_up_points;
+        q->n = o->n;
+        q->trans = copy_transformations(o->trans);
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->a11 = o->a11;
+        q->a12 = o->a12;
+        q->a21 = o->a21;
+        q->a22 = o->a22;
+        q->vector_field[0] = copy_term2(o->vector_field[0]);
+        q->vector_field[1] = copy_term2(o->vector_field[1]);
+        q->sep = copy_term1(o->sep);
+        q->type = o->type;
+        q->blow_up_vec_field = o->blow_up_vec_field;
+        q->point[0] = o->point[0];
+        q->point[1] = o->point[1];
+        q->first_sep_point = copy_orbits_points(o->first_sep_point);
+        q->last_sep_point = copy_orbits_points(o->last_sep_point);
+        q->next_blow_up_point = nullptr;
+        if (last != nullptr)
+            last->next_blow_up_point = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_blow_up_point;
+    }
+    return result;
+}
+
+transformations *WVFStudy::copy_transformations(transformations *p)
+{
+    transformations *result = nullptr;
+    transformations *o = p;
+    transformations *last = nullptr;
+    while (o != nullptr) {
+        transformations *q = new transformations;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->c1 = o->c1;
+        q->c2 = o->c2;
+        q->d1 = o->d1;
+        q->d2 = o->d2;
+        q->d3 = o->d3;
+        q->d4 = o->d4;
+        q->d = o->d;
+        q->next_trans = nullptr;
+        if (last != nullptr)
+            last->next_trans = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_trans;
+    }
+    return result;
+}
+
+weak_focus *WVFStudy::copy_weak_focus(weak_focus *p)
+{
+    weak_focus *result = nullptr;
+    weak_focus *o = p;
+    weak_focus *last = nullptr;
+    while (o != nullptr) {
+        weak_focus *q = new weak_focus;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->type = o->type;
+        q->next_wf = nullptr;
+        if (last != nullptr)
+            last->next_wf = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_wf;
+    }
+    return result;
+}
+
+strong_focus *WVFStudy::copy_strong_focus(strong_focus *p)
+{
+    strong_focus *result = nullptr;
+    strong_focus *o = p;
+    strong_focus *last = nullptr;
+    while (o != nullptr) {
+        strong_focus *q = new strong_focus;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->stable = o->stable;
+        q->next_sf = nullptr;
+        if (last != nullptr)
+            last->next_sf = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_sf;
+    }
+    return result;
+}
+
+node *WVFStudy::copy_node(node *p)
+{
+    node *result = nullptr;
+    node *o = p;
+    node *last = nullptr;
+    while (o != nullptr) {
+        node *q = new node;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->stable = o->stable;
+        if (last != nullptr)
+            last->next_node = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_node;
+    }
+    return result;
+}
+
+semi_elementary *WVFStudy::copy_semi_elementary(semi_elementary *p)
+{
+    semi_elementary *result = nullptr;
+    semi_elementary *o = p;
+    semi_elementary *last = nullptr;
+    while (o != nullptr) {
+        semi_elementary *q = new semi_elementary;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->epsilon = o->epsilon;
+        q->notadummy = o->notadummy;
+        q->separatrices = copy_sep(o->separatrices);
+        q->vector_field[0] = copy_term2(o->vector_field[0]);
+        q->vector_field[1] = copy_term2(o->vector_field[1]);
+        q->a11 = o->a11;
+        q->a12 = o->a12;
+        q->a21 = o->a21;
+        q->a22 = o->a22;
+        q->type = o->type;
+        q->next_se = nullptr;
+        if (last != nullptr)
+            last->next_se = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_se;
+    }
+    return result;
+}
+
+saddle *WVFStudy::copy_saddle(saddle *p)
+{
+    saddle *result = nullptr;
+    saddle *o = p;
+    saddle *last = nullptr;
+    while (o != nullptr) {
+        saddle *q = new saddle;
+        q->x0 = o->x0;
+        q->y0 = o->y0;
+        q->chart = o->chart;
+        q->epsilon = o->epsilon;
+        q->notadummy = o->notadummy;
+        q->separatrices = copy_sep(o->separatrices);
+        q->vector_field[0] = copy_term2(o->vector_field[0]);
+        q->vector_field[1] = copy_term2(o->vector_field[1]);
+        q->a11 = o->a11;
+        q->a12 = o->a12;
+        q->a21 = o->a21;
+        q->a22 = o->a22;
+        q->next_saddle = nullptr;
+        if (last != nullptr)
+            last->next_saddle = q;
+        else
+            result = q;
+        last = q;
+        o = o->next_saddle;
+    }
+    return result;
+}
+
+curves *WVFStudy::copy_curves(curves *p)
+{
+    curves *result = nullptr;
+    curves *o = p;
+    if (o != nullptr) {
+        curves *q = new curves;
+        q->r2 = copy_term2(o->r2);
+        q->u1 = copy_term2(o->u1);
+        q->u2 = copy_term2(o->u2);
+        q->v1 = copy_term2(o->v1);
+        q->v2 = copy_term2(o->v2);
+        q->c = copy_term3(o->c);
+        q->points = copy_orbits_points(o->points);
+        result = q;
+    }
+    return result;
+}
+
+isoclines *WVFStudy::copy_isoclines(isoclines *p)
+{
+    isoclines *result = nullptr;
+    isoclines *o = p;
+    if (o != nullptr) {
+        isoclines *q = new isoclines;
+        q->r2 = copy_term2(o->r2);
+        q->u1 = copy_term2(o->u1);
+        q->u2 = copy_term2(o->u2);
+        q->v1 = copy_term2(o->v1);
+        q->v2 = copy_term2(o->v2);
+        q->c = copy_term3(o->c);
+        q->points = copy_orbits_points(o->points);
+        q->color = o->color;
+        result = q;
+    }
+    return result;
 }
 
 // -----------------------------------------------------------------------
@@ -367,14 +856,14 @@ bool WVFStudy::readTables(std::string basename)
 
     fp = fopen((basename + "_vec.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("WVFStudy :: Cannot open file " + basename +
+        g_globalLogger.error("[WVFStudy] Cannot open file " + basename +
                              "_vec.tab.");
         deleteVF();
         return false;
     }
 
     if (fscanf(fp, "%d %d %d ", &typeofstudy_, &p_, &q_) != 3) {
-        g_globalLogger.error("WVFStudy :: Cannot read typeofstudy_ in " +
+        g_globalLogger.error("[WVFStudy] Cannot read typeofstudy_ in " +
                              basename + "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -384,7 +873,7 @@ bool WVFStudy::readTables(std::string basename)
     if (typeofstudy_ == TYPEOFSTUDY_ONE) {
         if (fscanf(fp, "%lf %lf %lf %lf", &xmin_, &xmax_, &ymin_, &ymax_) !=
             4) {
-            g_globalLogger.error("WVFStudy :: Cannot read min-max coords in " +
+            g_globalLogger.error("[WVFStudy] Cannot read min-max coords in " +
                                  basename + "_vec.tab.");
             deleteVF();
             fclose(fp);
@@ -405,7 +894,7 @@ bool WVFStudy::readTables(std::string basename)
     double_q_minus_p_ = (double)(q_ - p_);
 
     if (!readGCF(fp)) {
-        g_globalLogger.error("WVFStudy :: Cannot read gcf " + basename +
+        g_globalLogger.error("[WVFStudy] Cannot read gcf " + basename +
                              "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -413,7 +902,7 @@ bool WVFStudy::readTables(std::string basename)
     }
 
     if (!readVectorField(fp, f_vec_field_)) {
-        g_globalLogger.error("WVFStudy :: Cannot read vector field in " +
+        g_globalLogger.error("[WVFStudy] Cannot read vector field in " +
                              basename + "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -422,7 +911,7 @@ bool WVFStudy::readTables(std::string basename)
 
     if (!readVectorField(fp, vec_field_U1_)) {
         g_globalLogger.error(
-            "WVFStudy :: Cannot read vector field in U1-chart in " + basename +
+            "[WVFStudy] Cannot read vector field in U1-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -431,7 +920,7 @@ bool WVFStudy::readTables(std::string basename)
 
     if (!readVectorField(fp, vec_field_V1_)) {
         g_globalLogger.error(
-            "WVFStudy :: Cannot read vector field in V1-chart in " + basename +
+            "[WVFStudy] Cannot read vector field in V1-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -440,7 +929,7 @@ bool WVFStudy::readTables(std::string basename)
 
     if (!readVectorField(fp, vec_field_U2_)) {
         g_globalLogger.error(
-            "WVFStudy :: Cannot read vector field in U2-chart in " + basename +
+            "[WVFStudy] Cannot read vector field in U2-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -449,7 +938,7 @@ bool WVFStudy::readTables(std::string basename)
 
     if (!readVectorField(fp, vec_field_V2_)) {
         g_globalLogger.error(
-            "WVFStudy :: Cannot read vector field in V2-chart in " + basename +
+            "[WVFStudy] Cannot read vector field in V2-chart in " + basename +
             "_vec.tab.");
         deleteVF();
         fclose(fp);
@@ -459,7 +948,7 @@ bool WVFStudy::readTables(std::string basename)
     if (plweights_) {
         if (!readVectorFieldCylinder(fp, vec_field_C_)) {
             g_globalLogger.error(
-                "WVFStudy :: Cannot read vector field in Cylinder-chart in " +
+                "[WVFStudy] Cannot read vector field in Cylinder-chart in " +
                 basename + "_vec.tab.");
             deleteVF();
             fclose(fp);
@@ -468,7 +957,7 @@ bool WVFStudy::readTables(std::string basename)
         singinf_ = 0;
     } else {
         if (fscanf(fp, "%d %d", &flag, &dir_vec_field_) != 2) {
-            g_globalLogger.error("WVFStudy :: Cannot read sing-at-infinity "
+            g_globalLogger.error("[WVFStudy] Cannot read sing-at-infinity "
                                  "flag and directions flag in " +
                                  basename + "_vec.tab.");
             deleteVF();
@@ -485,7 +974,7 @@ bool WVFStudy::readTables(std::string basename)
         if (fp != nullptr) {
             if (!readPoints(fp)) {
                 g_globalLogger.error(
-                    "WVFStudy :: Problem reading singularity info from " +
+                    "[WVFStudy] Problem reading singularity info from " +
                     basename + "_fin.tab: " + lasterror_.toUTF8() + ".");
                 deleteVF();
                 fclose(fp);
@@ -493,7 +982,7 @@ bool WVFStudy::readTables(std::string basename)
             }
             fclose(fp);
         } else {
-            g_globalLogger.error("WVFStudy :: Cannot open " + basename +
+            g_globalLogger.error("[WVFStudy] Cannot open " + basename +
                                  "_fin.tab.");
             deleteVF();
             return false;
@@ -507,7 +996,7 @@ bool WVFStudy::readTables(std::string basename)
                 for (j = 1; j <= 2; j++) {
                     if (!readPoints(fp)) {
                         g_globalLogger.error(
-                            "WVFStudy :: Cannot read singular points in " +
+                            "[WVFStudy] Cannot read singular points in " +
                             basename + "_inf.tab (" + std::to_string(j) +
                             "): " + lasterror_.toUTF8() + ".");
                         deleteVF();
@@ -519,7 +1008,7 @@ bool WVFStudy::readTables(std::string basename)
                 for (j = 1; j <= 4; j++) {
                     if (!readPoints(fp)) {
                         g_globalLogger.error(
-                            "WVFStudy :: Cannot read singular points in " +
+                            "[WVFStudy] Cannot read singular points in " +
                             basename + "_inf.tab (" + std::to_string(j) +
                             "): " + lasterror_.toUTF8() + ".");
                         deleteVF();
@@ -530,14 +1019,14 @@ bool WVFStudy::readTables(std::string basename)
             }
             fclose(fp);
         } else {
-            g_globalLogger.error("WVFStudy :: Cannot open " + basename +
+            g_globalLogger.error("[WVFStudy] Cannot open " + basename +
                                  "_inf.tab.");
             deleteVF();
             return false;
         }
     }
 
-    g_globalLogger.debug("WFStudy :: Files " + basename +
+    g_globalLogger.debug("[WFStudy] Files " + basename +
                          "_{vec,fin,inf}.tab read correctly.");
     return true;
 }
@@ -627,7 +1116,7 @@ bool WVFStudy::readCurve(std::string basename)
 
     fp = fopen((basename + "_veccurve.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("WFStudy :: Cannot open file " + basename +
+        g_globalLogger.error("[WFStudy] Cannot open file " + basename +
                              "_veccurve.tab");
         return false;
     }
@@ -706,7 +1195,7 @@ bool WVFStudy::readIsoclines(std::string basename)
 
     fp = fopen((basename + "_vecisoclines.tab").c_str(), "rt");
     if (fp == nullptr) {
-        g_globalLogger.error("WVFSttudy :: Cannot open file " + basename +
+        g_globalLogger.error("[WVFSttudy] Cannot open file " + basename +
                              "_vecisoclines.tab");
         return false;
     }
