@@ -360,9 +360,19 @@ class HomeLeft : public Wt::WContainerWidget
      */
     Wt::Signal<int> &isoclineDeleteSignal() { return isoclineDeleteSignal_; }
     /**
-     * Signal to tell HomeRight to refresh the plot without erasing it
+     * Signal to tell HomeRight to refresh the plot and draw a sphere
      */
-    Wt::Signal<int> &refreshPlotSignal() { return refreshPlotSignal_; }
+    Wt::Signal<double> &refreshPlotSphereSignal()
+    {
+        return refreshPlotSphereSignal_;
+    }
+    /**
+     * Signal to tell HomeRight to refresh the plot and draw a plane
+     */
+    Wt::Signal<int, double, double, double, double> &refreshPlotPlaneSignal()
+    {
+        return refreshPlotPlaneSignal_;
+    }
 
     /* MainUI parent */
     MainUI *parent_;
@@ -477,7 +487,8 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<int> curveDeleteSignal_;
     Wt::Signal<std::string, int, int, int> plotIsoclineSignal_;
     Wt::Signal<int> isoclineDeleteSignal_;
-    Wt::Signal<int> refreshPlotSignal_;
+    Wt::Signal<double> refreshPlotSphereSignal_;
+    Wt::Signal<int, double, double, double, double> refreshPlotPlaneSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
