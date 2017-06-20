@@ -81,10 +81,10 @@ Session::Session() : sqlite3_(WApplication::instance()->appRoot() + "auth.db")
     Dbo::Transaction transaction(session_);
     try {
         session_.createTables();
-        g_globalLogger.info("Session :: Created database.");
+        g_globalLogger.info("[Session] Created database.");
     } catch (...) {
         // std::cerr << e.what() << std::endl;
-        g_globalLogger.info("Session :: Using existing database");
+        g_globalLogger.info("[Session] Using existing database");
     }
     transaction.commit();
 }

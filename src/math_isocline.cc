@@ -55,7 +55,7 @@ bool WSphere::evalIsoclineContinue(std::string fname, int points, int prec)
 
     if (!readTaskIsoclineResults(fname, isoclineTask_)) {
         isoclineError_ = true;
-        g_globalLogger.error("WSphere :: error at isocline readTaskIsoclineResults");
+        g_globalLogger.error("[WSphere] error at isocline readTaskIsoclineResults");
         return true;
     }
     isoclineTask_++;
@@ -66,7 +66,7 @@ bool WSphere::evalIsoclineContinue(std::string fname, int points, int prec)
 
     if (runTaskIsocline(fname, isoclineTask_, points, prec) < 0) {
         isoclineError_ = true;
-        g_globalLogger.error("WSphere :: error at isocline runTaskIsocline");
+        g_globalLogger.error("[WSphere] error at isocline runTaskIsocline");
         return true;
     }
 
@@ -89,7 +89,7 @@ int WSphere::runTaskIsocline(std::string fname, int task, int points, int prec)
 {
     bool value;
 
-    g_globalLogger.debug("WSphere :: will run isocline task=" +
+    g_globalLogger.debug("[WSphere] will run isocline task=" +
                          std::to_string(task) + " using file=" + fname);
     // TODO: prepareIsocline functions
     switch (task) {
@@ -150,7 +150,7 @@ int WSphere::runTaskIsocline(std::string fname, int task, int points, int prec)
 
 bool WSphere::readTaskIsoclineResults(std::string fname, int task)
 {
-    g_globalLogger.debug("WSphere :: called readTaskIsoclineResults with fname=" +
+    g_globalLogger.debug("[WSphere] called readTaskIsoclineResults with fname=" +
                          fname + " and task=" + std::to_string(task));
     bool value;
 
@@ -238,7 +238,7 @@ bool WSphere::read_isocline(std::string fname,
 
     fp = fopen(std::string(fname + "_isocline.tab").c_str(), "r");
     if (fp == nullptr) {
-        g_globalLogger.debug("WSphere :: cannot open file " +
+        g_globalLogger.debug("[WSphere] cannot open file " +
                              std::string(fname + "_isocline.tab") +
                              " for reading");
         return false;
