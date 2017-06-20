@@ -68,7 +68,7 @@ std::string ScriptHandler::randomFileName(std::string prefix,
         close(fd);
     }
 
-    g_globalLogger.debug("ScriptHandler :: created temp file " + fullname +
+    g_globalLogger.debug("[ScriptHandler] created temp file " + fullname +
                          " and prefix is " + prefix);
 
     return prefix;
@@ -76,7 +76,7 @@ std::string ScriptHandler::randomFileName(std::string prefix,
 
 bool ScriptHandler::prepareMapleFile(std::string &fname)
 {
-    g_globalLogger.debug("ScriptHandler :: received order to prepare script " +
+    g_globalLogger.debug("[ScriptHandler] received order to prepare script " +
                          fname);
     FILE *mplFile;
 
@@ -98,10 +98,10 @@ bool ScriptHandler::prepareMapleFile(std::string &fname)
     if (mplFile != nullptr) {
         fillMapleScript(mplFile);
         fclose(mplFile);
-        g_globalLogger.debug("ScriptHandler :: prepared Maple file " + fname);
+        g_globalLogger.debug("[ScriptHandler] prepared Maple file " + fname);
         return true;
     } else {
-        g_globalLogger.error("ScriptHandler :: cannot prepare Maple file");
+        g_globalLogger.error("[ScriptHandler] cannot prepare Maple file");
         return false;
     }
 }
@@ -116,6 +116,11 @@ void ScriptHandler::fillMapleScript(FILE *f)
         xeq = convertLabelsFromString(str_xeq_);
         yeq = convertLabelsFromString(str_yeq_);
         gcf = convertLabelsFromString(str_gcf_);
+        str_userf_ = "[" + xeq + "," + yeq + "]";
+    } else {
+        xeq = str_xeq_;
+        yeq = str_yeq_;
+        gcf = str_gcf_;
         str_userf_ = "[" + xeq + "," + yeq + "]";
     }
 
@@ -168,16 +173,16 @@ void ScriptHandler::fillMapleScript(FILE *f)
     fprintf(
         f, "if normalexit=0 then `quit`(0); else `quit(1)` end if: end try:\n");
 
-    g_globalLogger.debug("ScriptHandler :: filled Maple file");
+    g_globalLogger.debug("[ScriptHandler] filled Maple file");
 }
 
 siginfo_t ScriptHandler::evaluateMapleScript(std::string fname, int maxtime)
 {
     g_globalLogger.debug(
-        "ScriptHandler :: Will fork Maple process for script " + fname);
+        "[ScriptHandler] Will fork Maple process for script " + fname);
     pid_t pid = fork();
     if (pid < 0) {
-        g_globalLogger.error("HomeLeft :: error forking Maple thread.");
+        g_globalLogger.error("[HomeLeft] error forking Maple thread.");
         siginfo_t pinfo;
         pinfo.si_pid = -1;
         pinfo.si_code = -1;
@@ -213,17 +218,17 @@ siginfo_t ScriptHandler::evaluateMapleScript(std::string fname, int maxtime)
             waitid(P_PID, pid, &infop, WEXITED | WSTOPPED | WNOHANG);
             if (infop.si_pid != 0) {
                 g_globalLogger.debug(
-                    "ScriptHandler :: forked Maple execution finished");
+                    "[ScriptHandler] forked Maple execution finished");
                 return infop;
             }
             delay(1000);
         }
         std::string aux("pkill -TERM -P " + std::to_string(pid));
-        g_globalLogger.error("ScriptHandler :: " + aux);
+        g_globalLogger.error("[ScriptHandler] " + aux);
         system(aux.c_str());
         kill(pid, SIGTERM);
         g_globalLogger.error(
-            "ScriptHandler :: Maple execution took too much time");
+            "[ScriptHandler] Maple execution took too much time");
         infop.si_status = -2;
         infop.si_code = -2;
         return infop;
@@ -263,7 +268,7 @@ siginfo_t ScriptHandler::evaluateMapleScript(std::string fname, int maxtime)
 */
 bool ScriptHandler::fillSaveFile(std::string fname)
 {
-    g_globalLogger.debug("ScriptHandler :: filling save file...");
+    g_globalLogger.debug("[ScriptHandler] filling save file...");
     FILE *fp = fopen(fname.c_str(), "w");
 
     if (fp != nullptr) {
@@ -331,11 +336,11 @@ bool ScriptHandler::prepareGcf(std::string fname, P4POLYNOM2 f, double y1,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
-        g_globalLogger.debug("ScriptHandler :: prepared GCF file " + fname);
+        g_globalLogger.debug("[ScriptHandler] prepared GCF file " + fname);
         fclose(fp);
         return true;
     }
-    g_globalLogger.error("ScriptHandler :: cannot prepare GCF file");
+    g_globalLogger.error("[ScriptHandler] cannot prepare GCF file");
     return false;
 }
 
@@ -378,13 +383,13 @@ bool ScriptHandler::prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
-        g_globalLogger.debug("ScriptHandler :: prepared GCF_LyapunovCyl file " +
+        g_globalLogger.debug("[ScriptHandler] prepared GCF_LyapunovCyl file " +
                              fname);
         fclose(fp);
         return true;
     }
     g_globalLogger.error(
-        "ScriptHandler :: cannot prepare GCF_LyapunovCyl file");
+        "[ScriptHandler] cannot prepare GCF_LyapunovCyl file");
     return false;
 }
 
@@ -426,12 +431,12 @@ bool ScriptHandler::prepareGcf_LyapunovR2(std::string fname, P4POLYNOM2 f,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:");
 
-        g_globalLogger.debug("ScriptHandler :: prepared GCF_LyapunovR2 file " +
+        g_globalLogger.debug("[ScriptHandler] prepared GCF_LyapunovR2 file " +
                              fname);
         fclose(fp);
         return true;
     }
-    g_globalLogger.error("ScriptHandler :: cannot prepare GCF_LyapunovR2 file");
+    g_globalLogger.error("[ScriptHandler] cannot prepare GCF_LyapunovR2 file");
     return false;
 }
 
@@ -447,7 +452,7 @@ std::string ScriptHandler::convertLabelsFromString(std::string target)
         newLabel = currentLabel + "_";
         if (currentLabel.empty())
             continue;
-        g_globalLogger.debug("ScriptHandler :: looking for word " +
+        g_globalLogger.debug("[ScriptHandler] looking for word " +
                              currentLabel + " in " + target);
         while ((i = findIndexOfWordInTarget(target, currentLabel, 0)) != -1) {
             aux = target.substr(0, i);
@@ -532,7 +537,7 @@ void ScriptHandler::prepareCurveTable(std::string fname)
     char buf[100];
     std::string curve;
 
-    g_globalLogger.debug("ScriptHandler :: labels are...");
+    g_globalLogger.debug("[ScriptHandler] labels are...");
     std::vector<std::string>::const_iterator it;
     for (it = paramLabels_.begin(); it != paramLabels_.end(); it++)
         g_globalLogger.debug(*it);
@@ -555,7 +560,7 @@ void ScriptHandler::prepareCurveTable(std::string fname)
         system(std::string("rm -f " + str_curvetable_).c_str());
         fprintf(f, "curve_table := \"%s\":\n", str_curvetable_.c_str());
 
-        g_globalLogger.debug("ScriptHandler :: converting curve params...");
+        g_globalLogger.debug("[ScriptHandler] converting curve params...");
         curve = convertLabelsFromString(str_curve_);
         fprintf(f, "user_curve := %s:\n", curve.c_str());
 
@@ -631,11 +636,11 @@ bool ScriptHandler::prepareCurve(std::string fname, P4POLYNOM2 f, double y1,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
-        g_globalLogger.debug("ScriptHandler :: prepared curve file " + fname);
+        g_globalLogger.debug("[ScriptHandler] prepared curve file " + fname);
         fclose(fp);
         return true;
     }
-    g_globalLogger.error("ScriptHandler :: cannot prepare curve file");
+    g_globalLogger.error("[ScriptHandler] cannot prepare curve file");
     return false;
 }
 
@@ -675,12 +680,12 @@ bool ScriptHandler::prepareCurve_LyapunovCyl(std::string fname, P4POLYNOM3 f,
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
         g_globalLogger.debug(
-            "ScriptHandler :: prepared curve_LyapunovCyl file " + fname);
+            "[ScriptHandler] prepared curve_LyapunovCyl file " + fname);
         fclose(fp);
         return true;
     }
     g_globalLogger.error(
-        "ScriptHandler :: cannot prepare curve_LyapunovCyl file");
+        "[ScriptHandler] cannot prepare curve_LyapunovCyl file");
     return false;
 }
 
@@ -719,12 +724,12 @@ bool ScriptHandler::prepareCurve_LyapunovR2(std::string fname, P4POLYNOM2 f,
                     "`quit`(0); else `quit(1)` end if: end try:");
 
         g_globalLogger.debug(
-            "ScriptHandler :: prepared curve_LyapunovR2 file " + fname);
+            "[ScriptHandler] prepared curve_LyapunovR2 file " + fname);
         fclose(fp);
         return true;
     }
     g_globalLogger.error(
-        "ScriptHandler :: cannot prepare curve_LyapunovR2 file");
+        "[ScriptHandler] cannot prepare curve_LyapunovR2 file");
     return false;
 }
 
@@ -826,12 +831,12 @@ bool ScriptHandler::prepareIsocline(std::string fname, P4POLYNOM2 f, double y1,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
-        g_globalLogger.debug("ScriptHandler :: prepared isocline file " +
+        g_globalLogger.debug("[ScriptHandler] prepared isocline file " +
                              fname);
         fclose(fp);
         return true;
     }
-    g_globalLogger.error("ScriptHandler :: cannot prepare isocline file");
+    g_globalLogger.error("[ScriptHandler] cannot prepare isocline file");
     return false;
 }
 
@@ -871,12 +876,12 @@ bool ScriptHandler::prepareIsocline_LyapunovCyl(std::string fname, P4POLYNOM3 f,
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
         g_globalLogger.debug(
-            "ScriptHandler :: prepared isocline_LyapunovCyl file " + fname);
+            "[ScriptHandler] prepared isocline_LyapunovCyl file " + fname);
         fclose(fp);
         return true;
     }
     g_globalLogger.error(
-        "ScriptHandler :: cannot prepare isocline_LyapunovCyl file");
+        "[ScriptHandler] cannot prepare isocline_LyapunovCyl file");
     return false;
 }
 
@@ -915,11 +920,11 @@ bool ScriptHandler::prepareIsocline_LyapunovR2(std::string fname, P4POLYNOM2 f,
                     "`quit`(0); else `quit(1)` end if: end try:");
 
         g_globalLogger.debug(
-            "ScriptHandler :: prepared isocline_LyapunovR2 file " + fname);
+            "[ScriptHandler] prepared isocline_LyapunovR2 file " + fname);
         fclose(fp);
         return true;
     }
     g_globalLogger.error(
-        "ScriptHandler :: cannot prepare isocline_LyapunovR2 file");
+        "[ScriptHandler] cannot prepare isocline_LyapunovR2 file");
     return false;
 }
