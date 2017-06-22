@@ -42,6 +42,7 @@
 #include "math_polynom.h"
 #include "math_separatrice.h"
 
+#include <cmath>
 #include <string>
 
 using namespace Wt;
@@ -2689,14 +2690,6 @@ void WVFStudy::setupCoordinateTransformations(void)
         }
     }
 }
-
-#include "file_tab.h"
-
-#include "custom.h"
-#include "math_p4.h"
-#include "math_polynom.h"
-
-#include <cmath>
 
 // -----------------------------------------------------------------------
 //                      FUNCTION PROTOTYPES
