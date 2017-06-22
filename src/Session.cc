@@ -51,7 +51,7 @@ Auth::PasswordService myPasswordService(myAuthService);
 
 void Session::configureAuth()
 {
-    myAuthService.setAuthTokensEnabled(true, "p4webcookie");
+    myAuthService.setAuthTokensEnabled(true, "WP4logincookie");
     myAuthService.setEmailVerificationEnabled(true);
     myAuthService.setEmailVerificationRequired(false);
 
