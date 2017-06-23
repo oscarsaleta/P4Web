@@ -19,4 +19,4 @@
 
 PROGRAMPREFIX="build/Debug/src/"
 
-$PROGRAMPREFIX/WP4.wt --docroot $PROGRAMPREFIX --approot $PROGRAMPREFIX --http-port 8080 --http-addr 0::0 $@
+gdb --args $PROGRAMPREFIX/WP4.wt --docroot $PROGRAMPREFIX --approot $PROGRAMPREFIX --http-port 8080 --http-addr 0::0 $@
