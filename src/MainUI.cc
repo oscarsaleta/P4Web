@@ -27,6 +27,7 @@
 #include <Wt/WAnchor>
 #include <Wt/WApplication>
 #include <Wt/WLink>
+#include <Wt/WMessageBox>
 #include <Wt/WStackedWidget>
 #include <Wt/WString>
 #include <Wt/WText>
@@ -158,6 +159,7 @@ void MainUI::setupUI()
     leftContainer_->parent_ = this;
     g_globalLogger.debug("[MainUI] HomeLeft created");
     t->bindWidget("left", leftContainer_);
+    leftContainer_->errorSignal().connect(this, &MainUI::showErrorBox);
 
     // right widget (output text area, plots, legend)
     g_globalLogger.debug("[MainUI] creating HomeRight...");
@@ -279,3 +281,12 @@ void MainUI::setLogoutIndicator()
 }
 
 void MainUI::getMapleParams() { rightContainer_->refreshParamStringVectors(); }
+
+void MainUI::showErrorBox(std::string text)
+{
+    WString message(text);
+    WMessageBox *errorBox = new WMessageBox("Error", message, Critical, Ok);
+    errorBox->setModal(true);
+    errorBox->buttonClicked().connect(std::bind([=]() { delete errorBox; }));
+    errorBox->show();
+}
