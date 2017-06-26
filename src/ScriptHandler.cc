@@ -178,8 +178,8 @@ void ScriptHandler::fillMapleScript(FILE *f)
 
 siginfo_t ScriptHandler::evaluateMapleScript(std::string fname, int maxtime)
 {
-    g_globalLogger.debug(
-        "[ScriptHandler] Will fork Maple process for script " + fname);
+    g_globalLogger.debug("[ScriptHandler] Will fork Maple process for script " +
+                         fname);
     pid_t pid = fork();
     if (pid < 0) {
         g_globalLogger.error("[HomeLeft] error forking Maple thread.");
@@ -198,7 +198,7 @@ siginfo_t ScriptHandler::evaluateMapleScript(std::string fname, int maxtime)
 #endif
         commands.push_back(MAPLE_PATH);
         commands.push_back("-T ,1048576"); // 1GB memory limit
-        char *aux = new char[fname.length() + 1];
+        char *aux = new char[fname.length() + std::string(".mpl").length() + 1];
         std::strcpy(aux, fname.c_str());
         std::strcat(aux, ".mpl");
         commands.push_back(aux);
@@ -210,7 +210,9 @@ siginfo_t ScriptHandler::evaluateMapleScript(std::string fname, int maxtime)
         // execute command
         char **command = commands.data();
         int status = execvp(command[0], command);
-        // return status; // NOTE needed?
+        siginfo_t infop;
+        infop.si_status = status;
+        return infop;
     } else {
         siginfo_t infop;
         infop.si_pid = 0;
@@ -294,10 +296,10 @@ bool ScriptHandler::fillSaveFile(std::string fname)
             fprintf(fp, "%lu\n", paramLabels_.size()); // numparams
             writeMapleParameters(fp);
         }
-
         fclose(fp);
         return true;
     }
+    return false;
 }
 
 bool ScriptHandler::prepareGcf(std::string fname, P4POLYNOM2 f, double y1,
@@ -388,8 +390,7 @@ bool ScriptHandler::prepareGcf_LyapunovCyl(std::string fname, P4POLYNOM3 f,
         fclose(fp);
         return true;
     }
-    g_globalLogger.error(
-        "[ScriptHandler] cannot prepare GCF_LyapunovCyl file");
+    g_globalLogger.error("[ScriptHandler] cannot prepare GCF_LyapunovCyl file");
     return false;
 }
 
@@ -444,7 +445,7 @@ std::string ScriptHandler::convertLabelsFromString(std::string target)
 {
     std::string aux;
     std::string currentLabel, newLabel;
-    int i, j;
+    int i;
 
     std::vector<std::string>::iterator it;
     for (it = paramLabels_.begin(); it != paramLabels_.end(); it++) {
@@ -534,7 +535,6 @@ bool ScriptHandler::stringToBool(std::string s)
 void ScriptHandler::prepareCurveTable(std::string fname)
 {
     FILE *f;
-    char buf[100];
     std::string curve;
 
     g_globalLogger.debug("[ScriptHandler] labels are...");
@@ -723,8 +723,8 @@ bool ScriptHandler::prepareCurve_LyapunovR2(std::string fname, P4POLYNOM2 f,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:");
 
-        g_globalLogger.debug(
-            "[ScriptHandler] prepared curve_LyapunovR2 file " + fname);
+        g_globalLogger.debug("[ScriptHandler] prepared curve_LyapunovR2 file " +
+                             fname);
         fclose(fp);
         return true;
     }
@@ -736,7 +736,6 @@ bool ScriptHandler::prepareCurve_LyapunovR2(std::string fname, P4POLYNOM2 f,
 void ScriptHandler::prepareIsoclineTable(std::string fname)
 {
     FILE *f;
-    char buf[100];
 
     f = fopen((fname + "_isocline_prep.mpl").c_str(), "w");
 
@@ -831,8 +830,7 @@ bool ScriptHandler::prepareIsocline(std::string fname, P4POLYNOM2 f, double y1,
         fprintf(fp, "try FindSingularities() finally: if returnvalue=0 then "
                     "`quit`(0); else `quit(1)` end if: end try:\n");
 
-        g_globalLogger.debug("[ScriptHandler] prepared isocline file " +
-                             fname);
+        g_globalLogger.debug("[ScriptHandler] prepared isocline file " + fname);
         fclose(fp);
         return true;
     }
