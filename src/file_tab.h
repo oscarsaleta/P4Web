@@ -906,11 +906,13 @@ class WVFStudy
      */
     inline void deleteTransformations(transformations *t)
     {
-        if (t == nullptr)
-            return;
-        deleteTransformations(t->next_trans);
-        delete t;
-        t = nullptr;
+        transformations *u;
+        while (t != nullptr) {
+            u = t;
+            t = t->next_trans;
+            delete u;
+            u = nullptr;
+        }
     }
     /**
      * Delete the blowup linked list
