@@ -98,6 +98,7 @@ WVFStudy::WVFStudy(double projection) : config_projection_(projection)
     first_lim_cycle_ = nullptr;
     first_orbit_ = nullptr;
     current_orbit_ = nullptr;
+    current_lim_cycle_ = nullptr;
 
     // initialize others
     xmin_ = -1.0;
@@ -625,7 +626,11 @@ isoclines *WVFStudy::copy_isoclines(isoclines *p)
 //                              WVFStudy DESTRUCTOR
 // -----------------------------------------------------------------------
 
-WVFStudy::~WVFStudy() { deleteVF(); }
+WVFStudy::~WVFStudy()
+{
+    deleteVF();
+    g_globalLogger.debug("[WVFStudy] Deleted correctly");
+}
 
 // -----------------------------------------------------------------------
 //                          WVFStudy::DeleteVF
@@ -634,6 +639,7 @@ WVFStudy::~WVFStudy() { deleteVF(); }
 void WVFStudy::deleteVF()
 {
     // Delete Vector Field
+    g_globalLogger.debug("[WVFStudy] Deleting vector field terms...");
     delete_term2(f_vec_field_[0]);
     f_vec_field_[0] = nullptr;
     delete_term2(f_vec_field_[1]);
@@ -660,6 +666,7 @@ void WVFStudy::deleteVF()
     vec_field_C_[1] = nullptr;
 
     // Delete singular points
+    g_globalLogger.debug("[WVFStudy] Deleting singular points...");
     deleteSaddle(first_saddle_point_);
     first_saddle_point_ = nullptr;
     deleteSemiElementary(first_se_point_);
@@ -674,6 +681,7 @@ void WVFStudy::deleteVF()
     first_de_point_ = nullptr;
 
     // Delete GCF:
+    g_globalLogger.debug("[WVFStudy] Deleting GCF...");
     delete_term2(gcf_);
     gcf_ = nullptr;
     delete_term2(gcf_U1_);
@@ -692,21 +700,25 @@ void WVFStudy::deleteVF()
     last_gcf_point_ = nullptr;
 
     // Delete curves:
+    g_globalLogger.debug("[WVFStudy] Deleting curves...");    
     curve_vector_.clear();
     deleteOrbitPoint(last_curves_point_);
     last_curves_point_ = nullptr;
 
     // Delete isoclines
+    g_globalLogger.debug("[WVFStudy] Deleting isoclines...");    
     isocline_vector_.clear();
     deleteOrbitPoint(last_isoclines_point_);
     last_isoclines_point_ = nullptr;
 
     // Delete all orbits
+    g_globalLogger.debug("[WVFStudy] Deleting orbits...");    
     deleteOrbit(first_orbit_);
     first_orbit_ = nullptr;
     current_orbit_ = nullptr;
 
     // Delete limit cycles
+    g_globalLogger.debug("[WVFStudy] Deleting limit cycles...");    
     deleteLimitCycle(first_lim_cycle_);
     first_lim_cycle_ = nullptr;
 }
