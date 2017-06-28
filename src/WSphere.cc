@@ -969,16 +969,6 @@ void WSphere::plotCurves(void)
     std::vector<curves>::const_iterator it;
     for (it = study_->curve_vector_.begin(); it != study_->curve_vector_.end();
          it++) {
-        g_globalLogger.debug("[WSphere] r2: " + std::to_string(it->r2->coeff) +
-                             "*x^" + std::to_string(it->r2->exp_x) + "*y^" +
-                             std::to_string(it->r2->exp_y));
-        P4POLYNOM2 p = it->r2->next_term2;
-        while (p != nullptr) {
-            g_globalLogger.debug("[WSphere] + " + std::to_string(p->coeff) +
-                                 "*x^" + std::to_string(p->exp_x) + "*y^" +
-                                 std::to_string(p->exp_y));
-            p = p->next_term2;
-        }
         draw_curve(it->points, CCURV, 1);
     }
 }
