@@ -45,7 +45,6 @@
 #include <Wt/WImage>
 #include <Wt/WLabel>
 #include <Wt/WLineEdit>
-#include <Wt/WMessageBox>
 #include <Wt/WPushButton>
 #include <Wt/WRadioButton>
 #include <Wt/WSpinBox>
@@ -276,7 +275,7 @@ void HomeLeft::fileUploaded()
     if (extension != "inp") {
         g_globalLogger.warning(
             "[HomeLeft] client tried to upload a not supported file type");
-        showErrorBox("Filetype not accepted.");
+        errorSignal_.emit("Filetype not accepted.");
         return;
     }
 
@@ -308,9 +307,8 @@ void HomeLeft::fileUploaded()
 
 void HomeLeft::fileTooLarge()
 {
-    g_globalLogger.warning(
-        "[HomeLeft] Client tried to upload file too large.");
-    showErrorBox("File too large.");
+    g_globalLogger.warning("[HomeLeft] Client tried to upload file too large.");
+    errorSignal_.emit("File too large.");
 }
 
 void HomeLeft::parseInputFile()
@@ -329,9 +327,8 @@ void HomeLeft::parseInputFile()
             for (i = 0; i < 15; i++) {
                 std::getline(f, line);
                 if (line.empty()) {
-                    g_globalLogger.error(
-                        "[HomeLeft] error reading input file, "
-                        "expected more lines.");
+                    g_globalLogger.error("[HomeLeft] error reading input file, "
+                                         "expected more lines.");
                     break;
                 }
                 switch (i) {
@@ -450,13 +447,13 @@ void HomeLeft::parseInputFile()
             g_globalLogger.error(
                 "[HomeLeft] EOF while reading input file uploaded with name " +
                 fileUploadName_);
-            showErrorBox("Invalid input file.");
+            errorSignal_.emit("Invalid input file.");
             fileUploadName_ = std::string();
         } else if (f.bad()) {
             g_globalLogger.error("[HomeLeft] I/O error while reading input "
                                  "file uploaded with name " +
                                  fileUploadName_);
-            showErrorBox("Invalid input file.");
+            errorSignal_.emit("Invalid input file.");
             fileUploadName_ = std::string();
         } else {
             // prepareSaveFile();
@@ -595,9 +592,10 @@ void HomeLeft::setOptions()
 
 void HomeLeft::evaluate()
 {
+    evaluated_ = false;
     // validate options
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
-        showErrorBox(
+        errorSignal_.emit(
             "Cannot evaluate yet, insert a vector field in the input forms.");
         return;
     }
@@ -610,7 +608,7 @@ void HomeLeft::evaluate()
                              fileUploadName_);
     } else {
         g_globalLogger.error("[HomeLeft] Error creating Maple script.");
-        showErrorBox("Error creating Maple script.");
+        errorSignal_.emit("Error creating Maple script.");
         return;
     }
 
@@ -623,17 +621,17 @@ void HomeLeft::evaluate()
         if (status.si_code == CLD_EXITED) {
             g_globalLogger.error("[HomeLeft] Maple error");
             evaluatedSignal_.emit(fileUploadName_);
-            // showErrorBox("Maple process terminated prematurely (.");
+            // errorSignal_.emit("Maple process terminated prematurely (.");
         } else if (status.si_code == CLD_KILLED) {
             g_globalLogger.error("[HomeLeft] Maple process killed by system");
-            showErrorBox("Maple process killed by system.");
+            errorSignal_.emit("Maple process killed by system.");
         } else if (status.si_code == -2) {
             g_globalLogger.error(
                 "[HomeLeft] Maple computation ran out of time");
-            showErrorBox("Computation ran out of time");
+            errorSignal_.emit("Computation ran out of time");
         } else {
             g_globalLogger.error("[HomeLeft] unkwnown error in Maple process");
-            showErrorBox("Unknown error when creating Maple process.");
+            errorSignal_.emit("Unknown error when creating Maple process.");
         }
     }
 }
@@ -641,7 +639,7 @@ void HomeLeft::evaluate()
 void HomeLeft::prepareSaveFile()
 {
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
-        showErrorBox("Cannot prepare a Maple script without introducing a "
+        errorSignal_.emit("Cannot prepare a Maple script without introducing a "
                      "vector field first.");
         g_globalLogger.error(
             "[HomeLeft] tried to save without entering a vector field");
@@ -661,7 +659,7 @@ void HomeLeft::prepareSaveFile()
     setOptions();
     if (!scriptHandler_->fillSaveFile(saveFileName_)) {
         g_globalLogger.error("Cannot create save file " + saveFileName_);
-        showErrorBox("Could not create save file. You can notify this "
+        errorSignal_.emit("Could not create save file. You can notify this "
                      "error at osr@mat.uab.cat, sorry for the "
                      "inconvenience.");
         return;
@@ -685,7 +683,7 @@ void HomeLeft::prepareSaveFile()
 void HomeLeft::onPlot()
 {
     if (!evaluated_) {
-        showErrorBox("Cannot read results, evaluate a vector field first.");
+        errorSignal_.emit("Cannot read results, evaluate a vector field first.");
     } else {
         g_globalLogger.debug("[HomeLeft] sending onPlot signal");
         if (!loggedIn_)
@@ -1265,6 +1263,7 @@ void HomeLeft::hideSettings()
 
 void HomeLeft::resetUI()
 {
+    g_globalLogger.debug("[HomeLeft] Starting UI reset...");
     evaluated_ = false;
     plotted_ = false;
 
@@ -1276,17 +1275,19 @@ void HomeLeft::resetUI()
     gcfEquationInput_->setText(std::string());
 
     if (loggedIn_) {
+        g_globalLogger.debug("[HomeLeft] Hiding settins...");
         hideSettings();
+        g_globalLogger.debug("[HomeLeft] Showing settins...");
         showSettings();
     }
-
+    g_globalLogger.debug("[HomeLeft] Sending reset signal...");
     resetSignal_.emit(1);
 }
 
 void HomeLeft::onRefreshPlotBtn()
 {
     if (!evaluated_) {
-        showErrorBox("Cannot read results, evaluate a vector field first.");
+        errorSignal_.emit("Cannot read results, evaluate a vector field first.");
     } else {
         g_globalLogger.debug("[HomeLeft] sending refreshPlot signal");
         if (viewComboBox_->currentIndex() == 0) {
@@ -1442,13 +1443,19 @@ void HomeLeft::onPlotGcfBtn()
     if (!evaluated_) {
         g_globalLogger.warning(
             "[HomeLeft] user tried to plot GCF for an un-evaluated VF");
-        showErrorBox("Introduce and evaluate a vector field with a common "
+        errorSignal_.emit("Introduce and evaluate a vector field with a common "
                      "factor first.");
     } else if (scriptHandler_->str_gcf_ == "0") {
         g_globalLogger.warning(
             "[HomeLeft] user tried to plot a nonexistent GCF");
-        showErrorBox(
+        errorSignal_.emit(
             "The current vector field has no specified common factor.");
+    } else if (!plotted_) {
+        g_globalLogger.warning("[HomeLeft] user tried to plot GCF without "
+                               "plotting vector field first.");
+        errorSignal_.emit("Click the main Plot button first\n"
+                     "in order to create the plot window.");
+        return;
     } else {
         int npoints = gcfNPointsSpinBox_->value();
         if (npoints < GCF_NP_MIN || npoints > GCF_NP_MAX) {
@@ -1473,31 +1480,24 @@ void HomeLeft::addParameterToList(std::string label, std::string value)
     addParameterSignal_.emit(label, value);
 }
 
-void HomeLeft::showErrorBox(WString message)
-{
-    WMessageBox *errorBox = new WMessageBox("Error", message, Critical, Ok);
-    errorBox->buttonClicked().connect(std::bind([=]() { delete errorBox; }));
-    errorBox->show();
-}
-
 void HomeLeft::onPlotCurvesBtn()
 {
     evaluatedCurve_ = false;
 
     // check if vf is evaluated
     if (!evaluated_) {
-        showErrorBox("Cannot plot curve yet, evaluate a vector field first.");
+        errorSignal_.emit("Cannot plot curve yet, evaluate a vector field first.");
         return;
     }
     if (!plotted_) {
-        showErrorBox("Click the main Plot button first\n"
+        errorSignal_.emit("Click the main Plot button first\n"
                      "in order to create the plot window.");
         return;
     }
     // check if a curve has been introduced
     std::string curve = curvesLineEdit_->text().toUTF8();
     if (curve.empty() || curve == "") {
-        showErrorBox(
+        errorSignal_.emit(
             "The curve field must be filled with the equation of a curve.");
         return;
     }
@@ -1525,14 +1525,14 @@ void HomeLeft::onPlotCurvesBtn()
             evaluatedSignal_.emit(fileUploadName_);
         } else if (status.si_code == CLD_KILLED) {
             g_globalLogger.error("[HomeLeft] Maple process killed by system");
-            showErrorBox("Maple process killed by system.");
+            errorSignal_.emit("Maple process killed by system.");
         } else if (status.si_code == -2) {
             g_globalLogger.error(
                 "[HomeLeft] Maple computation ran out of time");
-            showErrorBox("Computation ran out of time");
+            errorSignal_.emit("Computation ran out of time");
         } else {
             g_globalLogger.error("[HomeLeft] unkwnown error in Maple process");
-            showErrorBox("Unknown error when creating Maple process.");
+            errorSignal_.emit("Unknown error when creating Maple process.");
         }
         return;
     }
@@ -1569,7 +1569,7 @@ void HomeLeft::curveConfirmed(bool computed)
             "[HomeLeft] evaluated and plotted curve, ncurves = " +
             std::to_string(nCurves_));
     } else {
-        showErrorBox(
+        errorSignal_.emit(
             "Error while computing curve, check inputs and try again.");
     }
 }
@@ -1611,19 +1611,19 @@ void HomeLeft::onPlotIsoclinesBtn()
 
     // check if vf is evaluated
     if (!evaluated_) {
-        showErrorBox(
+        errorSignal_.emit(
             "Cannot plot isocline yet, evaluate a vector field first.");
         return;
     }
     if (!plotted_) {
-        showErrorBox("Click the main Plot button first\n"
+        errorSignal_.emit("Click the main Plot button first\n"
                      "in order to create the plot window.");
         return;
     }
     // check if a isocline has been introduced
     std::string isocline = isoclinesLineEdit_->text().toUTF8();
     if (isocline.empty() || isocline == "") {
-        showErrorBox("The slope field must be filled with a valid value.");
+        errorSignal_.emit("The slope field must be filled with a valid value.");
         return;
     }
     // set the isocline equation
@@ -1654,14 +1654,13 @@ void HomeLeft::onPlotIsoclinesBtn()
                                                 scriptHandler_->str_xeq_ + ")";
             } catch (const std::invalid_argument &e) {
                 g_globalLogger.error("[HomeLeft] invalid isocline slope.");
-                showErrorBox("Invalid value for isocline slope");
+                errorSignal_.emit("Invalid value for isocline slope");
                 return;
             } catch (const std::out_of_range &e) {
                 g_globalLogger.error(
                     "[HomeLeft] value for isocline slope out of double range");
-                showErrorBox(
-                    "[HomeLeft] the introduced value for the slope is "
-                    "out\nof double precision range.");
+                errorSignal_.emit("[HomeLeft] the introduced value for the slope is "
+                             "out\nof double precision range.");
                 return;
             }
         }
@@ -1689,14 +1688,14 @@ void HomeLeft::onPlotIsoclinesBtn()
             evaluatedSignal_.emit(fileUploadName_);
         } else if (status.si_code == CLD_KILLED) {
             g_globalLogger.error("[HomeLeft] Maple process killed by system");
-            showErrorBox("Maple process killed by system.");
+            errorSignal_.emit("Maple process killed by system.");
         } else if (status.si_code == -2) {
             g_globalLogger.error(
                 "[HomeLeft] Maple computation ran out of time");
-            showErrorBox("Computation ran out of time");
+            errorSignal_.emit("Computation ran out of time");
         } else {
             g_globalLogger.error("[HomeLeft] unkwnown error in Maple process");
-            showErrorBox("Unknown error when creating Maple process.");
+            errorSignal_.emit("Unknown error when creating Maple process.");
         }
         return;
     }
@@ -1732,7 +1731,7 @@ void HomeLeft::isoclineConfirmed(bool computed)
             "[HomeLeft] evaluated and plotted isocline, nisoclines = " +
             std::to_string(nIsoclines_));
     } else {
-        showErrorBox(
+        errorSignal_.emit(
             "Error while computing isocline, check inputs and try again.");
     }
 }

@@ -907,7 +907,6 @@ class WVFStudy
     inline void deleteTransformations(transformations *t)
     {
         transformations *u;
-
         while (t != nullptr) {
             u = t;
             t = t->next_trans;
@@ -937,19 +936,16 @@ class WVFStudy
      *
      * @param p linked list of orbits points to delete
      *
-     * This function is called by deleteVF()
+     * This function is called by deleteVF(). It works recursively, deleting
+     * from bottom to top
      */
     inline void deleteOrbitPoint(P4ORBIT p)
     {
-        P4ORBIT q;
-
-        while (p != nullptr) {
-            q = p;
-            p = p->next_point;
-
-            delete q;
-            q = nullptr;
-        }
+        if (p == nullptr)
+            return;
+        deleteOrbitPoint(p->next_point);
+        delete p;
+        p = nullptr;
     }
     /**
      * Delete the orbits linked list

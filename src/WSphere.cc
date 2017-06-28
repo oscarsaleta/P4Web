@@ -70,10 +70,12 @@ using namespace Wt;
 WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
                  int height, std::string basename, double projection,
                  WVFStudy *study)
-    : width_(width), height_(height), basename_(basename), parentWnd(parent),
-      typeOfView_(0), projection_(projection), plotPrepared_(false),
-      plotDone_(false)
+    : width_(width), height_(height), basename_(basename),
+      projection_(projection)
 {
+    parentWnd = parent;
+    scriptHandler_ = s;
+
     if (study == nullptr) {
         study_ = new WVFStudy(projection);
         studyCopied_ = false;
@@ -82,7 +84,9 @@ WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
         studyCopied_ = true;
     }
 
-    scriptHandler_ = s;
+    typeOfView_ = 0;
+    plotPrepared_ = false;
+    plotDone_ = false;
 
     ReverseYaxis = false;
 
@@ -113,10 +117,12 @@ WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
 WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
                  int height, std::string basename, int type, double minx,
                  double maxx, double miny, double maxy, WVFStudy *study)
-    : width_(width), height_(height), basename_(basename), parentWnd(parent),
-      typeOfView_(type), viewMinX_(minx), viewMaxX_(maxx), viewMinY_(miny),
-      viewMaxY_(maxy), plotPrepared_(false), plotDone_(false)
+    : width_(width), height_(height), basename_(basename), typeOfView_(type),
+      viewMinX_(minx), viewMaxX_(maxx), viewMinY_(miny), viewMaxY_(maxy)
 {
+    parentWnd = parent;
+    scriptHandler_ = s;
+
     if (study == nullptr) {
         study_ = new WVFStudy();
         studyCopied_ = false;
@@ -125,7 +131,8 @@ WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
         studyCopied_ = true;
     }
 
-    scriptHandler_ = s;
+    plotPrepared_ = false;
+    plotDone_ = false;
 
     ReverseYaxis = false;
 
@@ -148,6 +155,7 @@ WSphere::WSphere(WContainerWidget *parent, ScriptHandler *s, int width,
 
 WSphere::~WSphere()
 {
+    g_globalLogger.debug("[WSphere] Deleting circle at infinity...");
     struct P4POLYLINES *t;
     while (CircleAtInfinity != nullptr) {
         t = CircleAtInfinity;
@@ -157,6 +165,7 @@ WSphere::~WSphere()
             t = nullptr;
         }
     }
+    g_globalLogger.debug("[WSphere] Deleting PL circle...");
     while (PLCircle != nullptr) {
         t = PLCircle;
         PLCircle = t->next;
@@ -165,13 +174,13 @@ WSphere::~WSphere()
             t = nullptr;
         }
     }
-
+    g_globalLogger.debug("[WSphere] Deleting WVFStudy...");
     if (study_ != nullptr) {
         delete study_;
         study_ = nullptr;
     }
 
-    g_globalLogger.debug("[WSphere] deleted correctly");
+    g_globalLogger.debug("[WSphere] Deleted correctly");
 }
 
 bool WSphere::setupPlot(void)
@@ -226,6 +235,12 @@ bool WSphere::setupPlot(void)
             study_->ymax_ = viewMaxY_;
             break;
         }
+
+        paintedXMin=0;
+        paintedXMax=width_;
+        paintedYMin=0;
+        paintedYMax=height_;
+
         g_globalLogger.debug(
             "[WSphere] Setting up WVFStudy coordinate transformations...");
         study_->setupCoordinateTransformations();

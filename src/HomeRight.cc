@@ -35,13 +35,17 @@
 using namespace Wt;
 
 HomeRight::HomeRight(WContainerWidget *parent, ScriptHandler *s)
-    : WContainerWidget(parent), plotCaption_(nullptr), sphere_(nullptr),
-      orbitStarted_(false), loggedIn_(false)
+    : WContainerWidget(parent)
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
-
     scriptHandler_ = s;
+    sphere_=nullptr;
+
+    plotCaption_=nullptr;
+    
+    loggedIn_=false;
+    orbitStarted_=false;
 
     g_globalLogger.debug("[HomeRight] setting up UI...");
     setupUI();
@@ -396,6 +400,7 @@ void HomeRight::sphereClicked(bool clickValid, double x, double y)
 
 void HomeRight::onReset(int dummy)
 {
+    g_globalLogger.debug("[HomeRight] Deleting sphere...");
     if (sphere_ != nullptr) {
         delete sphere_;
         sphere_ = nullptr;
@@ -405,7 +410,9 @@ void HomeRight::onReset(int dummy)
     outputTextArea_->setText(outputTextAreaContent_);
 
     if (loggedIn_) {
+    g_globalLogger.debug("[HomeRight] Hiding params tab...");
         hideParamsTab();
+        g_globalLogger.debug("[HomeRight] Showing params tab...");
         showParamsTab();
         tabWidget_->setCurrentIndex(2);
     } else {

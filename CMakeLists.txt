@@ -20,8 +20,12 @@ cmake_minimum_required (VERSION 2.8)
 project(WP4)
 set (WP4_VERSION_MAJOR 3)
 set (WP4_VERSION_MINOR 0)
-set (WP4_VERSION_PATCH 0)
+set (WP4_VERSION_PATCH 1)
+set (WP4_VERSION_DAY 26)
+set (WP4_VERSION_MONTH 06)
+set (WP4_VERSION_YEAR 2017)
 
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O1")
 set (CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/macros")
 include (ConfigureBoost)
 

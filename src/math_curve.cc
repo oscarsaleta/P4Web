@@ -229,7 +229,6 @@ void WVFStudy::insert_curve_point(double x0, double y0, double z0, int dashes)
 bool WSphere::read_curve(std::string fname,
                          void (WVFStudy::*chart)(double, double, double *))
 {
-    int t;
     int k;
     FILE *fp;
     double x, y;

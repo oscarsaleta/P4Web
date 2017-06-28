@@ -106,6 +106,8 @@ class MainUI : public Wt::WContainerWidget
 
     void setLoginIndicator(std::string userName);
     void setLogoutIndicator();
+    void showErrorBox(std::string text);
+
 };
 
 #endif // MAINUI_H

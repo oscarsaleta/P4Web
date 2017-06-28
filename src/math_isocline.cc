@@ -229,7 +229,6 @@ void WVFStudy::insert_isocline_point(double x0, double y0, double z0, int dashes
 bool WSphere::read_isocline(std::string fname,
                          void (WVFStudy::*chart)(double, double, double *))
 {
-    int t;
     int k;
     FILE *fp;
     double x, y;

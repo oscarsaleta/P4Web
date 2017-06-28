@@ -373,6 +373,10 @@ class HomeLeft : public Wt::WContainerWidget
     {
         return refreshPlotPlaneSignal_;
     }
+    /**
+     * Signal to show an error box in MainUI with a custom message
+     */
+    Wt::Signal<std::string> &errorSignal() { return errorSignal_; }
 
     /* MainUI parent */
     MainUI *parent_;
@@ -489,6 +493,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::Signal<int> isoclineDeleteSignal_;
     Wt::Signal<double> refreshPlotSphereSignal_;
     Wt::Signal<int, double, double, double, double> refreshPlotPlaneSignal_;
+    Wt::Signal<std::string> errorSignal_;
 
     /* FUNCTIONS */
     // sets up public UI
@@ -525,8 +530,6 @@ class HomeLeft : public Wt::WContainerWidget
     void onOrbitsDeleteAllBtn();
     // react to button presses in gcf tab
     void onPlotGcfBtn();
-    // show an error message box
-    void showErrorBox(Wt::WString message);
     // react to button clicks in curves tab
     void onPlotCurvesBtn();
     void onDelOneCurvesBtn();

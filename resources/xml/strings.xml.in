@@ -40,7 +40,7 @@
       <a href="mailto:osr@mat.uab.cat?subject=[WP4 bug]">send suggestions</a>
       .
     </p>
-    <p style="float:right">v@WP4_VERSION_MAJOR@.@WP4_VERSION_MINOR@.@WP4_VERSION_PATCH@ &copy; 2016-2017 Oscar Saleta.</p>
+    <p style="float:right">v@WP4_VERSION_MAJOR@.@WP4_VERSION_MINOR@.@WP4_VERSION_PATCH@ (@WP4_VERSION_YEAR@-@WP4_VERSION_MONTH@-@WP4_VERSION_DAY@) &copy; 2016-2017 Oscar Saleta.</p>
   </message>
 
   <message id="homeleft.equationboxtitle">

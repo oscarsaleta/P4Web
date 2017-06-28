@@ -231,13 +231,12 @@ void WVFStudy::insert_gcf_point(double x0, double y0, double z0, int dashes)
 
     last_gcf_point_->dashes = dashes;
     last_gcf_point_->color = CSING;
-    last_gcf_point_->next_point = nullptr;
+    //last_gcf_point_->next_point = nullptr;
 }
 
 bool WSphere::read_gcf(std::string fname,
                        void (WVFStudy::*chart)(double, double, double *))
 {
-    int t;
     int k;
     FILE *fp;
     double x, y;
