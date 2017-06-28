@@ -142,8 +142,6 @@ HomeLeft::~HomeLeft()
 
 void HomeLeft::setupUI()
 {
-    WLabel *label;
-
     // Equation boxes
     equationsBox_ = new WGroupBox(this);
     equationsBox_->setId("equationsBox_");
