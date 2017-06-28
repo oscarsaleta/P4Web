@@ -156,17 +156,18 @@ typedef struct orbits_points *P4ORBIT;
  * (#orbits_points)
  */
 struct orbits {
-    double pcoord[3];          ///< startpoint
-    int color;                 ///< color of the orbit
-    P4ORBIT f_orbits;          /**< linked list of orbit points (which makes
-                                    the full orbit) */
-    P4ORBIT current_f_orbits;  ///< current point
-    struct orbits *next_orbit; ///< pointer to next orbits (linked lists)
+    double pcoord[3];         ///< startpoint
+    int color;                ///< color of the orbit
+    P4ORBIT f_orbits;         /**< linked list of orbit points (which makes
+                                   the full orbit) */
+    P4ORBIT current_f_orbits; ///< current point
+    // struct orbits *next_orbit; ///< pointer to next orbits (linked lists)
 
     /**
      * Constructor method
      */
-    orbits() : next_orbit(nullptr){};
+    // orbits() : next_orbit(nullptr){};
+    orbits() : f_orbits(nullptr), current_f_orbits(nullptr){};
 };
 
 // -----------------------------------------------------------------------
@@ -597,10 +598,12 @@ class WVFStudy
     std::vector<isoclines> isocline_vector_; ///< isoclines vector
     P4ORBIT last_isoclines_point_;           ///< last isoclines points
 
+    std::vector<orbits> orbit_vector_; ///< orbits vector
+
     // limit cycles
 
-    orbits *first_lim_cycle_; ///< linked list of limit cycles
-    orbits *first_orbit_;     ///< linked list of orbits
+    //orbits *first_lim_cycle_; ///< linked list of limit cycles
+    //orbits *current_lim_cycle_; ///< current limit cycle for plotting
 
     // ------ Configuration
 
@@ -617,9 +620,6 @@ class WVFStudy
     bool config_kindvf_;        ///< true for original VF, false for reduced
 
     // run-time when plotting
-
-    orbits *current_orbit_;     ///< current orbit for plotting
-    orbits *current_lim_cycle_; ///< current limit cycle for plotting
 
     double selected_ucoord_[2];     ///< selected coordinate (plotting)
     saddle *selected_saddle_point_; ///< selected saddle (plotting)
@@ -922,7 +922,7 @@ class WVFStudy
      * This function is called by deleteVF()
      */
     void deleteBlowup(blow_up_points *b);
-    /**
+    /*
      * Delete the limit cycles (orbits) linked list
      *
      * @param o linked list of limit cycles (orbits)
@@ -930,7 +930,7 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    void deleteLimitCycle(orbits *o);
+    //void deleteLimitCycle(orbits *o);
     /**
      * Delete the orbits points linked list
      *
@@ -947,14 +947,14 @@ class WVFStudy
         delete p;
         p = nullptr;
     }
-    /**
+    /*
      * Delete the orbits linked list
      *
      * @param o linked list of orbits to delete
      *
      * This function is called by deleteVF()
      */
-    void deleteOrbit(orbits *o);
+    //void deleteOrbit(orbits *o);
 
     // reading of the Maple/Reduce results
 

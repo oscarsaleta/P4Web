@@ -444,14 +444,12 @@ void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
 void HomeRight::onOrbitsDelete(int flag)
 {
     if (sphere_ == nullptr || sphere_->study_ == nullptr ||
-        sphere_->study_->first_orbit_ == nullptr ||
-        sphere_->study_->current_orbit_ == nullptr)
+        sphere_->study_->orbit_vector_.empty())
         return;
 
-    if (flag == 0) {
-        sphere_->study_->deleteOrbit(sphere_->study_->first_orbit_);
-        sphere_->study_->first_orbit_ = nullptr;
-    } else if (flag == 1)
+    if (flag == 0)
+        sphere_->study_->orbit_vector_.clear();
+    else if (flag == 1)
         sphere_->deleteLastOrbit();
 
     sphere_->plotDone_ = false;

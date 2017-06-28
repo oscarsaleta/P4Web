@@ -57,42 +57,44 @@ void WSphere::integrateOrbit(int dir)
 
     if (dir == 0) {
         // continue orbit button has been pressed
+        dir = study_->orbit_vector_.back().current_f_orbits->dir;
 
-        dir = study_->current_orbit_->current_f_orbits->dir;
-
-        copy_x_into_y(study_->current_orbit_->current_f_orbits->pcoord, pcoord);
-        study_->current_orbit_->current_f_orbits->next_point =
+        copy_x_into_y(study_->orbit_vector_.back().current_f_orbits->pcoord,
+                      pcoord);
+        study_->orbit_vector_.back().current_f_orbits->next_point =
             integrate_orbit(pcoord, study_->config_currentstep_, dir, CORBIT,
                             study_->config_intpoints_, &sep);
 
-        study_->current_orbit_->current_f_orbits = sep;
+        study_->orbit_vector_.back().current_f_orbits = sep;
         return;
     }
 
-    copy_x_into_y(study_->current_orbit_->pcoord, pcoord);
+    copy_x_into_y(study_->orbit_vector_.back().pcoord, pcoord);
     ((study_)->*(study_->sphere_to_R2))(pcoord[0], pcoord[1], pcoord[2],
                                         ucoord);
     if (study_->config_kindvf_ == INTCONFIG_ORIGINAL)
         if (eval_term2(study_->gcf_, ucoord) < 0)
             dir = -dir;
 
-    if (study_->current_orbit_->f_orbits == nullptr) {
-        study_->current_orbit_->f_orbits =
+    if (study_->orbit_vector_.back().f_orbits == nullptr) {
+        study_->orbit_vector_.back().f_orbits =
             integrate_orbit(pcoord, study_->config_step_, dir, CORBIT,
                             study_->config_intpoints_, &sep);
     } else {
-        study_->current_orbit_->current_f_orbits->next_point = new orbits_points;
-        study_->current_orbit_->current_f_orbits =
-            study_->current_orbit_->current_f_orbits->next_point;
-        copy_x_into_y(pcoord, study_->current_orbit_->current_f_orbits->pcoord);
-        study_->current_orbit_->current_f_orbits->dashes = 0;
-        study_->current_orbit_->current_f_orbits->color = CORBIT;
-        study_->current_orbit_->current_f_orbits->dir = dir;
-        study_->current_orbit_->current_f_orbits->next_point =
+        study_->orbit_vector_.back().current_f_orbits->next_point =
+            new orbits_points;
+        study_->orbit_vector_.back().current_f_orbits =
+            study_->orbit_vector_.back().current_f_orbits->next_point;
+        copy_x_into_y(pcoord,
+                      study_->orbit_vector_.back().current_f_orbits->pcoord);
+        study_->orbit_vector_.back().current_f_orbits->dashes = 0;
+        study_->orbit_vector_.back().current_f_orbits->color = CORBIT;
+        study_->orbit_vector_.back().current_f_orbits->dir = dir;
+        study_->orbit_vector_.back().current_f_orbits->next_point =
             integrate_orbit(pcoord, study_->config_step_, dir, CORBIT,
                             study_->config_intpoints_, &sep);
     }
-    study_->current_orbit_->current_f_orbits = sep;
+    study_->orbit_vector_.back().current_f_orbits = sep;
 }
 
 //// -----------------------------------------------------------------------
@@ -108,27 +110,19 @@ bool WSphere::startOrbit(double x, double y, bool R)
     else
         (study_->*(study_->viewcoord_to_sphere))(x, y, pcoord);
 
-    if (study_->first_orbit_ == nullptr) {
-        study_->first_orbit_ = new orbits;
-        study_->current_orbit_ = study_->first_orbit_;
-    } else {
-        if (pcoord[0] == study_->current_orbit_->pcoord[0] &&
-            pcoord[1] == study_->current_orbit_->pcoord[1] &&
-            pcoord[2] == study_->current_orbit_->pcoord[2]) {
-            return false;
-        }
-        study_->current_orbit_->next_orbit = new orbits;
-        study_->current_orbit_ = study_->current_orbit_->next_orbit;
-    }
-
-    copy_x_into_y(pcoord, study_->current_orbit_->pcoord);
-    study_->current_orbit_->color = CORBIT;
-    study_->current_orbit_->f_orbits = nullptr;
-    study_->current_orbit_->next_orbit = nullptr;
+    if (!study_->orbit_vector_.empty() &&
+        (pcoord[0] == study_->orbit_vector_.back().pcoord[0] &&
+         pcoord[1] == study_->orbit_vector_.back().pcoord[1] &&
+         pcoord[2] == study_->orbit_vector_.back().pcoord[2]))
+        return false;
+    
+    orbits orb;
+    copy_x_into_y(pcoord, orb.pcoord);
+    orb.color = CORBIT;
+    study_->orbit_vector_.push_back(orb);
 
     (study_->*(study_->sphere_to_viewcoord))(pcoord[0], pcoord[1], pcoord[2],
                                              ucoord);
-
     return true;
 }
 
@@ -162,11 +156,10 @@ void WSphere::drawOrbit(double *pcoord, orbits_points *points, int color)
 // called from paintEvent()
 void WSphere::drawOrbits()
 {
-    orbits *orbit;
-
-    for (orbit = study_->first_orbit_; orbit != nullptr;
-         orbit = orbit->next_orbit) {
-        drawOrbit(orbit->pcoord, orbit->f_orbits, orbit->color);
+    std::vector<orbits>::iterator it;
+    for (it = study_->orbit_vector_.begin(); it != study_->orbit_vector_.end();
+         it++) {
+        drawOrbit(it->pcoord, it->f_orbits, it->color);
     }
 }
 
@@ -176,27 +169,10 @@ void WSphere::drawOrbits()
 
 void WSphere::deleteLastOrbit()
 {
-    orbits *orbit1, *orbit2;
-
-    if (study_->current_orbit_ == nullptr)
+    if (study_->orbit_vector_.empty())
         return;
-
-    orbit2 = study_->current_orbit_;
-    if (study_->first_orbit_ == study_->current_orbit_) {
-        study_->first_orbit_ = nullptr;
-        study_->current_orbit_ = nullptr;
-    } else {
-        orbit1 = study_->first_orbit_;
-        do {
-            study_->current_orbit_ = orbit1;
-            orbit1 = orbit1->next_orbit;
-        } while (orbit1 != orbit2);
-
-        study_->current_orbit_->next_orbit = nullptr;
-    }
-    study_->deleteOrbitPoint(orbit2->f_orbits);
-    delete orbit2;
-    orbit2 = nullptr;
+    study_->deleteOrbitPoint(study_->orbit_vector_.back().f_orbits);
+    study_->orbit_vector_.pop_back();
 }
 
 /*integrate poincare sphere case p=q=1 */
@@ -348,11 +324,6 @@ orbits_points *WSphere::integrate_orbit(double pcoord[3], double step, int dir,
         last_orbit->dashes = dashes * study_->config_dashes_;
         last_orbit->dir = d * h;
         last_orbit->next_point = nullptr;
-        /*if (dashes * study_->config_dashes_)
-            (*plot_l)(this,pcoord,pcoord2,color);
-        else
-            (*plot_p)(this,pcoord,color);*/
-        // update();
         copy_x_into_y(pcoord, pcoord2);
     }
     study_->set_current_step(fabs(hhi));

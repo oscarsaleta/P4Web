@@ -94,11 +94,9 @@ WVFStudy::WVFStudy(double projection) : config_projection_(projection)
     last_curves_point_ = nullptr;
     last_isoclines_point_ = nullptr;
 
-    // initialize limit cycles & orbits
-    first_lim_cycle_ = nullptr;
-    first_orbit_ = nullptr;
-    current_orbit_ = nullptr;
-    current_lim_cycle_ = nullptr;
+    // initialize limit cycles
+    // first_lim_cycle_ = nullptr;
+    // current_lim_cycle_ = nullptr;
 
     // initialize others
     xmin_ = -1.0;
@@ -208,8 +206,15 @@ WVFStudy::WVFStudy(const WVFStudy &obj)
     }
     last_isoclines_point_ = copy_orbits_points(obj.last_isoclines_point_);
 
-    first_lim_cycle_ = copy_orbits(obj.first_lim_cycle_);
-    first_orbit_ = copy_orbits(obj.first_orbit_);
+    std::vector<orbits>::const_iterator it3;
+    for (it3 = obj.orbit_vector_.begin(); it3 != obj.orbit_vector_.end();
+         it3++) {
+        orbits *orb = copy_orbits((orbits *)&(*it3));
+        orbit_vector_.push_back(*orb);
+    }
+
+    //first_lim_cycle_ = copy_orbits(obj.first_lim_cycle_);
+    //current_lim_cycle_ = copy_orbits(obj.current_lim_cycle_);
 
     config_lc_value_ = obj.config_lc_value_;
     config_hma_ = obj.config_hma_;
@@ -222,9 +227,6 @@ WVFStudy::WVFStudy(const WVFStudy &obj)
     config_lc_numpoints_ = obj.config_lc_numpoints_;
     config_dashes_ = obj.config_dashes_;
     config_kindvf_ = obj.config_kindvf_;
-
-    current_orbit_ = copy_orbits(obj.current_orbit_);
-    current_lim_cycle_ = copy_orbits(obj.current_lim_cycle_);
 
     selected_ucoord_[0] = obj.selected_ucoord_[0];
     selected_ucoord_[1] = obj.selected_ucoord_[1];
@@ -240,8 +242,7 @@ orbits *WVFStudy::copy_orbits(orbits *p)
 {
     orbits *result = nullptr;
     orbits *o = p;
-    orbits *last = nullptr;
-    while (o != nullptr) {
+    if (o != nullptr) {
         orbits *q = new orbits;
         q->pcoord[0] = o->pcoord[0];
         q->pcoord[1] = o->pcoord[1];
@@ -249,13 +250,7 @@ orbits *WVFStudy::copy_orbits(orbits *p)
         q->color = o->color;
         q->f_orbits = copy_orbits_points(o->f_orbits);
         q->current_f_orbits = copy_orbits_points(o->current_f_orbits);
-        q->next_orbit = nullptr;
-        if (last != nullptr)
-            last->next_orbit = q;
-        else
-            result = q;
-        last = q;
-        o = o->next_orbit;
+        result = q;
     }
     return result;
 }
@@ -700,27 +695,25 @@ void WVFStudy::deleteVF()
     last_gcf_point_ = nullptr;
 
     // Delete curves:
-    g_globalLogger.debug("[WVFStudy] Deleting curves...");    
+    g_globalLogger.debug("[WVFStudy] Deleting curves...");
     curve_vector_.clear();
     deleteOrbitPoint(last_curves_point_);
     last_curves_point_ = nullptr;
 
     // Delete isoclines
-    g_globalLogger.debug("[WVFStudy] Deleting isoclines...");    
+    g_globalLogger.debug("[WVFStudy] Deleting isoclines...");
     isocline_vector_.clear();
     deleteOrbitPoint(last_isoclines_point_);
     last_isoclines_point_ = nullptr;
 
     // Delete all orbits
-    g_globalLogger.debug("[WVFStudy] Deleting orbits...");    
-    deleteOrbit(first_orbit_);
-    first_orbit_ = nullptr;
-    current_orbit_ = nullptr;
+    g_globalLogger.debug("[WVFStudy] Deleting orbits...");
+    orbit_vector_.clear();
 
     // Delete limit cycles
-    g_globalLogger.debug("[WVFStudy] Deleting limit cycles...");    
-    deleteLimitCycle(first_lim_cycle_);
-    first_lim_cycle_ = nullptr;
+    //g_globalLogger.debug("[WVFStudy] Deleting limit cycles...");
+    // deleteLimitCycle(first_lim_cycle_);
+    // first_lim_cycle_ = nullptr;
 }
 
 // -----------------------------------------------------------------------
@@ -829,16 +822,16 @@ void WVFStudy::deleteBlowup(blow_up_points *b)
 //                      WVFStudy::DeleteLimitCycle
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteLimitCycle(orbits *p)
+/*void WVFStudy::deleteLimitCycle(orbits *p)
 {
     deleteOrbit(p); // limit cycle is implemented as orbit.
-}
+}*/
 
 // -----------------------------------------------------------------------
 //                      WVFStudy::DeleteOrbit
 // -----------------------------------------------------------------------
 
-void WVFStudy::deleteOrbit(orbits *p)
+/*void WVFStudy::deleteOrbit(orbits *p)
 {
     orbits *q;
 
@@ -850,7 +843,7 @@ void WVFStudy::deleteOrbit(orbits *p)
         delete q;
         q = nullptr;
     }
-}
+}*/
 
 // -----------------------------------------------------------------------
 //                      WVFStudy::ReadTables
