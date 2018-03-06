@@ -23,7 +23,7 @@
 #include "ScriptHandler.h"
 #include "custom.h"
 
-#include <boost/filesystem.hpp>
+//#include <boost/filesystem.hpp>
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
@@ -283,14 +283,19 @@ void HomeLeft::fileUploaded()
     g_globalLogger.debug("[HomeLeft] [ANTZ] copying uploaded file to " +
                          std::string(TMP_DIR));
 
-    try {
-        boost::filesystem::copy_file(fileUploadName_,
-                                     TMP_DIR + fileUploadName_.substr(5));
-        fileUploadName_ = TMP_DIR + fileUploadName_.substr(5);
-    } catch (const boost::filesystem::filesystem_error &e) {
-        std::cerr << "Error: " << e.what() << std::endl;
-        return;
-    }
+    // try {
+    std::ifstream source{fileUploadName_, std::ios::binary};
+    std::ofstream destiny{TMP_DIR + fileUploadName_.substr(5),
+                          std::iso::binary};
+    destiny << source.rdbuf();
+
+    // boost::filesystem::copy_file(fileUploadName_,
+    //                             TMP_DIR + fileUploadName_.substr(5));
+    fileUploadName_ = TMP_DIR + fileUploadName_.substr(5);
+    //} catch (const ::filesystem::filesystem_error &e) {
+    //    std::cerr << "Error: " << e.what() << std::endl;
+    //    return;
+    //}
 #endif
 
     evaluated_ = false;
@@ -638,7 +643,7 @@ void HomeLeft::prepareSaveFile()
 {
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
         errorSignal_.emit("Cannot prepare a Maple script without introducing a "
-                     "vector field first.");
+                          "vector field first.");
         g_globalLogger.error(
             "[HomeLeft] tried to save without entering a vector field");
         return;
@@ -658,8 +663,8 @@ void HomeLeft::prepareSaveFile()
     if (!scriptHandler_->fillSaveFile(saveFileName_)) {
         g_globalLogger.error("Cannot create save file " + saveFileName_);
         errorSignal_.emit("Could not create save file. You can notify this "
-                     "error at osr@mat.uab.cat, sorry for the "
-                     "inconvenience.");
+                          "error at osr@mat.uab.cat, sorry for the "
+                          "inconvenience.");
         return;
     }
 
@@ -681,7 +686,8 @@ void HomeLeft::prepareSaveFile()
 void HomeLeft::onPlot()
 {
     if (!evaluated_) {
-        errorSignal_.emit("Cannot read results, evaluate a vector field first.");
+        errorSignal_.emit(
+            "Cannot read results, evaluate a vector field first.");
     } else {
         g_globalLogger.debug("[HomeLeft] sending onPlot signal");
         if (!loggedIn_)
@@ -1285,7 +1291,8 @@ void HomeLeft::resetUI()
 void HomeLeft::onRefreshPlotBtn()
 {
     if (!evaluated_) {
-        errorSignal_.emit("Cannot read results, evaluate a vector field first.");
+        errorSignal_.emit(
+            "Cannot read results, evaluate a vector field first.");
     } else {
         g_globalLogger.debug("[HomeLeft] sending refreshPlot signal");
         if (viewComboBox_->currentIndex() == 0) {
@@ -1442,7 +1449,7 @@ void HomeLeft::onPlotGcfBtn()
         g_globalLogger.warning(
             "[HomeLeft] user tried to plot GCF for an un-evaluated VF");
         errorSignal_.emit("Introduce and evaluate a vector field with a common "
-                     "factor first.");
+                          "factor first.");
     } else if (scriptHandler_->str_gcf_ == "0") {
         g_globalLogger.warning(
             "[HomeLeft] user tried to plot a nonexistent GCF");
@@ -1452,7 +1459,7 @@ void HomeLeft::onPlotGcfBtn()
         g_globalLogger.warning("[HomeLeft] user tried to plot GCF without "
                                "plotting vector field first.");
         errorSignal_.emit("Click the main Plot button first\n"
-                     "in order to create the plot window.");
+                          "in order to create the plot window.");
         return;
     } else {
         int npoints = gcfNPointsSpinBox_->value();
@@ -1484,12 +1491,13 @@ void HomeLeft::onPlotCurvesBtn()
 
     // check if vf is evaluated
     if (!evaluated_) {
-        errorSignal_.emit("Cannot plot curve yet, evaluate a vector field first.");
+        errorSignal_.emit(
+            "Cannot plot curve yet, evaluate a vector field first.");
         return;
     }
     if (!plotted_) {
         errorSignal_.emit("Click the main Plot button first\n"
-                     "in order to create the plot window.");
+                          "in order to create the plot window.");
         return;
     }
     // check if a curve has been introduced
@@ -1615,7 +1623,7 @@ void HomeLeft::onPlotIsoclinesBtn()
     }
     if (!plotted_) {
         errorSignal_.emit("Click the main Plot button first\n"
-                     "in order to create the plot window.");
+                          "in order to create the plot window.");
         return;
     }
     // check if a isocline has been introduced
@@ -1657,8 +1665,9 @@ void HomeLeft::onPlotIsoclinesBtn()
             } catch (const std::out_of_range &e) {
                 g_globalLogger.error(
                     "[HomeLeft] value for isocline slope out of double range");
-                errorSignal_.emit("[HomeLeft] the introduced value for the slope is "
-                             "out\nof double precision range.");
+                errorSignal_.emit(
+                    "[HomeLeft] the introduced value for the slope is "
+                    "out\nof double precision range.");
                 return;
             }
         }
