@@ -30,7 +30,7 @@
 
 #include <Wt/WString>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 class WSphere;
 
@@ -323,9 +323,9 @@ class HomeRight : public Wt::WContainerWidget
     Wt::WContainerWidget *paramsScrollAreaContainer_;
     Wt::WPushButton *addParamBtn_;
     Wt::WPushButton *delParamBtn_;
-    std::vector<boost::shared_ptr<Wt::WLineEdit>> leLabelsVector_;
-    std::vector<boost::shared_ptr<Wt::WLineEdit>> leValuesVector_;
-    std::vector<boost::shared_ptr<Wt::WTemplate>> templatesVector_;
+    std::vector<std::unique_ptr<Wt::WLineEdit>> leLabelsVector_;
+    std::vector<std::unique_ptr<Wt::WLineEdit>> leValuesVector_;
+    std::vector<std::unique_ptr<Wt::WTemplate>> templatesVector_;
 
     // output tab
     Wt::WContainerWidget *outputContainer_;

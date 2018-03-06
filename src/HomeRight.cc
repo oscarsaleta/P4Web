@@ -40,12 +40,12 @@ HomeRight::HomeRight(WContainerWidget *parent, ScriptHandler *s)
     setId("HomeRight");
     setStyleClass("half-box-right");
     scriptHandler_ = s;
-    sphere_=nullptr;
+    sphere_ = nullptr;
 
-    plotCaption_=nullptr;
-    
-    loggedIn_=false;
-    orbitStarted_=false;
+    plotCaption_ = nullptr;
+
+    loggedIn_ = false;
+    orbitStarted_ = false;
 
     g_globalLogger.debug("[HomeRight] setting up UI...");
     setupUI();
@@ -348,7 +348,6 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
                           projection);
     setupSphereAndPlot();
     g_globalLogger.debug("[HomeRight] reacted to onSpherePlot signal");
-    
 }
 
 void HomeRight::onPlanePlot(std::string basename, int type, double minx,
@@ -410,7 +409,7 @@ void HomeRight::onReset(int dummy)
     outputTextArea_->setText(outputTextAreaContent_);
 
     if (loggedIn_) {
-    g_globalLogger.debug("[HomeRight] Hiding params tab...");
+        g_globalLogger.debug("[HomeRight] Hiding params tab...");
         hideParamsTab();
         g_globalLogger.debug("[HomeRight] Showing params tab...");
         showParamsTab();
@@ -461,8 +460,7 @@ void HomeRight::onOrbitsDelete(int flag)
 void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints,
                           int prec)
 {
-    g_globalLogger.debug("[HomeRight] received gcf signal with fname " +
-                         fname);
+    g_globalLogger.debug("[HomeRight] received gcf signal with fname " + fname);
     if (sphere_ == nullptr)
         return;
 
@@ -494,35 +492,39 @@ void HomeRight::plotSeparatrices()
 
 void HomeRight::addParameter()
 {
-    WTemplate *t = new WTemplate(WString::tr("template.params"),
-                                 paramsScrollAreaContainer_);
+    auto t = std::make_unique<WTemplate>(WString::tr("template.params"),
+                                         paramsScrollAreaContainer_);
     t->addFunction("id", WTemplate::Functions::id);
-    templatesVector_.push_back(boost::shared_ptr<WTemplate>(t));
 
-    WLineEdit *label = new WLineEdit(paramsScrollAreaContainer_);
-    leLabelsVector_.push_back(boost::shared_ptr<WLineEdit>(label));
+    auto label = std::make_unique<WLineEdit>(paramsScrollAreaContainer_);
     t->bindWidget("label", label);
-    WLineEdit *value = new WLineEdit(paramsScrollAreaContainer_);
-    leValuesVector_.push_back(boost::shared_ptr<WLineEdit>(value));
+    leLabelsVector_.push_back(std::move(label));
+
+    auto value = std::make_unique<WLineEdit>(paramsScrollAreaContainer_);
     t->bindWidget("value", value);
+    leValuesVector_.push_back(std::move(value));
+
+    templatesVector_.push_back(std::move(t));
 }
 
 void HomeRight::addParameterWithValue(std::string strlabel,
                                       std::string strvalue)
 {
-    WTemplate *t = new WTemplate(WString::tr("template.params"),
-                                 paramsScrollAreaContainer_);
+    auto t = std::make_unique<WTemplate>(WString::tr("template.params"),
+                                         paramsScrollAreaContainer_);
     t->addFunction("id", WTemplate::Functions::id);
-    templatesVector_.push_back(boost::shared_ptr<WTemplate>(t));
 
-    WLineEdit *label = new WLineEdit(paramsScrollAreaContainer_);
+    auto label = std::make_unique<WLineEdit>(paramsScrollAreaContainer_);
     label->setText(strlabel);
-    leLabelsVector_.push_back(boost::shared_ptr<WLineEdit>(label));
     t->bindWidget("label", label);
-    WLineEdit *value = new WLineEdit(paramsScrollAreaContainer_);
+    leLabelsVector_.push_back(std::move(label));
+
+    auto value = std::make_unique<WLineEdit>(paramsScrollAreaContainer_);
     value->setText(strvalue);
-    leValuesVector_.push_back(boost::shared_ptr<WLineEdit>(value));
     t->bindWidget("value", value);
+    leValuesVector_.push_back(std::move(value));
+
+    templatesVector_.push_back(std::move(t));
 
     if (tabWidget_->currentIndex() != 2)
         tabWidget_->setCurrentIndex(2);
@@ -531,25 +533,13 @@ void HomeRight::addParameterWithValue(std::string strlabel,
 void HomeRight::delParameter()
 {
     if (!leLabelsVector_.empty()) {
-        boost::shared_ptr<WLineEdit> label = leLabelsVector_.back();
-        if (label != nullptr) {
-            label.reset();
-            leLabelsVector_.pop_back();
-        }
+        leLabelsVector_.pop_back();
     }
     if (!leValuesVector_.empty()) {
-        boost::shared_ptr<WLineEdit> value = leValuesVector_.back();
-        if (value != nullptr) {
-            value.reset();
-            leValuesVector_.pop_back();
-        }
+        leValuesVector_.pop_back();
     }
     if (!templatesVector_.empty()) {
-        boost::shared_ptr<WTemplate> t = templatesVector_.back();
-        if (t != nullptr) {
-            t.reset();
-            templatesVector_.pop_back();
-        }
+        templatesVector_.pop_back();
     }
 }
 
@@ -594,11 +584,10 @@ void HomeRight::refreshParamStringVectors()
         std::vector<std::string>().swap(scriptHandler_->paramValues_);
     }
 
-    std::vector<boost::shared_ptr<WLineEdit>>::const_iterator it1;
-    std::vector<boost::shared_ptr<WLineEdit>>::const_iterator it2;
-    for (it1 = leLabelsVector_.begin(), it2 = leValuesVector_.begin();
-         it1 != leLabelsVector_.end(), it2 != leValuesVector_.end();
-         it1++, it2++) {
+    for (auto it1 = std::begin(leLabelsVector_),
+              auto it2 = std::begin(leValuesVector_),
+              it1 != std::end(leLabelsVector_),
+              it2 != std::end(leValuesVector_), ++it1, ++it2) {
         if ((*it1)->text().empty() || (*it2)->text().empty())
             continue;
         scriptHandler_->paramLabels_.push_back((*it1)->text().toUTF8());
