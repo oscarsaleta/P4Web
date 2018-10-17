@@ -292,5 +292,3 @@ enum TYPEOFVIEWS {
     TYPEOFVIEW_V1 = 4,     ///< V1 sphere chart
     TYPEOFVIEW_V2 = 5      ///< V2 sphere chart
 };
-
-#endif /* CUSTOM_H */

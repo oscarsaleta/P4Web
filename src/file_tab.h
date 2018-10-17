@@ -47,7 +47,7 @@
 
 #include "custom.h"
 
-#include <Wt/WString>
+#include <Wt/WString.h>
 
 // -----------------------------------------------------------------------
 //                      General polynomial expressions

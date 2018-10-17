@@ -41,7 +41,7 @@
  * @file color.h
  */
 
-#include <Wt/WColor>
+#include <Wt/WColor.h>
 
 //
 // XFIG 3.1 DEFAULT COLOR TABLE

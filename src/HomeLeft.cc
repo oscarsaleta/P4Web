@@ -33,28 +33,29 @@
 #include <sys/wait.h>
 #include <vector>
 
-#include <Wt/WAnchor>
-#include <Wt/WBreak>
-#include <Wt/WButtonGroup>
-#include <Wt/WComboBox>
-#include <Wt/WDoubleSpinBox>
-#include <Wt/WDoubleValidator>
-#include <Wt/WFileResource>
-#include <Wt/WFileUpload>
-#include <Wt/WGroupBox>
-#include <Wt/WImage>
-#include <Wt/WLabel>
-#include <Wt/WLineEdit>
-#include <Wt/WPushButton>
-#include <Wt/WRadioButton>
-#include <Wt/WSpinBox>
-#include <Wt/WTabWidget>
-#include <Wt/WTemplate>
+#include <Wt/WAnchor.h>
+#include <Wt/WBreak.h>
+#include <Wt/WButtonGroup.h>
+#include <Wt/WComboBox.h>
+#include <Wt/WDoubleSpinBox.h>
+#include <Wt/WDoubleValidator.h>
+#include <Wt/WFileResource.h>
+#include <Wt/WFileUpload.h>
+#include <Wt/WGroupBox.h>
+#include <Wt/WImage.h>
+#include <Wt/WLabel.h>
+#include <Wt/WLineEdit.h>
+#include <Wt/WMenuItem.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WRadioButton.h>
+#include <Wt/WSpinBox.h>
+#include <Wt/WTabWidget.h>
+#include <Wt/WTemplate.h>
 
 using namespace Wt;
 
 HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
-    : WContainerWidget(parent), settingsContainer_(nullptr),
+    : WContainerWidget(), settingsContainer_(nullptr),
       viewContainer_(nullptr), orbitsContainer_(nullptr)
 {
     loggedIn_ = false;
@@ -143,97 +144,83 @@ HomeLeft::~HomeLeft()
 void HomeLeft::setupUI()
 {
     // Equation boxes
-    equationsBox_ = new WGroupBox(this);
+    equationsBox_ = addWidget(std::make_unique<WGroupBox>());
     equationsBox_->setId("equationsBox_");
     equationsBox_->setTitle(WString::tr("homeleft.equationboxtitle"));
-    addWidget(equationsBox_);
 
-    WTemplate *t =
-        new WTemplate(WString::tr("template.homeleft-default"), equationsBox_);
+    auto t = std::make_unique<WTemplate>(WString::tr("template.homeleft-default"));
     t->addFunction("id", WTemplate::Functions::id);
 
-    fileUploadWidget_ = new WFileUpload(equationsBox_);
+    fileUploadWidget_ = t->bindWidget("upload", std::make_unique<WFileUpload>());
     fileUploadWidget_->setId("fileUploadWidget_");
     fileUploadWidget_->setFileTextSize(30);
     fileUploadWidget_->setFilters(".inp");
     fileUploadWidget_->setInline(true);
-    t->bindWidget("upload", fileUploadWidget_);
 
-    xEquationInput_ = new WLineEdit();
-    xEquationInput_->setId("xEquationInput_");
-    yEquationInput_ = new WLineEdit();
-    yEquationInput_->setId("yEquationInput_");
-    gcfEquationInput_ = new WLineEdit();
-    gcfEquationInput_->setId("gcfEquationInput_");
     t->bindString("vf-tooltip", WString::tr("tooltip.vectorfield"));
-    t->bindWidget("xeq", xEquationInput_);
-    t->bindWidget("yeq", yEquationInput_);
+    xEquationInput_ = t->bindWidget("xeq", std::make_unique<WLineEdit>());
+    yEquationInput_ = t->bindWidget("yeq",std::make_unique<WLineEdit>());
     t->bindString("gcf-tooltip", WString::tr("tooltip.gcf"));
-    t->bindWidget("gcf", gcfEquationInput_);
+    gcfEquationInput_ = t->bindWidget("gcf",std::make_unique<WLineEdit>());
+    xEquationInput_->setId("xEquationInput_");
+    yEquationInput_->setId("yEquationInput_");
+    gcfEquationInput_->setId("gcfEquationInput_");
 
     /* Buttons */
     // eval button
-    evalButton_ = new WPushButton("Evaluate", equationsBox_);
+    evalButton_ = t->bindWidget("eval", std::make_unique<WPushButton>("Evaluate", equationsBox_));
     evalButton_->setId("evalButton_");
     evalButton_->setStyleClass("btn btn-primary");
     evalButton_->setInline(true);
     evalButton_->setToolTip(WString::tr("tooltip.homeleft-eval-button"));
-    t->bindWidget("eval", evalButton_);
 
     // plot button
-    plotButton_ = new WPushButton("Plot", equationsBox_);
+    plotButton_ = t->bindWidget("plot", std::make_unique<WPushButton>("Plot", equationsBox_));
     plotButton_->setId("plotButton_");
     plotButton_->setStyleClass("btn btn-default");
     plotButton_->setInline(true);
     plotButton_->setToolTip(WString::tr("tooltip.homeleft-plot-button"));
-    t->bindWidget("plot", plotButton_);
 
     // prepare save file button
-    prepSaveButton_ = new WPushButton("Prepare save file", equationsBox_);
+    prepSaveButton_ = t->bindWidget("prep-save", std::make_unique<WPushButton>("Prepare save file", equationsBox_));
     prepSaveButton_->setId("prepSaveButton_");
     prepSaveButton_->setStyleClass("btn btn-default");
     prepSaveButton_->setInline(true);
     prepSaveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"));
-    t->bindWidget("prep-save", prepSaveButton_);
 
     // save file anchor
-    saveAnchor_ = new WAnchor(equationsBox_);
+    saveAnchor_ = t->bindWidget("down-save", std::make_unique<WAnchor>(equationsBox_));
     saveAnchor_->setId("saveAnchor_");
     saveAnchor_->setStyleClass("btn btn-default");
     saveAnchor_->setText("Download save file");
     saveAnchor_->setInline(true);
     saveAnchor_->setToolTip(WString::tr("tooltip.homeleft-save-button"));
     saveAnchor_->hide();
-    t->bindWidget("down-save", saveAnchor_);
 
-    resetButton_ = new WPushButton("Reset", equationsBox_);
+    resetButton_ = t->bindWidget("reset", std::make_unique<WPushButton>("Reset", equationsBox_));
     resetButton_->setId("resetButton_");
     resetButton_->setStyleClass("btn btn-warning");
     resetButton_->setInline(true);
     resetButton_->setToolTip(WString::tr("tooltip.homeleft-clear-button"));
-    t->bindWidget("reset", resetButton_);
 
-    new WBreak(this);
+    // add a break
+    std::make_unique<WBreak>();
 
     /* tab widget for legend et al */
-    tabs_ = new WTabWidget(this);
+    tabs_ = addWidget(std::make_unique<WTabWidget>());
     // legend tab ----
-    WContainerWidget *legendContainer = new WContainerWidget();
+    auto legendContainer = tabs_->addTab(std::make_unique<WContainerWidget>(),WString::fromUTF8("Legend"),
+                  ContentLoading::Eager);
     legendContainer->setId("legendContainer");
-    tabs_->addTab(legendContainer, WString::fromUTF8("Legend"),
-                  WTabWidget::PreLoading);
-    addWidget(tabs_);
 
-    t = new WTemplate(WString::tr("template.legend"), legendContainer);
+    auto t2 = std::make_unique<WTemplate>(WString::tr("template.legend"));
     t->addFunction("id", WTemplate::Functions::id);
 
     // legend image
-    WImage *legend =
-        new WImage(WLink("resources/p4legend.png"), legendContainer);
+    WImage *legend = t->bindWidget("img",std::make_unique<WImage>(WLink("resources/p4legend.png")));
     legend->setAlternateText("Plot legend");
     legend->setId("legend");
     legend->resize(400, 300);
-    t->bindWidget("img", legend);
 
     g_globalLogger.debug("[HomeLeft] UI set up");
 }
@@ -663,7 +650,7 @@ void HomeLeft::prepareSaveFile()
         return;
     }
 
-    saveFileResource_ = new WFileResource(saveFileName_);
+    saveFileResource_ = std::make_shared<WFileResource>(saveFileName_);
 
     char date[100];
     std::time_t now =
@@ -671,7 +658,7 @@ void HomeLeft::prepareSaveFile()
     std::strftime(date, sizeof(date), "%F_%R", std::localtime(&now));
 
     saveFileResource_->suggestFileName("WP4_" + std::string(date) + ".inp");
-    saveAnchor_->setLink(saveFileResource_);
+    saveAnchor_->setLink(WLink(saveFileResource_));
 
     prepSaveButton_->hide();
     // saveAnchor_->clicked().emit(WMouseEvent());
@@ -762,29 +749,25 @@ void HomeLeft::showSettings()
     /*
      * evaluation options
      */
-    settingsContainer_ = new WContainerWidget(this);
-    settingsContainer_->setId("settingsContainer_");
-    tabs_->addTab(settingsContainer_,
+    settingsContainer_ = tabs_->addTab(std::make_unique<WContainerWidget>(),
                   WString::tr("homeleft.evaluation-options"),
-                  WTabWidget::PreLoading);
+                  ContentLoading::Eager);
+    settingsContainer_->setId("settingsContainer_");
 
-    t = new WTemplate(WString::tr("template.homeleft-options"),
-                      settingsContainer_);
+    auto t3 = std::make_unique<WTemplate>(WString::tr("template.homeleft-options"));
     t->addFunction("id", WTemplate::Functions::id);
 
     // calculations
-    calculationsBtnGroup_ = new WButtonGroup(settingsContainer_);
-    button = new WRadioButton("Algebraic", settingsContainer_);
+    calculationsBtnGroup_ = std::make_shared<WButtonGroup>();
+    button = t->bindWidget("calc-algebraic", std::make_unique<WRadioButton>("Algebraic"));
     button->setInline(true);
-    t->bindWidget("calc-algebraic", button);
     calculationsBtnGroup_->addButton(button, Algebraic);
-    button = new WRadioButton("Numeric", settingsContainer_);
+    t->bindString("calc-tooltip", WString::tr("tooltip.calculations"));
+    button = t->bindWidget("calc-numeric", std::make_unique<WRadioButton>("Numeric"));
     button->setInline(true);
     calculationsBtnGroup_->addButton(button, Numeric);
     calculationsBtnGroup_->setCheckedButton(
         calculationsBtnGroup_->button(Numeric));
-    t->bindString("calc-tooltip", WString::tr("tooltip.calculations"));
-    t->bindWidget("calc-numeric", button);
 
     // separatrices
     separatricesBtnGroup_ = new WButtonGroup(settingsContainer_);

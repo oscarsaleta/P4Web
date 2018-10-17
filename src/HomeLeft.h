@@ -16,8 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HOMELEFT_H
-#define HOMELEFT_H
+#pragma once
 
 /*!
  * @brief Left side of UI
@@ -28,8 +27,8 @@
 #include "MainUI.h"
 #include "ScriptHandler.h"
 
-#include <Wt/WContainerWidget>
-#include <Wt/WSignal>
+#include <Wt/WContainerWidget.h>
+#include <Wt/WSignal.h>
 
 /**
  * Maximum number of parameters
@@ -411,14 +410,14 @@ class HomeLeft : public Wt::WContainerWidget
 
     Wt::WAnchor *saveAnchor_;
     std::string saveFileName_;
-    Wt::WFileResource *saveFileResource_;
+    std::shared_ptr<Wt::WFileResource> saveFileResource_;
 
     Wt::WTabWidget *tabs_;
 
     /* PRIVATE UI (log in needed) */
     // evaluation parameters tab
     Wt::WContainerWidget *settingsContainer_;
-    Wt::WButtonGroup *calculationsBtnGroup_;
+    std::shared_ptr<Wt::WButtonGroup> calculationsBtnGroup_;
     enum Calculations { Algebraic = 0, Numeric = 1 };
     Wt::WButtonGroup *separatricesBtnGroup_;
     enum Separatrices { Yes = 0, No = 1 };
@@ -539,5 +538,3 @@ class HomeLeft : public Wt::WContainerWidget
     void onDelOneIsoclinesBtn();
     void onDelAllIsoclinesBtn();
 };
-
-#endif // HOMELEFT_H
