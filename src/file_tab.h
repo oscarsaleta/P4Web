@@ -34,8 +34,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef FILE_TAB_H
-#define FILE_TAB_H
+#pragma once
 
 /*!
  * @brief This file implements the class WVFStudy and defines
@@ -1550,5 +1549,3 @@ class WVFStudy
 
 #define LINESTYLE_DASHES 1 ///< style for dashed lines in plot
 #define LINESTYLE_POINTS 0 ///< style for dot lines in plot
-
-#endif /*FILE_TAB_H*/

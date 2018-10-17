@@ -34,8 +34,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef COLOR_H
-#define COLOR_H
+#pragma once
 
 /*!
  * @brief Definitions for colors
@@ -107,5 +106,3 @@ struct P4RGBITEM {
  * Global struct array (one for each color defined in this file)
  */
 extern P4RGBITEM g_XFigToRGB[NUMXFIGCOLORS];
-
-#endif /* COLOR_H */

@@ -34,8 +34,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CUSTOM_H
-#define CUSTOM_H
+#pragma once
 
 /*!
  * @brief This file contains several macro and struct definitions
