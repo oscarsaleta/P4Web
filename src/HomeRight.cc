@@ -23,29 +23,28 @@
 
 #include <fstream>
 
-#include <Wt/WLineEdit>
-#include <Wt/WMessageBox>
-#include <Wt/WPushButton>
-#include <Wt/WScrollArea>
-#include <Wt/WTabWidget>
-#include <Wt/WTemplate>
-#include <Wt/WTextArea>
-#include <Wt/WToolBar>
+#include <Wt/WLineEdit.h>
+#include <Wt/WMessageBox.h>
+#include <Wt/WPushButton.h>
+#include <Wt/WTabWidget.h>
+#include <Wt/WTemplate.h>
+#include <Wt/WTextArea.h>
+#include <Wt/WToolBar.h>
 
 using namespace Wt;
 
 HomeRight::HomeRight(WContainerWidget *parent, ScriptHandler *s)
-    : WContainerWidget(parent)
+    : WContainerWidget()
 {
     setId("HomeRight");
     setStyleClass("half-box-right");
     scriptHandler_ = s;
-    sphere_=nullptr;
+    sphere_ = nullptr;
 
-    plotCaption_=nullptr;
-    
-    loggedIn_=false;
-    orbitStarted_=false;
+    plotCaption_ = nullptr;
+
+    loggedIn_ = false;
+    orbitStarted_ = false;
 
     g_globalLogger.debug("[HomeRight] setting up UI...");
     setupUI();
@@ -214,11 +213,12 @@ void HomeRight::setupUI()
 */
 
     // parameters tab ------
-    paramsContainer_ = new WContainerWidget();
-    tabWidget_->addTab(paramsContainer_, WString::fromUTF8("Parameters"),
-                       WTabWidget::LazyLoading);
+    paramsContainer_ = tabWidget_->addTab(std::make_unique<WContainerWidget>(),
+                                          WString::fromUTF8("Parameters"),
+                                          WTabWidget::LazyLoading);
 
-    addParamBtn_ = new WPushButton("Add", paramsContainer_);
+    addParamBtn_ =
+        paramsContainer_->addWidget(std::make_unique<WPushButton>("Add"));
     addParamBtn_->setId("addParamBtn_");
     addParamBtn_->setStyleClass("btn btn-primary");
     addParamBtn_->setMargin(15, Top);
@@ -233,7 +233,8 @@ void HomeRight::setupUI()
     delParamBtn_->setMargin(15, Bottom);
     delParamBtn_->setMargin(10, Left);
 
-    paramsScrollArea_ = new WScrollArea(paramsContainer_);
+    paramsScrollArea_ = new WContainerWidget(paramsContainer_);
+    paramsScrollArea_->setOverflow(Wt::Overflow::Auto, Orientation::Vertical);
     paramsScrollAreaContainer_ = new WContainerWidget();
     paramsScrollArea_->setWidget(paramsScrollAreaContainer_);
     paramsScrollArea_->setHorizontalScrollBarPolicy(
@@ -348,7 +349,6 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
                           projection);
     setupSphereAndPlot();
     g_globalLogger.debug("[HomeRight] reacted to onSpherePlot signal");
-    
 }
 
 void HomeRight::onPlanePlot(std::string basename, int type, double minx,
@@ -410,7 +410,7 @@ void HomeRight::onReset(int dummy)
     outputTextArea_->setText(outputTextAreaContent_);
 
     if (loggedIn_) {
-    g_globalLogger.debug("[HomeRight] Hiding params tab...");
+        g_globalLogger.debug("[HomeRight] Hiding params tab...");
         hideParamsTab();
         g_globalLogger.debug("[HomeRight] Showing params tab...");
         showParamsTab();
@@ -461,8 +461,7 @@ void HomeRight::onOrbitsDelete(int flag)
 void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints,
                           int prec)
 {
-    g_globalLogger.debug("[HomeRight] received gcf signal with fname " +
-                         fname);
+    g_globalLogger.debug("[HomeRight] received gcf signal with fname " + fname);
     if (sphere_ == nullptr)
         return;
 
