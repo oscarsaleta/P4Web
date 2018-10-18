@@ -27,6 +27,8 @@
 #include "MainUI.h"
 #include "ScriptHandler.h"
 
+#include <memory>
+
 #include <Wt/WContainerWidget.h>
 #include <Wt/WSignal.h>
 
@@ -419,7 +421,7 @@ class HomeLeft : public Wt::WContainerWidget
     Wt::WContainerWidget *settingsContainer_;
     std::shared_ptr<Wt::WButtonGroup> calculationsBtnGroup_;
     enum Calculations { Algebraic = 0, Numeric = 1 };
-    Wt::WButtonGroup *separatricesBtnGroup_;
+    std::shared_ptr<Wt::WButtonGroup> separatricesBtnGroup_;
     enum Separatrices { Yes = 0, No = 1 };
     Wt::WSpinBox *accuracySpinBox_;
     Wt::WSpinBox *precisionSpinBox_;
@@ -451,7 +453,7 @@ class HomeLeft : public Wt::WContainerWidget
     bool orbitsStartSelected_;
     // gcf tab
     Wt::WContainerWidget *gcfContainer_;
-    Wt::WButtonGroup *gcfAppearanceBtnGrp_;
+    std::shared_ptr<Wt::WButtonGroup> gcfAppearanceBtnGrp_;
     enum Appearance { Dots = 0, Dashes = 1 };
     Wt::WSpinBox *gcfNPointsSpinBox_;
     Wt::WSpinBox *gcfPrecisionSpinBox_;
@@ -459,7 +461,7 @@ class HomeLeft : public Wt::WContainerWidget
     // curves tab
     Wt::WContainerWidget *curvesContainer_;
     Wt::WLineEdit *curvesLineEdit_;
-    Wt::WButtonGroup *curvesAppearanceBtnGrp_;
+    std::shared_ptr<Wt::WButtonGroup> curvesAppearanceBtnGrp_;
     Wt::WSpinBox *curvesNPointsSpinBox_;
     Wt::WSpinBox *curvesPrecisionSpinBox_;
     Wt::WPushButton *curvesPlotBtn_;
@@ -468,7 +470,7 @@ class HomeLeft : public Wt::WContainerWidget
     // isoclines tab
     Wt::WContainerWidget *isoclinesContainer_;
     Wt::WLineEdit *isoclinesLineEdit_;
-    Wt::WButtonGroup *isoclinesAppearanceBtnGrp_;
+    std::shared_ptr<Wt::WButtonGroup> isoclinesAppearanceBtnGrp_;
     Wt::WSpinBox *isoclinesNPointsSpinBox_;
     Wt::WSpinBox *isoclinesPrecisionSpinBox_;
     Wt::WPushButton *isoclinesPlotBtn_;

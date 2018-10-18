@@ -55,8 +55,8 @@
 using namespace Wt;
 
 HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
-    : WContainerWidget(), settingsContainer_(nullptr),
-      viewContainer_(nullptr), orbitsContainer_(nullptr)
+    : WContainerWidget(), settingsContainer_(nullptr), viewContainer_(nullptr),
+      orbitsContainer_(nullptr)
 {
     loggedIn_ = false;
     evaluated_ = false;
@@ -83,6 +83,7 @@ HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
 
 HomeLeft::~HomeLeft()
 {
+    /*
     // main widget
 
     if (fileUploadWidget_ != nullptr) {
@@ -137,6 +138,7 @@ HomeLeft::~HomeLeft()
         delete tabs_;
         tabs_ = nullptr;
     }
+    */
 
     g_globalLogger.debug("[HomeLeft] deleted correctly");
 }
@@ -148,10 +150,12 @@ void HomeLeft::setupUI()
     equationsBox_->setId("equationsBox_");
     equationsBox_->setTitle(WString::tr("homeleft.equationboxtitle"));
 
-    auto t = std::make_unique<WTemplate>(WString::tr("template.homeleft-default"));
+    auto t = equationsBox_->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.homeleft-default")));
     t->addFunction("id", WTemplate::Functions::id);
 
-    fileUploadWidget_ = t->bindWidget("upload", std::make_unique<WFileUpload>());
+    fileUploadWidget_ =
+        t->bindWidget("upload", std::make_unique<WFileUpload>());
     fileUploadWidget_->setId("fileUploadWidget_");
     fileUploadWidget_->setFileTextSize(30);
     fileUploadWidget_->setFilters(".inp");
@@ -159,37 +163,42 @@ void HomeLeft::setupUI()
 
     t->bindString("vf-tooltip", WString::tr("tooltip.vectorfield"));
     xEquationInput_ = t->bindWidget("xeq", std::make_unique<WLineEdit>());
-    yEquationInput_ = t->bindWidget("yeq",std::make_unique<WLineEdit>());
+    yEquationInput_ = t->bindWidget("yeq", std::make_unique<WLineEdit>());
     t->bindString("gcf-tooltip", WString::tr("tooltip.gcf"));
-    gcfEquationInput_ = t->bindWidget("gcf",std::make_unique<WLineEdit>());
+    gcfEquationInput_ = t->bindWidget("gcf", std::make_unique<WLineEdit>());
     xEquationInput_->setId("xEquationInput_");
     yEquationInput_->setId("yEquationInput_");
     gcfEquationInput_->setId("gcfEquationInput_");
 
     /* Buttons */
     // eval button
-    evalButton_ = t->bindWidget("eval", std::make_unique<WPushButton>("Evaluate", equationsBox_));
+    evalButton_ = t->bindWidget(
+        "eval", std::make_unique<WPushButton>("Evaluate", equationsBox_));
     evalButton_->setId("evalButton_");
     evalButton_->setStyleClass("btn btn-primary");
     evalButton_->setInline(true);
     evalButton_->setToolTip(WString::tr("tooltip.homeleft-eval-button"));
 
     // plot button
-    plotButton_ = t->bindWidget("plot", std::make_unique<WPushButton>("Plot", equationsBox_));
+    plotButton_ = t->bindWidget(
+        "plot", std::make_unique<WPushButton>("Plot", equationsBox_));
     plotButton_->setId("plotButton_");
     plotButton_->setStyleClass("btn btn-default");
     plotButton_->setInline(true);
     plotButton_->setToolTip(WString::tr("tooltip.homeleft-plot-button"));
 
     // prepare save file button
-    prepSaveButton_ = t->bindWidget("prep-save", std::make_unique<WPushButton>("Prepare save file", equationsBox_));
+    prepSaveButton_ = t->bindWidget(
+        "prep-save",
+        std::make_unique<WPushButton>("Prepare save file", equationsBox_));
     prepSaveButton_->setId("prepSaveButton_");
     prepSaveButton_->setStyleClass("btn btn-default");
     prepSaveButton_->setInline(true);
     prepSaveButton_->setToolTip(WString::tr("tooltip.homeleft-save-button"));
 
     // save file anchor
-    saveAnchor_ = t->bindWidget("down-save", std::make_unique<WAnchor>(equationsBox_));
+    saveAnchor_ =
+        t->bindWidget("down-save", std::make_unique<WAnchor>(equationsBox_));
     saveAnchor_->setId("saveAnchor_");
     saveAnchor_->setStyleClass("btn btn-default");
     saveAnchor_->setText("Download save file");
@@ -197,7 +206,8 @@ void HomeLeft::setupUI()
     saveAnchor_->setToolTip(WString::tr("tooltip.homeleft-save-button"));
     saveAnchor_->hide();
 
-    resetButton_ = t->bindWidget("reset", std::make_unique<WPushButton>("Reset", equationsBox_));
+    resetButton_ = t->bindWidget(
+        "reset", std::make_unique<WPushButton>("Reset", equationsBox_));
     resetButton_->setId("resetButton_");
     resetButton_->setStyleClass("btn btn-warning");
     resetButton_->setInline(true);
@@ -209,15 +219,18 @@ void HomeLeft::setupUI()
     /* tab widget for legend et al */
     tabs_ = addWidget(std::make_unique<WTabWidget>());
     // legend tab ----
-    auto legendContainer = tabs_->addTab(std::make_unique<WContainerWidget>(),WString::fromUTF8("Legend"),
-                  ContentLoading::Eager);
+    auto legendContainer =
+        tabs_->addTab(std::make_unique<WContainerWidget>(),
+                      WString::fromUTF8("Legend"), ContentLoading::Eager);
     legendContainer->setId("legendContainer");
 
-    auto t2 = std::make_unique<WTemplate>(WString::tr("template.legend"));
+    t = legendContainer->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.legend")));
     t->addFunction("id", WTemplate::Functions::id);
 
     // legend image
-    WImage *legend = t->bindWidget("img",std::make_unique<WImage>(WLink("resources/p4legend.png")));
+    WImage *legend = t->bindWidget(
+        "img", std::make_unique<WImage>(WLink("resources/p4legend.png")));
     legend->setAlternateText("Plot legend");
     legend->setId("legend");
     legend->resize(400, 300);
@@ -242,7 +255,7 @@ void HomeLeft::setupConnectors()
     saveAnchor_->clicked().connect(std::bind([=]() {
         saveAnchor_->hide();
         prepSaveButton_->show();
-        delete saveFileResource_;
+        saveFileResource_.reset();
     }));
 
     g_globalLogger.debug("[HomeLeft] connectors set up");
@@ -625,7 +638,7 @@ void HomeLeft::prepareSaveFile()
 {
     if (xEquationInput_->text().empty() || yEquationInput_->text().empty()) {
         errorSignal_.emit("Cannot prepare a Maple script without introducing a "
-                     "vector field first.");
+                          "vector field first.");
         g_globalLogger.error(
             "[HomeLeft] tried to save without entering a vector field");
         return;
@@ -645,8 +658,8 @@ void HomeLeft::prepareSaveFile()
     if (!scriptHandler_->fillSaveFile(saveFileName_)) {
         g_globalLogger.error("Cannot create save file " + saveFileName_);
         errorSignal_.emit("Could not create save file. You can notify this "
-                     "error at osr@mat.uab.cat, sorry for the "
-                     "inconvenience.");
+                          "error at osr@mat.uab.cat, sorry for the "
+                          "inconvenience.");
         return;
     }
 
@@ -668,7 +681,8 @@ void HomeLeft::prepareSaveFile()
 void HomeLeft::onPlot()
 {
     if (!evaluated_) {
-        errorSignal_.emit("Cannot read results, evaluate a vector field first.");
+        errorSignal_.emit(
+            "Cannot read results, evaluate a vector field first.");
     } else {
         g_globalLogger.debug("[HomeLeft] sending onPlot signal");
         if (!loggedIn_)
@@ -742,111 +756,99 @@ void HomeLeft::showSettings()
         viewContainer_ = nullptr;
     }
 
-    WRadioButton *button;
-    WDoubleValidator *validator;
-    WTemplate *t;
-
     /*
      * evaluation options
      */
-    settingsContainer_ = tabs_->addTab(std::make_unique<WContainerWidget>(),
-                  WString::tr("homeleft.evaluation-options"),
-                  ContentLoading::Eager);
+    settingsContainer_ = tabs_->addTab(
+        std::make_unique<WContainerWidget>(),
+        WString::tr("homeleft.evaluation-options"), ContentLoading::Eager);
     settingsContainer_->setId("settingsContainer_");
 
-    auto t3 = std::make_unique<WTemplate>(WString::tr("template.homeleft-options"));
+    auto t = settingsContainer_->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.homeleft-options")));
     t->addFunction("id", WTemplate::Functions::id);
 
     // calculations
     calculationsBtnGroup_ = std::make_shared<WButtonGroup>();
-    button = t->bindWidget("calc-algebraic", std::make_unique<WRadioButton>("Algebraic"));
+    auto button = t->bindWidget("calc-algebraic",
+                                std::make_unique<WRadioButton>("Algebraic"));
     button->setInline(true);
     calculationsBtnGroup_->addButton(button, Algebraic);
     t->bindString("calc-tooltip", WString::tr("tooltip.calculations"));
-    button = t->bindWidget("calc-numeric", std::make_unique<WRadioButton>("Numeric"));
+    button = t->bindWidget("calc-numeric",
+                           std::make_unique<WRadioButton>("Numeric"));
     button->setInline(true);
     calculationsBtnGroup_->addButton(button, Numeric);
     calculationsBtnGroup_->setCheckedButton(
         calculationsBtnGroup_->button(Numeric));
 
     // separatrices
-    separatricesBtnGroup_ = new WButtonGroup(settingsContainer_);
-    button = new WRadioButton("Yes", settingsContainer_);
+    separatricesBtnGroup_ = std::make_shared<WButtonGroup>(settingsContainer_);
+    button = t->bindWidget("sep-yes", std::make_unique<WRadioButton>("Yes"));
     button->setInline(true);
-    t->bindWidget("sep-yes", button);
     separatricesBtnGroup_->addButton(button, Yes);
-    button = new WRadioButton("No", settingsContainer_);
+    t->bindString("sep-tooltip", WString::tr("tooltip.separatrices"));
+    button = t->bindWidget("sep-no", std::make_unique<WRadioButton>("No"));
     button->setInline(true);
     separatricesBtnGroup_->addButton(button, No);
     separatricesBtnGroup_->setCheckedButton(separatricesBtnGroup_->button(No));
-    t->bindString("sep-tooltip", WString::tr("tooltip.separatrices"));
-    t->bindWidget("sep-no", button);
 
     // accuracy
-    accuracySpinBox_ = new WSpinBox(settingsContainer_);
+    accuracySpinBox_ = t->bindWidget("acc", std::make_unique<WSpinBox>());
     accuracySpinBox_->setRange(ACCURACY_MIN, ACCURACY_MAX);
     accuracySpinBox_->setValue(ACCURACY_DEFAULT);
     accuracySpinBox_->setInline(true);
-    t->bindWidget("acc", accuracySpinBox_);
     t->bindString("acc-tooltip", WString::tr("tooltip.accuracy"));
 
     // precision
-    precisionSpinBox_ = new WSpinBox(settingsContainer_);
+    precisionSpinBox_ = t->bindWidget("pre", std::make_unique<WSpinBox>());
     precisionSpinBox_->setRange(PRECISION_MIN, PRECISION_MAX);
     precisionSpinBox_->setValue(PRECISION_DEFAULT);
-    t->bindWidget("pre", precisionSpinBox_);
     t->bindString("pre-tooltip", WString::tr("tooltip.precision"));
 
     // epsilon
-    epsilonSpinBox_ = new WDoubleSpinBox(settingsContainer_);
+    epsilonSpinBox_ = t->bindWidget("eps", std::make_unique<WDoubleSpinBox>());
     epsilonSpinBox_->setDecimals(2);
     epsilonSpinBox_->setSingleStep(0.01);
     epsilonSpinBox_->setRange(EPSILON_MIN, EPSILON_MAX);
     epsilonSpinBox_->setValue(EPSILON_DEFAULT);
-    t->bindWidget("eps", epsilonSpinBox_);
     t->bindString("eps-tooltip", WString::tr("tooltip.epsilon"));
 
     // level of approximation
-    levAppSpinBox_ = new WSpinBox(settingsContainer_);
+    levAppSpinBox_ = t->bindWidget("app", std::make_unique<WSpinBox>());
     levAppSpinBox_->setRange(APPROX_MIN, APPROX_MAX);
     levAppSpinBox_->setValue(APPROX_DEFAULT);
-    t->bindWidget("app", levAppSpinBox_);
     t->bindString("app-tooltip", WString::tr("tooltip.approximation-level"));
 
     // numeric level
-    numericLevelSpinBox_ = new WSpinBox(settingsContainer_);
+    numericLevelSpinBox_ = t->bindWidget("num", std::make_unique<WSpinBox>());
     numericLevelSpinBox_->setRange(NUMERIC_MIN, NUMERIC_MAX);
     numericLevelSpinBox_->setValue(NUMERIC_DEFAULT);
-    t->bindWidget("num", numericLevelSpinBox_);
     t->bindString("num-tooltip", WString::tr("tooltip.numeric-level"));
 
     // maximum level
-    maxLevelSpinBox_ = new WSpinBox(settingsContainer_);
+    maxLevelSpinBox_ = t->bindWidget("max", std::make_unique<WSpinBox>());
     maxLevelSpinBox_->setRange(MAXIMUM_MIN, MAXIMUM_MAX);
     maxLevelSpinBox_->setValue(MAXIMUM_DEFAULT);
-    t->bindWidget("max", maxLevelSpinBox_);
     t->bindString("max-tooltip", WString::tr("tooltip.maximum-level"));
 
     // max weakness level
-    maxWeakLevelSpinBox_ = new WSpinBox(settingsContainer_);
+    maxWeakLevelSpinBox_ = t->bindWidget("weak", std::make_unique<WSpinBox>());
     maxWeakLevelSpinBox_->setRange(WEAKNESS_MIN, WEAKNESS_MAX);
     maxWeakLevelSpinBox_->setValue(WEAKNESS_DEFAULT);
-    t->bindWidget("weak", maxWeakLevelSpinBox_);
     t->bindString("weak-tooltip",
                   WString::tr("tooltip.maximum-weakness-level"));
 
     // p q
-    PLWeightPSpinBox_ = new WSpinBox(settingsContainer_);
+    PLWeightPSpinBox_ = t->bindWidget("p", std::make_unique<WSpinBox>());
     PLWeightPSpinBox_->setRange(PQ_MIN, PQ_MAX);
     PLWeightPSpinBox_->setValue(PQ_DEFAULT);
-    t->bindWidget("p", PLWeightPSpinBox_);
     t->bindString("pq-tooltip",
                   WString::tr("tooltip.poincare-lyapunov-weights"));
 
-    PLWeightQSpinBox_ = new WSpinBox(settingsContainer_);
+    PLWeightQSpinBox_ = t->bindWidget("q", std::make_unique<WSpinBox>());
     PLWeightQSpinBox_->setRange(PQ_MIN, PQ_MAX);
     PLWeightQSpinBox_->setValue(PQ_DEFAULT);
-    t->bindWidget("q", PLWeightQSpinBox_);
 
     // enable separatrice test options only if separatrice testing is on Yes
     levAppSpinBox_->disable();
@@ -867,16 +869,18 @@ void HomeLeft::showSettings()
     /*
      * view settings
      */
-    viewContainer_ = new WContainerWidget(this);
+    viewContainer_ = tabs_->addTab(std::make_unique<WContainerWidget>(),
+                                   WString::fromUTF8("View settings"),
+                                   ContentLoading::Eager);
     viewContainer_->setId("viewContainer_");
-    tabs_->addTab(viewContainer_, WString::fromUTF8("View settings"),
-                  WTabWidget::PreLoading);
 
     // type of view
-    t = new WTemplate(WString::tr("template.homeleft-view"), viewContainer_);
+    t = viewContainer_->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.homeleft-view")));
     t->addFunction("id", &WTemplate::Functions::id);
 
-    viewComboBox_ = new WComboBox(viewContainer_);
+    t->bindString("selectview-tooltip", WString::tr("tooltip.view-select"));
+    viewComboBox_ = t->bindWidget("selectview", std::make_unique<WComboBox>());
     viewComboBox_->setId("viewComboBox_");
     viewComboBox_->addItem("Spherical");
     viewComboBox_->addItem("Planar");
@@ -884,41 +888,35 @@ void HomeLeft::showSettings()
     viewComboBox_->addItem("V1");
     viewComboBox_->addItem("U2");
     viewComboBox_->addItem("V2");
-    t->bindString("selectview-tooltip", WString::tr("tooltip.view-select"));
-    t->bindWidget("selectview", viewComboBox_);
 
     // projection
-    viewProjection_ = new WLineEdit(viewContainer_);
-    viewProjection_->setText("-1");
     t->bindString("projection-tooltip", WString::tr("tooltip.view-projection"));
-    t->bindWidget("projection", viewProjection_);
-    validator = new WDoubleValidator(-1e16, -1e-16);
+    viewProjection_ =
+        t->bindWidget("projection", std::make_unique<WLineEdit>());
+    viewProjection_->setText("-1");
+    auto validator = std::make_shared<WDoubleValidator>(-1e16, -1e-16);
     validator->setMandatory(true);
     viewProjection_->setValidator(validator);
 
-    viewMinX_ = new WLineEdit(viewContainer_);
+    t->bindString("minx-tooltip", WString::tr("tooltip.view-minx"));
+    viewMinX_ = t->bindWidget("minx", std::make_unique<WLineEdit>());
     viewMinX_->setText("-1");
     viewMinX_->disable();
-    t->bindString("minx-tooltip", WString::tr("tooltip.view-minx"));
-    t->bindWidget("minx", viewMinX_);
 
-    viewMaxX_ = new WLineEdit(viewContainer_);
+    t->bindString("maxx-tooltip", WString::tr("tooltip.view-maxx"));
+    viewMaxX_ = t->bindWidget("maxx", std::make_unique<WLineEdit>());
     viewMaxX_->setText("1");
     viewMaxX_->disable();
-    t->bindString("maxx-tooltip", WString::tr("tooltip.view-maxx"));
-    t->bindWidget("maxx", viewMaxX_);
 
-    viewMinY_ = new WLineEdit(viewContainer_);
+    t->bindString("miny-tooltip", WString::tr("tooltip.view-miny"));
+    viewMinY_ = t->bindWidget("miny", std::make_unique<WLineEdit>());
     viewMinY_->setText("-1");
     viewMinY_->disable();
-    t->bindString("miny-tooltip", WString::tr("tooltip.view-miny"));
-    t->bindWidget("miny", viewMinY_);
 
-    viewMaxY_ = new WLineEdit(viewContainer_);
+    t->bindString("maxy-tooltip", WString::tr("tooltip.view-maxy"));
+    viewMaxY_ = t->bindWidget("maxy", std::make_unique<WLineEdit>());
     viewMaxY_->setText("1");
     viewMaxY_->disable();
-    t->bindString("maxy-tooltip", WString::tr("tooltip.view-maxy"));
-    t->bindWidget("maxy", viewMaxY_);
 
     // enable view range boxes only if sphere is not selected
     viewComboBox_->changed().connect(std::bind([=]() {
@@ -945,8 +943,8 @@ void HomeLeft::showSettings()
     }));
 
     // refresh button
-    refreshPlotButton_ = new WPushButton("Refresh plot", viewContainer_);
-    t->bindWidget("btn", refreshPlotButton_);
+    refreshPlotButton_ =
+        t->bindWidget("btn", std::make_unique<WPushButton>("Refresh plot"));
 
     // connect refresh button to refresh plot signal
     refreshPlotButton_->clicked().connect(this, &HomeLeft::onRefreshPlotBtn);
@@ -954,43 +952,39 @@ void HomeLeft::showSettings()
     /*
      * orbits integration
      */
-    orbitsContainer_ = new WContainerWidget(this);
+    orbitsContainer_ =
+        tabs_->addTab(std::make_unique<WContainerWidget>(), "Orbits");
     orbitsContainer_->setId("orbitsContainer_");
-    tabs_->addTab(orbitsContainer_, "Orbits");
 
-    t = new WTemplate(WString::tr("template.homeleft-orbits"),
-                      orbitsContainer_);
+    t = orbitsContainer_->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.homeleft-orbits")));
     t->addFunction("id", WTemplate::Functions::id);
 
-    orbitsXLineEdit_ = new WLineEdit(orbitsContainer_);
-    t->bindWidget("x", orbitsXLineEdit_);
+    orbitsXLineEdit_ = t->bindWidget("x", std::make_unique<WLineEdit>());
     t->bindString("point-label", WString::tr("tooltip.orbits-selected-point"));
-    orbitsYLineEdit_ = new WLineEdit(orbitsContainer_);
-    t->bindWidget("y", orbitsYLineEdit_);
+    orbitsYLineEdit_ = t->bindWidget("y", std::make_unique<WLineEdit>());
 
     // reenable forward/backward and disable continue when point is modified
     // manually
     orbitsXLineEdit_->changed().connect(this, &HomeLeft::onOrbitsDialogChange);
     orbitsYLineEdit_->changed().connect(this, &HomeLeft::onOrbitsDialogChange);
 
-    orbitsForwardsBtn_ = new WPushButton("Forwards", orbitsContainer_);
-    orbitsContinueBtn_ = new WPushButton("Continue", orbitsContainer_);
+    orbitsForwardsBtn_ =
+        t->bindWidget("fw", std::make_unique<WPushButton>("Forwards"));
+    orbitsContinueBtn_ =
+        t->bindWidget("cnt", std::make_unique<WPushButton>("Continue"));
     orbitsContinueBtn_->disable();
-    orbitsBackwardsBtn_ = new WPushButton("Backwards", orbitsContainer_);
-    t->bindWidget("fw", orbitsForwardsBtn_);
-    t->bindWidget("cnt", orbitsContinueBtn_);
-    t->bindWidget("bw", orbitsBackwardsBtn_);
+    orbitsBackwardsBtn_ =
+        t->bindWidget("bw", std::make_unique<WPushButton>("Backwards"));
 
     orbitsDeleteOneBtn_ =
-        new WPushButton("Delete last orbit", orbitsContainer_);
+        t->bindWidget("dl", std::make_unique<WPushButton>("Delete last orbit"));
     orbitsDeleteOneBtn_->setStyleClass("btn btn-warning");
     orbitsDeleteOneBtn_->disable();
     orbitsDeleteAllBtn_ =
-        new WPushButton("Delete all orbits", orbitsContainer_);
+        t->bindWidget("da", std::make_unique<WPushButton>("Delete all orbits"));
     orbitsDeleteAllBtn_->setStyleClass("btn btn-danger");
     orbitsDeleteAllBtn_->disable();
-    t->bindWidget("dl", orbitsDeleteOneBtn_);
-    t->bindWidget("da", orbitsDeleteAllBtn_);
 
     // enable delete orbits and continue if integrate button has been pressed
     orbitsForwardsBtn_->clicked().connect(this, &HomeLeft::onOrbitsForwardsBtn);
@@ -1005,46 +999,44 @@ void HomeLeft::showSettings()
     /*
      * gcf settings
      */
-    gcfContainer_ = new WContainerWidget(this);
+    gcfContainer_ = tabs_->addTab(std::make_unique<WContainerWidget>(), "Gcf");
     gcfContainer_->setId("gcfContainer_");
-    tabs_->addTab(gcfContainer_, "Gcf");
 
-    t = new WTemplate(WString::tr("template.homeleft-gcf"), gcfContainer_);
+    t = gcfContainer_->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.homeleft-gcf")));
     t->addFunction("id", WTemplate::Functions::id);
 
     // appearance
-    gcfAppearanceBtnGrp_ = new WButtonGroup(gcfContainer_);
-    button = new WRadioButton("Dots", gcfContainer_);
+    gcfAppearanceBtnGrp_ = std::make_shared<WButtonGroup>();
+    button = t->bindWidget("gcf-dots", std::make_unique<WRadioButton>("Dots"));
     button->setInline(true);
-    t->bindWidget("gcf-dots", button);
     t->bindString("gcf-tooltip-dots", WString::tr("tooltip.appearance-dots"));
     gcfAppearanceBtnGrp_->addButton(button, Dots);
-    button = new WRadioButton("Dashes", gcfContainer_);
+    button =
+        t->bindWidget("gcf-dashes", std::make_unique<WRadioButton>("Dashes"));
     button->setInline(true);
     gcfAppearanceBtnGrp_->addButton(button, Dashes);
     gcfAppearanceBtnGrp_->setCheckedButton(
         gcfAppearanceBtnGrp_->button(Dashes));
-    t->bindWidget("gcf-dashes", button);
     t->bindString("gcf-tooltip-dashes",
                   WString::tr("tooltip.appearance-dashes"));
 
     // n points
-    gcfNPointsSpinBox_ = new WSpinBox(gcfContainer_);
+    gcfNPointsSpinBox_ = t->bindWidget("nps", std::make_unique<WSpinBox>());
     gcfNPointsSpinBox_->setRange(GCF_NP_MIN, GCF_NP_MAX);
     gcfNPointsSpinBox_->setValue(GCF_NP_DEFAULT);
-    t->bindWidget("nps", gcfNPointsSpinBox_);
     t->bindString("gcf-tooltip-nps", WString::tr("tooltip.npoints"));
 
     // precision
-    gcfPrecisionSpinBox_ = new WSpinBox(gcfContainer_);
+    gcfPrecisionSpinBox_ =
+        t->bindWidget("gcf-prc", std::make_unique<WSpinBox>());
     gcfPrecisionSpinBox_->setRange(GCF_PREC_MIN, GCF_PREC_MAX);
     gcfPrecisionSpinBox_->setValue(GCF_PREC_DEFAULT);
-    t->bindWidget("gcf-prc", gcfPrecisionSpinBox_);
     t->bindString("gcf-tooltip-prc", WString::tr("tooltip.gcf-prc"));
 
     // plot gcf button
-    gcfPlotBtn_ = new WPushButton("Plot GCF", gcfContainer_);
-    t->bindWidget("gcf-btn", gcfPlotBtn_);
+    gcfPlotBtn_ =
+        t->bindWidget("gcf-btn", std::make_unique<WPushButton>("Plot GCF"));
 
     // connect gcf plot button to function
     gcfPlotBtn_->clicked().connect(this, &HomeLeft::onPlotGcfBtn);
@@ -1052,69 +1044,69 @@ void HomeLeft::showSettings()
     /*
      * Curves
      */
-    curvesContainer_ = new WContainerWidget(this);
+    curvesContainer_ =
+        tabs_->addTab(std::make_unique<WContainerWidget>(), "Curves");
     curvesContainer_->setId("curvesContainer_");
-    tabs_->addTab(curvesContainer_, "Curves");
 
-    t = new WTemplate(WString::tr("template.homeleft-curves"),
-                      curvesContainer_);
+    t = curvesContainer_->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.homeleft-curves")));
     t->addFunction("id", WTemplate::Functions::id);
 
     // curve equation
-    curvesLineEdit_ = new WLineEdit(curvesContainer_);
-    t->bindWidget("curve-eqn", curvesLineEdit_);
+    curvesLineEdit_ = t->bindWidget("curve-eqn", std::make_unique<WLineEdit>());
     t->bindString("curve-tooltip-eqn", WString::tr("tooltip.curve-eqn"));
 
     // appearance
-    curvesAppearanceBtnGrp_ = new WButtonGroup(curvesContainer_);
+    curvesAppearanceBtnGrp_ = std::make_shared<WButtonGroup>();
     t->bindString("curve-tooltip-appearance",
                   WString::tr("tooltip.appearance"));
-    button = new WRadioButton("Dots", curvesContainer_);
+    button =
+        t->bindWidget("curve-dots", std::make_unique<WRadioButton>("Dots"));
     button->setInline(true);
-    t->bindWidget("curve-dots", button);
     t->bindString("curve-tooltip-dots", WString::tr("tooltip.appearance-dots"));
     curvesAppearanceBtnGrp_->addButton(button, Dots);
-    button = new WRadioButton("Dashes", curvesContainer_);
+    button =
+        t->bindWidget("curve-dashes", std::make_unique<WRadioButton>("Dashes"));
     button->setInline(true);
     curvesAppearanceBtnGrp_->addButton(button, Dashes);
     curvesAppearanceBtnGrp_->setCheckedButton(
         curvesAppearanceBtnGrp_->button(Dashes));
-    t->bindWidget("curve-dashes", button);
     t->bindString("curve-tooltip-dashes",
                   WString::tr("tooltip.appearance-dashes"));
 
     // n points
-    curvesNPointsSpinBox_ = new WSpinBox(curvesContainer_);
+    curvesNPointsSpinBox_ = t->bindWidget("nps", std::make_unique<WSpinBox>());
     curvesNPointsSpinBox_->setRange(CURVES_NP_MIN, CURVES_NP_MAX);
     curvesNPointsSpinBox_->setValue(CURVES_NP_DEFAULT);
-    t->bindWidget("nps", curvesNPointsSpinBox_);
     t->bindString("curve-tooltip-nps", WString::tr("tooltip.npoints"));
 
     // precision
-    curvesPrecisionSpinBox_ = new WSpinBox(curvesContainer_);
+    curvesPrecisionSpinBox_ =
+        t->bindWidget("curve-prc", std::make_unique<WSpinBox>());
     curvesPrecisionSpinBox_->setRange(CURVES_PREC_MIN, CURVES_PREC_MAX);
     curvesPrecisionSpinBox_->setValue(CURVES_PREC_DEFAULT);
-    t->bindWidget("curve-prc", curvesPrecisionSpinBox_);
     t->bindString("curve-tooltip-prc", WString::tr("tooltip.prc"));
 
     // plot curve button
-    curvesPlotBtn_ = new WPushButton("Plot curve", curvesContainer_);
-    t->bindWidget("curve-btn-plot", curvesPlotBtn_);
+    curvesPlotBtn_ = t->bindWidget("curve-btn-plot",
+                                   std::make_unique<WPushButton>("Plot curve"));
     t->bindString("curve-tooltip-plot", WString::tr("tooltip.curve-plot"));
 
     // delete one button
-    curvesDelOneBtn_ = new WPushButton("Delete last curve", curvesContainer_);
+    curvesDelOneBtn_ =
+        t->bindWidget("curve-btn-del-one",
+                      std::make_unique<WPushButton>("Delete last curve"));
     curvesDelOneBtn_->setStyleClass("btn btn-warning");
     curvesDelOneBtn_->disable();
-    t->bindWidget("curve-btn-del-one", curvesDelOneBtn_);
     t->bindString("curve-tooltip-del-one",
                   WString::tr("tooltip.curve-del-one"));
 
     // delete all button
-    curvesDelAllBtn_ = new WPushButton("Delete all curves", curvesContainer_);
+    curvesDelAllBtn_ =
+        t->bindWidget("curve-btn-del-all",
+                      std::make_unique<WPushButton>("Delete all curves"));
     curvesDelAllBtn_->setStyleClass("btn btn-danger");
     curvesDelAllBtn_->disable();
-    t->bindWidget("curve-btn-del-all", curvesDelAllBtn_);
     t->bindString("curve-tooltip-del-all",
                   WString::tr("tooltip.curve-del-all"));
 
@@ -1126,74 +1118,74 @@ void HomeLeft::showSettings()
     /*
      * Isoclines
      */
-    isoclinesContainer_ = new WContainerWidget(this);
+    isoclinesContainer_ =
+        tabs_->addTab(std::make_unique<WContainerWidget>(), "Isoclines");
     isoclinesContainer_->setId("isoclinesContainer_");
-    tabs_->addTab(isoclinesContainer_, "Isoclines");
 
-    t = new WTemplate(WString::tr("template.homeleft-isoclines"),
-                      isoclinesContainer_);
+    t = isoclinesContainer_->addWidget(std::make_unique<WTemplate>(
+        WString::tr("template.homeleft-isoclines")));
     t->addFunction("id", WTemplate::Functions::id);
 
     // isocline slope
-    isoclinesLineEdit_ = new WLineEdit(isoclinesContainer_);
-    t->bindWidget("isocline-slope", isoclinesLineEdit_);
+    isoclinesLineEdit_ =
+        t->bindWidget("isocline-slope", std::make_unique<WLineEdit>());
     t->bindString("isocline-tooltip-slope",
                   WString::tr("tooltip.isocline-slope"));
 
     // appearance
-    isoclinesAppearanceBtnGrp_ = new WButtonGroup(isoclinesContainer_);
+    isoclinesAppearanceBtnGrp_ = std::make_shared<WButtonGroup>();
     t->bindString("isocline-tooltip-appearance",
                   WString::tr("tooltip.appearance"));
-    button = new WRadioButton("Dots", isoclinesContainer_);
+    button =
+        t->bindWidget("isocline-dots", std::make_unique<WRadioButton>("Dots"));
     button->setInline(true);
-    t->bindWidget("isocline-dots", button);
     t->bindString("isocline-tooltip-dots",
                   WString::tr("tooltip.appearance-dots"));
     isoclinesAppearanceBtnGrp_->addButton(button, Dots);
-    button = new WRadioButton("Dashes", isoclinesContainer_);
+    button = t->bindWidget("isocline-dashes",
+                           std::make_unique<WRadioButton>("Dashes"));
     button->setInline(true);
     isoclinesAppearanceBtnGrp_->addButton(button, Dashes);
     isoclinesAppearanceBtnGrp_->setCheckedButton(
         isoclinesAppearanceBtnGrp_->button(Dashes));
-    t->bindWidget("isocline-dashes", button);
     t->bindString("isocline-tooltip-dashes",
                   WString::tr("tooltip.appearance-dashes"));
 
     // n points
-    isoclinesNPointsSpinBox_ = new WSpinBox(isoclinesContainer_);
+    isoclinesNPointsSpinBox_ =
+        t->bindWidget("nps", std::make_unique<WSpinBox>());
     isoclinesNPointsSpinBox_->setRange(CURVES_NP_MIN, CURVES_NP_MAX);
     isoclinesNPointsSpinBox_->setValue(CURVES_NP_DEFAULT);
-    t->bindWidget("nps", isoclinesNPointsSpinBox_);
     t->bindString("isocline-tooltip-nps", WString::tr("tooltip.npoints"));
 
     // precision
-    isoclinesPrecisionSpinBox_ = new WSpinBox(isoclinesContainer_);
+    isoclinesPrecisionSpinBox_ =
+        t->bindWidget("isocline-prc", std::make_unique<WSpinBox>());
     isoclinesPrecisionSpinBox_->setRange(CURVES_PREC_MIN, CURVES_PREC_MAX);
     isoclinesPrecisionSpinBox_->setValue(CURVES_PREC_DEFAULT);
-    t->bindWidget("isocline-prc", isoclinesPrecisionSpinBox_);
     t->bindString("isocline-tooltip-prc", WString::tr("tooltip.prc"));
 
     // plot isocline button
-    isoclinesPlotBtn_ = new WPushButton("Plot isocline", isoclinesContainer_);
-    t->bindWidget("isocline-btn-plot", isoclinesPlotBtn_);
+    isoclinesPlotBtn_ = t->bindWidget(
+        "isocline-btn-plot", std::make_unique<WPushButton>("Plot isocline"));
     t->bindString("isocline-tooltip-plot",
                   WString::tr("tooltip.isocline-plot"));
 
     // delete one button
     isoclinesDelOneBtn_ =
-        new WPushButton("Delete last isocline", isoclinesContainer_);
+        t->bindWidget("isocline-btn-del-one",
+                      std::make_unique<WPushButton>("Delete last isocline"));
     isoclinesDelOneBtn_->setStyleClass("btn btn-warning");
     isoclinesDelOneBtn_->disable();
-    t->bindWidget("isocline-btn-del-one", isoclinesDelOneBtn_);
     t->bindString("isocline-tooltip-del-one",
                   WString::tr("tooltip.isocline-del-one"));
 
     // delete all button
     isoclinesDelAllBtn_ =
-        new WPushButton("Delete all isoclines", isoclinesContainer_);
+        t->bindWidget("isocline-btn-del-all",
+                      std::make_unique<WPushButton>("Delete all isoclines"));
     isoclinesDelAllBtn_->setStyleClass("btn btn-danger");
     isoclinesDelAllBtn_->disable();
-    t->bindWidget("isocline-btn-del-all", isoclinesDelAllBtn_);
     t->bindString("isocline-tooltip-del-all",
                   WString::tr("tooltip.isocline-del-all"));
 
@@ -1212,32 +1204,26 @@ void HomeLeft::hideSettings()
     loggedIn_ = false;
     if (settingsContainer_ != nullptr) {
         tabs_->removeTab(settingsContainer_);
-        delete settingsContainer_;
         settingsContainer_ = nullptr;
     }
     if (viewContainer_ != nullptr) {
         tabs_->removeTab(viewContainer_);
-        delete viewContainer_;
         viewContainer_ = nullptr;
     }
     if (orbitsContainer_ != nullptr) {
         tabs_->removeTab(orbitsContainer_);
-        delete orbitsContainer_;
         orbitsContainer_ = nullptr;
     }
     if (gcfContainer_ != nullptr) {
         tabs_->removeTab(gcfContainer_);
-        delete gcfContainer_;
         gcfContainer_ = nullptr;
     }
     if (curvesContainer_ != nullptr) {
         tabs_->removeTab(curvesContainer_);
-        delete curvesContainer_;
         curvesContainer_ = nullptr;
     }
     if (isoclinesContainer_ != nullptr) {
         tabs_->removeTab(isoclinesContainer_);
-        delete isoclinesContainer_;
         isoclinesContainer_ = nullptr;
     }
 }
@@ -1268,7 +1254,8 @@ void HomeLeft::resetUI()
 void HomeLeft::onRefreshPlotBtn()
 {
     if (!evaluated_) {
-        errorSignal_.emit("Cannot read results, evaluate a vector field first.");
+        errorSignal_.emit(
+            "Cannot read results, evaluate a vector field first.");
     } else {
         g_globalLogger.debug("[HomeLeft] sending refreshPlot signal");
         if (viewComboBox_->currentIndex() == 0) {
@@ -1425,7 +1412,7 @@ void HomeLeft::onPlotGcfBtn()
         g_globalLogger.warning(
             "[HomeLeft] user tried to plot GCF for an un-evaluated VF");
         errorSignal_.emit("Introduce and evaluate a vector field with a common "
-                     "factor first.");
+                          "factor first.");
     } else if (scriptHandler_->str_gcf_ == "0") {
         g_globalLogger.warning(
             "[HomeLeft] user tried to plot a nonexistent GCF");
@@ -1435,7 +1422,7 @@ void HomeLeft::onPlotGcfBtn()
         g_globalLogger.warning("[HomeLeft] user tried to plot GCF without "
                                "plotting vector field first.");
         errorSignal_.emit("Click the main Plot button first\n"
-                     "in order to create the plot window.");
+                          "in order to create the plot window.");
         return;
     } else {
         int npoints = gcfNPointsSpinBox_->value();
@@ -1467,12 +1454,13 @@ void HomeLeft::onPlotCurvesBtn()
 
     // check if vf is evaluated
     if (!evaluated_) {
-        errorSignal_.emit("Cannot plot curve yet, evaluate a vector field first.");
+        errorSignal_.emit(
+            "Cannot plot curve yet, evaluate a vector field first.");
         return;
     }
     if (!plotted_) {
         errorSignal_.emit("Click the main Plot button first\n"
-                     "in order to create the plot window.");
+                          "in order to create the plot window.");
         return;
     }
     // check if a curve has been introduced
@@ -1486,7 +1474,6 @@ void HomeLeft::onPlotCurvesBtn()
     scriptHandler_->str_curve_ = curve;
 
     // prepare file where we transform curve equation into table
-    std::string fname;
     if (fileUploadName_.empty()) {
         fileUploadName_ =
             scriptHandler_->randomFileName(TMP_DIR, "_curve_prep.mpl");
@@ -1598,7 +1585,7 @@ void HomeLeft::onPlotIsoclinesBtn()
     }
     if (!plotted_) {
         errorSignal_.emit("Click the main Plot button first\n"
-                     "in order to create the plot window.");
+                          "in order to create the plot window.");
         return;
     }
     // check if a isocline has been introduced
@@ -1640,8 +1627,9 @@ void HomeLeft::onPlotIsoclinesBtn()
             } catch (const std::out_of_range &e) {
                 g_globalLogger.error(
                     "[HomeLeft] value for isocline slope out of double range");
-                errorSignal_.emit("[HomeLeft] the introduced value for the slope is "
-                             "out\nof double precision range.");
+                errorSignal_.emit(
+                    "[HomeLeft] the introduced value for the slope is "
+                    "out\nof double precision range.");
                 return;
             }
         }
