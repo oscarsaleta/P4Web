@@ -83,50 +83,49 @@ HomeLeft::HomeLeft(WContainerWidget *parent, ScriptHandler *scriptHandler)
 
 HomeLeft::~HomeLeft()
 {
-    /*
     // main widget
 
     if (fileUploadWidget_ != nullptr) {
-        delete fileUploadWidget_;
+        // delete fileUploadWidget_;
         fileUploadWidget_ = nullptr;
     }
 
     if (xEquationInput_ != nullptr) {
-        delete xEquationInput_;
+        // delete xEquationInput_;
         xEquationInput_ = nullptr;
     }
     if (yEquationInput_ != nullptr) {
-        delete yEquationInput_;
+        // delete yEquationInput_;
         yEquationInput_ = nullptr;
     }
     if (gcfEquationInput_ != nullptr) {
-        delete gcfEquationInput_;
+        // delete gcfEquationInput_;
         gcfEquationInput_ = nullptr;
     }
 
     if (evalButton_ != nullptr) {
-        delete evalButton_;
+        // delete evalButton_;
         evalButton_ = nullptr;
     }
     if (plotButton_ != nullptr) {
-        delete plotButton_;
+        // delete plotButton_;
         plotButton_ = nullptr;
     }
     if (prepSaveButton_ != nullptr) {
-        delete prepSaveButton_;
+        // delete prepSaveButton_;
         prepSaveButton_ = nullptr;
     }
     if (saveAnchor_ != nullptr) {
-        delete saveAnchor_;
+        // delete saveAnchor_;
         saveAnchor_ = nullptr;
     }
     if (resetButton_ != nullptr) {
-        delete resetButton_;
+        // delete resetButton_;
         resetButton_ = nullptr;
     }
 
     if (equationsBox_ != nullptr) {
-        delete equationsBox_;
+        // delete equationsBox_;
         equationsBox_ = nullptr;
     }
 
@@ -135,10 +134,9 @@ HomeLeft::~HomeLeft()
     if (loggedIn_)
         hideSettings();
     if (tabs_ != nullptr) {
-        delete tabs_;
+        // delete tabs_;
         tabs_ = nullptr;
     }
-    */
 
     g_globalLogger.debug("[HomeLeft] deleted correctly");
 }
@@ -748,11 +746,11 @@ void HomeLeft::showSettings()
 {
     loggedIn_ = true;
     if (settingsContainer_ != nullptr) {
-        delete settingsContainer_;
+        // delete settingsContainer_;
         settingsContainer_ = nullptr;
     }
     if (viewContainer_ != nullptr) {
-        delete viewContainer_;
+        // delete viewContainer_;
         viewContainer_ = nullptr;
     }
 
