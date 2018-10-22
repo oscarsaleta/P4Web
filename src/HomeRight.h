@@ -16,8 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef HOMERIGHT_H
-#define HOMERIGHT_H
+#pragma once
 
 /*!
  * @brief Right side of the UI
@@ -29,8 +28,6 @@
 #include "ScriptHandler.h"
 
 #include <Wt/WString>
-
-#include <boost/shared_ptr.hpp>
 
 class WSphere;
 
@@ -319,23 +316,23 @@ class HomeRight : public Wt::WContainerWidget
 
     // parameters tab
     Wt::WContainerWidget *paramsContainer_;
-    Wt::WScrollArea *paramsScrollArea_;
+    Wt::WContainerWidget *paramsScrollArea_;
     Wt::WContainerWidget *paramsScrollAreaContainer_;
     Wt::WPushButton *addParamBtn_;
     Wt::WPushButton *delParamBtn_;
-    std::vector<boost::shared_ptr<Wt::WLineEdit>> leLabelsVector_;
-    std::vector<boost::shared_ptr<Wt::WLineEdit>> leValuesVector_;
-    std::vector<boost::shared_ptr<Wt::WTemplate>> templatesVector_;
+    std::vector<Wt::WLineEdit *> leLabelsVector_;
+    std::vector<Wt::WLineEdit *> leValuesVector_;
+    std::vector<Wt::WTemplate *> templatesVector_;
 
     // output tab
     Wt::WContainerWidget *outputContainer_;
     Wt::WTextArea *outputTextArea_;
     Wt::WString outputTextAreaContent_;
     Wt::WToolBar *outputButtonsToolbar_;
-    Wt::WPushButton *fullResButton_;
-    Wt::WPushButton *finResButton_;
-    Wt::WPushButton *infResButton_;
-    Wt::WPushButton *clearOutputButton_;
+    std::unique_ptr<Wt::WPushButton> fullResButton_;
+    std::unique_ptr<Wt::WPushButton> finResButton_;
+    std::unique_ptr<Wt::WPushButton> infResButton_;
+    std::unique_ptr<Wt::WPushButton> clearOutputButton_;
 
     std::string fileName_;
     std::string fullResults_;
@@ -343,7 +340,7 @@ class HomeRight : public Wt::WContainerWidget
     std::string infResults_;
 
     // plot tab
-    WSphere *sphere_;
+    std::unique_ptr<WSphere> sphere_;
     std::string sphereBasename_;
 
     Wt::WContainerWidget *plotContainer_;
@@ -383,5 +380,3 @@ class HomeRight : public Wt::WContainerWidget
     Wt::Signal<bool> curveConfirmedSignal_;
     Wt::Signal<bool> isoclineConfirmedSignal_;
 };
-
-#endif // HOMERIGHT_H

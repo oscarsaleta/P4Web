@@ -23,7 +23,9 @@
 
 #include <fstream>
 
+#include <Wt/WContainerWidget.h>
 #include <Wt/WLineEdit.h>
+#include <Wt/WMenuItem.h>
 #include <Wt/WMessageBox.h>
 #include <Wt/WPushButton.h>
 #include <Wt/WTabWidget.h>
@@ -57,55 +59,54 @@ HomeRight::~HomeRight()
 {
     // output tab
     if (fullResButton_ != nullptr) {
-        delete fullResButton_;
+        // delete fullResButton_;
         fullResButton_ = nullptr;
     }
     if (finResButton_ != nullptr) {
-        delete finResButton_;
+        // delete finResButton_;
         finResButton_ = nullptr;
     }
     if (infResButton_ != nullptr) {
-        delete infResButton_;
+        // delete infResButton_;
         infResButton_ = nullptr;
     }
     if (clearOutputButton_ != nullptr) {
-        delete clearOutputButton_;
+        // delete clearOutputButton_;
         clearOutputButton_ = nullptr;
     }
     if (outputButtonsToolbar_ != nullptr) {
-        delete outputButtonsToolbar_;
+        // delete outputButtonsToolbar_;
         outputButtonsToolbar_ = nullptr;
     }
     if (outputTextArea_ != nullptr) {
-        delete outputTextArea_;
+        // delete outputTextArea_;
         outputTextArea_ = nullptr;
     }
     if (outputContainer_ != nullptr) {
-        delete outputContainer_;
+        // delete outputContainer_;
         outputContainer_ = nullptr;
     }
 
     // plot tab
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
+    if (sphere_) {
+        sphere_.reset();
     }
     if (plotCaption_ != nullptr) {
-        delete plotCaption_;
+        // delete plotCaption_;
         plotCaption_ = nullptr;
     }
     if (plotContainer_ != nullptr) {
-        delete plotContainer_;
+        // delete plotContainer_;
         plotContainer_ = nullptr;
     }
 
     // parameters tab
     if (addParamBtn_ != nullptr) {
-        delete addParamBtn_;
+        // delete addParamBtn_;
         addParamBtn_ = nullptr;
     }
     if (delParamBtn_ != nullptr) {
-        delete delParamBtn_;
+        // delete delParamBtn_;
         delParamBtn_ = nullptr;
     }
     std::vector<std::string>().swap(paramLabels_);
@@ -114,13 +115,13 @@ HomeRight::~HomeRight()
     leValuesVector_.clear();
     templatesVector_.clear();
     if (paramsScrollArea_ != nullptr) {
-        delete paramsScrollArea_;
+        // delete paramsScrollArea_;
         paramsScrollArea_ = nullptr;
     }
 
     // tab widget
     if (tabWidget_ != nullptr) {
-        delete tabWidget_;
+        // delete tabWidget_;
         tabWidget_ = nullptr;
     }
 
@@ -129,63 +130,64 @@ HomeRight::~HomeRight()
 
 void HomeRight::setupUI()
 {
-    tabWidget_ = new WTabWidget(this);
+    tabWidget_ = addWidget(std::make_unique<WTabWidget>());
     tabWidget_->setId("tabWidget_");
 
     // output tab ----
-    outputContainer_ = new WContainerWidget();
+    outputContainer_ =
+        tabWidget_->addTab(std::make_unique<WContainerWidget>(),
+                           WString::fromUTF8("Output"), ContentLoading::Eager);
     outputContainer_->setId("outputContainer_");
-    tabWidget_->addTab(outputContainer_, WString::fromUTF8("Output"),
-                       WTabWidget::PreLoading);
 
     // text area where results are shown
     outputTextAreaContent_ = "";
-    outputTextArea_ = new WTextArea(outputTextAreaContent_);
+    outputTextArea_ = outputContainer_->addWidget(
+        std::make_unique<WTextArea>(outputTextAreaContent_));
     outputTextArea_->setId("outputTextArea_");
     outputTextArea_->setReadOnly(true);
     outputTextArea_->setMinimumSize(550, 550);
     outputTextArea_->resize(WLength::Auto, 550);
-    outputTextArea_->setMargin(5, Top);
-    outputContainer_->addWidget(outputTextArea_);
+    outputTextArea_->setMargin(5, Side::Top);
 
     // buttons menu for choosing output
-    outputButtonsToolbar_ = new WToolBar(outputContainer_);
+    outputButtonsToolbar_ =
+        outputContainer_->addWidget(std::make_unique<WToolBar>());
     outputButtonsToolbar_->setId("outputButtonsToolbar_");
-    outputButtonsToolbar_->setMargin(5, Top);
-    outputButtonsToolbar_->setMargin(5, Bottom);
+    outputButtonsToolbar_->setMargin(5, Side::Top);
+    outputButtonsToolbar_->setMargin(5, Side::Bottom);
 
-    fullResButton_ = new WPushButton("Full output");
+    fullResButton_ = std::make_unique<WPushButton>("Full output");
     fullResButton_->setId("fullResButton_");
     fullResButton_->setStyleClass("btn-default btn");
     fullResButton_->setToolTip(WString::tr("tooltip.homeright-full-button"));
-    outputButtonsToolbar_->addButton(fullResButton_);
+    outputButtonsToolbar_->addButton(std::move(fullResButton_));
 
-    finResButton_ = new WPushButton("Finite");
+    finResButton_ = std::make_unique<WPushButton>("Finite");
     finResButton_->setId("finResButton_");
     finResButton_->setStyleClass("btn-default btn");
     finResButton_->setToolTip(WString::tr("tooltip.homeright-finite-button"));
-    outputButtonsToolbar_->addButton(finResButton_);
+    outputButtonsToolbar_->addButton(std::move(finResButton_));
 
-    infResButton_ = new WPushButton("Infinite");
+    infResButton_ = std::make_unique<WPushButton>("Infinite");
     infResButton_->setId("infResButton_");
     infResButton_->setStyleClass("btn-default btn");
     infResButton_->setToolTip(WString::tr("tooltip.homeright-infinite-button"));
-    outputButtonsToolbar_->addButton(infResButton_);
+    outputButtonsToolbar_->addButton(std::move(infResButton_));
 
     outputButtonsToolbar_->addSeparator();
 
-    clearOutputButton_ = new WPushButton("Clear");
+    clearOutputButton_ = std::make_unique<WPushButton>("Clear");
     clearOutputButton_->setId("clearOutputButton_");
     clearOutputButton_->setStyleClass("btn-warning btn");
     clearOutputButton_->setToolTip(
         WString::tr("tooltip.homeright-clear-button"));
-    outputButtonsToolbar_->addButton(clearOutputButton_);
+    outputButtonsToolbar_->addButton(std::move(clearOutputButton_));
 
     // plot tab ----
-    plotContainer_ = new WContainerWidget();
+    plotContainer_ =
+        tabWidget_->addTab(std::make_unique<WContainerWidget>(),
+                           WString::fromUTF8("Plot"), ContentLoading::Eager);
     plotContainer_->setId("plotContainer_");
-    tabWidget_->addTab(plotContainer_, WString::fromUTF8("Plot"),
-                       WTabWidget::PreLoading);
 
     // TODO: add plot separatrices, orbits, etc buttons?
     /*plotButtonsToolbar_ = new WToolBar(plotContainer_);
@@ -215,30 +217,32 @@ void HomeRight::setupUI()
     // parameters tab ------
     paramsContainer_ = tabWidget_->addTab(std::make_unique<WContainerWidget>(),
                                           WString::fromUTF8("Parameters"),
-                                          WTabWidget::LazyLoading);
+                                          ContentLoading::Lazy);
 
     addParamBtn_ =
         paramsContainer_->addWidget(std::make_unique<WPushButton>("Add"));
     addParamBtn_->setId("addParamBtn_");
     addParamBtn_->setStyleClass("btn btn-primary");
-    addParamBtn_->setMargin(15, Top);
-    addParamBtn_->setMargin(15, Bottom);
+    addParamBtn_->setMargin(15, Side::Top);
+    addParamBtn_->setMargin(15, Side::Bottom);
     addParamBtn_->setToolTip(WString::tr("tooltip.homeright-addparam-button"));
 
-    delParamBtn_ = new WPushButton("Remove", paramsContainer_);
+    delParamBtn_ =
+        paramsContainer_->addWidget(std::make_unique<WPushButton>("Remove"));
     delParamBtn_->setId("delParamBtn_");
     delParamBtn_->setStyleClass("btn btn-danger");
     delParamBtn_->setToolTip(WString::tr("tooltip.homeright-delparam-button"));
-    delParamBtn_->setMargin(15, Top);
-    delParamBtn_->setMargin(15, Bottom);
-    delParamBtn_->setMargin(10, Left);
+    delParamBtn_->setMargin(15, Side::Top);
+    delParamBtn_->setMargin(15, Side::Bottom);
+    delParamBtn_->setMargin(10, Side::Left);
 
-    paramsScrollArea_ = new WContainerWidget(paramsContainer_);
+    paramsScrollArea_ =
+        paramsContainer_->addWidget(std::make_unique<WContainerWidget>());
     paramsScrollArea_->setOverflow(Wt::Overflow::Auto, Orientation::Vertical);
-    paramsScrollAreaContainer_ = new WContainerWidget();
-    paramsScrollArea_->setWidget(paramsScrollAreaContainer_);
-    paramsScrollArea_->setHorizontalScrollBarPolicy(
-        WScrollArea::ScrollBarAlwaysOff);
+    // paramsScrollAreaContainer_ = new WContainerWidget();
+    // paramsScrollArea_->setWidget(paramsScrollAreaContainer_);
+    // paramsScrollArea_->setHorizontalScrollBarPolicy(
+    // WScrollArea::ScrollBarAlwaysOff);
     paramsScrollArea_->setMinimumSize(550, 550);
     paramsScrollArea_->resize(WLength::Auto, 550);
 
@@ -340,13 +344,12 @@ void HomeRight::clearResults()
 
 void HomeRight::onSpherePlot(std::string basename, double projection)
 {
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
+    if (sphere_) {
+        sphere_.reset();
     }
     sphereBasename_ = basename;
-    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550, basename,
-                          projection);
+    sphere_ = std::make_unique<WSphere>(plotContainer_, scriptHandler_, 550,
+                                        550, basename, projection);
     setupSphereAndPlot();
     g_globalLogger.debug("[HomeRight] reacted to onSpherePlot signal");
 }
@@ -354,13 +357,13 @@ void HomeRight::onSpherePlot(std::string basename, double projection)
 void HomeRight::onPlanePlot(std::string basename, int type, double minx,
                             double maxx, double miny, double maxy)
 {
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
+    if (sphere_) {
+        sphere_.reset();
     }
     sphereBasename_ = basename;
-    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550, basename,
-                          type, minx, maxx, miny, maxy);
+    sphere_ =
+        std::make_unique<WSphere>(plotContainer_, scriptHandler_, 550, 550,
+                                  basename, type, minx, maxx, miny, maxy);
     setupSphereAndPlot();
     g_globalLogger.debug("[HomeRight] reacted to onPlanePlot signal");
 }
@@ -368,17 +371,15 @@ void HomeRight::onPlanePlot(std::string basename, int type, double minx,
 void HomeRight::setupSphereAndPlot()
 {
     sphere_->setId("sphere_");
-    sphere_->setMargin(5, Top);
-    plotContainer_->addWidget(sphere_);
+    sphere_->setMargin(5, Side::Top);
+    plotContainer_->addWidget(std::move(sphere_));
 
     if (plotCaption_ != nullptr) {
-        delete plotCaption_;
-        plotCaption_ = nullptr;
+        plotCaption_->removeFromParent();
     }
 
-    plotCaption_ = new WText(plotContainer_);
+    plotCaption_ = addWidget(std::make_unique<WText>());
     plotCaption_->setId("plotCaption_");
-    plotContainer_->addWidget(plotCaption_);
 
     sphere_->hoverSignal().connect(this, &HomeRight::mouseMovedEvent);
     sphere_->errorSignal().connect(this, &HomeRight::printError);
@@ -401,9 +402,8 @@ void HomeRight::sphereClicked(bool clickValid, double x, double y)
 void HomeRight::onReset(int dummy)
 {
     g_globalLogger.debug("[HomeRight] Deleting sphere...");
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
+    if (sphere_) {
+        sphere_.reset();
     }
 
     outputTextAreaContent_ = std::string();
@@ -436,7 +436,7 @@ void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
 
     // update with flag PaintUpdate so widget is not cleared before painting
     // orbit
-    sphere_->update(PaintUpdate);
+    sphere_->update(PaintFlag::Update);
     if (tabWidget_->currentIndex() != 1)
         tabWidget_->setCurrentIndex(1);
 }
@@ -471,7 +471,7 @@ void HomeRight::onGcfEval(std::string fname, int pointdash, int npoints,
     sphere_->gcfNPoints_ = npoints;
     sphere_->gcfPrec_ = prec;
     sphere_->plotDone_ = false;
-    sphere_->update(PaintUpdate);
+    sphere_->update(PaintFlag::Update);
     if (tabWidget_->currentIndex() != 1)
         tabWidget_->setCurrentIndex(1);
 }
@@ -493,35 +493,34 @@ void HomeRight::plotSeparatrices()
 
 void HomeRight::addParameter()
 {
-    WTemplate *t = new WTemplate(WString::tr("template.params"),
-                                 paramsScrollAreaContainer_);
+    auto t = paramsScrollArea_->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.params")));
     t->addFunction("id", WTemplate::Functions::id);
-    templatesVector_.push_back(boost::shared_ptr<WTemplate>(t));
+    templatesVector_.push_back(t);
 
-    WLineEdit *label = new WLineEdit(paramsScrollAreaContainer_);
-    leLabelsVector_.push_back(boost::shared_ptr<WLineEdit>(label));
-    t->bindWidget("label", label);
-    WLineEdit *value = new WLineEdit(paramsScrollAreaContainer_);
-    leValuesVector_.push_back(boost::shared_ptr<WLineEdit>(value));
-    t->bindWidget("value", value);
+    auto label = t->bindWidget("label", std::make_unique<WLineEdit>());
+    leLabelsVector_.push_back(label);
+
+    auto value = t->bindWidget("value", std::make_unique<WLineEdit>());
+    leValuesVector_.push_back(value);
 }
 
 void HomeRight::addParameterWithValue(std::string strlabel,
                                       std::string strvalue)
 {
-    WTemplate *t = new WTemplate(WString::tr("template.params"),
-                                 paramsScrollAreaContainer_);
+    auto t = paramsScrollArea_->addWidget(
+        std::make_unique<WTemplate>(WString::tr("template.params")));
     t->addFunction("id", WTemplate::Functions::id);
-    templatesVector_.push_back(boost::shared_ptr<WTemplate>(t));
+    templatesVector_.push_back(t);
 
-    WLineEdit *label = new WLineEdit(paramsScrollAreaContainer_);
+    auto label = t->bindWidget(
+        "label", std::make_unique<WLineEdit>(paramsScrollAreaContainer_));
     label->setText(strlabel);
-    leLabelsVector_.push_back(boost::shared_ptr<WLineEdit>(label));
-    t->bindWidget("label", label);
-    WLineEdit *value = new WLineEdit(paramsScrollAreaContainer_);
+    leLabelsVector_.push_back(label);
+    auto value = t->bindWidget(
+        "value", std::make_unique<WLineEdit>(paramsScrollAreaContainer_));
     value->setText(strvalue);
-    leValuesVector_.push_back(boost::shared_ptr<WLineEdit>(value));
-    t->bindWidget("value", value);
+    leValuesVector_.push_back(value);
 
     if (tabWidget_->currentIndex() != 2)
         tabWidget_->setCurrentIndex(2);
@@ -530,23 +529,23 @@ void HomeRight::addParameterWithValue(std::string strlabel,
 void HomeRight::delParameter()
 {
     if (!leLabelsVector_.empty()) {
-        boost::shared_ptr<WLineEdit> label = leLabelsVector_.back();
+        auto label = leLabelsVector_.back();
         if (label != nullptr) {
-            label.reset();
+            label->removeFromParent();
             leLabelsVector_.pop_back();
         }
     }
     if (!leValuesVector_.empty()) {
-        boost::shared_ptr<WLineEdit> value = leValuesVector_.back();
+        auto value = leValuesVector_.back();
         if (value != nullptr) {
-            value.reset();
+            value->removeFromParent();
             leValuesVector_.pop_back();
         }
     }
     if (!templatesVector_.empty()) {
-        boost::shared_ptr<WTemplate> t = templatesVector_.back();
+        auto t = templatesVector_.back();
         if (t != nullptr) {
-            t.reset();
+            t->removeFromParent();
             templatesVector_.pop_back();
         }
     }
@@ -593,11 +592,9 @@ void HomeRight::refreshParamStringVectors()
         std::vector<std::string>().swap(scriptHandler_->paramValues_);
     }
 
-    std::vector<boost::shared_ptr<WLineEdit>>::const_iterator it1;
-    std::vector<boost::shared_ptr<WLineEdit>>::const_iterator it2;
-    for (it1 = leLabelsVector_.begin(), it2 = leValuesVector_.begin();
+    for (auto it1 = leLabelsVector_.begin(), it2 = leValuesVector_.begin();
          it1 != leLabelsVector_.end(), it2 != leValuesVector_.end();
-         it1++, it2++) {
+         ++it1, ++it2) {
         if ((*it1)->text().empty() || (*it2)->text().empty())
             continue;
         scriptHandler_->paramLabels_.push_back((*it1)->text().toUTF8());
@@ -664,7 +661,7 @@ void HomeRight::onCurvePlot(std::string fname, int pointdash, int npoints,
     }
 
     // 3. plot
-    sphere_->update(PaintUpdate);
+    sphere_->update(PaintFlag::Update);
 
     // 4. Focus plot tab
     tabWidget_->setCurrentIndex(1);
@@ -751,7 +748,7 @@ void HomeRight::onIsoclinePlot(std::string fname, int pointdash, int npoints,
     // 3. assign color and plot
     int nisocs = (sphere_->study_->isocline_vector_.size() - 1) % 4;
     sphere_->study_->isocline_vector_.back().color = CISOC + nisocs;
-    sphere_->update(PaintUpdate);
+    sphere_->update(PaintFlag::Update);
 
     // 4. Focus plot tab
     tabWidget_->setCurrentIndex(1);
@@ -789,13 +786,12 @@ void HomeRight::refreshPlotSphere(double p)
         study = nullptr;
     }
 
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
+    if (sphere_) {
+        sphere_.reset();
     }
 
-    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550,
-                          sphereBasename_, p, study);
+    sphere_ = std::make_unique<WSphere>(plotContainer_, scriptHandler_, 550,
+                                        550, sphereBasename_, p, study);
     setupSphereAndPlot();
 }
 
@@ -811,12 +807,12 @@ void HomeRight::refreshPlotPlane(int type, double minx, double maxx,
         study = nullptr;
     }
 
-    if (sphere_ != nullptr) {
-        delete sphere_;
-        sphere_ = nullptr;
+    if (sphere_) {
+        sphere_.reset();
     }
 
-    sphere_ = new WSphere(plotContainer_, scriptHandler_, 550, 550,
-                          sphereBasename_, type, minx, maxx, miny, maxy, study);
+    sphere_ = std::make_unique<WSphere>(plotContainer_, scriptHandler_, 550,
+                                        550, sphereBasename_, type, minx, maxx,
+                                        miny, maxy, study);
     setupSphereAndPlot();
 }
