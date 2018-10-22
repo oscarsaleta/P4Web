@@ -23,13 +23,12 @@
  * @file HomeRight.h
  * @author Oscar Saleta
  */
-#include <Wt/WContainerWidget>
+#include <Wt/WContainerWidget.h>
 
 #include "ScriptHandler.h"
+#include "WSphere.h"
 
-#include <Wt/WString>
-
-class WSphere;
+#include <Wt/WString.h>
 
 /**
  * This class holds the UI from the right side of the website
@@ -368,7 +367,7 @@ class HomeRight : public Wt::WContainerWidget
     // plot functions
     void setupSphereAndPlot();
 
-    void sphereClicked(Wt::WMouseEvent e);
+    void sphereClicked(bool clickValid, double x, double y);
 
     /*void plotSingularPoints();
     void plotSeparatrices();

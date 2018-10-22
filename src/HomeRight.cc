@@ -443,7 +443,7 @@ void HomeRight::onOrbitsIntegrate(int dir, double x0, double y0)
 
 void HomeRight::onOrbitsDelete(int flag)
 {
-    if (sphere_ == nullptr || sphere_->study_ == nullptr ||
+    if (!sphere_ || sphere_->study_ == nullptr ||
         sphere_->study_->orbit_vector_.empty())
         return;
 
