@@ -34,8 +34,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WIN_SPHERE_H
-#define WIN_SPHERE_H
+#pragma once
 
 /*!
  * @brief This file implements the class WSphere
@@ -48,15 +47,18 @@
  * projection.
  */
 
+#include <Wt/WPaintedWidget.h>
+
+#include <vector>
+
+#include <Wt/WContainerWidget.h>
+#include <Wt/WPaintDevice.h>
+#include <Wt/WPainter.h>
+#include <Wt/WPointF.h>
+
 #include "ScriptHandler.h"
 #include "custom.h"
 #include "file_tab.h"
-
-#include <Wt/WContainerWidget>
-#include <Wt/WPaintDevice>
-#include <Wt/WPaintedWidget>
-#include <Wt/WPainter>
-#include <Wt/WPointF>
 
 #define EVAL_GCF_NONE 0            ///< no gcf evaluation
 #define EVAL_GCF_R2 1              ///< gcf evaluation in R^2
@@ -123,19 +125,18 @@ class WSphere : public Wt::WPaintedWidget
   public:
     /**
      * Constructor method for a spherical plot
-     * @param parent       container widget which created the sphere
      * @param width         width of the painting area
      * @param height        height of the painting area
      * @param basename      name of the file that contains Maple output for the
      * current vector field
      * @param projection    projection for the sphere
+     * @param study         WVFStudy that supports the contents of this WSphere
      */
-    WSphere(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0,
-            int width = 255, int height = 255, std::string basename = "",
-            double projection = -1.0, WVFStudy *study = 0);
+    WSphere(ScriptHandler *s = 0, int width = 255, int height = 255,
+            std::string basename = "", double projection = -1.0,
+            std::unique_ptr<WVFStudy> study = 0);
     /**
      * Constructor method for a planar (or chart) plot
-     * @param parent   container widget which created the sphere
      * @param width     width of the painting area
      * @param height    height of the painting area
      * @param basename  name of the file that contains Maple output for the
@@ -145,19 +146,21 @@ class WSphere : public Wt::WPaintedWidget
      * @param maxx      maximum x for plot
      * @param miny      minimum y for plot
      * @param maxy      maximum y for plot
+     * @param study     WVFStudy that supports the contents of this WSphere
      */
-    WSphere(Wt::WContainerWidget *parent = 0, ScriptHandler *s = 0,
-            int width = 255, int height = 255, std::string basename = "",
-            int type = 1, double minx = -1, double maxx = 1, double miny = -1,
-            double maxy = 1, WVFStudy *study = 0);
+    WSphere(ScriptHandler *s = 0, int width = 255, int height = 255,
+            std::string basename = "", int type = 1, double minx = -1,
+            double maxx = 1, double miny = -1, double maxy = 1,
+            std::unique_ptr<WVFStudy> study = 0);
     /**
      * Destructor method
      */
     ~WSphere();
 
-    int width_;       ///< width of the plotting area
-    int height_;      ///< height of the plotting area
-    WVFStudy *study_; ///< WVFStudy object which will parse results from Maple
+    int width_;  ///< width of the plotting area
+    int height_; ///< height of the plotting area
+    std::unique_ptr<WVFStudy>
+        study_; ///< WVFStudy object which will parse results from Maple
     std::string basename_; ///< filename where Maple output is stored
     int typeOfView_;       ///< type of view for *study_
     int projection_;       ///< used for sphere view
@@ -173,10 +176,10 @@ class WSphere : public Wt::WPaintedWidget
      */
     int coWinX(double x);
     /**
-    * Y Coordinate change: from world (double) to window (int) coordinates
-    * @param  y coordinate to transform
-    * @return   transformed coordinate
-    */
+     * Y Coordinate change: from world (double) to window (int) coordinates
+     * @param  y coordinate to transform
+     * @return   transformed coordinate
+     */
     int coWinY(double y);
     /**
      * X Coordinate change: from window (int) to world (double) coordinates
@@ -203,23 +206,23 @@ class WSphere : public Wt::WPaintedWidget
      */
     int coWinV(double deltay);
 
-    double x0; ///< world-coordinates of upper-left corner
-    double y0; ///< world-coordinates of upper-left corner
-    double x1; ///< world-coordinates of upper-right corner
-    double y1; ///< world-coordinates of upper-right corner
-    double dx; ///< x1-x0
-    double dy; ///< y1-y0
+    double x0_; ///< world-coordinates of upper-left corner
+    double y0_; ///< world-coordinates of upper-left corner
+    double x1_; ///< world-coordinates of upper-right corner
+    double y1_; ///< world-coordinates of upper-right corner
+    double dx_; ///< x1-x0
+    double dy_; ///< y1-y0
 
-    int paintedXMin; /**< to know the update rectangle after painting
+    int paintedXMin_; /**< to know the update rectangle after painting
                      we keep to smallest rectangle enclosing
                      all painted objects. */
-    int paintedXMax; /**< to know the update rectangle after painting
+    int paintedXMax_; /**< to know the update rectangle after painting
                      we keep to smallest rectangle enclosing
                      all painted objects. */
-    int paintedYMin; /**< to know the update rectangle after painting
+    int paintedYMin_; /**< to know the update rectangle after painting
                      we keep to smallest rectangle enclosing
                      all painted objects. */
-    int paintedYMax; /**< to know the update rectangle after painting
+    int paintedYMax_; /**< to know the update rectangle after painting
                      we keep to smallest rectangle enclosing
                      all painted objects. */
 
@@ -235,11 +238,11 @@ class WSphere : public Wt::WPaintedWidget
     /**
      * background color
      */
-    int spherebgcolor;
+    int spherebgcolor_;
     /**
      * next WSphere (linked list)
      */
-    WSphere *next;
+    // WSphere *next;
     // int SelectingX, SelectingY, SelectingPointStep, SelectingPointRadius;
     // QTimer * SelectingTimer;
 
@@ -322,7 +325,7 @@ class WSphere : public Wt::WPaintedWidget
     // void MarkSelection( int x1, int y1, int x2, int y2, int selectiontype );
 
     /**
-     * Produce a linked list of lines with the shape of an ellipse
+     * Produce a vector of lines with the shape of an ellipse
      * @param  cx     x coordinate of center
      * @param  cy     y coordinate of center
      * @param  a      major semi axis
@@ -330,10 +333,11 @@ class WSphere : public Wt::WPaintedWidget
      * @param  dotted is the ellipse dotted or a line
      * @param  resa   @p a converted to window length
      * @param  resb   @p b converted to window length
-     * @return        linked list of lines that form the ellipse
+     * @return        vector of lines that form the ellipse
      */
-    P4POLYLINES *produceEllipse(double cx, double cy, double a, double b,
-                                bool dotted, double resa, double resb);
+    std::vector<P4POLYLINES> produceEllipse(double cx, double cy, double a,
+                                            double b, bool dotted, double resa,
+                                            double resb);
 
     /**
      * Draw a point with a given color
@@ -446,7 +450,7 @@ class WSphere : public Wt::WPaintedWidget
      * This makes possible to distribute painting to different functions and
      * compiling units (even from outside the object)
      */
-    Wt::WPainter *staticPainter;
+    Wt::WPainter *staticPainter_;
 
     /**
      * Flag used to not replot every time we just want to update something
@@ -588,22 +592,18 @@ class WSphere : public Wt::WPaintedWidget
     Wt::Signal<std::string> errorSignal_;
 
     /**
-     * parent widget (stored from @c parent, argument passed to constructor)
-     */
-    Wt::WContainerWidget *parentWnd;
-    /**
      * when calculating coordinates: this determines orientation of horizontal
      * axis.  Normally false, only true when printing.
      */
-    bool ReverseYaxis;
+    bool reverseYaxis_;
     /**
      * linked list of lines that form the Poincaré circle
      */
-    P4POLYLINES *CircleAtInfinity;
+    std::vector<P4POLYLINES> circleAtInfinity_;
     /**
      * linked list of lines that form the Poincaré-Lyapunov circle
      */
-    P4POLYLINES *PLCircle;
+    std::vector<P4POLYLINES> pLCircle_;
 
     /**
      * used for plot caption
@@ -663,5 +663,3 @@ class WSphere : public Wt::WPaintedWidget
     // flag to know if study was copied or will be created
     bool studyCopied_;
 };
-
-#endif /* WIN_SPHERE_H */
