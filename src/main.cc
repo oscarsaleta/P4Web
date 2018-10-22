@@ -52,13 +52,13 @@
 #include "MyApplication.h"
 #include "Session.h"
 
-#include <Wt/WServer>
+#include <Wt/WServer.h>
 
 using namespace Wt;
 
-WApplication *createApplication(const WEnvironment &env)
+std::unique_ptr<WApplication> createApplication(const WEnvironment &env)
 {
-    return new MyApplication(env);
+    return std::make_unique<MyApplication>(env);
 }
 
 int main(int argc, char **argv)
@@ -69,8 +69,8 @@ int main(int argc, char **argv)
         server.addEntryPoint(Wt::Application, createApplication, "/WP4.wt",
                              "favicon.ico");
 #else
-        server.addEntryPoint(Wt::Application, createApplication, std::string(),
-                             "favicon.ico");
+        server.addEntryPoint(EntryPointType::Application, createApplication,
+                             std::string(), "favicon.ico");
 #endif
         Session::configureAuth();
         server.run();
