@@ -229,18 +229,17 @@ struct isoclines {
  * A point (x,y) is translated to F(x,y)=(c1*x^d1*y^d2,c2*x^d3*y^d4)/x^d
  */
 struct transformations {
-    double x0; ///< translation point
-    double y0; ///< translation point
-    int c1;    ///< coefficients for F(x,y)
-    int c2;    ///< coefficients for F(x,y)
-    int d1;    ///< coefficients for F(x,y)
-    int d2;    ///< coefficients for F(x,y)
-    int d3;    ///< coefficients for F(x,y)
-    int d4;    ///< coefficients for F(x,y)
-    int d;     ///< X/x^d
-    struct transformations
-        *next_trans; /**< pointer to next transformations (linked
-                        list) */
+    double x0;                          ///< translation point
+    double y0;                          ///< translation point
+    int c1;                             ///< coefficients for F(x,y)
+    int c2;                             ///< coefficients for F(x,y)
+    int d1;                             ///< coefficients for F(x,y)
+    int d2;                             ///< coefficients for F(x,y)
+    int d3;                             ///< coefficients for F(x,y)
+    int d4;                             ///< coefficients for F(x,y)
+    int d;                              ///< X/x^d
+    struct transformations *next_trans; /**< pointer to next transformations
+                                           (linked list) */
 
     /**
      * Constructor method
@@ -601,8 +600,8 @@ class WVFStudy
 
     // limit cycles
 
-    //orbits *first_lim_cycle_; ///< linked list of limit cycles
-    //orbits *current_lim_cycle_; ///< current limit cycle for plotting
+    // orbits *first_lim_cycle_; ///< linked list of limit cycles
+    // orbits *current_lim_cycle_; ///< current limit cycle for plotting
 
     // ------ Configuration
 
@@ -638,7 +637,7 @@ class WVFStudy
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*viewcoord_to_sphere)(double, double, double *);
+    void (WVFStudy::*viewcoord_to_sphere)(double, double, double *) = nullptr;
     /**
      * Sphere coordinates to current view coordinates
      *
@@ -647,7 +646,8 @@ class WVFStudy
      * math_charts.cc.
      */
     bool (WVFStudy::*sphere_to_viewcoordpair)(double *, double *, double *,
-                                              double *, double *, double *);
+                                              double *, double *,
+                                              double *) = nullptr;
 
     /**
      * Finite coordinates to current view coordinates
@@ -656,7 +656,7 @@ class WVFStudy
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*finite_to_viewcoord)(double, double, double *);
+    void (WVFStudy::*finite_to_viewcoord)(double, double, double *) = nullptr;
     /**
      * Sphere coordinates to current view coordinates
      *
@@ -664,7 +664,8 @@ class WVFStudy
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*sphere_to_viewcoord)(double, double, double, double *);
+    void (WVFStudy::*sphere_to_viewcoord)(double, double, double,
+                                          double *) = nullptr;
     /**
      * Check whether current view coordinates are valid
      *
@@ -672,7 +673,7 @@ class WVFStudy
      * on the current view coordinates). The functions are implemented in
      * math_charts.cc.
      */
-    bool (WVFStudy::*is_valid_viewcoord)(double, double, double *);
+    bool (WVFStudy::*is_valid_viewcoord)(double, double, double *) = nullptr;
     /**
      * Integrate separatrices in current sphere
      *
@@ -682,7 +683,7 @@ class WVFStudy
      */
     void (WVFStudy::*integrate_sphere_sep)(double, double, double, double *,
                                            double *, int *, int *, int *, int *,
-                                           double, double);
+                                           double, double) = nullptr;
     /**
      * U1 chart coordinates to sphere coordinates
      *
@@ -690,7 +691,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*U1_to_sphere)(double, double, double *);
+    void (WVFStudy::*U1_to_sphere)(double, double, double *) = nullptr;
     /**
      * U2 chart coordinates to sphere coordinates
      *
@@ -698,7 +699,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*U2_to_sphere)(double, double, double *);
+    void (WVFStudy::*U2_to_sphere)(double, double, double *) = nullptr;
     /**
      * V1 chart coordinates to sphere coordinates
      *
@@ -706,7 +707,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*V1_to_sphere)(double, double, double *);
+    void (WVFStudy::*V1_to_sphere)(double, double, double *) = nullptr;
     /**
      * V2 chart coordinates to sphere coordinates
      *
@@ -714,7 +715,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*V2_to_sphere)(double, double, double *);
+    void (WVFStudy::*V2_to_sphere)(double, double, double *) = nullptr;
     /**
      * Sphere coordinates to U1 chart coordinates
      *
@@ -722,7 +723,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*sphere_to_U1)(double, double, double, double *);
+    void (WVFStudy::*sphere_to_U1)(double, double, double, double *) = nullptr;
     /**
      * Sphere coordinates to U2 chart coordinates
      *
@@ -730,7 +731,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*sphere_to_U2)(double, double, double, double *);
+    void (WVFStudy::*sphere_to_U2)(double, double, double, double *) = nullptr;
     /**
      * Sphere coordinates to V1 chart coordinates
      *
@@ -738,7 +739,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*sphere_to_V1)(double, double, double, double *);
+    void (WVFStudy::*sphere_to_V1)(double, double, double, double *) = nullptr;
     /**
      * Sphere coordinates to V2 chart coordinates
      *
@@ -746,7 +747,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*sphere_to_V2)(double, double, double, double *);
+    void (WVFStudy::*sphere_to_V2)(double, double, double, double *) = nullptr;
 
     /**
      * Sphere coordinates to R2 coordinates
@@ -755,7 +756,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*sphere_to_R2)(double, double, double, double *);
+    void (WVFStudy::*sphere_to_R2)(double, double, double, double *) = nullptr;
     /**
      * R2 coordinates to sphere coordinates
      *
@@ -763,7 +764,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_charts.cc.
      */
-    void (WVFStudy::*R2_to_sphere)(double, double, double *);
+    void (WVFStudy::*R2_to_sphere)(double, double, double *) = nullptr;
     /**
      * Integrate an orbit in the current sphere
      *
@@ -773,7 +774,7 @@ class WVFStudy
      */
     void (WVFStudy::*integrate_sphere_orbit)(double, double, double, double *,
                                              double *, int *, int *, double,
-                                             double);
+                                             double) = nullptr;
     /**
      * Evaluate a limit cycle in the current sphere
      *
@@ -781,7 +782,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_p4.cc.
      */
-    double (WVFStudy::*eval_lc)(double *, double, double, double);
+    double (WVFStudy::*eval_lc)(double *, double, double, double) = nullptr;
     /**
      * Less method for current sphere
      *
@@ -789,7 +790,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_p4.cc.
      */
-    bool (WVFStudy::*less2)(double *, double *);
+    bool (WVFStudy::*less2)(double *, double *) = nullptr;
     /**
      * Change direction in current sphere
      *
@@ -797,7 +798,7 @@ class WVFStudy
      * on the current sphere used). The functions are implemented in
      * math_changedir.h.
      */
-    int (WVFStudy::*change_dir)(double *);
+    int (WVFStudy::*change_dir)(double *) = nullptr;
 
     // initialization and destruction of structures
 
@@ -929,7 +930,7 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    //void deleteLimitCycle(orbits *o);
+    // void deleteLimitCycle(orbits *o);
     /**
      * Delete the orbits points linked list
      *
@@ -953,7 +954,7 @@ class WVFStudy
      *
      * This function is called by deleteVF()
      */
-    //void deleteOrbit(orbits *o);
+    // void deleteOrbit(orbits *o);
 
     // reading of the Maple/Reduce results
 
