@@ -59,11 +59,11 @@
  * Linked list of lines (pairs of points)
  */
 struct P4POLYLINES {
-    double x1;         ///< coord 1 of point 1
-    double y1;         ///< coord 2 of point 1
-    double x2;         ///< coord 1 of point 2
-    double y2;         ///< coord 2 of point 2
-    P4POLYLINES *next; ///< next struct P4POLYLINES (linked list)
+    double x1; ///< coord 1 of point 1
+    double y1; ///< coord 2 of point 1
+    double x2; ///< coord 1 of point 2
+    double y2; ///< coord 2 of point 2
+    // P4POLYLINES *next; ///< next struct P4POLYLINES (linked list)
 };
 
 // parameters in the plot window (including parameters for the Runge-Kutta 7/8
